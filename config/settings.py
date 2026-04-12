@@ -155,7 +155,10 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # Security (production)
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # Railway handles HTTPS at edge — don't redirect inside Django
+    # (breaks Railway healthchecks which use internal HTTP)
+    SECURE_SSL_REDIRECT = False
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
@@ -163,7 +166,6 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     X_FRAME_OPTIONS = "DENY"
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
