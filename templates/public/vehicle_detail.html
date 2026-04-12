@@ -39,17 +39,17 @@
 {% endblock %}
 
 {% block content %}
-<section class="pt-8 pb-24 px-8 max-w-screen-2xl mx-auto">
+<section class="pt-4 sm:pt-8 pb-12 sm:pb-24 px-4 sm:px-8 max-w-screen-2xl mx-auto">
     <!-- Breadcrumb -->
-    <div class="mb-8">
-        <div class="flex items-center gap-2 text-sm text-on-surface-variant">
+    <div class="mb-4 sm:mb-8">
+        <div class="flex items-center gap-2 text-xs sm:text-sm text-on-surface-variant">
             <a href="{% url 'vehicle_list' %}" class="hover:text-primary">Fleet</a>
             <span class="material-symbols-outlined text-sm">chevron_right</span>
             <span>{{ vehicle.name }}</span>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-[60%_1fr] gap-16 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-[60%_1fr] gap-8 lg:gap-16 items-start">
         <!-- Left: Gallery -->
         <div x-data="{ activeImage: 0 }">
             <!-- Main Image -->
@@ -90,9 +90,9 @@
 
             <!-- Features -->
             {% if vehicle.features %}
-            <div class="mt-12 bg-surface-container-low rounded-2xl p-8">
+            <div class="mt-8 sm:mt-12 bg-surface-container-low rounded-2xl p-5 sm:p-8">
                 <h3 class="text-sm font-extrabold uppercase tracking-widest text-primary mb-6">Included Features</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-y-6 gap-x-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6 sm:gap-y-6 sm:gap-x-8">
                     {% for feature in vehicle.features %}
                     <div class="flex items-center gap-3">
                         <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
@@ -111,12 +111,12 @@
                 {% if vehicle.category %}
                 <p class="text-primary font-label text-xs tracking-[0.2em] uppercase mb-2">{{ vehicle.category.name }}</p>
                 {% endif %}
-                <h1 class="text-3xl md:text-4xl font-serif font-bold mb-2">{{ vehicle.name }}</h1>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-2">{{ vehicle.name }}</h1>
                 <p class="text-on-surface-variant">{{ vehicle.brand }} {{ vehicle.model }}{% if vehicle.year %} &middot; {{ vehicle.year }}{% endif %}</p>
             </div>
 
             <!-- Price Card -->
-            <div class="bg-primary-fixed p-8 rounded-xl">
+            <div class="bg-primary-fixed p-5 sm:p-8 rounded-xl">
                 <!-- Primary price -->
                 <p class="text-3xl font-serif font-bold text-primary">{{ vehicle.primary_price_value|inr }}<span class="text-sm font-sans font-normal text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></p>
 
@@ -281,8 +281,8 @@
 
     {% if related_vehicles %}
     <!-- Related Vehicles -->
-    <div class="mt-24">
-        <h2 class="text-3xl font-serif font-bold mb-8">Similar Vehicles</h2>
+    <div class="mt-12 sm:mt-24">
+        <h2 class="text-xl sm:text-3xl font-serif font-bold mb-6 sm:mb-8">Similar Vehicles</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {% for vehicle in related_vehicles %}
                 {% include "public/includes/vehicle_card.html" %}

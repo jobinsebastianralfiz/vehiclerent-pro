@@ -230,7 +230,38 @@
                     <div>
                         <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Thumbnail Image</label>
                         {% if vehicle.thumbnail %}<img src="{{ vehicle.thumbnail.url }}" alt="" class="w-24 h-24 rounded-lg object-cover mb-2"/>{% endif %}
-                        <input type="file" name="thumbnail" accept="image/*" class="text-sm"/>
+                        <input type="file" name="thumbnail" accept="image/*" class="text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery Images -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+                <div class="col-span-1">
+                    <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Gallery Images</p>
+                    <p class="text-xs text-stone-400 mt-1">Upload multiple images. These appear in the vehicle detail carousel.</p>
+                </div>
+                <div class="lg:col-span-2 space-y-4">
+                    {% if vehicle.images.all %}
+                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 mb-4">
+                        {% for img in vehicle.images.all %}
+                        <div class="relative aspect-square rounded-xl overflow-hidden border border-stone-100 group">
+                            <img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover"/>
+                            {% if img.is_primary %}
+                            <span class="absolute top-1.5 left-1.5 bg-primary text-white text-[8px] font-bold px-1.5 py-0.5 rounded">PRIMARY</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <p class="text-xs text-stone-400">{{ vehicle.images.count }} image{{ vehicle.images.count|pluralize }} uploaded. <a href="{% url 'vehicle_images' vehicle.pk %}" class="text-primary hover:underline">Manage gallery</a> to set primary, reorder, or delete.</p>
+                    {% endif %}
+
+                    <div x-data="{ files: [] }" class="border-2 border-dashed border-stone-200 rounded-xl p-6 sm:p-8 text-center hover:border-primary/40 transition-colors">
+                        <span class="material-symbols-outlined text-4xl text-stone-300 mb-3">add_photo_alternate</span>
+                        <p class="text-sm font-medium text-stone-600 mb-1">Drop images here or click to browse</p>
+                        <p class="text-xs text-stone-400 mb-4">PNG, JPG up to 10MB each. Select multiple files.</p>
+                        <input type="file" name="gallery_images" accept="image/*" multiple class="text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary file:text-white hover:file:bg-primary-container cursor-pointer" x-on:change="files = Array.from($event.target.files)"/>
+                        <div x-show="files.length > 0" class="mt-4 text-sm text-primary font-medium" x-text="files.length + ' file(s) selected'"></div>
                     </div>
                 </div>
             </div>

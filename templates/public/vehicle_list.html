@@ -4,68 +4,66 @@
 {% block title %}Our Fleet - {{ BUSINESS_NAME }}{% endblock %}
 
 {% block content %}
-<section class="pt-8 pb-24 px-8 max-w-screen-2xl mx-auto">
+<section class="pt-4 sm:pt-8 pb-12 sm:pb-24 px-4 sm:px-8 max-w-screen-2xl mx-auto">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 gap-4">
         <div>
-            <p class="text-primary font-label text-xs tracking-[0.2em] mb-4 uppercase">Exclusive Selection</p>
-            <h1 class="text-4xl md:text-5xl font-headline font-bold">Our Fleet</h1>
-            <p class="text-on-surface-variant mt-2">{{ total_count }} vehicle{{ total_count|pluralize }} available</p>
+            <p class="text-primary font-label text-[10px] sm:text-xs tracking-[0.2em] mb-2 sm:mb-4 uppercase">Exclusive Selection</p>
+            <h1 class="text-2xl sm:text-4xl md:text-5xl font-headline font-bold">Our Fleet</h1>
+            <p class="text-on-surface-variant text-sm mt-1 sm:mt-2">{{ total_count }} vehicle{{ total_count|pluralize }} available</p>
         </div>
-        <div class="mt-4 md:mt-0 flex items-center gap-4">
-            <div class="relative">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-lg">search</span>
-                <form method="get" action="{% url 'vehicle_list' %}">
-                    <input type="text" name="search" value="{{ search }}" placeholder="Search by name or brand..." class="pl-10 pr-4 py-3 bg-surface-container-low rounded-full text-sm focus:ring-1 focus:ring-primary focus:outline-none w-64 ghost-border"/>
-                </form>
-            </div>
+        <div class="relative w-full md:w-auto">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-lg">search</span>
+            <form method="get" action="{% url 'vehicle_list' %}">
+                <input type="text" name="search" value="{{ search }}" placeholder="Search by name or brand..." class="pl-10 pr-4 py-3 bg-surface-container-low rounded-full text-sm focus:ring-1 focus:ring-primary focus:outline-none w-full md:w-64 ghost-border"/>
+            </form>
         </div>
     </div>
 
     <!-- Filters -->
-    <div x-data="{ showFilters: false }" class="mb-10">
-        <button x-on:click="showFilters = !showFilters" class="flex items-center gap-2 text-sm font-medium text-on-surface-variant hover:text-primary transition-colors mb-4">
+    <div x-data="{ showFilters: false }" class="mb-6 sm:mb-10">
+        <button x-on:click="showFilters = !showFilters" class="flex items-center gap-2 text-sm font-medium text-on-surface-variant hover:text-primary transition-colors mb-3">
             <span class="material-symbols-outlined text-lg">tune</span>
             <span x-text="showFilters ? 'Hide Filters' : 'Show Filters'">Show Filters</span>
         </button>
-        <div x-show="showFilters" x-transition class="grid grid-cols-2 md:grid-cols-6 gap-4">
+        <div x-show="showFilters" x-transition class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             <form method="get" action="{% url 'vehicle_list' %}" class="contents" id="filter-form">
                 {% if search %}<input type="hidden" name="search" value="{{ search }}"/>{% endif %}
-                <select name="type" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-sm ghost-border py-3 px-4 bg-white focus:ring-1 focus:ring-primary">
+                <select name="type" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-xs sm:text-sm ghost-border py-2.5 sm:py-3 px-3 bg-white focus:ring-1 focus:ring-primary">
                     <option value="">All Types</option>
                     {% for val, label in vehicle_types %}
                     <option value="{{ val }}" {% if current_type == val %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
-                <select name="category" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-sm ghost-border py-3 px-4 bg-white focus:ring-1 focus:ring-primary">
+                <select name="category" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-xs sm:text-sm ghost-border py-2.5 sm:py-3 px-3 bg-white focus:ring-1 focus:ring-primary">
                     <option value="">All Categories</option>
                     {% for cat in categories %}
                     <option value="{{ cat.id }}" {% if current_category == cat.id|stringformat:"d" %}selected{% endif %}>{{ cat.name }}</option>
                     {% endfor %}
                 </select>
-                <select name="brand" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-sm ghost-border py-3 px-4 bg-white focus:ring-1 focus:ring-primary">
+                <select name="brand" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-xs sm:text-sm ghost-border py-2.5 sm:py-3 px-3 bg-white focus:ring-1 focus:ring-primary">
                     <option value="">All Brands</option>
                     {% for b in brands %}
                     <option value="{{ b }}" {% if current_brand == b %}selected{% endif %}>{{ b }}</option>
                     {% endfor %}
                 </select>
-                <select name="fuel" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-sm ghost-border py-3 px-4 bg-white focus:ring-1 focus:ring-primary">
-                    <option value="">All Fuel Types</option>
+                <select name="fuel" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-xs sm:text-sm ghost-border py-2.5 sm:py-3 px-3 bg-white focus:ring-1 focus:ring-primary">
+                    <option value="">All Fuel</option>
                     {% for val, label in fuel_types %}
                     <option value="{{ val }}" {% if current_fuel == val %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
-                <select name="rental" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-sm ghost-border py-3 px-4 bg-white focus:ring-1 focus:ring-primary">
-                    <option value="">All Rental Plans</option>
+                <select name="rental" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-xs sm:text-sm ghost-border py-2.5 sm:py-3 px-3 bg-white focus:ring-1 focus:ring-primary">
+                    <option value="">All Plans</option>
                     {% for val, label in rental_modes %}
                     <option value="{{ val }}" {% if current_rental == val %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
-                <select name="sort" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-sm ghost-border py-3 px-4 bg-white focus:ring-1 focus:ring-primary">
-                    <option value="-created" {% if current_sort == '-created' %}selected{% endif %}>Newest First</option>
-                    <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Price: Low to High</option>
-                    <option value="-price" {% if current_sort == '-price' %}selected{% endif %}>Price: High to Low</option>
-                    <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name: A to Z</option>
+                <select name="sort" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-xs sm:text-sm ghost-border py-2.5 sm:py-3 px-3 bg-white focus:ring-1 focus:ring-primary">
+                    <option value="-created" {% if current_sort == '-created' %}selected{% endif %}>Newest</option>
+                    <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Price: Low</option>
+                    <option value="-price" {% if current_sort == '-price' %}selected{% endif %}>Price: High</option>
+                    <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name: A-Z</option>
                 </select>
             </form>
         </div>
@@ -73,7 +71,7 @@
 
     <!-- Vehicle Grid -->
     {% if page_obj %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
         {% for vehicle in page_obj %}
             {% include "public/includes/vehicle_card.html" %}
         {% endfor %}
@@ -81,11 +79,11 @@
 
     {% include "public/includes/pagination.html" %}
     {% else %}
-    <div class="text-center py-24">
-        <span class="material-symbols-outlined text-6xl text-outline/30 mb-4">search_off</span>
-        <h3 class="text-2xl font-serif font-bold mb-2">No Vehicles Found</h3>
-        <p class="text-on-surface-variant mb-6">Try adjusting your filters or search query.</p>
-        <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-8 py-3 rounded-full font-medium">Clear Filters</a>
+    <div class="text-center py-16 sm:py-24">
+        <span class="material-symbols-outlined text-5xl text-outline/30 mb-4">search_off</span>
+        <h3 class="text-xl sm:text-2xl font-serif font-bold mb-2">No Vehicles Found</h3>
+        <p class="text-on-surface-variant text-sm mb-6">Try adjusting your filters or search.</p>
+        <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-6 py-3 rounded-full font-medium text-sm">Clear Filters</a>
     </div>
     {% endif %}
 </section>

@@ -1,8 +1,8 @@
 {% load vehicle_tags %}
-<footer class="bg-stone-100 w-full py-16 mt-24" id="contact" role="contentinfo" aria-label="Site footer">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-12 px-8 max-w-7xl mx-auto">
+<footer class="bg-stone-100 w-full py-10 sm:py-16 mt-12 sm:mt-24" id="contact" role="contentinfo" aria-label="Site footer">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 px-4 sm:px-8 max-w-7xl mx-auto">
         <!-- Brand -->
-        <div class="col-span-2 md:col-span-1">
+        <div class="sm:col-span-2 lg:col-span-1">
             <div class="font-serif font-bold text-on-surface text-2xl mb-6">{{ BUSINESS_NAME }}</div>
             <p class="text-stone-600 text-sm tracking-wide leading-relaxed mb-6">
                 Premium vehicle rental service. Flexible daily, weekly & monthly plans for cars, SUVs, bikes and more.
@@ -71,21 +71,17 @@
     </div>
 
     <!-- Bottom Bar -->
-    <div class="max-w-7xl mx-auto px-8 pt-16 border-t border-stone-200 mt-16">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-stone-500 text-sm tracking-wide">&copy; {% now "Y" %} {{ BUSINESS_NAME }}. All rights reserved.</p>
-            <div class="flex items-center gap-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-8 pt-8 sm:pt-16 border-t border-stone-200 mt-8 sm:mt-16">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p class="text-stone-500 text-xs sm:text-sm tracking-wide text-center sm:text-left">&copy; {% now "Y" %} {{ BUSINESS_NAME }}. All rights reserved.</p>
+            <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
                 <a href="{% url 'terms' %}" class="text-stone-500 text-xs hover:text-primary transition-colors">Terms</a>
                 <a href="{% url 'privacy' %}" class="text-stone-500 text-xs hover:text-primary transition-colors">Privacy</a>
                 <a href="{% url 'faq' %}" class="text-stone-500 text-xs hover:text-primary transition-colors">FAQ</a>
-
-                <!-- Accessibility Controls -->
-                <div class="flex items-center gap-2 ml-4 border-l border-stone-300 pl-4">
-                    <button onclick="document.documentElement.style.fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) + 1 + 'px'" aria-label="Increase text size" class="w-8 h-8 rounded-full bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-sm font-bold transition-colors" title="Increase text size">A+</button>
-                    <button onclick="document.documentElement.style.fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) - 1 + 'px'" aria-label="Decrease text size" class="w-8 h-8 rounded-full bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-xs font-bold transition-colors" title="Decrease text size">A-</button>
-                    <button onclick="document.documentElement.style.fontSize = ''" aria-label="Reset text size" class="w-8 h-8 rounded-full bg-stone-200 hover:bg-stone-300 flex items-center justify-center transition-colors" title="Reset text size">
-                        <span class="material-symbols-outlined text-sm" aria-hidden="true">restart_alt</span>
-                    </button>
+                <div class="flex items-center gap-1.5 border-l border-stone-300 pl-4">
+                    <button onclick="document.documentElement.style.fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) + 1 + 'px'" aria-label="Increase text size" class="w-7 h-7 rounded-full bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-xs font-bold transition-colors">A+</button>
+                    <button onclick="document.documentElement.style.fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) - 1 + 'px'" aria-label="Decrease text size" class="w-7 h-7 rounded-full bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-[10px] font-bold transition-colors">A-</button>
+                    <button onclick="document.documentElement.style.fontSize = ''" aria-label="Reset text size" class="w-7 h-7 rounded-full bg-stone-200 hover:bg-stone-300 flex items-center justify-center transition-colors"><span class="material-symbols-outlined text-xs" aria-hidden="true">restart_alt</span></button>
                 </div>
             </div>
         </div>

@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 from .models import Vehicle, VehicleCategory, VehicleImage
 
@@ -9,12 +11,27 @@ class VehicleForm(forms.ModelForm):
         widgets = {
             "description": forms.Textarea(attrs={"rows": 4}),
             "short_description": forms.Textarea(attrs={"rows": 2}),
-            "features": forms.Textarea(attrs={"rows": 3, "placeholder": '["AC", "GPS", "Bluetooth"]'}),
+            "features": forms.HiddenInput(),
             "vehicle_type": forms.Select(),
             "fuel_type": forms.Select(),
             "transmission": forms.Select(),
             "status": forms.Select(),
         }
+
+    def clean_features(self):
+        """Accept JSON string from the Alpine.js chips component."""
+        value = self.cleaned_data.get("features")
+        if not value:
+            return []
+        if isinstance(value, list):
+            return value
+        try:
+            parsed = json.loads(value)
+            if isinstance(parsed, list):
+                return parsed
+        except (json.JSONDecodeError, TypeError):
+            pass
+        return []
 
 
 class CategoryForm(forms.ModelForm):

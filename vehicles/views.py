@@ -122,14 +122,28 @@ def vehicle_manage_list(request):
     })
 
 
+def _save_gallery_images(request, vehicle):
+    """Save multiple uploaded gallery images to a vehicle."""
+    files = request.FILES.getlist("gallery_images")
+    start_order = vehicle.images.count()
+    for i, f in enumerate(files):
+        VehicleImage.objects.create(
+            vehicle=vehicle,
+            image=f,
+            display_order=start_order + i,
+        )
+
+
 @login_required
 def vehicle_add(request):
     if request.method == "POST":
         form = VehicleForm(request.POST, request.FILES)
         if form.is_valid():
             vehicle = form.save()
-            messages.success(request, f"Vehicle '{vehicle.name}' created successfully.")
-            return redirect("vehicle_images", pk=vehicle.pk)
+            _save_gallery_images(request, vehicle)
+            img_count = request.FILES.getlist("gallery_images")
+            messages.success(request, f"Vehicle '{vehicle.name}' created with {len(img_count)} gallery image(s).")
+            return redirect("vehicle_manage_list")
     else:
         form = VehicleForm()
 
@@ -143,6 +157,7 @@ def vehicle_edit(request, pk):
         form = VehicleForm(request.POST, request.FILES, instance=vehicle)
         if form.is_valid():
             form.save()
+            _save_gallery_images(request, vehicle)
             messages.success(request, f"Vehicle '{vehicle.name}' updated successfully.")
             return redirect("vehicle_manage_list")
     else:
