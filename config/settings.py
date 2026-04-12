@@ -10,12 +10,16 @@ SECRET_KEY = config("SECRET_KEY", default="django-insecure-dev-key-change-in-pro
 DEBUG = config("DEBUG", default=True, cast=bool)
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 
-# Railway sets RAILWAY_PUBLIC_DOMAIN
+# Railway auto-sets RAILWAY_PUBLIC_DOMAIN
 RAILWAY_DOMAIN = os.environ.get("RAILWAY_PUBLIC_DOMAIN")
 if RAILWAY_DOMAIN:
     ALLOWED_HOSTS.append(RAILWAY_DOMAIN)
+    ALLOWED_HOSTS.append(".railway.app")
 
-CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
+CSRF_TRUSTED_ORIGINS = []
+_csrf_origins = config("CSRF_TRUSTED_ORIGINS", default="")
+if _csrf_origins:
+    CSRF_TRUSTED_ORIGINS = [o.strip() for o in _csrf_origins.split(",") if o.strip()]
 if RAILWAY_DOMAIN:
     CSRF_TRUSTED_ORIGINS.append(f"https://{RAILWAY_DOMAIN}")
 
@@ -110,7 +114,7 @@ STORAGES = {
     },
 }
 
-# Media files — Railway volume mount at /data/media
+# Media files — Railway volume mount
 MEDIA_URL = "/media/"
 RAILWAY_VOLUME_MOUNT = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH", "")
 if RAILWAY_VOLUME_MOUNT:
