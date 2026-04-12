@@ -1,0 +1,103 @@
+{% extends "public/base_public.html" %}
+
+{% block title %}Terms of Service - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Terms of Service for {{ BUSINESS_NAME }}. Read our rental terms, conditions, cancellation policy, and liability information.{% endblock %}
+
+{% block content %}
+<article class="py-12 px-8 max-w-4xl mx-auto" aria-label="Terms of Service">
+    <header class="mb-16">
+        <p class="text-primary font-label text-xs tracking-[0.2em] mb-4 uppercase">Legal</p>
+        <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">Terms of Service</h1>
+        <p class="text-on-surface-variant">Last updated: {% now "F j, Y" %}</p>
+    </header>
+
+    <div class="prose-content space-y-12 text-on-surface-variant leading-relaxed">
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">1. Acceptance of Terms</h2>
+            <p>By accessing and using the {{ BUSINESS_NAME }} website and services, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.</p>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">2. Rental Agreement</h2>
+            <p class="mb-4">All vehicle rentals are subject to the following conditions:</p>
+            <ul class="list-disc pl-6 space-y-2">
+                <li>The renter must be at least 21 years of age and hold a valid driving license.</li>
+                <li>A valid government-issued photo ID (Aadhaar, Passport, Voter ID) is required at the time of pickup.</li>
+                <li>Rental rates are confirmed at the time of booking and are inclusive of the vehicle only. Fuel, tolls, and parking are the renter's responsibility.</li>
+                <li>The vehicle must be returned in the same condition as it was received, with normal wear and tear excepted.</li>
+                <li>Any damage to the vehicle during the rental period is the renter's responsibility.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">3. Security Deposit</h2>
+            <p>A refundable security deposit may be collected at the time of vehicle pickup. The deposit amount varies by vehicle type and will be communicated at the time of booking. The deposit will be refunded upon satisfactory return of the vehicle, minus any applicable deductions for damage, fines, or excess usage.</p>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">4. Cancellation Policy</h2>
+            <ul class="list-disc pl-6 space-y-2">
+                <li><strong>More than 48 hours before pickup:</strong> Full refund of any advance payment.</li>
+                <li><strong>24-48 hours before pickup:</strong> 50% refund of advance payment.</li>
+                <li><strong>Less than 24 hours before pickup:</strong> No refund.</li>
+                <li>No-shows will forfeit the entire advance payment.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">5. Prohibited Use</h2>
+            <p class="mb-4">Rented vehicles must not be used for:</p>
+            <ul class="list-disc pl-6 space-y-2">
+                <li>Any illegal activity or purpose.</li>
+                <li>Sub-leasing or renting to a third party.</li>
+                <li>Racing, off-roading (unless the vehicle is designated for such use), or reckless driving.</li>
+                <li>Transporting hazardous materials.</li>
+                <li>Driving under the influence of alcohol or drugs.</li>
+                <li>Crossing state or national borders without prior written consent.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">6. Liability</h2>
+            <p>{{ BUSINESS_NAME }} shall not be held liable for any loss, injury, or damage arising from the use of rented vehicles, except where such loss is directly caused by our negligence. Renters are advised to exercise due care and follow all applicable traffic laws.</p>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">7. Insurance</h2>
+            <p>Basic third-party insurance is included in all rentals as required by law. Comprehensive insurance may be available as an add-on. The renter is responsible for any costs not covered by the insurance policy, including deductibles.</p>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">8. Late Returns</h2>
+            <p>Vehicles must be returned by the agreed-upon date and time. Late returns will be charged at the applicable daily rate plus a 25% surcharge for each additional day or part thereof.</p>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">9. Modifications to Terms</h2>
+            <p>{{ BUSINESS_NAME }} reserves the right to modify these terms at any time. Changes will be posted on this page with an updated revision date. Continued use of our services after changes constitutes acceptance of the modified terms.</p>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">10. Governing Law</h2>
+            <p>These terms shall be governed by and construed in accordance with the laws of India. Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the courts in Kerala, India.</p>
+        </section>
+
+        <section class="bg-surface-container-low rounded-2xl p-8">
+            <h2 class="text-xl font-serif font-bold text-on-surface mb-3">Questions?</h2>
+            <p class="mb-4">If you have any questions about these terms, please contact us:</p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                {% if BUSINESS_EMAIL %}
+                <a href="mailto:{{ BUSINESS_EMAIL }}" class="flex items-center gap-2 text-primary font-medium hover:underline">
+                    <span class="material-symbols-outlined text-lg" aria-hidden="true">mail</span> {{ BUSINESS_EMAIL }}
+                </a>
+                {% endif %}
+                {% if BUSINESS_PHONE %}
+                <a href="tel:{{ BUSINESS_PHONE }}" class="flex items-center gap-2 text-primary font-medium hover:underline">
+                    <span class="material-symbols-outlined text-lg" aria-hidden="true">call</span> {{ BUSINESS_PHONE }}
+                </a>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</article>
+{% endblock %}

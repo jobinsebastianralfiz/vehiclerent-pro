@@ -1,0 +1,11 @@
+<div class="bg-white rounded-2xl p-6 border border-stone-100">
+    <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center {{ bg_color|default:'bg-blue-50' }}">
+            <span class="material-symbols-outlined text-xl {{ icon_color|default:'text-blue-600' }}">{{ icon }}</span>
+        </div>
+        <div>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-stone-500">{{ label }}</p>
+            <p class="text-2xl font-bold text-stone-900">{{ value }}</p>
+        </div>
+    </div>
+</div>

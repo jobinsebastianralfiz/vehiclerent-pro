@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login - {{ BUSINESS_NAME }}{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center bg-surface px-4">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-serif font-bold text-on-surface mb-2">{{ BUSINESS_NAME }}</h1>
+            <p class="text-on-surface-variant text-sm">Sign in to your admin panel</p>
+        </div>
+        <div class="bg-white rounded-2xl p-8 shadow-sm border border-outline-variant/10">
+            {% if error %}
+            <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 text-red-800 mb-6 text-sm">
+                <span class="material-symbols-outlined text-lg">error</span>
+                {{ error }}
+            </div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="space-y-5">
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Email Address</label>
+                        <input type="email" name="email" required autofocus value="{{ form.email.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary py-3 px-4" placeholder="admin@example.com"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Password</label>
+                        <input type="password" name="password" required class="w-full border-stone-200 rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary py-3 px-4" placeholder="Enter your password"/>
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-on-primary py-3 rounded-full font-bold hover:bg-primary-container transition-colors">Sign In</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

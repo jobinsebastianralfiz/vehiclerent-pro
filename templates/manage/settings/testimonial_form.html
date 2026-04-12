@@ -1,0 +1,69 @@
+{% extends "manage/base_admin.html" %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <a href="{% url 'testimonial_list' %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
+        <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Testimonials
+    </a>
+</div>
+
+<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+    <div class="px-8 py-6 border-b border-stone-100">
+        <h2 class="text-xl font-bold">{{ title }}</h2>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="p-8">
+        {% csrf_token %}
+        {% if form.errors %}<div class="mb-8 px-4 py-3 rounded-xl bg-red-50 text-red-800 text-sm">{{ form.errors }}</div>{% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Testimonial</p>
+                <p class="text-xs text-stone-400 mt-1">Customer review details</p>
+            </div>
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Customer Name *</label>
+                    <input type="text" name="name" value="{{ form.name.value|default:'' }}" required class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Role / Title</label>
+                    <input type="text" name="role" value="{{ form.role.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. Business Owner, Tourist"/>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Quote *</label>
+                    <textarea name="quote" rows="3" required class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="What the customer said...">{{ form.quote.value|default:'' }}</textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Photo</label>
+                    {% if testimonial.photo %}<img src="{{ testimonial.photo.url }}" alt="" class="w-16 h-16 rounded-full object-cover mb-2"/>{% endif %}
+                    <input type="file" name="photo" accept="image/*" class="text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Rating (1-5)</label>
+                    <select name="rating" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">
+                        {% for i in "54321" %}<option value="{{ i }}" {% if form.rating.value|stringformat:"d" == i %}selected{% endif %}>{{ i }} Star{{ i|pluralize }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Display Order</label>
+                    <input type="number" name="display_order" value="{{ form.display_order.value|default:'0' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div class="flex items-center pt-6">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="is_active" {% if form.is_active.value %}checked{% endif %} class="rounded border-stone-300 text-primary focus:ring-primary"/>
+                        <span class="text-sm font-medium">Active (visible on website)</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-4 pt-8 border-t border-stone-100">
+            <a href="{% url 'testimonial_list' %}" class="px-6 py-3 bg-stone-100 text-stone-700 rounded-full font-medium">Cancel</a>
+            <button type="submit" class="px-8 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors">Save Testimonial</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

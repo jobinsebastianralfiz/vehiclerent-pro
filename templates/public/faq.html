@@ -1,0 +1,84 @@
+{% extends "public/base_public.html" %}
+
+{% block title %}Frequently Asked Questions - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Frequently asked questions about {{ BUSINESS_NAME }} vehicle rentals. Find answers about booking, documents, cancellation, deposits, and more.{% endblock %}
+
+{% block structured_data %}
+{{ block.super }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {% for item in faq_items %}
+        {
+            "@type": "Question",
+            "name": "{{ item.q }}",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "{{ item.a }}"
+            }
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="py-12 px-8 max-w-4xl mx-auto" aria-label="Frequently Asked Questions">
+    <header class="mb-16 text-center">
+        <p class="text-primary font-label text-xs tracking-[0.2em] mb-4 uppercase">Help Center</p>
+        <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">Frequently Asked Questions</h1>
+        <p class="text-on-surface-variant max-w-2xl mx-auto">Find quick answers to common questions about our vehicle rental services. Can't find what you're looking for? <a href="{% url 'contact' %}" class="text-primary font-medium hover:underline">Contact us</a>.</p>
+    </header>
+
+    <div class="space-y-4" role="list">
+        {% for item in faq_items %}
+        <div x-data="{ open: {% if forloop.first %}true{% else %}false{% endif %} }" class="bg-white rounded-2xl border border-outline-variant/10 overflow-hidden" role="listitem">
+            <button x-on:click="open = !open" class="w-full flex items-center justify-between px-8 py-6 text-left hover:bg-stone-50 transition-colors" aria-expanded="false" x-bind:aria-expanded="open.toString()">
+                <h2 class="text-lg font-serif font-bold text-on-surface pr-4">{{ item.q }}</h2>
+                <span class="material-symbols-outlined text-primary transition-transform duration-300 flex-shrink-0" x-bind:class="open ? 'rotate-180' : ''" aria-hidden="true">expand_more</span>
+            </button>
+            <div x-show="open" x-collapse x-cloak>
+                <div class="px-8 pb-6 text-on-surface-variant leading-relaxed">
+                    {{ item.a|safe }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- CTA -->
+    <div class="mt-16 bg-primary-fixed rounded-2xl p-8 md:p-12 text-center">
+        <h2 class="text-2xl font-serif font-bold text-primary mb-3">Still have questions?</h2>
+        <p class="text-on-surface-variant mb-8 max-w-lg mx-auto">Our team is happy to help. Reach out to us via WhatsApp, email, or phone.</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="{% url 'contact' %}" class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold hover:bg-primary-container transition-colors inline-flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-lg" aria-hidden="true">mail</span> Contact Us
+            </a>
+            {% if WHATSAPP_NUMBER %}
+            {% load vehicle_tags %}
+            <a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="bg-[#25D366] text-white px-8 py-3 rounded-full font-bold hover:opacity-90 transition-opacity inline-flex items-center justify-center gap-2">
+                WhatsApp Us
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</article>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Alpine.js collapse plugin (inline lightweight version)
+    document.addEventListener('alpine:init', () => {
+        Alpine.directive('collapse', (el) => {
+            el.style.overflow = 'hidden';
+            let full = el.scrollHeight;
+            Alpine.bind(el, {
+                'x-show'() { return true; },
+            });
+        });
+    });
+</script>
+{% endblock %}

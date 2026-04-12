@@ -1,0 +1,149 @@
+{% extends "public/base_public.html" %}
+{% load vehicle_tags %}
+
+{% block title %}{{ config.about_title }} - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Learn about {{ BUSINESS_NAME }}. Our mission, vision, licenses, and the team behind your trusted vehicle rental service.{% endblock %}
+
+{% block content %}
+<article class="py-12" aria-label="About Us">
+
+    <!-- Hero -->
+    <header class="px-8 max-w-screen-2xl mx-auto mb-16">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <p class="text-primary font-label text-xs tracking-[0.2em] mb-4 uppercase">About Us</p>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold leading-tight mb-6">{{ config.about_title }}</h1>
+                {% if config.about_content %}
+                <div class="text-on-surface-variant leading-relaxed space-y-4">{{ config.about_content|safe }}</div>
+                {% else %}
+                <p class="text-on-surface-variant leading-relaxed">{{ BUSINESS_NAME }} is a trusted vehicle rental service providing quality cars, SUVs, bikes, and more. We're committed to making transportation accessible, affordable, and reliable for everyone.</p>
+                {% endif %}
+            </div>
+            <div>
+                {% if config.about_image %}
+                <img src="{{ config.about_image.url }}" alt="About {{ BUSINESS_NAME }}" class="w-full rounded-2xl object-cover aspect-[4/3]" loading="lazy"/>
+                {% else %}
+                <div class="w-full rounded-2xl bg-surface-container-low aspect-[4/3] flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[80px] text-outline/20">business</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats -->
+    {% if config.years_in_business or config.total_happy_customers %}
+    <section class="bg-primary py-16 px-8">
+        <div class="max-w-screen-2xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {% if config.years_in_business %}
+            <div>
+                <p class="text-4xl md:text-5xl font-serif font-bold text-on-primary">{{ config.years_in_business }}+</p>
+                <p class="text-primary-fixed text-sm mt-2 uppercase tracking-widest">Years Experience</p>
+            </div>
+            {% endif %}
+            {% if config.total_happy_customers %}
+            <div>
+                <p class="text-4xl md:text-5xl font-serif font-bold text-on-primary">{{ config.total_happy_customers }}+</p>
+                <p class="text-primary-fixed text-sm mt-2 uppercase tracking-widest">Happy Customers</p>
+            </div>
+            {% endif %}
+            <div>
+                <p class="text-4xl md:text-5xl font-serif font-bold text-on-primary">24/7</p>
+                <p class="text-primary-fixed text-sm mt-2 uppercase tracking-widest">Support</p>
+            </div>
+            <div>
+                <p class="text-4xl md:text-5xl font-serif font-bold text-on-primary">100%</p>
+                <p class="text-primary-fixed text-sm mt-2 uppercase tracking-widest">Verified Fleet</p>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Mission & Vision -->
+    {% if config.about_mission or config.about_vision %}
+    <section class="py-24 px-8 max-w-screen-2xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+            {% if config.about_mission %}
+            <div class="bg-surface-container-low rounded-2xl p-10">
+                <div class="bg-primary/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-primary text-2xl">flag</span>
+                </div>
+                <h2 class="text-2xl font-serif font-bold mb-4">Our Mission</h2>
+                <p class="text-on-surface-variant leading-relaxed">{{ config.about_mission }}</p>
+            </div>
+            {% endif %}
+            {% if config.about_vision %}
+            <div class="bg-surface-container-low rounded-2xl p-10">
+                <div class="bg-primary/10 w-14 h-14 rounded-full flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-primary text-2xl">visibility</span>
+                </div>
+                <h2 class="text-2xl font-serif font-bold mb-4">Our Vision</h2>
+                <p class="text-on-surface-variant leading-relaxed">{{ config.about_vision }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Licenses & Certifications -->
+    {% if config.license_number or config.license_details %}
+    <section class="py-24 px-8 bg-surface-container-low">
+        <div class="max-w-4xl mx-auto text-center">
+            <span class="material-symbols-outlined text-5xl text-primary mb-6">verified</span>
+            <h2 class="text-3xl font-serif font-bold mb-4">Licensed & Certified</h2>
+            {% if config.license_number %}
+            <p class="text-on-surface-variant mb-2">Registration No: <strong class="text-on-surface">{{ config.license_number }}</strong></p>
+            {% endif %}
+            {% if config.license_details %}
+            <div class="text-on-surface-variant leading-relaxed mt-6 text-left max-w-2xl mx-auto">{{ config.license_details|safe }}</div>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Testimonials -->
+    {% if testimonials %}
+    <section class="py-24 px-8">
+        <div class="max-w-screen-2xl mx-auto">
+            <div class="text-center mb-16">
+                <p class="text-primary font-label text-xs tracking-[0.2em] mb-4 uppercase">What Our Customers Say</p>
+                <h2 class="text-4xl font-serif font-bold">Customer Reviews</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for t in testimonials %}
+                <div class="bg-white rounded-2xl p-8 border border-outline-variant/10">
+                    <div class="flex items-center gap-1 text-amber-500 mb-4">
+                        {% for i in "12345" %}{% if forloop.counter <= t.rating %}<span>&#9733;</span>{% else %}<span class="text-stone-300">&#9734;</span>{% endif %}{% endfor %}
+                    </div>
+                    <p class="text-on-surface-variant leading-relaxed mb-6">"{{ t.quote }}"</p>
+                    <div class="flex items-center gap-3">
+                        {% if t.photo %}
+                        <img src="{{ t.photo.url }}" alt="{{ t.name }}" class="w-10 h-10 rounded-full object-cover"/>
+                        {% else %}
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">{{ t.name|first }}</div>
+                        {% endif %}
+                        <div>
+                            <p class="font-bold text-sm">{{ t.name }}</p>
+                            {% if t.role %}<p class="text-xs text-on-surface-variant">{{ t.role }}</p>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- CTA -->
+    <section class="py-24 px-8">
+        <div class="max-w-4xl mx-auto text-center bg-primary-fixed rounded-2xl p-12">
+            <h2 class="text-3xl font-serif font-bold text-primary mb-4">Ready to Hit the Road?</h2>
+            <p class="text-on-surface-variant mb-8">Browse our fleet and find the perfect vehicle for your needs.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold hover:bg-primary-container transition-colors">Browse Fleet</a>
+                <a href="{% url 'contact' %}" class="bg-white text-on-surface px-8 py-3 rounded-full font-bold hover:bg-stone-50 transition-colors">Contact Us</a>
+            </div>
+        </div>
+    </section>
+</article>
+{% endblock %}

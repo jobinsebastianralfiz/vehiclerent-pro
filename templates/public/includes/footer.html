@@ -1,0 +1,93 @@
+{% load vehicle_tags %}
+<footer class="bg-stone-100 w-full py-16 mt-24" id="contact" role="contentinfo" aria-label="Site footer">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-12 px-8 max-w-7xl mx-auto">
+        <!-- Brand -->
+        <div class="col-span-2 md:col-span-1">
+            <div class="font-serif font-bold text-on-surface text-2xl mb-6">{{ BUSINESS_NAME }}</div>
+            <p class="text-stone-600 text-sm tracking-wide leading-relaxed mb-6">
+                Premium vehicle rental service. Flexible daily, weekly & monthly plans for cars, SUVs, bikes and more.
+            </p>
+            {% if BUSINESS_ADDRESS %}
+            <div class="flex items-start gap-2 text-stone-600 text-sm">
+                <span class="material-symbols-outlined text-base mt-0.5 flex-shrink-0" aria-hidden="true">location_on</span>
+                <span>{{ BUSINESS_ADDRESS }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Fleet -->
+        <nav aria-label="Fleet categories">
+            <h6 class="font-serif font-bold text-on-surface text-sm mb-6">Fleet</h6>
+            <ul class="space-y-4" role="list">
+                <li><a class="text-stone-600 text-sm hover:underline underline-offset-4 transition-all duration-300" href="{% url 'vehicle_list' %}?type=car">Cars</a></li>
+                <li><a class="text-stone-600 text-sm hover:underline underline-offset-4 transition-all duration-300" href="{% url 'vehicle_list' %}?type=suv">SUVs</a></li>
+                <li><a class="text-stone-600 text-sm hover:underline underline-offset-4 transition-all duration-300" href="{% url 'vehicle_list' %}?type=bike">Bikes</a></li>
+                <li><a class="text-stone-600 text-sm hover:underline underline-offset-4 transition-all duration-300" href="{% url 'vehicle_list' %}?type=van">Vans</a></li>
+                <li><a class="text-stone-600 text-sm hover:underline underline-offset-4 transition-all duration-300" href="{% url 'vehicle_list' %}">View All</a></li>
+            </ul>
+        </nav>
+
+        <!-- Legal & Support -->
+        <nav aria-label="Legal and support links">
+            <h6 class="font-serif font-bold text-on-surface text-sm mb-6">Support</h6>
+            <ul class="space-y-4" role="list">
+                <li><a class="text-stone-600 text-sm hover:underline underline-offset-4 transition-all duration-300" href="{% url 'terms' %}">Terms of Service</a></li>
+                <li><a class="text-stone-600 text-sm hover:underline underline-offset-4 transition-all duration-300" href="{% url 'privacy' %}">Privacy Policy</a></li>
+                <li><a class="text-stone-600 text-sm hover:underline underline-offset-4 transition-all duration-300" href="{% url 'faq' %}">FAQ</a></li>
+                <li><a class="text-stone-600 text-sm hover:underline underline-offset-4 transition-all duration-300" href="{% url 'contact' %}">Contact Us</a></li>
+            </ul>
+        </nav>
+
+        <!-- Contact Info -->
+        <div>
+            <h6 class="font-serif font-bold text-on-surface text-sm mb-6">Get in Touch</h6>
+            <ul class="space-y-4" role="list">
+                {% if BUSINESS_PHONE %}
+                <li>
+                    <a href="tel:{{ BUSINESS_PHONE }}" class="flex items-center gap-2 text-stone-600 text-sm hover:text-primary transition-colors" aria-label="Call us at {{ BUSINESS_PHONE }}">
+                        <span class="material-symbols-outlined text-base" aria-hidden="true">call</span>
+                        {{ BUSINESS_PHONE }}
+                    </a>
+                </li>
+                {% endif %}
+                {% if BUSINESS_EMAIL %}
+                <li>
+                    <a href="mailto:{{ BUSINESS_EMAIL }}" class="flex items-center gap-2 text-stone-600 text-sm hover:text-primary transition-colors" aria-label="Email us at {{ BUSINESS_EMAIL }}">
+                        <span class="material-symbols-outlined text-base" aria-hidden="true">mail</span>
+                        {{ BUSINESS_EMAIL }}
+                    </a>
+                </li>
+                {% endif %}
+                {% if WHATSAPP_NUMBER %}
+                <li>
+                    <a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="flex items-center gap-2 text-stone-600 text-sm hover:text-[#25D366] transition-colors" aria-label="Chat with us on WhatsApp">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.468l4.573-1.462A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.16 0-4.16-.68-5.804-1.836l-.416-.283-3.103.992.989-3.043-.306-.434A9.965 9.965 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                        WhatsApp
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="max-w-7xl mx-auto px-8 pt-16 border-t border-stone-200 mt-16">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-stone-500 text-sm tracking-wide">&copy; {% now "Y" %} {{ BUSINESS_NAME }}. All rights reserved.</p>
+            <div class="flex items-center gap-6">
+                <a href="{% url 'terms' %}" class="text-stone-500 text-xs hover:text-primary transition-colors">Terms</a>
+                <a href="{% url 'privacy' %}" class="text-stone-500 text-xs hover:text-primary transition-colors">Privacy</a>
+                <a href="{% url 'faq' %}" class="text-stone-500 text-xs hover:text-primary transition-colors">FAQ</a>
+
+                <!-- Accessibility Controls -->
+                <div class="flex items-center gap-2 ml-4 border-l border-stone-300 pl-4">
+                    <button onclick="document.documentElement.style.fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) + 1 + 'px'" aria-label="Increase text size" class="w-8 h-8 rounded-full bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-sm font-bold transition-colors" title="Increase text size">A+</button>
+                    <button onclick="document.documentElement.style.fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) - 1 + 'px'" aria-label="Decrease text size" class="w-8 h-8 rounded-full bg-stone-200 hover:bg-stone-300 flex items-center justify-center text-xs font-bold transition-colors" title="Decrease text size">A-</button>
+                    <button onclick="document.documentElement.style.fontSize = ''" aria-label="Reset text size" class="w-8 h-8 rounded-full bg-stone-200 hover:bg-stone-300 flex items-center justify-center transition-colors" title="Reset text size">
+                        <span class="material-symbols-outlined text-sm" aria-hidden="true">restart_alt</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

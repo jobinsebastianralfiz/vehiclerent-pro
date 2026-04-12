@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load vehicle_tags %}
+
+{% block extra_css %}
+<style>
+    .admin-sidebar { scrollbar-width: thin; scrollbar-color: #44403c transparent; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div x-data="{ sidebarOpen: false }">
+    <!-- Mobile sidebar overlay -->
+    <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-stone-900/60 z-40 lg:hidden" x-on:click="sidebarOpen = false"></div>
+
+    {% include "manage/includes/sidebar.html" %}
+
+    <!-- Main Content -->
+    <div class="lg:ml-64 min-h-screen">
+        {% include "manage/includes/header.html" %}
+        <div class="p-8">
+            {% include "manage/includes/messages.html" %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

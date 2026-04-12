@@ -1,0 +1,66 @@
+{% extends "manage/base_admin.html" %}
+{% load vehicle_tags %}
+
+{% block page_title %}Customers{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+    <div>
+        <h1 class="text-2xl font-bold">Customer Management</h1>
+        <p class="text-stone-500 text-sm mt-1">Manage your customers</p>
+    </div>
+    <div class="flex items-center gap-4 mt-4 md:mt-0">
+        <form method="get" class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-lg">search</span>
+            <input type="text" name="q" value="{{ q }}" placeholder="Search customers..." class="pl-10 pr-4 py-2 bg-surface-container-low rounded-full text-sm focus:ring-1 focus:ring-primary border-0 w-56"/>
+        </form>
+        <a href="{% url 'customer_add' %}" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">add</span> Add Customer
+        </a>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+    <table class="w-full">
+        <thead>
+            <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
+                <th class="text-left px-6 py-4">Name</th>
+                <th class="text-left px-4 py-4">Phone</th>
+                <th class="text-left px-4 py-4">Email</th>
+                <th class="text-center px-4 py-4">Allocations</th>
+                <th class="text-center px-4 py-4">Status</th>
+                <th class="text-right px-6 py-4">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in page_obj %}
+            <tr class="hover:bg-stone-50 transition-colors border-b border-stone-50">
+                <td class="px-6 py-4">
+                    <a href="{% url 'customer_detail' customer.pk %}" class="font-medium text-sm hover:text-primary">{{ customer.full_name }}</a>
+                </td>
+                <td class="px-4 py-4 text-sm text-stone-600">{{ customer.phone }}</td>
+                <td class="px-4 py-4 text-sm text-stone-600">{{ customer.email|default:"-" }}</td>
+                <td class="px-4 py-4 text-center text-sm">{{ customer.total_allocations }}</td>
+                <td class="px-4 py-4 text-center">
+                    {% if customer.is_blacklisted %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Blacklisted</span>
+                    {% else %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <a href="{% url 'customer_detail' customer.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100 inline-block"><span class="material-symbols-outlined text-lg text-stone-500">visibility</span></a>
+                    <a href="{% url 'customer_edit' customer.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100 inline-block"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
+                    <form method="post" action="{% url 'customer_delete' customer.pk %}" class="inline" onsubmit="return confirm('Delete this customer?')">
+                        {% csrf_token %}
+                        <button type="submit" class="p-1.5 rounded-lg hover:bg-red-50"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="px-8 py-16 text-center text-stone-400">No customers yet. <a href="{% url 'customer_add' %}" class="text-primary font-medium">Add one</a>.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

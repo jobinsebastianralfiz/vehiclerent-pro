@@ -1,0 +1,24 @@
+<header class="sticky top-0 w-full z-40 bg-white border-b border-stone-100">
+    <div class="flex items-center justify-between px-8 py-4">
+        <div class="flex items-center gap-4">
+            <button x-on:click="sidebarOpen = !sidebarOpen" class="lg:hidden">
+                <span class="material-symbols-outlined text-2xl text-stone-600">menu</span>
+            </button>
+            <div>
+                <h2 class="text-stone-900 font-bold text-xl">{% block page_title %}Dashboard{% endblock %}</h2>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="relative hidden md:block">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-lg">search</span>
+                <input type="text" placeholder="Search across fleet..." class="pl-10 pr-4 py-2 bg-surface-container-low rounded-full text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none w-64 border-0"/>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-sm font-medium text-stone-600">{{ request.user.full_name }}</span>
+                <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                    <span class="text-white text-xs font-bold">{{ request.user.full_name|first }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

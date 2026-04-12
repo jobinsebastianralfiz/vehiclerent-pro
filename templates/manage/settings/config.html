@@ -1,0 +1,280 @@
+{% extends "manage/base_admin.html" %}
+
+{% block page_title %}Site Settings{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-8">
+    <div>
+        <h1 class="text-2xl font-bold">Site Settings</h1>
+        <p class="text-stone-500 text-sm mt-1">Configure your website branding, content, and SEO</p>
+    </div>
+    <a href="{% url 'testimonial_list' %}" class="bg-stone-100 text-stone-700 px-5 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-stone-200 transition-colors">
+        <span class="material-symbols-outlined text-lg">format_quote</span> Manage Testimonials
+    </a>
+</div>
+
+<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+    <form method="post" enctype="multipart/form-data" class="p-8">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="mb-8 px-4 py-3 rounded-xl bg-red-50 text-red-800 text-sm">{{ form.errors }}</div>
+        {% endif %}
+
+        <!-- Branding -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Branding</p>
+                <p class="text-xs text-stone-400 mt-1">Site name, logo, and tagline displayed across the website</p>
+            </div>
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Site Name</label>
+                    <input type="text" name="site_name" value="{{ form.site_name.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Tagline</label>
+                    <input type="text" name="tagline" value="{{ form.tagline.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Logo</label>
+                    {% if config.logo %}<img src="{{ config.logo.url }}" alt="Current logo" class="h-10 mb-2"/>{% endif %}
+                    <input type="file" name="logo" accept="image/*" class="text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Favicon</label>
+                    {% if config.favicon %}<img src="{{ config.favicon.url }}" alt="Current favicon" class="h-8 mb-2"/>{% endif %}
+                    <input type="file" name="favicon" accept="image/*" class="text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Contact Info</p>
+                <p class="text-xs text-stone-400 mt-1">Displayed in footer, contact page, and enquiry emails</p>
+            </div>
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Phone</label>
+                    <input type="text" name="phone" value="{{ form.phone.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="+91 99999 99999"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Email</label>
+                    <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">WhatsApp Number</label>
+                    <input type="text" name="whatsapp_number" value="{{ form.whatsapp_number.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="919999999999"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">WhatsApp Default Message</label>
+                    <input type="text" name="whatsapp_default_message" value="{{ form.whatsapp_default_message.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Address</label>
+                    <textarea name="address" rows="2" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">{{ form.address.value|default:'' }}</textarea>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Google Maps Embed URL</label>
+                    <textarea name="google_maps_embed" rows="2" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4 font-mono text-xs" placeholder="https://www.google.com/maps/embed?...">{{ form.google_maps_embed.value|default:'' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Homepage Hero -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Homepage Hero</p>
+                <p class="text-xs text-stone-400 mt-1">The main banner area on the homepage</p>
+            </div>
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Hero Title</label>
+                    <input type="text" name="hero_title" value="{{ form.hero_title.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Hero Subtitle</label>
+                    <input type="text" name="hero_subtitle" value="{{ form.hero_subtitle.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">CTA Button Text</label>
+                    <input type="text" name="hero_cta_text" value="{{ form.hero_cta_text.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Hero Image</label>
+                    {% if config.hero_image %}<img src="{{ config.hero_image.url }}" alt="" class="h-24 rounded-lg object-cover mb-2"/>{% endif %}
+                    <input type="file" name="hero_image" accept="image/*" class="text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Page -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">About Page</p>
+                <p class="text-xs text-stone-400 mt-1">Content displayed on the About Us page</p>
+            </div>
+            <div class="lg:col-span-2 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">About Title</label>
+                        <input type="text" name="about_title" value="{{ form.about_title.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">About Content</label>
+                        <textarea name="about_content" rows="8" class="richtext w-full border-stone-200 rounded-lg text-sm">{{ form.about_content.value|default:'' }}</textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">About Image</label>
+                        {% if config.about_image %}<img src="{{ config.about_image.url }}" alt="" class="h-24 rounded-lg object-cover mb-2"/>{% endif %}
+                        <input type="file" name="about_image" accept="image/*" class="text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Our Mission</label>
+                        <textarea name="about_mission" rows="3" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">{{ form.about_mission.value|default:'' }}</textarea>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Our Vision</label>
+                        <textarea name="about_vision" rows="3" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">{{ form.about_vision.value|default:'' }}</textarea>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Years in Business</label>
+                        <input type="number" name="years_in_business" value="{{ form.years_in_business.value|default:'0' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Total Happy Customers</label>
+                        <input type="number" name="total_happy_customers" value="{{ form.total_happy_customers.value|default:'0' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">License / Registration Number</label>
+                        <input type="text" name="license_number" value="{{ form.license_number.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">License Details & Certifications</label>
+                        <textarea name="license_details" rows="4" class="richtext w-full border-stone-200 rounded-lg text-sm">{{ form.license_details.value|default:'' }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEO -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">SEO & Meta</p>
+                <p class="text-xs text-stone-400 mt-1">Search engine optimization and social sharing defaults</p>
+            </div>
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Meta Title</label>
+                    <input type="text" name="meta_title" value="{{ form.meta_title.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="Default page title for search engines"/>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Meta Description</label>
+                    <textarea name="meta_description" rows="2" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">{{ form.meta_description.value|default:'' }}</textarea>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Meta Keywords</label>
+                    <input type="text" name="meta_keywords" value="{{ form.meta_keywords.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="vehicle rental, car hire, bike rental..."/>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Default OG Image (for social sharing)</label>
+                    {% if config.og_image %}<img src="{{ config.og_image.url }}" alt="" class="h-16 rounded-lg object-cover mb-2"/>{% endif %}
+                    <input type="file" name="og_image" accept="image/*" class="text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Social Links</p>
+                <p class="text-xs text-stone-400 mt-1">Social media profile URLs</p>
+            </div>
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Facebook URL</label>
+                    <input type="url" name="facebook_url" value="{{ form.facebook_url.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Instagram URL</label>
+                    <input type="url" name="instagram_url" value="{{ form.instagram_url.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">YouTube URL</label>
+                    <input type="url" name="youtube_url" value="{{ form.youtube_url.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Twitter / X URL</label>
+                    <input type="url" name="twitter_url" value="{{ form.twitter_url.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Footer</p>
+                <p class="text-xs text-stone-400 mt-1">Footer description text</p>
+            </div>
+            <div class="lg:col-span-2">
+                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Footer Text</label>
+                <textarea name="footer_text" rows="2" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">{{ form.footer_text.value|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-4 pt-8 border-t border-stone-100">
+            <button type="submit" class="px-8 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors">Save Settings</button>
+        </div>
+    </form>
+</div>
+
+<!-- Quill Rich Text Editor (no API key needed) -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<style>
+    .ql-toolbar.ql-snow { border-radius: 8px 8px 0 0; border-color: #e7e5e4; background: #fafaf9; }
+    .ql-container.ql-snow { border-radius: 0 0 8px 8px; border-color: #e7e5e4; font-family: 'Manrope', sans-serif; font-size: 14px; min-height: 200px; }
+    .ql-editor { line-height: 1.7; color: #1a1c1c; }
+    .ql-editor h2, .ql-editor h3 { font-family: 'Noto Serif', serif; }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('textarea.richtext').forEach(function(textarea) {
+        // Hide the textarea
+        textarea.style.display = 'none';
+
+        // Create editor container
+        var editorDiv = document.createElement('div');
+        editorDiv.innerHTML = textarea.value;
+        textarea.parentNode.insertBefore(editorDiv, textarea.nextSibling);
+
+        // Init Quill
+        var quill = new Quill(editorDiv, {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [2, 3, 4, false] }],
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['link'],
+                    ['clean']
+                ]
+            },
+            placeholder: 'Start typing...'
+        });
+
+        // Sync to textarea on text change
+        quill.on('text-change', function() {
+            textarea.value = quill.root.innerHTML;
+        });
+
+        // Sync before form submit
+        textarea.closest('form').addEventListener('submit', function() {
+            textarea.value = quill.root.innerHTML;
+        });
+    });
+});
+</script>
+{% endblock %}

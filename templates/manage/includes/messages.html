@@ -1,0 +1,17 @@
+{% if messages %}
+<div class="space-y-3 mb-6">
+    {% for message in messages %}
+    <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" x-transition class="flex items-center justify-between px-6 py-4 rounded-xl {% if message.tags == 'success' %}bg-green-50 text-green-800{% elif message.tags == 'error' %}bg-red-50 text-red-800{% elif message.tags == 'warning' %}bg-amber-50 text-amber-800{% else %}bg-blue-50 text-blue-800{% endif %}">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-lg">
+                {% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}
+            </span>
+            <span class="text-sm font-medium">{{ message }}</span>
+        </div>
+        <button x-on:click="show = false" class="opacity-60 hover:opacity-100">
+            <span class="material-symbols-outlined text-lg">close</span>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

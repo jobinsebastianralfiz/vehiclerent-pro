@@ -1,0 +1,66 @@
+{% extends "manage/base_admin.html" %}
+{% load vehicle_tags %}
+
+{% block page_title %}Enquiries{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+    <div>
+        <h1 class="text-2xl font-bold">Enquiry Management</h1>
+        <p class="text-stone-500 text-sm mt-1">Manage incoming enquiries</p>
+    </div>
+    <div class="flex items-center gap-4 mt-4 md:mt-0">
+        <select onchange="window.location.href='?status='+this.value+'&source={{ current_source|default:'' }}'" class="rounded-lg text-sm ghost-border py-2 px-3 bg-white">
+            <option value="">All Status</option>
+            {% for val, label in status_choices %}
+            <option value="{{ val }}" {% if current_status == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select onchange="window.location.href='?source='+this.value+'&status={{ current_status|default:'' }}'" class="rounded-lg text-sm ghost-border py-2 px-3 bg-white">
+            <option value="">All Sources</option>
+            {% for val, label in source_choices %}
+            <option value="{{ val }}" {% if current_source == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+    <table class="w-full">
+        <thead>
+            <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
+                <th class="text-left px-6 py-4">Name</th>
+                <th class="text-left px-4 py-4">Phone</th>
+                <th class="text-left px-4 py-4">Vehicle</th>
+                <th class="text-left px-4 py-4">Source</th>
+                <th class="text-left px-4 py-4">Status</th>
+                <th class="text-left px-4 py-4">Date</th>
+                <th class="text-right px-6 py-4">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enq in page_obj %}
+            <tr class="hover:bg-stone-50 transition-colors border-b border-stone-50">
+                <td class="px-6 py-4">
+                    <a href="{% url 'enquiry_detail' enq.pk %}" class="font-medium text-sm hover:text-primary">{{ enq.name }}</a>
+                </td>
+                <td class="px-4 py-4 text-sm text-stone-600">{{ enq.phone }}</td>
+                <td class="px-4 py-4 text-sm text-stone-600">{{ enq.vehicle.name|default:"General" }}</td>
+                <td class="px-4 py-4">{% status_badge enq.source %}</td>
+                <td class="px-4 py-4">{% status_badge enq.status %}</td>
+                <td class="px-4 py-4 text-sm text-stone-500">{{ enq.created_at|date:"d M Y" }}</td>
+                <td class="px-6 py-4 text-right">
+                    <a href="{% url 'enquiry_detail' enq.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100 inline-block"><span class="material-symbols-outlined text-lg text-stone-500">visibility</span></a>
+                    <form method="post" action="{% url 'enquiry_delete' enq.pk %}" class="inline" onsubmit="return confirm('Delete this enquiry?')">
+                        {% csrf_token %}
+                        <button type="submit" class="p-1.5 rounded-lg hover:bg-red-50"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="px-8 py-16 text-center text-stone-400">No enquiries yet</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

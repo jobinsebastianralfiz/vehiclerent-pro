@@ -1,0 +1,49 @@
+{% load vehicle_tags %}
+<aside class="fixed left-0 top-0 h-full w-64 bg-stone-950 flex flex-col py-6 border-r border-stone-800 z-50 transform transition-transform duration-300 lg:translate-x-0" x-bind:class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
+    <div class="px-6 mb-8">
+        <h1 class="text-white font-bold tracking-tighter text-xl">Admin Panel</h1>
+        <p class="text-stone-500 text-xs font-medium tracking-widest uppercase mt-1">{{ BUSINESS_NAME }}</p>
+    </div>
+    <nav class="flex-1 space-y-1 admin-sidebar overflow-y-auto">
+        {% with request.resolver_match.url_name as current_url %}
+        <a class="flex items-center space-x-3 {% if current_url == 'dashboard' %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'dashboard' %}">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span class="font-sans font-medium text-sm">Dashboard</span>
+        </a>
+        <a class="flex items-center space-x-3 {% if 'vehicle' in current_url or 'category' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'vehicle_manage_list' %}">
+            <span class="material-symbols-outlined">directions_car</span>
+            <span class="font-sans font-medium text-sm">Vehicles</span>
+        </a>
+        <a class="flex items-center space-x-3 {% if 'customer' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'customer_list' %}">
+            <span class="material-symbols-outlined">group</span>
+            <span class="font-sans font-medium text-sm">Customers</span>
+        </a>
+        <a class="flex items-center space-x-3 {% if 'allocation' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'allocation_list' %}">
+            <span class="material-symbols-outlined">assignment</span>
+            <span class="font-sans font-medium text-sm">Allocations</span>
+        </a>
+        <a class="flex items-center space-x-3 {% if 'enquiry' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'enquiry_list' %}">
+            <span class="material-symbols-outlined">mail</span>
+            <span class="font-sans font-medium text-sm">Enquiries</span>
+            {% if new_enquiry_count %}
+            <span class="bg-primary text-[10px] text-white px-2 py-0.5 rounded-full ml-auto">{{ new_enquiry_count }}</span>
+            {% endif %}
+        </a>
+        <div class="mx-2 my-2 border-t border-stone-800"></div>
+        <a class="flex items-center space-x-3 {% if 'site_config' in current_url or 'testimonial' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'site_config_edit' %}">
+            <span class="material-symbols-outlined">settings</span>
+            <span class="font-sans font-medium text-sm">Settings</span>
+        </a>
+        {% endwith %}
+    </nav>
+    <div class="px-2 space-y-1 pt-4 border-t border-stone-800">
+        <div class="flex items-center space-x-3 text-stone-500 px-4 py-3 mx-2">
+            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span class="text-xs">All systems online</span>
+        </div>
+        <a class="flex items-center space-x-3 text-stone-400 hover:text-white hover:bg-stone-800 rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'admin_logout' %}">
+            <span class="material-symbols-outlined">logout</span>
+            <span class="font-sans font-medium text-sm">Logout</span>
+        </a>
+    </div>
+</aside>

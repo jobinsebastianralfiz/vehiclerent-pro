@@ -1,0 +1,68 @@
+{% extends "manage/base_admin.html" %}
+{% load vehicle_tags %}
+
+{% block page_title %}{{ customer.full_name }}{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <a href="{% url 'customer_list' %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
+        <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Customers
+    </a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Customer Info -->
+    <div class="bg-white rounded-2xl border border-stone-100 p-8">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold">{{ customer.full_name }}</h2>
+            {% if customer.is_blacklisted %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Blacklisted</span>
+            {% endif %}
+        </div>
+        <div class="space-y-4 text-sm">
+            <div><span class="text-stone-500">Phone:</span> <span class="font-medium">{{ customer.phone }}</span></div>
+            {% if customer.email %}<div><span class="text-stone-500">Email:</span> <span class="font-medium">{{ customer.email }}</span></div>{% endif %}
+            {% if customer.address %}<div><span class="text-stone-500">Address:</span> <span class="font-medium">{{ customer.address }}</span></div>{% endif %}
+            {% if customer.id_proof_type %}<div><span class="text-stone-500">ID Proof:</span> <span class="font-medium">{{ customer.get_id_proof_type_display }} - {{ customer.id_proof_number }}</span></div>{% endif %}
+            {% if customer.license_number %}<div><span class="text-stone-500">License:</span> <span class="font-medium">{{ customer.license_number }}{% if customer.license_expiry %} (exp: {{ customer.license_expiry }}){% endif %}</span></div>{% endif %}
+            {% if customer.notes %}<div><span class="text-stone-500">Notes:</span> <span class="font-medium">{{ customer.notes }}</span></div>{% endif %}
+        </div>
+        <div class="flex gap-3 mt-8 pt-6 border-t border-stone-100">
+            <a href="{% url 'customer_edit' customer.pk %}" class="flex-1 text-center px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">Edit</a>
+            <a href="{% url 'allocation_add' %}?customer={{ customer.pk }}" class="flex-1 text-center px-4 py-2 bg-stone-100 text-stone-700 rounded-lg text-sm font-medium">New Allocation</a>
+        </div>
+    </div>
+
+    <!-- Allocation History -->
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-stone-100 overflow-hidden">
+        <div class="px-8 py-6 border-b border-stone-100">
+            <h3 class="font-bold text-lg">Allocation History</h3>
+            <p class="text-stone-500 text-xs mt-1">{{ allocations|length }} total allocation{{ allocations|length|pluralize }}</p>
+        </div>
+        <table class="w-full">
+            <thead>
+                <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
+                    <th class="text-left px-6 py-3">Vehicle</th>
+                    <th class="text-left px-4 py-3">Duration</th>
+                    <th class="text-left px-4 py-3">Amount</th>
+                    <th class="text-left px-4 py-3">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alloc in allocations %}
+                <tr class="hover:bg-stone-50 transition-colors border-b border-stone-50">
+                    <td class="px-6 py-4 text-sm font-medium">
+                        <a href="{% url 'allocation_detail' alloc.pk %}" class="hover:text-primary">{{ alloc.vehicle.name }}</a>
+                    </td>
+                    <td class="px-4 py-4 text-sm text-stone-600">{{ alloc.start_date|date:"d M Y" }} - {{ alloc.end_date|date:"d M Y" }}</td>
+                    <td class="px-4 py-4 text-sm font-medium">{{ alloc.total_amount|inr }}</td>
+                    <td class="px-4 py-4">{% status_badge alloc.status %}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="px-8 py-12 text-center text-stone-400">No allocations yet</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+<!-- Usage: wrap a delete button with x-data="{ confirmDelete: false }" -->
+<div x-show="confirmDelete" x-transition class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4" x-cloak>
+    <div class="bg-white rounded-2xl max-w-md w-full p-8" x-on:click.outside="confirmDelete = false">
+        <div class="text-center">
+            <span class="material-symbols-outlined text-5xl text-error mb-4">warning</span>
+            <h3 class="text-xl font-serif font-bold mb-2">Confirm Deletion</h3>
+            <p class="text-on-surface-variant text-sm mb-8">{{ delete_message|default:"Are you sure you want to delete this item? This action cannot be undone." }}</p>
+        </div>
+        <div class="flex gap-4">
+            <button x-on:click="confirmDelete = false" class="flex-1 px-6 py-3 bg-stone-100 text-stone-700 rounded-full font-medium hover:bg-stone-200 transition-colors">Cancel</button>
+            <form method="post" action="{{ delete_url }}" class="flex-1">
+                {% csrf_token %}
+                <button type="submit" class="w-full px-6 py-3 bg-error text-on-error rounded-full font-medium hover:opacity-90 transition-opacity">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>

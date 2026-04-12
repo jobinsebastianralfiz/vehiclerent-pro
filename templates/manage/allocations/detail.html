@@ -1,0 +1,86 @@
+{% extends "manage/base_admin.html" %}
+{% load vehicle_tags %}
+
+{% block page_title %}Allocation #{{ allocation.pk }}{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <a href="{% url 'allocation_list' %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
+        <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Allocations
+    </a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Info -->
+    <div class="lg:col-span-2 space-y-8">
+        <div class="bg-white rounded-2xl border border-stone-100 p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold">Allocation Details</h2>
+                {% status_badge allocation.status %}
+            </div>
+            <div class="grid grid-cols-2 gap-6 text-sm">
+                <div><span class="text-stone-500">Vehicle:</span> <a href="{% url 'vehicle_edit' allocation.vehicle.pk %}" class="font-medium text-primary hover:underline">{{ allocation.vehicle.brand }} {{ allocation.vehicle.name }}</a></div>
+                <div><span class="text-stone-500">Customer:</span> <a href="{% url 'customer_detail' allocation.customer.pk %}" class="font-medium text-primary hover:underline">{{ allocation.customer.full_name }}</a></div>
+                <div><span class="text-stone-500">Start Date:</span> <span class="font-medium">{{ allocation.start_date|date:"d M Y" }}</span></div>
+                <div><span class="text-stone-500">End Date:</span> <span class="font-medium">{{ allocation.end_date|date:"d M Y" }}</span></div>
+                <div><span class="text-stone-500">Duration:</span> <span class="font-medium">{{ allocation.duration_days }} days</span></div>
+                {% if allocation.actual_return_date %}<div><span class="text-stone-500">Actual Return:</span> <span class="font-medium">{{ allocation.actual_return_date|date:"d M Y" }}</span></div>{% endif %}
+                <div><span class="text-stone-500">Daily Rate:</span> <span class="font-medium">{{ allocation.daily_rate|inr }}</span></div>
+                <div><span class="text-stone-500">Total Amount:</span> <span class="font-medium text-lg">{{ allocation.total_amount|inr }}</span></div>
+                <div><span class="text-stone-500">Advance Paid:</span> <span class="font-medium">{{ allocation.advance_paid|inr }}</span></div>
+                <div><span class="text-stone-500">Balance:</span> <span class="font-medium {% if allocation.balance_amount > 0 %}text-amber-600{% endif %}">{{ allocation.balance_amount|inr }}</span></div>
+                {% if allocation.security_deposit %}<div><span class="text-stone-500">Security Deposit:</span> <span class="font-medium">{{ allocation.security_deposit|inr }}</span></div>{% endif %}
+                {% if allocation.pickup_location %}<div><span class="text-stone-500">Pickup:</span> <span class="font-medium">{{ allocation.pickup_location }}</span></div>{% endif %}
+                {% if allocation.drop_location %}<div><span class="text-stone-500">Drop:</span> <span class="font-medium">{{ allocation.drop_location }}</span></div>{% endif %}
+                {% if allocation.odometer_start %}<div><span class="text-stone-500">Odometer Start:</span> <span class="font-medium">{{ allocation.odometer_start }} km</span></div>{% endif %}
+                {% if allocation.odometer_end %}<div><span class="text-stone-500">Odometer End:</span> <span class="font-medium">{{ allocation.odometer_end }} km</span></div>{% endif %}
+            </div>
+            {% if allocation.notes %}
+            <div class="mt-6 pt-6 border-t border-stone-100">
+                <span class="text-stone-500 text-sm">Notes:</span>
+                <p class="text-sm mt-1">{{ allocation.notes }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Actions Sidebar -->
+    <div class="space-y-4">
+        {% if allocation.status == 'active' %}
+        <!-- Complete -->
+        <div class="bg-white rounded-2xl border border-stone-100 p-6" x-data="{ showComplete: false }">
+            <h3 class="font-bold text-sm mb-4">Complete Allocation</h3>
+            <button x-on:click="showComplete = !showComplete" class="w-full bg-green-600 text-white py-3 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">Mark as Completed</button>
+            <div x-show="showComplete" x-transition class="mt-4">
+                <form method="post" action="{% url 'allocation_complete' allocation.pk %}">
+                    {% csrf_token %}
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-1">Return Date</label>
+                            <input type="date" name="actual_return_date" required class="w-full border-stone-200 rounded-lg text-sm py-2 px-3"/>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-1">Odometer End</label>
+                            <input type="number" name="odometer_end" class="w-full border-stone-200 rounded-lg text-sm py-2 px-3"/>
+                        </div>
+                        <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg text-sm font-medium">Confirm</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Cancel -->
+        <div class="bg-white rounded-2xl border border-stone-100 p-6">
+            <h3 class="font-bold text-sm mb-4">Cancel Allocation</h3>
+            <form method="post" action="{% url 'allocation_cancel' allocation.pk %}" onsubmit="return confirm('Cancel this allocation? The vehicle will be freed.')">
+                {% csrf_token %}
+                <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">Cancel Allocation</button>
+            </form>
+        </div>
+
+        <!-- Edit -->
+        <a href="{% url 'allocation_edit' allocation.pk %}" class="block w-full text-center bg-stone-100 text-stone-700 py-3 rounded-lg text-sm font-medium hover:bg-stone-200 transition-colors">Edit Details</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

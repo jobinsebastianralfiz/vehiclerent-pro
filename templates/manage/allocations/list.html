@@ -1,0 +1,65 @@
+{% extends "manage/base_admin.html" %}
+{% load vehicle_tags %}
+
+{% block page_title %}Allocations{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+    <div>
+        <h1 class="text-2xl font-bold">Allocation Management</h1>
+        <p class="text-stone-500 text-sm mt-1">Manage vehicle allocations</p>
+    </div>
+    <div class="flex items-center gap-4 mt-4 md:mt-0">
+        <select onchange="window.location.href='?status='+this.value" class="rounded-lg text-sm ghost-border py-2 px-3 bg-white">
+            <option value="">All Status</option>
+            {% for val, label in status_choices %}
+            <option value="{{ val }}" {% if current_status == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <a href="{% url 'allocation_add' %}" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">add</span> New Allocation
+        </a>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
+                    <th class="text-left px-6 py-4">Vehicle</th>
+                    <th class="text-left px-4 py-4">Customer</th>
+                    <th class="text-left px-4 py-4">Duration</th>
+                    <th class="text-left px-4 py-4">Total</th>
+                    <th class="text-left px-4 py-4">Balance</th>
+                    <th class="text-left px-4 py-4">Status</th>
+                    <th class="text-right px-6 py-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alloc in page_obj %}
+                <tr class="hover:bg-stone-50 transition-colors border-b border-stone-50">
+                    <td class="px-6 py-4">
+                        <div class="font-medium text-sm">{{ alloc.vehicle.name }}</div>
+                        <div class="text-xs text-stone-500">{{ alloc.vehicle.brand }}</div>
+                    </td>
+                    <td class="px-4 py-4 text-sm">{{ alloc.customer.full_name }}</td>
+                    <td class="px-4 py-4 text-sm text-stone-600">{{ alloc.start_date|date:"d M" }} - {{ alloc.end_date|date:"d M" }}<br><span class="text-xs text-stone-400">{{ alloc.duration_days }} days</span></td>
+                    <td class="px-4 py-4 text-sm font-medium">{{ alloc.total_amount|inr }}</td>
+                    <td class="px-4 py-4 text-sm {% if alloc.balance_amount > 0 %}text-amber-600 font-medium{% else %}text-stone-500{% endif %}">{{ alloc.balance_amount|inr }}</td>
+                    <td class="px-4 py-4">{% status_badge alloc.status %}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'allocation_detail' alloc.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100 inline-block"><span class="material-symbols-outlined text-lg text-stone-500">visibility</span></a>
+                        {% if alloc.status == 'active' %}
+                        <a href="{% url 'allocation_edit' alloc.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100 inline-block"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="px-8 py-16 text-center text-stone-400">No allocations yet. <a href="{% url 'allocation_add' %}" class="text-primary font-medium">Create one</a>.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

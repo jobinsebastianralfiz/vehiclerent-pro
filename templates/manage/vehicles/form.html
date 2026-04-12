@@ -1,0 +1,310 @@
+{% extends "manage/base_admin.html" %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div>
+    <div class="mb-8">
+        <a href="{% url 'vehicle_manage_list' %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
+            <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Vehicles
+        </a>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+        <div class="px-8 py-6 border-b border-stone-100">
+            <h2 class="text-xl font-bold">{{ title }}</h2>
+            <p class="text-stone-500 text-xs mt-1">Fill in the vehicle details below</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="p-8">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="mb-6 px-4 py-3 rounded-xl bg-red-50 text-red-800 text-sm">
+                <p class="font-medium mb-2">Please correct the errors below:</p>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+
+            <!-- Basic Identity -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+                <div class="col-span-1">
+                    <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Basic Identity</p>
+                    <p class="text-xs text-stone-400 mt-1">Essential branding and identification</p>
+                </div>
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Vehicle Name *</label>
+                        <input type="text" name="name" value="{{ form.name.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. Swift Dzire VXi"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Brand *</label>
+                        <input type="text" name="brand" value="{{ form.brand.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. Maruti Suzuki"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Model *</label>
+                        <input type="text" name="model" value="{{ form.model.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. Dzire"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Year</label>
+                        <input type="number" name="year" value="{{ form.year.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Registration Number</label>
+                        <input type="text" name="registration_number" value="{{ form.registration_number.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Color</label>
+                        <input type="text" name="color" value="{{ form.color.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classification -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+                <div class="col-span-1">
+                    <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Classification</p>
+                    <p class="text-xs text-stone-400 mt-1">Vehicle type and category</p>
+                </div>
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Vehicle Type</label>
+                        {{ form.vehicle_type }}
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Category</label>
+                        {{ form.category }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Specs -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+                <div class="col-span-1">
+                    <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Technical Specs</p>
+                    <p class="text-xs text-stone-400 mt-1">Performance metrics</p>
+                </div>
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Fuel Type</label>
+                        {{ form.fuel_type }}
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Transmission</label>
+                        {{ form.transmission }}
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Seating Capacity</label>
+                        <input type="number" name="seating_capacity" value="{{ form.seating_capacity.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Engine CC</label>
+                        <input type="number" name="engine_cc" value="{{ form.engine_cc.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="For petrol/diesel"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Mileage (km/l)</label>
+                        <input type="number" step="0.1" name="mileage_kmpl" value="{{ form.mileage_kmpl.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EV / Hybrid Specs -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+                <div class="col-span-1">
+                    <p class="text-sm font-extrabold uppercase tracking-widest text-primary">EV / Hybrid Specs</p>
+                    <p class="text-xs text-stone-400 mt-1">Fill these for electric or hybrid vehicles</p>
+                </div>
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Battery (kWh)</label>
+                        <input type="number" step="0.1" name="battery_capacity_kwh" value="{{ form.battery_capacity_kwh.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Range (km)</label>
+                        <input type="number" name="range_km" value="{{ form.range_km.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Motor Power (kW)</label>
+                        <input type="number" step="0.1" name="motor_power_kw" value="{{ form.motor_power_kw.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Charge Time (hrs)</label>
+                        <input type="number" step="0.1" name="charging_time_hours" value="{{ form.charging_time_hours.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div class="flex items-center pt-6">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="fast_charging" {% if form.fast_charging.value %}checked{% endif %} class="rounded border-stone-300 text-primary focus:ring-primary"/>
+                            <span class="text-sm font-medium">Fast Charging Support</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+                <div class="col-span-1">
+                    <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Rates & Pricing</p>
+                    <p class="text-xs text-stone-400 mt-1">Define rental mode and rates. Fill at least one price field.</p>
+                </div>
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Rental Mode</label>
+                        <select name="rental_mode" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">
+                            <option value="flexible" {% if form.rental_mode.value == 'flexible' %}selected{% endif %}>Flexible (All Plans)</option>
+                            <option value="daily" {% if form.rental_mode.value == 'daily' %}selected{% endif %}>Daily Rental</option>
+                            <option value="weekly" {% if form.rental_mode.value == 'weekly' %}selected{% endif %}>Weekly Rental</option>
+                            <option value="monthly" {% if form.rental_mode.value == 'monthly' %}selected{% endif %}>Monthly Rental</option>
+                        </select>
+                        <p class="text-xs text-stone-400 mt-1">Controls which price is shown as the headline rate</p>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Minimum Rental Days</label>
+                        <input type="number" name="minimum_rental_days" value="{{ form.minimum_rental_days.value|default:'1' }}" min="1" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                        <p class="text-xs text-stone-400 mt-1">e.g. 30 for monthly-only vehicles</p>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Price Per Day</label>
+                        <input type="number" step="0.01" name="price_per_day" value="{{ form.price_per_day.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Price Per Week</label>
+                        <input type="number" step="0.01" name="price_per_week" value="{{ form.price_per_week.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Price Per Month</label>
+                        <input type="number" step="0.01" name="price_per_month" value="{{ form.price_per_month.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Security Deposit</label>
+                        <input type="number" step="0.01" name="security_deposit" value="{{ form.security_deposit.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+                <div class="col-span-1">
+                    <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Content</p>
+                    <p class="text-xs text-stone-400 mt-1">Descriptions and features</p>
+                </div>
+                <div class="lg:col-span-2 space-y-6">
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Short Description</label>
+                        <textarea name="short_description" rows="2" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">{{ form.short_description.value|default:'' }}</textarea>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Full Description</label>
+                        <textarea name="description" rows="4" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">{{ form.description.value|default:'' }}</textarea>
+                    </div>
+                    <div x-data="featureChips({{ form.features.value|default:'[]' }})">
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Features</label>
+                        <!-- Hidden field stores the JSON value -->
+                        <input type="hidden" name="features" x-bind:value="JSON.stringify(selected)"/>
+
+                        <!-- Quick-add preset chips -->
+                        <p class="text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Click to add:</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <template x-for="feature in presets" :key="feature">
+                                <button type="button" x-on:click="toggle(feature)" class="px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer" x-bind:class="selected.includes(feature) ? 'bg-primary text-on-primary border-primary' : 'bg-white text-stone-600 border-stone-200 hover:border-primary hover:text-primary'" x-text="feature"></button>
+                            </template>
+                        </div>
+
+                        <!-- Selected features -->
+                        <div class="flex flex-wrap gap-2 mb-3" x-show="selected.length > 0">
+                            <template x-for="(feature, index) in selected" :key="feature + index">
+                                <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-primary-fixed text-primary">
+                                    <span x-text="feature"></span>
+                                    <button type="button" x-on:click="remove(index)" class="hover:text-error" aria-label="Remove feature">
+                                        <span class="material-symbols-outlined text-sm">close</span>
+                                    </button>
+                                </span>
+                            </template>
+                        </div>
+
+                        <!-- Custom feature input -->
+                        <div class="flex gap-2">
+                            <input type="text" x-ref="customFeature" placeholder="Type a custom feature..." class="flex-1 border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-2 px-3" x-on:keydown.enter.prevent="addCustom()"/>
+                            <button type="button" x-on:click="addCustom()" class="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg text-sm font-medium hover:bg-stone-200 transition-colors">Add</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Thumbnail Image</label>
+                        {% if vehicle.thumbnail %}<img src="{{ vehicle.thumbnail.url }}" alt="" class="w-24 h-24 rounded-lg object-cover mb-2"/>{% endif %}
+                        <input type="file" name="thumbnail" accept="image/*" class="text-sm"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+                <div class="col-span-1">
+                    <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Settings</p>
+                    <p class="text-xs text-stone-400 mt-1">Visibility and status</p>
+                </div>
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Status</label>
+                        {{ form.status }}
+                    </div>
+                    <div class="flex items-center gap-6 pt-6">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="is_featured" {% if form.is_featured.value %}checked{% endif %} class="rounded border-stone-300 text-primary focus:ring-primary"/>
+                            <span class="text-sm font-medium">Featured</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="is_published" {% if form.is_published.value %}checked{% endif %} class="rounded border-stone-300 text-primary focus:ring-primary"/>
+                            <span class="text-sm font-medium">Published</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex justify-end gap-4 pt-8 border-t border-stone-100">
+                <a href="{% url 'vehicle_manage_list' %}" class="px-6 py-3 bg-stone-100 text-stone-700 rounded-full font-medium hover:bg-stone-200 transition-colors">Cancel</a>
+                <button type="submit" class="px-8 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors">Save Vehicle</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    select { @apply w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4; }
+</style>
+
+<script>
+function featureChips(initial) {
+    return {
+        selected: Array.isArray(initial) ? [...initial] : [],
+        presets: [
+            'AC', 'GPS Navigation', 'Bluetooth', 'USB Charging', 'Music System',
+            'Power Steering', 'Power Windows', 'Central Locking', 'Reverse Camera',
+            'Airbags', 'ABS', 'Sunroof', 'Touchscreen', 'Cruise Control',
+            'Alloy Wheels', 'Leather Seats', 'Rear AC Vents', 'Parking Sensors',
+            'Keyless Entry', 'Push Start', 'Hill Assist', 'Fog Lamps',
+            'Rain Sensing Wipers', 'Auto Headlamps', 'ISOFIX', 'Boot Space',
+            'Helmet (2)', 'First Aid Kit', 'Tool Kit', 'Spare Tyre',
+        ],
+        toggle(feature) {
+            const idx = this.selected.indexOf(feature);
+            if (idx === -1) {
+                this.selected.push(feature);
+            } else {
+                this.selected.splice(idx, 1);
+            }
+        },
+        remove(index) {
+            this.selected.splice(index, 1);
+        },
+        addCustom() {
+            const input = this.$refs.customFeature;
+            const val = input.value.trim();
+            if (val && !this.selected.includes(val)) {
+                this.selected.push(val);
+                input.value = '';
+            }
+        }
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,313 @@
+{% extends "public/base_public.html" %}
+{% load vehicle_tags %}
+
+{% block title %}{{ BUSINESS_NAME }} | {{ config.tagline|default:"The Digital Concierge" }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative min-h-[700px] flex items-center overflow-hidden px-8 max-w-screen-2xl mx-auto" x-data="heroCarousel()" x-init="start()">
+    <!-- Left: Text -->
+    <div class="z-10 w-full lg:w-1/2">
+        <div class="flex-1">
+            <p class="text-primary font-label text-xs tracking-[0.2em] mb-4 uppercase">{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</p>
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-serif font-bold leading-[1.1] mb-8 tracking-tighter">{{ config.hero_title|default:"Rent Your Perfect Vehicle" }}</h1>
+            <div class="flex items-center gap-6 mb-12">
+                <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-10 py-4 rounded-full font-bold flex items-center gap-2 hover:bg-primary-container transition-colors">
+                    <span class="material-symbols-outlined">directions_car</span> {{ config.hero_cta_text|default:"Browse Fleet" }}
+                </a>
+                <a href="#enquiry" class="text-primary font-bold flex items-center gap-2 hover:underline underline-offset-4">
+                    Send Enquiry <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+            </div>
+            <div class="grid grid-cols-3 gap-8 pt-12 border-t border-outline-variant/10">
+                <div>
+                    <p class="text-3xl font-serif font-bold">{{ featured_vehicles|length }}+</p>
+                    <p class="text-[10px] font-label font-extrabold tracking-widest text-on-surface-variant uppercase">Vehicles</p>
+                </div>
+                <div>
+                    <p class="text-3xl font-serif font-bold">{{ categories|length }}</p>
+                    <p class="text-[10px] font-label font-extrabold tracking-widest text-on-surface-variant uppercase">Categories</p>
+                </div>
+                <div>
+                    <p class="text-3xl font-serif font-bold">24/7</p>
+                    <p class="text-[10px] font-label font-extrabold tracking-widest text-on-surface-variant uppercase">Support</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Vehicle Showcase Carousel -->
+    <div class="hidden lg:block absolute right-[-2%] top-1/2 -translate-y-1/2 w-[52%]">
+        {% if featured_vehicles %}
+        <div class="relative">
+            <!-- Vehicle Cards -->
+            {% for vehicle in featured_vehicles %}
+            <div x-show="active === {{ forloop.counter0 }}" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="glass-nav bg-white/40 p-6 rounded-3xl">
+                <!-- Image -->
+                <div class="relative rounded-2xl overflow-hidden aspect-[16/10] bg-surface-container-low">
+                    {% if vehicle.thumbnail %}
+                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover"/>
+                    {% else %}
+                    <div class="w-full h-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[80px] text-outline/20">directions_car</span>
+                    </div>
+                    {% endif %}
+                    <!-- Price Badge -->
+                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full">
+                        <p class="text-lg font-serif font-bold text-primary">{{ vehicle.primary_price_value|inr }}<span class="text-xs font-sans font-normal text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></p>
+                    </div>
+                    {% if vehicle.rental_mode == "monthly" %}
+                    <div class="absolute top-4 left-4 bg-primary/90 text-on-primary text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full">Monthly</div>
+                    {% endif %}
+                </div>
+                <!-- Info Bar -->
+                <div class="flex items-center justify-between mt-5 px-2">
+                    <div>
+                        <p class="text-xs font-label tracking-widest uppercase text-on-surface-variant/60">{{ vehicle.brand }}</p>
+                        <h3 class="text-xl font-serif font-bold text-on-surface">{{ vehicle.name }}</h3>
+                        <div class="flex items-center gap-4 mt-2 text-on-surface-variant text-xs">
+                            {% if vehicle.fuel_type %}<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" aria-hidden="true">{% if vehicle.fuel_type == 'electric' %}bolt{% else %}local_gas_station{% endif %}</span>{{ vehicle.get_fuel_type_display }}</span>{% endif %}
+                            {% if vehicle.transmission %}<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" aria-hidden="true">settings</span>{{ vehicle.get_transmission_display }}</span>{% endif %}
+                            {% if vehicle.seating_capacity %}<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" aria-hidden="true">event_seat</span>{{ vehicle.seating_capacity }}</span>{% endif %}
+                        </div>
+                    </div>
+                    <a href="{{ vehicle.get_absolute_url }}" class="bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-bold hover:bg-primary-container transition-colors flex items-center gap-2">
+                        View <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Navigation Dots + Arrows -->
+            <div class="flex items-center justify-between mt-6 px-2">
+                <!-- Dots -->
+                <div class="flex items-center gap-2">
+                    {% for vehicle in featured_vehicles %}
+                    <button x-on:click="goTo({{ forloop.counter0 }})" class="w-2 h-2 rounded-full transition-all duration-300" x-bind:class="active === {{ forloop.counter0 }} ? 'bg-primary w-6' : 'bg-stone-300 hover:bg-stone-400'" aria-label="Show vehicle {{ forloop.counter }}"></button>
+                    {% endfor %}
+                </div>
+                <!-- Arrows -->
+                <div class="flex items-center gap-2">
+                    <button x-on:click="prev()" class="w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center hover:bg-white transition-colors shadow-sm" aria-label="Previous vehicle">
+                        <span class="material-symbols-outlined text-on-surface">chevron_left</span>
+                    </button>
+                    <button x-on:click="next()" class="w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center hover:bg-white transition-colors shadow-sm" aria-label="Next vehicle">
+                        <span class="material-symbols-outlined text-on-surface">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% elif config.hero_image %}
+        <div class="glass-nav bg-white/30 p-8 rounded-3xl">
+            <img src="{{ config.hero_image.url }}" alt="{{ BUSINESS_NAME }}" class="w-full rounded-2xl h-[500px] object-cover"/>
+        </div>
+        {% else %}
+        <div class="glass-nav bg-white/30 p-8 rounded-3xl">
+            <div class="bg-surface-container-low rounded-2xl h-[500px] flex items-center justify-center">
+                <span class="material-symbols-outlined text-[120px] text-outline/30">directions_car</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Mobile: Featured Vehicle (first one) -->
+    {% if featured_vehicles %}
+    <div class="lg:hidden mt-12 w-full">
+        {% with vehicle=featured_vehicles.0 %}
+        {% if vehicle %}
+        <div class="bg-surface-container-low rounded-2xl overflow-hidden">
+            {% if vehicle.thumbnail %}
+            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.name }}" class="w-full aspect-[16/10] object-cover"/>
+            {% endif %}
+            <div class="p-5 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-on-surface-variant/60 uppercase tracking-widest">{{ vehicle.brand }}</p>
+                    <p class="font-serif font-bold">{{ vehicle.name }}</p>
+                    <p class="text-primary font-bold mt-1">{{ vehicle.primary_price_value|inr }}<span class="text-xs font-normal text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></p>
+                </div>
+                <a href="{{ vehicle.get_absolute_url }}" class="bg-primary text-on-primary px-5 py-2.5 rounded-full text-sm font-bold">View</a>
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+    </div>
+    {% endif %}
+</section>
+
+<script>
+function heroCarousel() {
+    return {
+        active: 0,
+        total: {{ featured_vehicles|length|default:"0" }},
+        timer: null,
+        start() {
+            if (this.total > 1) {
+                this.timer = setInterval(() => this.next(), 5000);
+            }
+        },
+        next() {
+            this.active = (this.active + 1) % this.total;
+        },
+        prev() {
+            this.active = (this.active - 1 + this.total) % this.total;
+        },
+        goTo(index) {
+            this.active = index;
+            clearInterval(this.timer);
+            this.start();
+        }
+    }
+}
+</script>
+
+{% if categories %}
+<!-- Categories Section -->
+<section class="py-24 px-8 max-w-screen-2xl mx-auto">
+    <div class="text-center mb-16">
+        <p class="text-primary font-label text-xs tracking-[0.2em] mb-4 uppercase">Browse by Category</p>
+        <h2 class="text-4xl md:text-5xl font-serif font-bold">Our Fleet</h2>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {% for cat in categories %}
+        <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="bg-surface-container-low rounded-xl p-8 text-center hover:shadow-lg transition-all group">
+            <span class="material-symbols-outlined text-4xl text-primary mb-4 group-hover:scale-110 transition-transform inline-block">{{ cat.icon|default:"category" }}</span>
+            <h3 class="font-serif font-bold text-lg mb-1">{{ cat.name }}</h3>
+            <p class="text-on-surface-variant text-sm">{{ cat.count }} vehicle{{ cat.count|pluralize }}</p>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if featured_vehicles %}
+<!-- Featured Vehicles -->
+<section class="py-24 px-8 bg-surface-container-low">
+    <div class="max-w-screen-2xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+            <div>
+                <p class="text-primary font-label text-xs tracking-[0.2em] mb-4 uppercase">Handpicked Selection</p>
+                <h2 class="text-4xl md:text-5xl font-serif font-bold">Featured Vehicles</h2>
+            </div>
+            <a href="{% url 'vehicle_list' %}?featured=1" class="text-primary font-bold flex items-center gap-2 hover:underline underline-offset-4 mt-4 md:mt-0">
+                View All <span class="material-symbols-outlined">arrow_forward</span>
+            </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {% for vehicle in featured_vehicles %}
+                {% include "public/includes/vehicle_card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Why Choose Us -->
+<section class="py-24 px-8">
+    <div class="max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-16">
+        <div class="flex flex-col gap-6">
+            <div class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary text-3xl">headset_mic</span>
+            </div>
+            <h4 class="text-2xl font-serif font-bold">24/7 Support</h4>
+            <p class="text-on-surface-variant leading-relaxed">Our dedicated team is available around the clock to assist with any request, ensuring your journey remains uninterrupted.</p>
+        </div>
+        <div class="flex flex-col gap-6">
+            <div class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary text-3xl">currency_exchange</span>
+            </div>
+            <h4 class="text-2xl font-serif font-bold">Best Rates</h4>
+            <p class="text-on-surface-variant leading-relaxed">Competitive pricing across our entire fleet. Flexible daily, weekly, and monthly rental plans to suit your budget.</p>
+        </div>
+        <div class="flex flex-col gap-6">
+            <div class="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary text-3xl">verified_user</span>
+            </div>
+            <h4 class="text-2xl font-serif font-bold">Well Maintained</h4>
+            <p class="text-on-surface-variant leading-relaxed">Every vehicle in our fleet is regularly serviced and maintained to the highest standards for a safe, comfortable ride.</p>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-24 px-8 bg-surface-container-low">
+    <div class="max-w-screen-2xl mx-auto">
+        <div class="text-center mb-20">
+            <h2 class="text-4xl md:text-5xl font-serif font-bold mb-4">How It Works</h2>
+            <p class="text-on-surface-variant">Three simple steps to get on the road.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="relative p-12 bg-white rounded-2xl text-center border border-outline-variant/10 group hover:bg-primary transition-all duration-500">
+                <span class="absolute top-8 left-1/2 -translate-x-1/2 text-8xl font-serif font-bold opacity-5 group-hover:text-white group-hover:opacity-20 transition-all">01</span>
+                <div class="relative z-10">
+                    <span class="material-symbols-outlined text-4xl text-primary mb-6 group-hover:text-white">search</span>
+                    <h5 class="text-xl font-serif font-bold mb-4 group-hover:text-white">Browse Fleet</h5>
+                    <p class="text-on-surface-variant text-sm group-hover:text-white/80">Explore our collection and find the perfect vehicle for your needs.</p>
+                </div>
+            </div>
+            <div class="relative p-12 bg-white rounded-2xl text-center border border-outline-variant/10 group hover:bg-primary transition-all duration-500">
+                <span class="absolute top-8 left-1/2 -translate-x-1/2 text-8xl font-serif font-bold opacity-5 group-hover:text-white group-hover:opacity-20 transition-all">02</span>
+                <div class="relative z-10">
+                    <span class="material-symbols-outlined text-4xl text-primary mb-6 group-hover:text-white">chat</span>
+                    <h5 class="text-xl font-serif font-bold mb-4 group-hover:text-white">Get in Touch</h5>
+                    <p class="text-on-surface-variant text-sm group-hover:text-white/80">Send an enquiry or message us on WhatsApp for instant assistance.</p>
+                </div>
+            </div>
+            <div class="relative p-12 bg-white rounded-2xl text-center border border-outline-variant/10 group hover:bg-primary transition-all duration-500">
+                <span class="absolute top-8 left-1/2 -translate-x-1/2 text-8xl font-serif font-bold opacity-5 group-hover:text-white group-hover:opacity-20 transition-all">03</span>
+                <div class="relative z-10">
+                    <span class="material-symbols-outlined text-4xl text-primary mb-6 group-hover:text-white">key</span>
+                    <h5 class="text-xl font-serif font-bold mb-4 group-hover:text-white">Hit the Road</h5>
+                    <p class="text-on-surface-variant text-sm group-hover:text-white/80">Pick up your vehicle and enjoy a hassle-free rental experience.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+{% if testimonials %}
+<section class="py-24 px-8">
+    <div class="max-w-screen-2xl mx-auto">
+        <div class="text-center mb-16">
+            <p class="text-primary font-label text-xs tracking-[0.2em] mb-4 uppercase">What Our Customers Say</p>
+            <h2 class="text-4xl md:text-5xl font-serif font-bold">Customer Reviews</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for t in testimonials %}
+            <div class="bg-white rounded-2xl p-8 border border-outline-variant/10 hover:shadow-lg transition-shadow">
+                <div class="flex items-center gap-1 text-amber-500 mb-4">
+                    {% for i in "12345" %}{% if forloop.counter <= t.rating %}<span>&#9733;</span>{% else %}<span class="text-stone-300">&#9734;</span>{% endif %}{% endfor %}
+                </div>
+                <p class="text-on-surface-variant leading-relaxed mb-6">"{{ t.quote }}"</p>
+                <div class="flex items-center gap-3">
+                    {% if t.photo %}
+                    <img src="{{ t.photo.url }}" alt="{{ t.name }}" class="w-10 h-10 rounded-full object-cover" loading="lazy"/>
+                    {% else %}
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">{{ t.name|first }}</div>
+                    {% endif %}
+                    <div>
+                        <p class="font-bold text-sm">{{ t.name }}</p>
+                        {% if t.role %}<p class="text-xs text-on-surface-variant">{{ t.role }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Enquiry Form -->
+<section class="py-24 px-8" id="enquiry">
+    <div class="max-w-3xl mx-auto">
+        <div class="text-center mb-12">
+            <p class="text-primary font-label text-xs tracking-[0.2em] mb-4 uppercase">Get in Touch</p>
+            <h2 class="text-4xl md:text-5xl font-serif font-bold mb-4">Send Us an Enquiry</h2>
+            <p class="text-on-surface-variant">Fill in the form below and we'll get back to you as soon as possible.</p>
+        </div>
+        <div class="bg-white rounded-2xl p-8 md:p-12 border border-outline-variant/10">
+            {% include "public/includes/enquiry_form.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}

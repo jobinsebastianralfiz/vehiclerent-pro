@@ -1,0 +1,53 @@
+{% load vehicle_tags %}
+<article class="vehicle-card bg-surface-container-low rounded-xl overflow-hidden group hover:shadow-xl" itemscope itemtype="https://schema.org/Product" aria-label="{{ vehicle.brand }} {{ vehicle.name }}">
+    <div class="relative">
+        {% if vehicle.is_featured %}
+        <span class="absolute top-4 left-4 bg-primary/90 text-on-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full z-10" aria-label="Featured vehicle">Featured</span>
+        {% endif %}
+        <div class="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-white/80 backdrop-blur-md rounded-full z-10">
+            <span class="w-1.5 h-1.5 rounded-full {% if vehicle.status == 'available' %}bg-green-500{% elif vehicle.status == 'rented' %}bg-blue-500{% else %}bg-amber-500{% endif %}" aria-hidden="true"></span>
+            <span class="text-[10px] font-bold uppercase tracking-wider">{{ vehicle.get_status_display }}</span>
+        </div>
+        <div class="aspect-[16/10] overflow-hidden">
+            {% if vehicle.thumbnail %}
+            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }} - {{ vehicle.get_vehicle_type_display }} for rent" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" itemprop="image"/>
+            {% else %}
+            <div class="w-full h-full bg-surface-container flex items-center justify-center">
+                <span class="material-symbols-outlined text-6xl text-outline">directions_car</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="p-6">
+        <div class="flex justify-between items-start mb-2">
+            <div>
+                <p class="text-xs font-label tracking-widest uppercase opacity-60" itemprop="brand">{{ vehicle.brand }}</p>
+                <h3 class="text-lg font-serif font-bold" itemprop="name">{{ vehicle.name }}</h3>
+            </div>
+        </div>
+        <div class="flex justify-between items-center mb-4 text-on-surface-variant text-xs">
+            {% if vehicle.seating_capacity %}
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" aria-hidden="true">event_seat</span> {{ vehicle.seating_capacity }} Seats</span>
+            {% endif %}
+            {% if vehicle.fuel_type %}
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" aria-hidden="true">local_gas_station</span> {{ vehicle.get_fuel_type_display }}</span>
+            {% endif %}
+            {% if vehicle.transmission %}
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" aria-hidden="true">settings</span> {{ vehicle.get_transmission_display }}</span>
+            {% endif %}
+        </div>
+        <div class="flex justify-between items-center pt-4 border-t border-outline-variant/10" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+            <div>
+                <p class="text-lg font-serif font-bold"><span itemprop="price" content="{{ vehicle.primary_price_value }}">{{ vehicle.primary_price_value|inr }}</span><span class="text-xs font-sans font-normal opacity-60">/{{ vehicle.primary_price_label }}</span>
+                    <meta itemprop="priceCurrency" content="INR"/>
+                </p>
+                {% if vehicle.rental_mode == "monthly" %}
+                <span class="text-[9px] font-bold uppercase tracking-widest text-primary bg-primary-fixed px-2 py-0.5 rounded mt-1 inline-block">Monthly Only</span>
+                {% elif vehicle.rental_mode == "weekly" %}
+                <span class="text-[9px] font-bold uppercase tracking-widest text-primary bg-primary-fixed px-2 py-0.5 rounded mt-1 inline-block">Weekly Min</span>
+                {% endif %}
+            </div>
+            <a href="{{ vehicle.get_absolute_url }}" class="bg-primary text-on-primary px-5 py-2 rounded-full text-xs font-bold hover:bg-primary-container transition-colors" itemprop="url" aria-label="View details for {{ vehicle.name }}">View Details</a>
+        </div>
+    </div>
+</article>

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load vehicle_tags %}
+
+{% block body %}
+{% include "public/includes/navbar.html" %}
+
+<main id="main-content" role="main" class="pt-24">
+    {% block content %}{% endblock %}
+</main>
+
+{% include "public/includes/footer.html" %}
+{% include "public/includes/whatsapp_float.html" %}
+{% include "public/includes/cookie_banner.html" %}
+{% endblock %}

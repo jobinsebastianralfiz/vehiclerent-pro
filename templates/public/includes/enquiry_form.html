@@ -1,0 +1,51 @@
+{% load vehicle_tags %}
+<form method="post" action="{% url 'submit_enquiry' %}" x-data="{ submitted: false, loading: false }" x-on:submit.prevent="
+    loading = true;
+    const formData = new FormData($el);
+    fetch('{% url 'submit_enquiry' %}', { method: 'POST', body: formData, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json())
+        .then(data => { loading = false; if(data.success) submitted = true; })
+        .catch(() => { loading = false; $el.submit(); });
+">
+    {% csrf_token %}
+    {% if vehicle_id %}
+    <input type="hidden" name="vehicle" value="{{ vehicle_id }}"/>
+    {% endif %}
+
+    <div x-show="!submitted">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Your Name *</label>
+                <input type="text" name="name" required class="w-full border-stone-200 rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary py-3 px-4" placeholder="Full name"/>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Phone Number *</label>
+                <input type="tel" name="phone" required class="w-full border-stone-200 rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary py-3 px-4" placeholder="+91 "/>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Email</label>
+                <input type="email" name="email" class="w-full border-stone-200 rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary py-3 px-4" placeholder="you@example.com"/>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Preferred Start Date</label>
+                <input type="date" name="preferred_start_date" class="w-full border-stone-200 rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary py-3 px-4"/>
+            </div>
+            <div class="md:col-span-2">
+                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Message</label>
+                <textarea name="message" rows="3" class="w-full border-stone-200 rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary py-3 px-4" placeholder="Tell us about your requirements..."></textarea>
+            </div>
+        </div>
+        <div class="mt-6">
+            <button type="submit" x-bind:disabled="loading" class="bg-primary text-on-primary px-10 py-4 rounded-full font-bold hover:bg-primary-container transition-colors w-full md:w-auto">
+                <span x-show="!loading">Send Enquiry</span>
+                <span x-show="loading">Sending...</span>
+            </button>
+        </div>
+    </div>
+
+    <div x-show="submitted" x-cloak class="text-center py-8">
+        <span class="material-symbols-outlined text-5xl text-primary mb-4">check_circle</span>
+        <h3 class="text-2xl font-serif font-bold mb-2">Thank You!</h3>
+        <p class="text-on-surface-variant">We've received your enquiry and will get back to you shortly.</p>
+    </div>
+</form>

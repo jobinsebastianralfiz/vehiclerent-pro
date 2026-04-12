@@ -1,0 +1,155 @@
+{% extends "manage/base_admin.html" %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <a href="{% url 'customer_list' %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
+        <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Customers
+    </a>
+</div>
+
+<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+    <div class="px-8 py-6 border-b border-stone-100">
+        <h2 class="text-xl font-bold">{{ title }}</h2>
+        <p class="text-stone-500 text-xs mt-1">{% if customer %}Update customer information{% else %}Add a new customer to the system{% endif %}</p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="p-8">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="mb-8 px-4 py-3 rounded-xl bg-red-50 text-red-800 text-sm">
+            <p class="font-medium mb-2">Please correct the errors below:</p>
+            {{ form.errors }}
+        </div>
+        {% endif %}
+
+        <!-- Personal Information -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Personal Info</p>
+                <p class="text-xs text-stone-400 mt-1">Basic contact details for the customer</p>
+            </div>
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Full Name *</label>
+                    <input type="text" name="full_name" value="{{ form.full_name.value|default:'' }}" required class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. Rahul Sharma"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Phone Number *</label>
+                    <input type="tel" name="phone" value="{{ form.phone.value|default:'' }}" required class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="+91 98765 43210"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Email</label>
+                    <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="customer@example.com"/>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Address</label>
+                    <textarea name="address" rows="3" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="Full address...">{{ form.address.value|default:'' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Identity Verification -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">ID Verification</p>
+                <p class="text-xs text-stone-400 mt-1">Government-issued identification documents</p>
+            </div>
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">ID Proof Type</label>
+                    <select name="id_proof_type" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">
+                        <option value="">Select type</option>
+                        <option value="aadhaar" {% if form.id_proof_type.value == 'aadhaar' %}selected{% endif %}>Aadhaar</option>
+                        <option value="driving_license" {% if form.id_proof_type.value == 'driving_license' %}selected{% endif %}>Driving License</option>
+                        <option value="passport" {% if form.id_proof_type.value == 'passport' %}selected{% endif %}>Passport</option>
+                        <option value="voter_id" {% if form.id_proof_type.value == 'voter_id' %}selected{% endif %}>Voter ID</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">ID Proof Number</label>
+                    <input type="text" name="id_proof_number" value="{{ form.id_proof_number.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. XXXX XXXX 1234"/>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">ID Proof Image</label>
+                    {% if customer.id_proof_image %}
+                    <div class="mb-2 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-green-600">check_circle</span>
+                        <span class="text-sm text-stone-600">File uploaded</span>
+                        <a href="{{ customer.id_proof_image.url }}" target="_blank" class="text-primary text-sm hover:underline">View</a>
+                    </div>
+                    {% endif %}
+                    <input type="file" name="id_proof_image" accept="image/*,.pdf" class="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Driving License -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Driving License</p>
+                <p class="text-xs text-stone-400 mt-1">License details required for vehicle rental</p>
+            </div>
+            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">License Number</label>
+                    <input type="text" name="license_number" value="{{ form.license_number.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. KL-01-2020-0012345"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">License Expiry Date</label>
+                    <input type="date" name="license_expiry" value="{{ form.license_expiry.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">License Image</label>
+                    {% if customer.license_image %}
+                    <div class="mb-2 flex items-center gap-3">
+                        <span class="material-symbols-outlined text-green-600">check_circle</span>
+                        <span class="text-sm text-stone-600">File uploaded</span>
+                        <a href="{{ customer.license_image.url }}" target="_blank" class="text-primary text-sm hover:underline">View</a>
+                    </div>
+                    {% endif %}
+                    <input type="file" name="license_image" accept="image/*,.pdf" class="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Settings -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Admin Settings</p>
+                <p class="text-xs text-stone-400 mt-1">Internal notes and status flags</p>
+            </div>
+            <div class="lg:col-span-2 space-y-6">
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Admin Notes</label>
+                    <textarea name="notes" rows="3" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="Internal notes about this customer...">{{ form.notes.value|default:'' }}</textarea>
+                </div>
+                <div class="flex items-center gap-3 p-4 bg-red-50/50 rounded-xl">
+                    <input type="checkbox" name="is_blacklisted" {% if form.is_blacklisted.value %}checked{% endif %} class="rounded border-red-300 text-red-600 focus:ring-red-500" id="id_blacklisted"/>
+                    <label for="id_blacklisted" class="cursor-pointer">
+                        <span class="text-sm font-medium text-stone-800">Blacklist this customer</span>
+                        <p class="text-xs text-stone-500 mt-0.5">Blacklisted customers cannot be assigned new vehicle allocations</p>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-between items-center pt-8 border-t border-stone-100">
+            <div>
+                {% if customer %}
+                <a href="{% url 'customer_detail' customer.pk %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
+                    <span class="material-symbols-outlined text-lg">visibility</span> View Customer Profile
+                </a>
+                {% endif %}
+            </div>
+            <div class="flex gap-4">
+                <a href="{% url 'customer_list' %}" class="px-6 py-3 bg-stone-100 text-stone-700 rounded-full font-medium hover:bg-stone-200 transition-colors">Cancel</a>
+                <button type="submit" class="px-8 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors">Save Customer</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

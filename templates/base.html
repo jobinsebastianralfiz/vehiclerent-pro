@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="theme-color" content="#33450d"/>
+    <meta name="color-scheme" content="light"/>
+    <title>{% block title %}VehicleRent Pro{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ BUSINESS_NAME }} - Premium vehicle rental service. Browse our fleet of cars, SUVs, bikes and more. Flexible daily, weekly & monthly rentals.{% endblock %}"/>
+    <meta name="robots" content="index, follow"/>
+    <link rel="canonical" href="{{ request.build_absolute_uri }}"/>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% block og_title %}{{ BUSINESS_NAME }}{% endblock %}"/>
+    <meta property="og:description" content="{% block og_description %}Premium vehicle rental service with a wide fleet of cars, SUVs, bikes and more.{% endblock %}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="{{ request.build_absolute_uri }}"/>
+    <meta property="og:site_name" content="{{ BUSINESS_NAME }}"/>
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-container": "#5c6274",
+                        "primary-fixed-dim": "#b8cf88",
+                        "on-background": "#1a1c1c",
+                        "on-secondary-fixed": "#141b2b",
+                        "tertiary-fixed": "#dae2fd",
+                        "primary": "#33450d",
+                        "surface": "#f9f9f9",
+                        "secondary-container": "#d9dff5",
+                        "on-primary-fixed": "#141f00",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#2f3131",
+                        "secondary-fixed": "#dce2f7",
+                        "inverse-on-surface": "#f0f1f1",
+                        "on-secondary-fixed-variant": "#404758",
+                        "surface-tint": "#52652a",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#c4cbe6",
+                        "outline-variant": "#c6c8b8",
+                        "on-tertiary-fixed": "#131b2e",
+                        "on-surface-variant": "#45483c",
+                        "surface-container": "#eeeeee",
+                        "surface-variant": "#e2e2e2",
+                        "background": "#f9f9f9",
+                        "primary-fixed": "#d4eca2",
+                        "primary-container": "#4a5d23",
+                        "tertiary-container": "#4e566c",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-error-container": "#93000a",
+                        "outline": "#76786b",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-bright": "#f9f9f9",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "surface-dim": "#dadada",
+                        "tertiary": "#373f54",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#b8cf88",
+                        "surface-container-low": "#f3f3f3",
+                        "secondary-fixed-dim": "#c0c6db",
+                        "secondary": "#575e70",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#bed58e",
+                        "on-primary-fixed-variant": "#3b4d14"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.125rem",
+                        lg: "0.25rem",
+                        xl: "0.5rem",
+                        full: "0.75rem"
+                    },
+                    fontFamily: {
+                        headline: ["Noto Serif"],
+                        body: ["Manrope"],
+                        label: ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body { font-family: 'Manrope', sans-serif; background-color: #f9f9f9; color: #1a1c1c; }
+        .font-serif { font-family: 'Noto Serif', serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        .glass-nav { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .vehicle-card:hover { transform: translateY(-8px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .vehicle-card { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .ghost-border { border: 1px solid rgba(118, 120, 107, 0.15); }
+
+        /* Accessibility */
+        [x-cloak] { display: none !important; }
+        .skip-link { position: absolute; top: -100%; left: 50%; transform: translateX(-50%); z-index: 9999; }
+        .skip-link:focus { top: 0.5rem; }
+        *:focus-visible { outline: 2px solid #33450d; outline-offset: 2px; border-radius: 4px; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+            .vehicle-card:hover { transform: none; }
+        }
+
+        /* Print */
+        @media print { nav, aside, .no-print, .whatsapp-float, #back-to-top, #cookie-banner { display: none !important; } main { padding-top: 0 !important; } }
+
+        /* Smooth image loading */
+        img { content-visibility: auto; }
+        img[loading="lazy"] { transition: opacity 0.3s; }
+    </style>
+    {% block extra_css %}{% endblock %}
+
+    <!-- Structured Data -->
+    {% block structured_data %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "AutoRental",
+        "name": "{{ BUSINESS_NAME }}",
+        "telephone": "{{ BUSINESS_PHONE }}",
+        "email": "{{ BUSINESS_EMAIL }}",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "{{ BUSINESS_ADDRESS }}"
+        }
+    }
+    </script>
+    {% endblock %}
+</head>
+<body class="bg-surface text-on-surface">
+    <!-- Skip to Content (Accessibility) -->
+    <a href="#main-content" class="skip-link bg-primary text-on-primary px-6 py-3 rounded-full font-bold shadow-lg focus:outline-none">Skip to main content</a>
+
+    {% block body %}{% endblock %}
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top" class="fixed bottom-8 left-8 z-40 w-12 h-12 bg-white/80 backdrop-blur-md text-on-surface rounded-full shadow-lg flex items-center justify-center hover:bg-white transition-all opacity-0 pointer-events-none" style="transition: opacity 0.3s;">
+        <span class="material-symbols-outlined">keyboard_arrow_up</span>
+    </button>
+
+    <script>
+        // Back to top visibility
+        (function() {
+            var btn = document.getElementById('back-to-top');
+            if (!btn) return;
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 600) {
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                } else {
+                    btn.style.opacity = '0';
+                    btn.style.pointerEvents = 'none';
+                }
+            }, { passive: true });
+        })();
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

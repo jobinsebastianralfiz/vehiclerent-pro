@@ -1,0 +1,127 @@
+{% extends "manage/base_admin.html" %}
+{% load vehicle_tags %}
+
+{% block page_title %}Enquiry from {{ enquiry.name }}{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <a href="{% url 'enquiry_list' %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
+        <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Enquiries
+    </a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Enquiry Info -->
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-stone-100 overflow-hidden">
+        <div class="px-8 py-6 border-b border-stone-100 flex items-center justify-between">
+            <div>
+                <h2 class="text-xl font-bold">Enquiry Details</h2>
+                <p class="text-stone-500 text-xs mt-1">Received on {{ enquiry.created_at|date:"d M Y, h:i A" }}</p>
+            </div>
+            {% status_badge enquiry.status %}
+        </div>
+
+        <div class="p-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-5">
+                    <div>
+                        <p class="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Name</p>
+                        <p class="font-medium text-on-surface">{{ enquiry.name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Phone</p>
+                        <p class="font-medium text-on-surface">
+                            <a href="tel:{{ enquiry.phone }}" class="text-primary hover:underline">{{ enquiry.phone }}</a>
+                        </p>
+                    </div>
+                    {% if enquiry.email %}
+                    <div>
+                        <p class="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Email</p>
+                        <p class="font-medium text-on-surface">
+                            <a href="mailto:{{ enquiry.email }}" class="text-primary hover:underline">{{ enquiry.email }}</a>
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="space-y-5">
+                    <div>
+                        <p class="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Source</p>
+                        {% status_badge enquiry.source %}
+                    </div>
+                    {% if enquiry.vehicle %}
+                    <div>
+                        <p class="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Interested Vehicle</p>
+                        <p class="font-medium text-on-surface">{{ enquiry.vehicle.brand }} {{ enquiry.vehicle.name }}</p>
+                    </div>
+                    {% endif %}
+                    {% if enquiry.preferred_start_date %}
+                    <div>
+                        <p class="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Preferred Dates</p>
+                        <p class="font-medium text-on-surface">{{ enquiry.preferred_start_date|date:"d M Y" }}{% if enquiry.preferred_end_date %} &mdash; {{ enquiry.preferred_end_date|date:"d M Y" }}{% endif %}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if enquiry.message %}
+            <div class="mt-8 pt-8 border-t border-stone-100">
+                <p class="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-3">Message</p>
+                <div class="bg-surface-container-low p-6 rounded-xl text-on-surface-variant leading-relaxed">{{ enquiry.message|linebreaksbr }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sidebar: Update + Actions -->
+    <div class="space-y-6">
+        <!-- Update Status -->
+        <div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-stone-100">
+                <h3 class="font-bold text-sm">Update Status</h3>
+            </div>
+            <form method="post" class="p-6">
+                {% csrf_token %}
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Status</label>
+                        <select name="status" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">
+                            {% for val, label in form.fields.status.choices %}
+                            <option value="{{ val }}" {% if enquiry.status == val %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Admin Notes</label>
+                        <textarea name="admin_notes" rows="5" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="Internal notes...">{{ enquiry.admin_notes }}</textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">Update Enquiry</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-stone-100">
+                <h3 class="font-bold text-sm">Actions</h3>
+            </div>
+            <div class="p-6 space-y-3">
+                <a href="{% url 'customer_add' %}?from_enquiry={{ enquiry.pk }}" class="flex items-center justify-center gap-2 w-full bg-primary text-on-primary py-3 rounded-lg text-sm font-medium hover:bg-primary-container transition-colors">
+                    <span class="material-symbols-outlined text-lg">person_add</span> Create Customer
+                </a>
+                {% if WHATSAPP_NUMBER %}
+                {% load vehicle_tags %}
+                <a href="https://wa.me/{{ WHATSAPP_NUMBER }}?text=Hi {{ enquiry.name }}, regarding your enquiry..." target="_blank" rel="noopener" class="flex items-center justify-center gap-2 w-full bg-[#25D366] text-white py-3 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
+                    <span class="material-symbols-outlined text-lg">chat</span> Reply via WhatsApp
+                </a>
+                {% endif %}
+                <form method="post" action="{% url 'enquiry_delete' enquiry.pk %}" onsubmit="return confirm('Delete this enquiry permanently?')">
+                    {% csrf_token %}
+                    <button type="submit" class="flex items-center justify-center gap-2 w-full bg-red-50 text-red-600 py-3 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors">
+                        <span class="material-symbols-outlined text-lg">delete</span> Delete Enquiry
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

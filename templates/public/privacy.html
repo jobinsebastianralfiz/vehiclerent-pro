@@ -1,0 +1,104 @@
+{% extends "public/base_public.html" %}
+
+{% block title %}Privacy Policy - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Privacy Policy for {{ BUSINESS_NAME }}. Learn how we collect, use, and protect your personal information.{% endblock %}
+
+{% block content %}
+<article class="py-12 px-8 max-w-4xl mx-auto" aria-label="Privacy Policy">
+    <header class="mb-16">
+        <p class="text-primary font-label text-xs tracking-[0.2em] mb-4 uppercase">Legal</p>
+        <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">Privacy Policy</h1>
+        <p class="text-on-surface-variant">Last updated: {% now "F j, Y" %}</p>
+    </header>
+
+    <div class="prose-content space-y-12 text-on-surface-variant leading-relaxed">
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">1. Information We Collect</h2>
+            <p class="mb-4">We collect information that you provide directly to us when using our services:</p>
+            <ul class="list-disc pl-6 space-y-2">
+                <li><strong>Personal Information:</strong> Name, phone number, email address when you submit an enquiry form or contact us.</li>
+                <li><strong>Identity Documents:</strong> Driving license, government ID (Aadhaar, Passport, etc.) — collected only during the rental process for verification purposes.</li>
+                <li><strong>Rental Information:</strong> Vehicle preferences, rental dates, pickup/drop locations.</li>
+                <li><strong>Communication Data:</strong> Messages sent through our enquiry forms or WhatsApp.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">2. How We Use Your Information</h2>
+            <ul class="list-disc pl-6 space-y-2">
+                <li>To process and manage vehicle rental enquiries and bookings.</li>
+                <li>To communicate with you about your enquiry, booking, or rental.</li>
+                <li>To verify your identity and eligibility for vehicle rental.</li>
+                <li>To send you important notices about your rental (pickup confirmation, return reminders).</li>
+                <li>To improve our services and website experience.</li>
+                <li>To comply with legal obligations.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">3. Information Sharing</h2>
+            <p class="mb-4">We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:</p>
+            <ul class="list-disc pl-6 space-y-2">
+                <li>With law enforcement or government authorities when required by law.</li>
+                <li>With insurance providers in the event of an accident or damage claim.</li>
+                <li>With service providers who assist us in operating our business (e.g., email service), bound by confidentiality agreements.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">4. Data Security</h2>
+            <p>We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. This includes encrypted data transmission (HTTPS), secure server infrastructure, and restricted access to personal data.</p>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">5. Data Retention</h2>
+            <p>We retain your personal information for as long as necessary to fulfill the purposes for which it was collected, including to satisfy legal, accounting, or reporting requirements. Enquiry data is retained for up to 2 years. Rental records are retained for 7 years as required by applicable law.</p>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">6. Cookies</h2>
+            <p>Our website uses only essential cookies necessary for the site to function (session management, CSRF protection). We do not use tracking cookies, advertising cookies, or third-party analytics that track individual users.</p>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">7. Your Rights</h2>
+            <p class="mb-4">You have the right to:</p>
+            <ul class="list-disc pl-6 space-y-2">
+                <li><strong>Access</strong> — Request a copy of the personal information we hold about you.</li>
+                <li><strong>Correction</strong> — Request correction of inaccurate or incomplete information.</li>
+                <li><strong>Deletion</strong> — Request deletion of your personal information, subject to legal retention requirements.</li>
+                <li><strong>Objection</strong> — Object to the processing of your personal information.</li>
+                <li><strong>Portability</strong> — Request transfer of your information in a machine-readable format.</li>
+            </ul>
+            <p class="mt-4">To exercise any of these rights, please contact us using the details below.</p>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">8. Children's Privacy</h2>
+            <p>Our services are not directed to individuals under the age of 18. We do not knowingly collect personal information from children.</p>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-serif font-bold text-on-surface mb-4">9. Changes to This Policy</h2>
+            <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page with an updated revision date.</p>
+        </section>
+
+        <section class="bg-surface-container-low rounded-2xl p-8">
+            <h2 class="text-xl font-serif font-bold text-on-surface mb-3">Contact Our Privacy Team</h2>
+            <p class="mb-4">For privacy-related questions or to exercise your rights:</p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                {% if BUSINESS_EMAIL %}
+                <a href="mailto:{{ BUSINESS_EMAIL }}" class="flex items-center gap-2 text-primary font-medium hover:underline">
+                    <span class="material-symbols-outlined text-lg" aria-hidden="true">mail</span> {{ BUSINESS_EMAIL }}
+                </a>
+                {% endif %}
+                {% if BUSINESS_PHONE %}
+                <a href="tel:{{ BUSINESS_PHONE }}" class="flex items-center gap-2 text-primary font-medium hover:underline">
+                    <span class="material-symbols-outlined text-lg" aria-hidden="true">call</span> {{ BUSINESS_PHONE }}
+                </a>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</article>
+{% endblock %}
