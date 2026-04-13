@@ -3,50 +3,74 @@
 {% block page_title %}Categories{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-8">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
     <div>
-        <h1 class="text-2xl font-bold">Categories</h1>
-        <p class="text-stone-500 text-sm mt-1">Manage vehicle categories</p>
+        <h1 class="text-xl sm:text-2xl font-bold">Categories</h1>
+        <p class="text-stone-500 text-xs sm:text-sm mt-1">Manage vehicle categories</p>
     </div>
-    <a href="{% url 'category_add' %}" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+    <a href="{% url 'category_add' %}" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
         <span class="material-symbols-outlined text-lg">add</span> Add Category
     </a>
 </div>
 
-<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
-    <table class="w-full">
-        <thead>
-            <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
-                <th class="text-left px-6 py-4">Name</th>
-                <th class="text-left px-4 py-4">Icon</th>
-                <th class="text-center px-4 py-4">Vehicles</th>
-                <th class="text-left px-4 py-4">Order</th>
-                <th class="text-center px-4 py-4">Active</th>
-                <th class="text-right px-6 py-4">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cat in categories %}
-            <tr class="hover:bg-stone-50 transition-colors border-b border-stone-50">
-                <td class="px-6 py-4 font-medium text-sm">{{ cat.name }}</td>
-                <td class="px-4 py-4"><span class="material-symbols-outlined text-primary">{{ cat.icon|default:"category" }}</span></td>
-                <td class="px-4 py-4 text-center text-sm text-stone-600">{{ cat.vehicle_count }}</td>
-                <td class="px-4 py-4 text-sm text-stone-600">{{ cat.display_order }}</td>
-                <td class="px-4 py-4 text-center">
-                    <span class="material-symbols-outlined text-lg {% if cat.is_active %}text-green-600{% else %}text-stone-300{% endif %}">{% if cat.is_active %}check_circle{% else %}cancel{% endif %}</span>
-                </td>
-                <td class="px-6 py-4 text-right">
-                    <a href="{% url 'category_edit' cat.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100 inline-block"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
-                    <form method="post" action="{% url 'category_delete' cat.pk %}" class="inline" onsubmit="return confirm('Delete this category?')">
-                        {% csrf_token %}
-                        <button type="submit" class="p-1.5 rounded-lg hover:bg-red-50"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button>
-                    </form>
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="6" class="px-8 py-16 text-center text-stone-400">No categories yet. <a href="{% url 'category_add' %}" class="text-primary font-medium">Add one</a>.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- Mobile: Card Layout -->
+<div class="sm:hidden space-y-3">
+    {% for cat in categories %}
+    <div class="bg-white rounded-xl border border-stone-100 p-4">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-primary">{{ cat.icon|default:"category" }}</span>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="font-medium text-sm">{{ cat.name }}</p>
+                <p class="text-xs text-stone-500">{{ cat.vehicle_count }} vehicle{{ cat.vehicle_count|pluralize }} &middot; Order: {{ cat.display_order }}</p>
+            </div>
+            <span class="material-symbols-outlined text-lg {% if cat.is_active %}text-green-600{% else %}text-stone-300{% endif %}">{% if cat.is_active %}check_circle{% else %}cancel{% endif %}</span>
+        </div>
+        <div class="flex items-center justify-end gap-1 pt-3 border-t border-stone-100">
+            <a href="{% url 'category_edit' cat.pk %}" class="p-2 rounded-lg hover:bg-stone-100"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
+            <form method="post" action="{% url 'category_delete' cat.pk %}" class="inline" onsubmit="return confirm('Delete this category?')">{% csrf_token %}<button type="submit" class="p-2 rounded-lg hover:bg-red-50"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button></form>
+        </div>
+    </div>
+    {% empty %}
+    <div class="bg-white rounded-xl border border-stone-100 p-8 text-center text-stone-400">No categories yet. <a href="{% url 'category_add' %}" class="text-primary font-medium">Add one</a>.</div>
+    {% endfor %}
+</div>
+
+<!-- Desktop: Table Layout -->
+<div class="hidden sm:block bg-white rounded-2xl border border-stone-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
+                    <th class="text-left px-6 py-4">Name</th>
+                    <th class="text-left px-4 py-4">Icon</th>
+                    <th class="text-center px-4 py-4">Vehicles</th>
+                    <th class="text-left px-4 py-4">Order</th>
+                    <th class="text-center px-4 py-4">Active</th>
+                    <th class="text-right px-6 py-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cat in categories %}
+                <tr class="hover:bg-stone-50 transition-colors border-b border-stone-50">
+                    <td class="px-6 py-4 font-medium text-sm">{{ cat.name }}</td>
+                    <td class="px-4 py-4"><span class="material-symbols-outlined text-primary">{{ cat.icon|default:"category" }}</span></td>
+                    <td class="px-4 py-4 text-center text-sm text-stone-600">{{ cat.vehicle_count }}</td>
+                    <td class="px-4 py-4 text-sm text-stone-600">{{ cat.display_order }}</td>
+                    <td class="px-4 py-4 text-center">
+                        <span class="material-symbols-outlined text-lg {% if cat.is_active %}text-green-600{% else %}text-stone-300{% endif %}">{% if cat.is_active %}check_circle{% else %}cancel{% endif %}</span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'category_edit' cat.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100 inline-block"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
+                        <form method="post" action="{% url 'category_delete' cat.pk %}" class="inline" onsubmit="return confirm('Delete this category?')">{% csrf_token %}<button type="submit" class="p-1.5 rounded-lg hover:bg-red-50"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button></form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="px-8 py-16 text-center text-stone-400">No categories yet. <a href="{% url 'category_add' %}" class="text-primary font-medium">Add one</a>.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

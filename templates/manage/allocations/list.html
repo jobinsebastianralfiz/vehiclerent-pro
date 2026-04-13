@@ -4,25 +4,59 @@
 {% block page_title %}Allocations{% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
     <div>
-        <h1 class="text-2xl font-bold">Allocation Management</h1>
-        <p class="text-stone-500 text-sm mt-1">Manage vehicle allocations</p>
+        <h1 class="text-xl sm:text-2xl font-bold">Allocation Management</h1>
+        <p class="text-stone-500 text-xs sm:text-sm mt-1">Manage vehicle allocations</p>
     </div>
-    <div class="flex items-center gap-4 mt-4 md:mt-0">
-        <select onchange="window.location.href='?status='+this.value" class="rounded-lg text-sm ghost-border py-2 px-3 bg-white">
-            <option value="">All Status</option>
-            {% for val, label in status_choices %}
-            <option value="{{ val }}" {% if current_status == val %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
-        <a href="{% url 'allocation_add' %}" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-            <span class="material-symbols-outlined text-lg">add</span> New Allocation
-        </a>
-    </div>
+    <a href="{% url 'allocation_add' %}" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
+        <span class="material-symbols-outlined text-lg">add</span> New Allocation
+    </a>
 </div>
 
-<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+<!-- Filters -->
+<div class="mb-6">
+    <select onchange="window.location.href='?status='+this.value" class="rounded-lg text-sm ghost-border py-2.5 px-3 bg-white w-full sm:w-auto">
+        <option value="">All Status</option>
+        {% for val, label in status_choices %}
+        <option value="{{ val }}" {% if current_status == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<!-- Mobile: Card Layout -->
+<div class="sm:hidden space-y-3">
+    {% for alloc in page_obj %}
+    <a href="{% url 'allocation_detail' alloc.pk %}" class="block bg-white rounded-xl border border-stone-100 p-4 active:bg-stone-50">
+        <div class="flex items-center justify-between mb-2">
+            <div>
+                <p class="font-medium text-sm">{{ alloc.vehicle.name }}</p>
+                <p class="text-xs text-stone-500">{{ alloc.vehicle.brand }} &middot; {{ alloc.customer.full_name }}</p>
+            </div>
+            {% status_badge alloc.status %}
+        </div>
+        <div class="flex items-center gap-3 text-xs text-stone-500 mb-3 pb-3 border-b border-stone-100">
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">calendar_today</span>{{ alloc.start_date|date:"d M" }} - {{ alloc.end_date|date:"d M" }}</span>
+            <span>{{ alloc.duration_days }} days</span>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+            <div>
+                <span class="font-medium">{{ alloc.total_amount|inr }}</span>
+            </div>
+            {% if alloc.balance_amount > 0 %}
+            <span class="text-amber-600 font-medium text-xs">Balance: {{ alloc.balance_amount|inr }}</span>
+            {% else %}
+            <span class="text-green-600 text-xs font-medium">Paid</span>
+            {% endif %}
+        </div>
+    </a>
+    {% empty %}
+    <div class="bg-white rounded-xl border border-stone-100 p-8 text-center text-stone-400">No allocations yet. <a href="{% url 'allocation_add' %}" class="text-primary font-medium">Create one</a>.</div>
+    {% endfor %}
+</div>
+
+<!-- Desktop: Table Layout -->
+<div class="hidden sm:block bg-white rounded-2xl border border-stone-100 overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead>

@@ -4,29 +4,74 @@
 {% block page_title %}Vehicles{% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
     <div>
-        <h1 class="text-2xl font-bold">Vehicle Management</h1>
-        <p class="text-stone-500 text-sm mt-1">Manage your fleet inventory</p>
+        <h1 class="text-xl sm:text-2xl font-bold">Vehicle Management</h1>
+        <p class="text-stone-500 text-xs sm:text-sm mt-1">Manage your fleet inventory</p>
     </div>
-    <div class="flex items-center gap-4 mt-4 md:mt-0">
-        <form method="get" class="relative">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-lg">search</span>
-            <input type="text" name="q" value="{{ q }}" placeholder="Search vehicles..." class="pl-10 pr-4 py-2 bg-surface-container-low rounded-full text-sm focus:ring-1 focus:ring-primary border-0 w-56"/>
-        </form>
-        <select onchange="window.location.href='?status='+this.value" class="rounded-lg text-sm ghost-border py-2 px-3 bg-white">
-            <option value="">All Status</option>
-            {% for val, label in status_choices %}
-            <option value="{{ val }}" {% if current_status == val %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
-        <a href="{% url 'vehicle_add' %}" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-blue-700 transition-colors">
-            <span class="material-symbols-outlined text-lg">add</span> Add Vehicle
-        </a>
-    </div>
+    <a href="{% url 'vehicle_add' %}" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-blue-700 transition-colors w-full sm:w-auto justify-center sm:justify-start">
+        <span class="material-symbols-outlined text-lg">add</span> Add Vehicle
+    </a>
 </div>
 
-<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+<!-- Filters -->
+<div class="flex flex-col sm:flex-row gap-3 mb-6">
+    <form method="get" class="relative flex-1 sm:flex-none">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-lg">search</span>
+        <input type="text" name="q" value="{{ q }}" placeholder="Search vehicles..." class="pl-10 pr-4 py-2.5 bg-surface-container-low rounded-lg text-sm focus:ring-1 focus:ring-primary border-0 w-full sm:w-56"/>
+    </form>
+    <select onchange="window.location.href='?status='+this.value" class="rounded-lg text-sm ghost-border py-2.5 px-3 bg-white">
+        <option value="">All Status</option>
+        {% for val, label in status_choices %}
+        <option value="{{ val }}" {% if current_status == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<!-- Mobile: Card Layout -->
+<div class="sm:hidden space-y-3">
+    {% for vehicle in page_obj %}
+    <div class="bg-white rounded-xl border border-stone-100 p-4">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-14 h-14 rounded-lg overflow-hidden bg-stone-100 flex-shrink-0">
+                {% if vehicle.thumbnail %}
+                <img src="{{ vehicle.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>
+                {% else %}
+                <div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-stone-400">directions_car</span></div>
+                {% endif %}
+            </div>
+            <div class="min-w-0 flex-1">
+                <p class="font-medium text-sm truncate">{{ vehicle.name }}{% if vehicle.is_premium %} <span class="text-amber-500"><span class="material-symbols-outlined text-sm">star</span></span>{% endif %}{% if vehicle.is_wedding_service %} <span class="text-pink-500"><span class="material-symbols-outlined text-sm">favorite</span></span>{% endif %}</p>
+                <p class="text-xs text-stone-500 truncate">{{ vehicle.brand }} &middot; {{ vehicle.registration_number|default:"No Reg." }}</p>
+            </div>
+            {% status_badge vehicle.status %}
+        </div>
+        <div class="flex items-center justify-between text-xs text-stone-500 mb-3 pb-3 border-b border-stone-100">
+            <span>{{ vehicle.get_vehicle_type_display }}</span>
+            <span class="font-medium text-on-surface text-sm">{{ vehicle.primary_price_value|inr }}<span class="text-stone-400 font-normal">/{{ vehicle.primary_price_label }}</span></span>
+        </div>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <form method="post" action="{% url 'vehicle_toggle_status' vehicle.pk %}" class="inline">{% csrf_token %}<input type="hidden" name="action" value="toggle_featured"/><button type="submit" class="text-lg">{% if vehicle.is_featured %}<span class="text-amber-500">&#9733;</span>{% else %}<span class="text-stone-300">&#9734;</span>{% endif %}</button></form>
+                <form method="post" action="{% url 'vehicle_toggle_status' vehicle.pk %}" class="inline">{% csrf_token %}<input type="hidden" name="action" value="toggle_published"/><button type="submit"><span class="material-symbols-outlined text-lg {% if vehicle.is_published %}text-green-600{% else %}text-stone-300{% endif %}">{% if vehicle.is_published %}visibility{% else %}visibility_off{% endif %}</span></button></form>
+            </div>
+            <div class="flex items-center gap-1">
+                <a href="{% url 'vehicle_images' vehicle.pk %}" class="p-2 rounded-lg hover:bg-stone-100"><span class="material-symbols-outlined text-lg text-stone-500">image</span></a>
+                <a href="{% url 'vehicle_edit' vehicle.pk %}" class="p-2 rounded-lg hover:bg-stone-100"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
+                <form method="post" action="{% url 'vehicle_delete' vehicle.pk %}" onsubmit="return confirm('Delete?')">{% csrf_token %}<button type="submit" class="p-2 rounded-lg hover:bg-red-50"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button></form>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="bg-white rounded-xl border border-stone-100 p-8 text-center text-stone-400">
+        <span class="material-symbols-outlined text-4xl mb-3 block">directions_car</span>
+        No vehicles found. <a href="{% url 'vehicle_add' %}" class="text-primary font-medium">Add your first vehicle</a>.
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Desktop: Table Layout -->
+<div class="hidden sm:block bg-white rounded-2xl border border-stone-100 overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead>
@@ -66,27 +111,16 @@
                     </td>
                     <td class="px-4 py-4 text-sm font-medium">{{ vehicle.primary_price_value|inr }}<span class="text-xs text-stone-400 font-normal">/{{ vehicle.primary_price_label }}</span></td>
                     <td class="px-4 py-4 text-center">
-                        <form method="post" action="{% url 'vehicle_toggle_status' vehicle.pk %}" class="inline">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="toggle_featured"/>
-                            <button type="submit" class="text-lg">{% if vehicle.is_featured %}<span class="text-amber-500">&#9733;</span>{% else %}<span class="text-stone-300">&#9734;</span>{% endif %}</button>
-                        </form>
+                        <form method="post" action="{% url 'vehicle_toggle_status' vehicle.pk %}" class="inline">{% csrf_token %}<input type="hidden" name="action" value="toggle_featured"/><button type="submit" class="text-lg">{% if vehicle.is_featured %}<span class="text-amber-500">&#9733;</span>{% else %}<span class="text-stone-300">&#9734;</span>{% endif %}</button></form>
                     </td>
                     <td class="px-4 py-4 text-center">
-                        <form method="post" action="{% url 'vehicle_toggle_status' vehicle.pk %}" class="inline">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="toggle_published"/>
-                            <button type="submit"><span class="material-symbols-outlined text-lg {% if vehicle.is_published %}text-green-600{% else %}text-stone-300{% endif %}">{% if vehicle.is_published %}visibility{% else %}visibility_off{% endif %}</span></button>
-                        </form>
+                        <form method="post" action="{% url 'vehicle_toggle_status' vehicle.pk %}" class="inline">{% csrf_token %}<input type="hidden" name="action" value="toggle_published"/><button type="submit"><span class="material-symbols-outlined text-lg {% if vehicle.is_published %}text-green-600{% else %}text-stone-300{% endif %}">{% if vehicle.is_published %}visibility{% else %}visibility_off{% endif %}</span></button></form>
                     </td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex items-center justify-end gap-2">
                             <a href="{% url 'vehicle_images' vehicle.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100" title="Images"><span class="material-symbols-outlined text-lg text-stone-500">image</span></a>
                             <a href="{% url 'vehicle_edit' vehicle.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100" title="Edit"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
-                            <form method="post" action="{% url 'vehicle_delete' vehicle.pk %}" onsubmit="return confirm('Delete this vehicle?')">
-                                {% csrf_token %}
-                                <button type="submit" class="p-1.5 rounded-lg hover:bg-red-50" title="Delete"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button>
-                            </form>
+                            <form method="post" action="{% url 'vehicle_delete' vehicle.pk %}" onsubmit="return confirm('Delete this vehicle?')">{% csrf_token %}<button type="submit" class="p-1.5 rounded-lg hover:bg-red-50" title="Delete"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button></form>
                         </div>
                     </td>
                 </tr>
