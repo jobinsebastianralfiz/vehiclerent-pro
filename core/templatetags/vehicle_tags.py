@@ -6,16 +6,31 @@ from django.conf import settings
 register = template.Library()
 
 
+def _get_whatsapp_config():
+    """Get WhatsApp number and message from SiteConfig, falling back to settings."""
+    from core.models import SiteConfig
+    try:
+        config = SiteConfig.load()
+        number = config.whatsapp_number or settings.WHATSAPP_NUMBER
+        message = config.whatsapp_default_message or settings.WHATSAPP_DEFAULT_MESSAGE
+    except Exception:
+        number = settings.WHATSAPP_NUMBER
+        message = settings.WHATSAPP_DEFAULT_MESSAGE
+    return number, message
+
+
 @register.simple_tag
 def whatsapp_url(number=None):
-    num = number or settings.WHATSAPP_NUMBER
-    msg = quote(settings.WHATSAPP_DEFAULT_MESSAGE)
+    wa_number, wa_message = _get_whatsapp_config()
+    num = number or wa_number
+    msg = quote(wa_message)
     return f"https://wa.me/{num}?text={msg}"
 
 
 @register.simple_tag
 def whatsapp_vehicle_url(vehicle, number=None):
-    num = number or settings.WHATSAPP_NUMBER
+    wa_number, _ = _get_whatsapp_config()
+    num = number or wa_number
     msg = quote(
         f"Hi! I'm interested in renting the *{vehicle.name}* "
         f"({vehicle.get_vehicle_type_display()}) "
