@@ -35,10 +35,34 @@
                     <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Description</label>
                     <textarea name="description" rows="3" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="Brief description of this category...">{{ form.description.value|default:'' }}</textarea>
                 </div>
-                <div>
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Icon Name</label>
-                    <input type="text" name="icon" value="{{ form.icon.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. directions_car"/>
-                    <p class="text-xs text-stone-400 mt-1">Material Symbols icon name. Preview: {% if form.icon.value %}<span class="material-symbols-outlined text-primary align-middle">{{ form.icon.value }}</span>{% endif %}</p>
+                <div class="md:col-span-2" x-data="iconPicker('{{ form.icon.value|default:'' }}')">
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Icon</label>
+                    <input type="hidden" name="icon" x-bind:value="selected"/>
+
+                    <!-- Current selection -->
+                    <div class="flex items-center gap-3 mb-4 p-3 bg-surface-container-low rounded-lg" x-show="selected">
+                        <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center">
+                            <span class="material-symbols-outlined text-2xl text-primary" x-text="selected"></span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium" x-text="selected"></p>
+                            <p class="text-xs text-stone-400">Selected icon</p>
+                        </div>
+                    </div>
+
+                    <!-- Search -->
+                    <input type="text" x-model="search" placeholder="Search icons..." class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-2.5 px-4 mb-3"/>
+
+                    <!-- Icon Grid -->
+                    <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 max-h-64 overflow-y-auto p-1">
+                        <template x-for="icon in filtered" :key="icon.name">
+                            <button type="button" x-on:click="selected = icon.name" class="flex flex-col items-center gap-1 p-2.5 rounded-xl border transition-all cursor-pointer" x-bind:class="selected === icon.name ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-stone-100 hover:border-stone-300 hover:bg-stone-50'">
+                                <span class="material-symbols-outlined text-xl" x-bind:class="selected === icon.name ? 'text-primary' : 'text-stone-600'" x-text="icon.name"></span>
+                                <span class="text-[9px] text-stone-400 truncate w-full text-center" x-text="icon.label"></span>
+                            </button>
+                        </template>
+                    </div>
+                    <p class="text-xs text-stone-400 mt-2">Click to select. You can also type a custom <a href="https://fonts.google.com/icons" target="_blank" class="text-primary hover:underline">Material Symbols</a> icon name in the search box and it will be used if no match is found.</p>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Display Order</label>
@@ -63,4 +87,71 @@
         </div>
     </form>
 </div>
+
+<script>
+function iconPicker(initial) {
+    return {
+        selected: initial || '',
+        search: '',
+        icons: [
+            // Cars & Vehicles
+            { name: 'directions_car', label: 'Car', tags: 'car sedan hatchback' },
+            { name: 'directions_car_filled', label: 'Car Filled', tags: 'car sedan filled' },
+            { name: 'no_crash', label: 'SUV', tags: 'suv crossover jeep offroad' },
+            { name: 'minor_crash', label: 'SUV Alt', tags: 'suv truck' },
+            { name: 'local_taxi', label: 'Taxi', tags: 'taxi cab car' },
+            { name: 'airport_shuttle', label: 'Van', tags: 'van shuttle minivan mpv' },
+            { name: 'local_shipping', label: 'Truck', tags: 'truck delivery cargo pickup' },
+            { name: 'fire_truck', label: 'Big Truck', tags: 'truck large heavy' },
+            { name: 'commute', label: 'Commute', tags: 'car commute travel' },
+            { name: 'drive_eta', label: 'Drive', tags: 'drive car eta' },
+            { name: 'garage', label: 'Garage', tags: 'garage parking car' },
+            { name: 'car_rental', label: 'Car Rental', tags: 'rental key car' },
+            { name: 'car_repair', label: 'Car Repair', tags: 'repair service wrench' },
+            // Two Wheelers
+            { name: 'two_wheeler', label: 'Bike', tags: 'bike motorcycle two wheeler' },
+            { name: 'electric_scooter', label: 'Scooter', tags: 'scooter electric' },
+            { name: 'moped', label: 'Moped', tags: 'moped scooter bike' },
+            { name: 'pedal_bike', label: 'Bicycle', tags: 'bicycle cycle pedal' },
+            { name: 'electric_bike', label: 'E-Bike', tags: 'electric bike ebike' },
+            // Bus & Transit
+            { name: 'directions_bus', label: 'Bus', tags: 'bus transit public' },
+            { name: 'directions_bus_filled', label: 'Bus Filled', tags: 'bus filled' },
+            // Specialty
+            { name: 'rv_hookup', label: 'RV', tags: 'rv camper caravan' },
+            { name: 'agriculture', label: 'Tractor', tags: 'tractor farm agriculture' },
+            { name: 'electric_car', label: 'Electric', tags: 'electric ev car' },
+            { name: 'electric_rickshaw', label: 'Auto', tags: 'auto rickshaw three wheeler' },
+            // Premium & Special
+            { name: 'star', label: 'Star', tags: 'premium luxury star' },
+            { name: 'diamond', label: 'Diamond', tags: 'premium luxury diamond' },
+            { name: 'workspace_premium', label: 'Premium', tags: 'premium luxury badge' },
+            { name: 'favorite', label: 'Heart', tags: 'wedding favorite love' },
+            { name: 'celebration', label: 'Party', tags: 'wedding celebration event' },
+            { name: 'emoji_transportation', label: 'Transport', tags: 'transport car building' },
+            // General
+            { name: 'category', label: 'Category', tags: 'category default general' },
+            { name: 'speed', label: 'Speed', tags: 'speed fast performance' },
+            { name: 'bolt', label: 'Bolt', tags: 'electric bolt energy fast' },
+            { name: 'eco', label: 'Eco', tags: 'eco green hybrid' },
+            { name: 'local_gas_station', label: 'Fuel', tags: 'fuel gas petrol diesel' },
+            { name: 'ev_station', label: 'EV Station', tags: 'ev charge electric station' },
+            { name: 'key', label: 'Key', tags: 'key rental access' },
+            { name: 'shield', label: 'Shield', tags: 'shield safety secure' },
+            { name: 'timer', label: 'Timer', tags: 'timer hourly rental time' },
+            { name: 'map', label: 'Map', tags: 'map location travel' },
+        ],
+        get filtered() {
+            if (!this.search) return this.icons;
+            const q = this.search.toLowerCase();
+            const matched = this.icons.filter(i => i.name.includes(q) || i.label.toLowerCase().includes(q) || i.tags.includes(q));
+            // If no match, allow using the search text as a custom icon name
+            if (matched.length === 0 && this.search.length > 1) {
+                this.selected = this.search;
+            }
+            return matched.length > 0 ? matched : this.icons;
+        }
+    }
+}
+</script>
 {% endblock %}
