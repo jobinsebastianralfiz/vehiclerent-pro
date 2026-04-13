@@ -1,27 +1,27 @@
 {% load vehicle_tags %}
-<nav class="fixed top-0 w-full z-50 bg-stone-50/80 backdrop-blur-xl shadow-sm" role="navigation" aria-label="Main navigation">
-    <div class="flex justify-between items-center px-4 sm:px-8 py-4 sm:py-6 max-w-screen-2xl mx-auto">
+<nav x-data="{ scrolled: false }" x-on:scroll.window="scrolled = (window.scrollY > 50)" class="fixed top-0 w-full z-50 transition-all duration-300" x-bind:class="scrolled ? 'bg-stone-50/95 backdrop-blur-xl shadow-sm' : 'bg-transparent'" role="navigation" aria-label="Main navigation">
+    <div class="flex justify-between items-center px-4 sm:px-8 py-4 sm:py-5 max-w-screen-2xl mx-auto">
         <a href="{% url 'home' %}" class="flex items-center gap-2 sm:gap-3 min-w-0" aria-label="{{ BUSINESS_NAME }} - Home">
             {% if SITE_CONFIG.logo %}
             <img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-10 sm:h-12 flex-shrink-0"/>
             {% endif %}
             {% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}
-            <span class="text-lg sm:text-2xl font-serif font-bold text-on-surface truncate">{{ BUSINESS_NAME }}</span>
+            <span class="text-lg sm:text-2xl font-serif font-bold truncate transition-colors duration-300" x-bind:class="scrolled ? 'text-on-surface' : 'text-white'">{{ BUSINESS_NAME }}</span>
             {% endif %}
         </a>
 
         <!-- Desktop Nav -->
         <div class="hidden lg:flex items-center space-x-10" role="menubar">
-            <a class="font-serif text-on-surface hover:text-primary transition-colors tracking-tight" href="{% url 'home' %}" role="menuitem">Home</a>
-            <a class="font-serif text-stone-500 hover:text-primary transition-colors tracking-tight" href="{% url 'vehicle_list' %}" role="menuitem">Fleet</a>
-            <a class="font-serif text-stone-500 hover:text-primary transition-colors tracking-tight" href="{% url 'about' %}" role="menuitem">About</a>
-            <a class="font-serif text-stone-500 hover:text-primary transition-colors tracking-tight" href="{% url 'contact' %}" role="menuitem">Contact</a>
+            <a class="font-serif transition-colors tracking-tight" x-bind:class="scrolled ? 'text-on-surface hover:text-primary' : 'text-white/90 hover:text-white'" href="{% url 'home' %}" role="menuitem">Home</a>
+            <a class="font-serif transition-colors tracking-tight" x-bind:class="scrolled ? 'text-stone-500 hover:text-primary' : 'text-white/70 hover:text-white'" href="{% url 'vehicle_list' %}" role="menuitem">Fleet</a>
+            <a class="font-serif transition-colors tracking-tight" x-bind:class="scrolled ? 'text-stone-500 hover:text-primary' : 'text-white/70 hover:text-white'" href="{% url 'about' %}" role="menuitem">About</a>
+            <a class="font-serif transition-colors tracking-tight" x-bind:class="scrolled ? 'text-stone-500 hover:text-primary' : 'text-white/70 hover:text-white'" href="{% url 'contact' %}" role="menuitem">Contact</a>
         </div>
 
         <div class="flex items-center gap-3">
-            <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-medium text-sm transition-transform active:scale-95 hidden lg:inline-block">Browse Fleet</a>
-            <button x-data x-on:click="$dispatch('toggle-mobile-menu')" class="lg:hidden p-1" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
-                <span class="material-symbols-outlined text-2xl" aria-hidden="true">menu</span>
+            <a href="{% url 'vehicle_list' %}" class="px-6 py-2.5 rounded-full font-medium text-sm transition-all active:scale-95 hidden lg:inline-block" x-bind:class="scrolled ? 'bg-primary text-on-primary' : 'bg-white/15 text-white border border-white/25 backdrop-blur-md hover:bg-white/25'">Browse Fleet</a>
+            <button x-on:click="$dispatch('toggle-mobile-menu')" class="lg:hidden p-1" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+                <span class="material-symbols-outlined text-2xl transition-colors duration-300" x-bind:class="scrolled ? 'text-on-surface' : 'text-white'" aria-hidden="true">menu</span>
             </button>
         </div>
     </div>

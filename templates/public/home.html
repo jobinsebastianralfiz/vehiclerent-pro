@@ -5,138 +5,148 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="relative lg:min-h-[700px] flex flex-col lg:flex-row lg:items-center overflow-hidden px-4 sm:px-8 max-w-screen-2xl mx-auto py-8 sm:py-12 lg:py-0" x-data="heroCarousel()" x-init="start()">
-    <!-- Left: Text -->
-    <div class="z-10 w-full lg:w-1/2">
-        <p class="text-primary font-label text-[10px] sm:text-xs tracking-[0.2em] mb-3 sm:mb-4 uppercase">{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</p>
-        <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-serif font-bold leading-[1.1] mb-6 sm:mb-8 tracking-tighter">{{ config.hero_title|default:"Rent Your Perfect Vehicle" }}</h1>
-        <!-- Search Bar -->
-        <form action="{% url 'vehicle_list' %}" method="get" class="flex items-center bg-white rounded-full shadow-lg border border-stone-200/60 mb-6 sm:mb-8 max-w-xl overflow-hidden">
-            <span class="material-symbols-outlined text-stone-400 text-xl pl-5 flex-shrink-0">search</span>
-            <input type="text" name="search" placeholder="Search by vehicle name or brand..." class="flex-1 border-0 bg-transparent text-sm py-3.5 sm:py-4 px-3 focus:ring-0 placeholder:text-stone-400"/>
-            <button type="submit" class="bg-primary text-on-primary px-5 sm:px-7 py-3.5 sm:py-4 font-bold text-sm hover:bg-primary-container transition-colors flex-shrink-0">Search</button>
-        </form>
-        <div class="flex flex-row items-center gap-4 sm:gap-6 mb-8 sm:mb-12">
-            <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-6 sm:px-10 py-3 sm:py-4 rounded-full font-bold flex items-center gap-2 hover:bg-primary-container transition-colors text-sm sm:text-base">
-                <span class="material-symbols-outlined text-lg">directions_car</span> {{ config.hero_cta_text|default:"Browse Fleet" }}
-            </a>
-            <a href="#enquiry" class="text-primary font-bold flex items-center gap-2 hover:underline underline-offset-4 text-sm sm:text-base whitespace-nowrap">
-                Send Enquiry <span class="material-symbols-outlined text-lg">arrow_forward</span>
-            </a>
+<section class="relative min-h-[90vh] lg:min-h-[720px] flex flex-col lg:flex-row lg:items-center overflow-hidden -mt-24" x-data="heroCarousel()" x-init="start()">
+    <!-- Ken Burns Background Slideshow -->
+    {% if hero_bg_images %}
+    <div class="absolute inset-0 z-0">
+        {% for bg_url in hero_bg_images %}
+        <div x-show="bgSlide === {{ forloop.counter0 }}" x-transition:enter="transition-opacity duration-[1500ms]" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-[1500ms]" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="absolute inset-0">
+            <img src="{{ bg_url }}" alt="" class="w-full h-full object-cover {% if forloop.counter0|divisibleby:2 %}kenburns{% else %}kenburns-reverse{% endif %}"/>
         </div>
-        <div class="grid grid-cols-3 gap-4 sm:gap-8 pt-8 sm:pt-12 border-t border-outline-variant/10">
-            <div>
-                <p class="text-xl sm:text-3xl font-serif font-bold">{{ featured_vehicles|length }}+</p>
-                <p class="text-[8px] sm:text-[10px] font-label font-extrabold tracking-widest text-on-surface-variant uppercase">Vehicles</p>
+        {% endfor %}
+        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/25"></div>
+    </div>
+    {% elif config.hero_image %}
+    <div class="absolute inset-0 z-0">
+        <img src="{{ config.hero_image.url }}" alt="" class="w-full h-full object-cover kenburns"/>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/25"></div>
+    </div>
+    {% else %}
+    <div class="absolute inset-0 z-0 bg-stone-900"></div>
+    {% endif %}
+
+    <!-- Left: Text -->
+    <div class="relative z-10 px-4 sm:px-8 max-w-screen-2xl mx-auto w-full pt-32 sm:pt-36 lg:pt-0 pb-8 lg:pb-0">
+        <div class="lg:w-[45%]">
+            <p class="font-label text-[10px] sm:text-xs tracking-[0.2em] mb-3 uppercase text-primary-fixed">{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</p>
+            <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-bold leading-[1.1] mb-4 tracking-tighter text-white">{{ config.hero_title|default:"Rent Your Perfect Vehicle" }}</h1>
+            {% if config.hero_description %}
+            <p class="text-white/50 text-sm mb-6 max-w-lg leading-relaxed">{{ config.hero_description }}</p>
+            {% endif %}
+
+            <!-- Search Bar -->
+            <form action="{% url 'vehicle_list' %}" method="get" class="flex items-center bg-white rounded-full shadow-2xl mb-6 max-w-xl overflow-hidden">
+                <span class="material-symbols-outlined text-stone-400 text-xl pl-5 flex-shrink-0">search</span>
+                <input type="text" name="search" placeholder="Search by vehicle name or brand..." class="flex-1 border-0 bg-transparent text-sm py-3.5 sm:py-4 px-3 focus:ring-0 placeholder:text-stone-400"/>
+                <button type="submit" class="bg-primary text-on-primary px-6 sm:px-7 py-3.5 sm:py-4 font-bold text-sm hover:bg-primary-container transition-colors flex-shrink-0">Search</button>
+            </form>
+
+            <div class="flex flex-row items-center gap-3 sm:gap-4 mb-8 sm:mb-12">
+                <a href="{% url 'vehicle_list' %}" class="bg-white text-on-surface px-6 sm:px-10 py-3 sm:py-4 rounded-full font-bold flex items-center gap-2 hover:bg-stone-100 transition-colors text-sm sm:text-base shadow-lg">
+                    <span class="material-symbols-outlined text-lg">directions_car</span> {{ config.hero_cta_text|default:"Browse Fleet" }}
+                </a>
+                <a href="#enquiry" class="bg-white/10 backdrop-blur-md text-white border border-white/20 px-6 sm:px-10 py-3 sm:py-4 rounded-full font-bold flex items-center gap-2 hover:bg-white/20 transition-colors text-sm sm:text-base">
+                    <span class="material-symbols-outlined text-lg">chat</span> Enquire
+                </a>
             </div>
-            <div>
-                <p class="text-xl sm:text-3xl font-serif font-bold">{{ categories|length }}</p>
-                <p class="text-[8px] sm:text-[10px] font-label font-extrabold tracking-widest text-on-surface-variant uppercase">Categories</p>
-            </div>
-            <div>
-                <p class="text-xl sm:text-3xl font-serif font-bold">24/7</p>
-                <p class="text-[8px] sm:text-[10px] font-label font-extrabold tracking-widest text-on-surface-variant uppercase">Support</p>
+
+            <div class="grid grid-cols-3 gap-4 sm:gap-8 pt-8 border-t border-white/15 max-w-md">
+                <div>
+                    <p class="text-xl sm:text-3xl font-serif font-bold text-white">{{ featured_vehicles|length }}+</p>
+                    <p class="text-[8px] sm:text-[10px] font-label font-extrabold tracking-widest text-white/50 uppercase">Vehicles</p>
+                </div>
+                <div>
+                    <p class="text-xl sm:text-3xl font-serif font-bold text-white">{{ categories|length }}</p>
+                    <p class="text-[8px] sm:text-[10px] font-label font-extrabold tracking-widest text-white/50 uppercase">Categories</p>
+                </div>
+                <div>
+                    <p class="text-xl sm:text-3xl font-serif font-bold text-white">24/7</p>
+                    <p class="text-[8px] sm:text-[10px] font-label font-extrabold tracking-widest text-white/50 uppercase">Support</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Right: Vehicle Showcase Carousel (desktop only) -->
-    <div class="hidden lg:block absolute right-[-2%] top-1/2 -translate-y-1/2 w-[52%]">
-        {% if featured_vehicles %}
+    <!-- Right: Vehicle Showcase Carousel (desktop) -->
+    {% if featured_vehicles %}
+    <div class="hidden lg:block absolute right-[3%] top-1/2 -translate-y-1/2 w-[42%] z-10">
         <div class="relative">
             {% for vehicle in featured_vehicles %}
-            <div x-show="active === {{ forloop.counter0 }}" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" x-transition:leave="transition ease-in duration-300 absolute inset-0" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="glass-nav bg-white/40 p-6 rounded-3xl">
-                <div class="relative rounded-2xl overflow-hidden aspect-[16/10] bg-surface-container-low">
+            <div x-show="active === {{ forloop.counter0 }}" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-300 absolute inset-0" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="glass-nav bg-white/15 border border-white/20 p-4 rounded-2xl">
+                <div class="relative rounded-xl overflow-hidden aspect-[16/10]">
                     {% if vehicle.thumbnail %}
                     <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover"/>
                     {% else %}
-                    <div class="w-full h-full flex items-center justify-center">
-                        <span class="material-symbols-outlined text-[80px] text-outline/20">directions_car</span>
+                    <div class="w-full h-full bg-black/20 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[60px] text-white/20">directions_car</span>
                     </div>
                     {% endif %}
-                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full">
-                        <p class="text-lg font-serif font-bold text-primary">{{ vehicle.primary_price_value|inr }}<span class="text-xs font-sans font-normal text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></p>
+                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full">
+                        <p class="text-base font-serif font-bold text-primary">{{ vehicle.primary_price_value|inr }}<span class="text-xs font-sans font-normal text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></p>
                     </div>
                     {% if vehicle.rental_mode == "monthly" %}
-                    <div class="absolute top-4 left-4 bg-primary/90 text-on-primary text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full">Monthly</div>
+                    <div class="absolute top-3 left-3 bg-primary/90 text-on-primary text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full">Monthly</div>
                     {% endif %}
                 </div>
-                <div class="flex items-center justify-between mt-5 px-2">
+                <div class="flex items-center justify-between mt-3 px-1">
                     <div>
-                        <p class="text-xs font-label tracking-widest uppercase text-on-surface-variant/60">{{ vehicle.brand }}</p>
-                        <h3 class="text-xl font-serif font-bold text-on-surface">{{ vehicle.name }}</h3>
-                        <div class="flex items-center gap-4 mt-2 text-on-surface-variant text-xs">
+                        <p class="text-xs font-label tracking-widest uppercase text-white/50">{{ vehicle.brand }}</p>
+                        <h3 class="text-lg font-serif font-bold text-white">{{ vehicle.name }}</h3>
+                        <div class="flex items-center gap-3 mt-1.5 text-white/60 text-xs">
                             {% if vehicle.fuel_type %}<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" aria-hidden="true">{% if vehicle.fuel_type == 'electric' %}bolt{% else %}local_gas_station{% endif %}</span>{{ vehicle.get_fuel_type_display }}</span>{% endif %}
                             {% if vehicle.transmission %}<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" aria-hidden="true">settings</span>{{ vehicle.get_transmission_display }}</span>{% endif %}
                             {% if vehicle.seating_capacity %}<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" aria-hidden="true">event_seat</span>{{ vehicle.seating_capacity }}</span>{% endif %}
                         </div>
                     </div>
-                    <a href="{{ vehicle.get_absolute_url }}" class="bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-bold hover:bg-primary-container transition-colors flex items-center gap-2">
+                    <a href="{{ vehicle.get_absolute_url }}" class="bg-white text-on-surface px-5 py-2.5 rounded-full text-sm font-bold hover:bg-stone-100 transition-colors flex items-center gap-2">
                         View <span class="material-symbols-outlined text-lg">arrow_forward</span>
                     </a>
                 </div>
             </div>
             {% endfor %}
-            <div class="flex items-center justify-between mt-6 px-2">
+            <div class="flex items-center justify-between mt-4 px-1">
                 <div class="flex items-center gap-2">
                     {% for vehicle in featured_vehicles %}
-                    <button x-on:click="goTo({{ forloop.counter0 }})" class="w-2 h-2 rounded-full transition-all duration-300" x-bind:class="active === {{ forloop.counter0 }} ? 'bg-primary w-6' : 'bg-stone-300 hover:bg-stone-400'" aria-label="Show vehicle {{ forloop.counter }}"></button>
+                    <button x-on:click="goTo({{ forloop.counter0 }})" class="w-2 h-2 rounded-full transition-all duration-300" x-bind:class="active === {{ forloop.counter0 }} ? 'bg-white w-6' : 'bg-white/40 hover:bg-white/60'" aria-label="Show vehicle {{ forloop.counter }}"></button>
                     {% endfor %}
                 </div>
                 <div class="flex items-center gap-2">
-                    <button x-on:click="prev()" class="w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center hover:bg-white transition-colors shadow-sm" aria-label="Previous"><span class="material-symbols-outlined text-on-surface">chevron_left</span></button>
-                    <button x-on:click="next()" class="w-10 h-10 rounded-full bg-white/80 backdrop-blur-md flex items-center justify-center hover:bg-white transition-colors shadow-sm" aria-label="Next"><span class="material-symbols-outlined text-on-surface">chevron_right</span></button>
+                    <button x-on:click="prev()" class="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/25 transition-colors" aria-label="Previous"><span class="material-symbols-outlined text-white text-lg">chevron_left</span></button>
+                    <button x-on:click="next()" class="w-9 h-9 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-white/25 transition-colors" aria-label="Next"><span class="material-symbols-outlined text-white text-lg">chevron_right</span></button>
                 </div>
             </div>
         </div>
-        {% elif config.hero_image %}
-        <div class="glass-nav bg-white/30 p-8 rounded-3xl">
-            <img src="{{ config.hero_image.url }}" alt="{{ BUSINESS_NAME }}" class="w-full rounded-2xl h-[500px] object-cover"/>
-        </div>
-        {% else %}
-        <div class="glass-nav bg-white/30 p-8 rounded-3xl">
-            <div class="bg-surface-container-low rounded-2xl h-[500px] flex items-center justify-center">
-                <span class="material-symbols-outlined text-[120px] text-outline/30">directions_car</span>
-            </div>
-        </div>
-        {% endif %}
     </div>
+    {% endif %}
 
-    <!-- Mobile: Featured Vehicle Swipeable Cards -->
+    <!-- Mobile: Swipeable Cards -->
     {% if featured_vehicles %}
-    <div class="lg:hidden mt-6 sm:mt-10 w-full" x-data="mobileCarousel()" x-init="start()">
+    <div class="lg:hidden relative z-10 w-full px-4 pb-8" x-data="mobileCarousel()" x-init="start()">
         <div x-ref="scroller" class="flex gap-3 overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory scroll-smooth">
             {% for vehicle in featured_vehicles %}
-            <a href="{{ vehicle.get_absolute_url }}" class="bg-surface-container-low rounded-2xl overflow-hidden flex-shrink-0 w-[70vw] max-w-[280px] snap-center shadow-sm block">
+            <a href="{{ vehicle.get_absolute_url }}" class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl overflow-hidden flex-shrink-0 w-[70vw] max-w-[280px] snap-center block">
                 {% if vehicle.thumbnail %}
                 <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.name }}" class="w-full aspect-[16/10] object-cover"/>
                 {% else %}
-                <div class="w-full aspect-[16/10] bg-surface-container flex items-center justify-center">
-                    <span class="material-symbols-outlined text-4xl text-outline/30">directions_car</span>
+                <div class="w-full aspect-[16/10] bg-white/5 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-4xl text-white/20">directions_car</span>
                 </div>
                 {% endif %}
                 <div class="p-3">
-                    <p class="text-[9px] text-on-surface-variant/60 uppercase tracking-widest truncate">{{ vehicle.brand }}</p>
-                    <p class="font-serif font-bold text-sm truncate">{{ vehicle.name }}</p>
+                    <p class="text-[9px] text-white/50 uppercase tracking-widest truncate">{{ vehicle.brand }}</p>
+                    <p class="font-serif font-bold text-sm text-white truncate">{{ vehicle.name }}</p>
                     <div class="flex justify-between items-center mt-2">
-                        <p class="text-primary font-bold text-sm">{{ vehicle.primary_price_value|inr }}<span class="text-[10px] font-normal text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></p>
-                        <span class="bg-primary text-on-primary px-3 py-1 rounded-full text-xs font-bold flex-shrink-0">View</span>
+                        <p class="text-white font-bold text-sm">{{ vehicle.primary_price_value|inr }}<span class="text-[10px] font-normal text-white/50">/{{ vehicle.primary_price_label }}</span></p>
+                        <span class="bg-white text-on-surface px-3 py-1 rounded-full text-xs font-bold flex-shrink-0">View</span>
                     </div>
                 </div>
             </a>
             {% endfor %}
         </div>
-        <!-- Dots -->
         <div class="flex justify-center gap-1.5 mt-3">
             {% for vehicle in featured_vehicles %}
-            <button x-on:click="goTo({{ forloop.counter0 }})" class="w-1.5 h-1.5 rounded-full transition-all duration-300" x-bind:class="active === {{ forloop.counter0 }} ? 'bg-primary w-5' : 'bg-stone-300'" aria-label="Show vehicle {{ forloop.counter }}"></button>
+            <button x-on:click="goTo({{ forloop.counter0 }})" class="w-1.5 h-1.5 rounded-full transition-all duration-300" x-bind:class="active === {{ forloop.counter0 }} ? 'bg-white w-5' : 'bg-white/40'" aria-label="Show vehicle {{ forloop.counter }}"></button>
             {% endfor %}
-        </div>
-    </div>
-    {% elif config.hero_image %}
-    <div class="lg:hidden mt-8 w-full">
-        <div class="rounded-2xl overflow-hidden">
-            <img src="{{ config.hero_image.url }}" alt="{{ BUSINESS_NAME }}" class="w-full aspect-[16/10] object-cover rounded-2xl"/>
         </div>
     </div>
     {% endif %}
@@ -146,12 +156,27 @@
 function heroCarousel() {
     return {
         active: 0,
+        bgSlide: 0,
         total: {{ featured_vehicles|length|default:"0" }},
+        bgTotal: {{ hero_bg_images|length|default:"0" }},
         timer: null,
-        start() { if (this.total > 1) this.timer = setInterval(() => this.next(), 5000); },
-        next() { this.active = (this.active + 1) % this.total; },
-        prev() { this.active = (this.active - 1 + this.total) % this.total; },
-        goTo(i) { this.active = i; clearInterval(this.timer); this.start(); }
+        start() {
+            if (this.total > 1) this.timer = setInterval(() => this.next(), 5000);
+            else if (this.bgTotal > 1) this.timer = setInterval(() => { this.bgSlide = (this.bgSlide + 1) % this.bgTotal; }, 5000);
+        },
+        next() {
+            this.active = (this.active + 1) % this.total;
+            if (this.bgTotal > 0) this.bgSlide = this.active % this.bgTotal;
+        },
+        prev() {
+            this.active = (this.active - 1 + this.total) % this.total;
+            if (this.bgTotal > 0) this.bgSlide = this.active % this.bgTotal;
+        },
+        goTo(i) {
+            this.active = i;
+            if (this.bgTotal > 0) this.bgSlide = i % this.bgTotal;
+            clearInterval(this.timer); this.start();
+        }
     }
 }
 function mobileCarousel() {
@@ -165,28 +190,13 @@ function mobileCarousel() {
             this.$refs.scroller.addEventListener('touchstart', () => { clearInterval(this.timer); }, { passive: true });
             this.$refs.scroller.addEventListener('touchend', () => { clearInterval(this.timer); this.timer = setInterval(() => this.next(), 4000); }, { passive: true });
         },
-        next() {
-            this.active = (this.active + 1) % this.total;
-            this.scrollTo(this.active);
-        },
-        goTo(i) {
-            this.active = i;
-            this.scrollTo(i);
-            clearInterval(this.timer);
-            this.timer = setInterval(() => this.next(), 4000);
-        },
-        scrollTo(i) {
-            const el = this.$refs.scroller.children[i];
-            if (el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        },
+        next() { this.active = (this.active + 1) % this.total; this.scrollTo(this.active); },
+        goTo(i) { this.active = i; this.scrollTo(i); clearInterval(this.timer); this.timer = setInterval(() => this.next(), 4000); },
+        scrollTo(i) { const el = this.$refs.scroller.children[i]; if (el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); },
         onScroll() {
-            const scroller = this.$refs.scroller;
-            const center = scroller.scrollLeft + scroller.offsetWidth / 2;
-            let closest = 0, minDist = Infinity;
-            Array.from(scroller.children).forEach((child, i) => {
-                const dist = Math.abs(child.offsetLeft + child.offsetWidth / 2 - center);
-                if (dist < minDist) { minDist = dist; closest = i; }
-            });
+            const s = this.$refs.scroller, c = s.scrollLeft + s.offsetWidth / 2;
+            let closest = 0, min = Infinity;
+            Array.from(s.children).forEach((ch, i) => { const d = Math.abs(ch.offsetLeft + ch.offsetWidth / 2 - c); if (d < min) { min = d; closest = i; } });
             this.active = closest;
         }
     }

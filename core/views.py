@@ -26,11 +26,18 @@ def home(request):
         .select_related("category")[:8]
     )
     testimonials = Testimonial.objects.filter(is_active=True)[:6]
+    # Collect hero background images
+    hero_bg_images = []
+    if config:
+        for field in [config.hero_bg_1, config.hero_bg_2, config.hero_bg_3]:
+            if field:
+                hero_bg_images.append(field.url)
     return render(request, "public/home.html", {
         "config": config,
         "categories": categories,
         "featured_vehicles": featured_vehicles,
         "testimonials": testimonials,
+        "hero_bg_images": hero_bg_images,
     })
 
 

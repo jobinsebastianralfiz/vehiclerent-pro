@@ -118,6 +118,14 @@
         /* Print */
         @media print { nav, aside, .no-print, .whatsapp-float, #back-to-top, #cookie-banner { display: none !important; } main { padding-top: 0 !important; } }
 
+        /* Ken Burns animation for hero background */
+        @keyframes kenburns {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
+        }
+        .kenburns { animation: kenburns 18s ease-in-out infinite alternate; }
+        .kenburns-reverse { animation: kenburns 18s ease-in-out infinite alternate-reverse; }
+
         /* Smooth image loading */
         img { content-visibility: auto; }
         img[loading="lazy"] { transition: opacity 0.3s; }
