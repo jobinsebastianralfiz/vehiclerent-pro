@@ -98,10 +98,10 @@
 
     <!-- Mobile: Featured Vehicle Swipeable Cards -->
     {% if featured_vehicles %}
-    <div class="lg:hidden mt-6 sm:mt-10 w-full overflow-hidden">
-        <div class="flex gap-3 overflow-x-auto no-scrollbar pb-4 -mx-4 px-4 snap-x snap-mandatory">
+    <div class="lg:hidden mt-6 sm:mt-10 w-full" x-data="mobileCarousel()" x-init="start()">
+        <div x-ref="scroller" class="flex gap-3 overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory scroll-smooth">
             {% for vehicle in featured_vehicles %}
-            <a href="{{ vehicle.get_absolute_url }}" class="bg-surface-container-low rounded-2xl overflow-hidden flex-shrink-0 w-[68vw] max-w-[280px] snap-start shadow-sm block">
+            <a href="{{ vehicle.get_absolute_url }}" class="bg-surface-container-low rounded-2xl overflow-hidden flex-shrink-0 w-[70vw] max-w-[280px] snap-center shadow-sm block">
                 {% if vehicle.thumbnail %}
                 <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.name }}" class="w-full aspect-[16/10] object-cover"/>
                 {% else %}
@@ -118,6 +118,12 @@
                     </div>
                 </div>
             </a>
+            {% endfor %}
+        </div>
+        <!-- Dots -->
+        <div class="flex justify-center gap-1.5 mt-3">
+            {% for vehicle in featured_vehicles %}
+            <button x-on:click="goTo({{ forloop.counter0 }})" class="w-1.5 h-1.5 rounded-full transition-all duration-300" x-bind:class="active === {{ forloop.counter0 }} ? 'bg-primary w-5' : 'bg-stone-300'" aria-label="Show vehicle {{ forloop.counter }}"></button>
             {% endfor %}
         </div>
     </div>
@@ -140,6 +146,43 @@ function heroCarousel() {
         next() { this.active = (this.active + 1) % this.total; },
         prev() { this.active = (this.active - 1 + this.total) % this.total; },
         goTo(i) { this.active = i; clearInterval(this.timer); this.start(); }
+    }
+}
+function mobileCarousel() {
+    return {
+        active: 0,
+        total: {{ featured_vehicles|length|default:"0" }},
+        timer: null,
+        start() {
+            if (this.total > 1) this.timer = setInterval(() => this.next(), 4000);
+            this.$refs.scroller.addEventListener('scrollend', () => this.onScroll());
+            this.$refs.scroller.addEventListener('touchstart', () => { clearInterval(this.timer); }, { passive: true });
+            this.$refs.scroller.addEventListener('touchend', () => { clearInterval(this.timer); this.timer = setInterval(() => this.next(), 4000); }, { passive: true });
+        },
+        next() {
+            this.active = (this.active + 1) % this.total;
+            this.scrollTo(this.active);
+        },
+        goTo(i) {
+            this.active = i;
+            this.scrollTo(i);
+            clearInterval(this.timer);
+            this.timer = setInterval(() => this.next(), 4000);
+        },
+        scrollTo(i) {
+            const el = this.$refs.scroller.children[i];
+            if (el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        },
+        onScroll() {
+            const scroller = this.$refs.scroller;
+            const center = scroller.scrollLeft + scroller.offsetWidth / 2;
+            let closest = 0, minDist = Infinity;
+            Array.from(scroller.children).forEach((child, i) => {
+                const dist = Math.abs(child.offsetLeft + child.offsetWidth / 2 - center);
+                if (dist < minDist) { minDist = dist; closest = i; }
+            });
+            this.active = closest;
+        }
     }
 }
 </script>
