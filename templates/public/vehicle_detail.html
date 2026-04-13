@@ -116,43 +116,60 @@
             </div>
 
             <!-- Price Card -->
-            <div class="bg-primary-fixed p-5 sm:p-8 rounded-xl">
-                <!-- Primary price -->
-                <p class="text-3xl font-serif font-bold text-primary">{{ vehicle.primary_price_value|inr }}<span class="text-sm font-sans font-normal text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></p>
+            <div class="bg-white border border-stone-200 rounded-2xl overflow-hidden">
+                <div class="p-5 sm:p-6">
+                    <!-- Primary price -->
+                    <p class="text-3xl sm:text-4xl font-serif font-bold text-on-surface">{{ vehicle.primary_price_value|inr }}<span class="text-sm font-sans font-normal text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></p>
 
-                {% if vehicle.rental_mode == "monthly" %}
-                <span class="inline-flex items-center gap-1 mt-2 text-xs font-bold text-primary bg-white/60 px-3 py-1 rounded-full">
-                    <span class="material-symbols-outlined text-sm" aria-hidden="true">calendar_month</span> Monthly Rental Only
-                </span>
-                {% elif vehicle.rental_mode == "weekly" %}
-                <span class="inline-flex items-center gap-1 mt-2 text-xs font-bold text-primary bg-white/60 px-3 py-1 rounded-full">
-                    <span class="material-symbols-outlined text-sm" aria-hidden="true">date_range</span> Weekly Minimum
-                </span>
-                {% endif %}
-
-                <!-- Other available rates -->
-                <div class="mt-4 space-y-1">
-                    {% if vehicle.price_per_day and vehicle.rental_mode != "daily" %}
-                    <p class="text-sm text-on-surface-variant">{{ vehicle.price_per_day|inr }}/day</p>
-                    {% endif %}
-                    {% if vehicle.price_per_week and vehicle.rental_mode != "weekly" %}
-                    <p class="text-sm text-on-surface-variant">{{ vehicle.price_per_week|inr }}/week</p>
-                    {% endif %}
-                    {% if vehicle.price_per_month and vehicle.rental_mode != "monthly" %}
-                    <p class="text-sm text-on-surface-variant">{{ vehicle.price_per_month|inr }}/month</p>
+                    {% if vehicle.rental_mode == "monthly" %}
+                    <span class="inline-flex items-center gap-1 mt-2 text-xs font-bold text-primary bg-primary-fixed px-3 py-1 rounded-full">
+                        <span class="material-symbols-outlined text-sm" aria-hidden="true">calendar_month</span> Monthly Rental Only
+                    </span>
+                    {% elif vehicle.rental_mode == "weekly" %}
+                    <span class="inline-flex items-center gap-1 mt-2 text-xs font-bold text-primary bg-primary-fixed px-3 py-1 rounded-full">
+                        <span class="material-symbols-outlined text-sm" aria-hidden="true">date_range</span> Weekly Minimum
+                    </span>
                     {% endif %}
                 </div>
 
-                {% if vehicle.minimum_rental_days > 1 %}
-                <p class="text-xs text-on-surface-variant mt-3 pt-3 border-t border-primary/10">Minimum rental: {{ vehicle.minimum_rental_days }} days</p>
+                <!-- Other available rates -->
+                {% if vehicle.price_per_day or vehicle.price_per_week or vehicle.price_per_month %}
+                <div class="border-t border-stone-100 px-5 sm:px-6 py-4 space-y-2.5">
+                    {% if vehicle.price_per_day %}
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-on-surface-variant">Daily</span>
+                        <span class="font-bold">{{ vehicle.price_per_day|inr }}</span>
+                    </div>
+                    {% endif %}
+                    {% if vehicle.price_per_week %}
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-on-surface-variant">Weekly</span>
+                        <span class="font-bold">{{ vehicle.price_per_week|inr }}</span>
+                    </div>
+                    {% endif %}
+                    {% if vehicle.price_per_month %}
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-on-surface-variant">Monthly</span>
+                        <span class="font-bold">{{ vehicle.price_per_month|inr }}</span>
+                    </div>
+                    {% endif %}
+                </div>
                 {% endif %}
-                {% if vehicle.security_deposit %}
-                <p class="text-xs text-on-surface-variant {% if vehicle.minimum_rental_days <= 1 %}mt-3 pt-3 border-t border-primary/10{% else %}mt-1{% endif %}">Security deposit: {{ vehicle.security_deposit|inr }}</p>
+
+                {% if vehicle.minimum_rental_days > 1 or vehicle.security_deposit %}
+                <div class="border-t border-stone-100 px-5 sm:px-6 py-3 bg-stone-50 space-y-1">
+                    {% if vehicle.minimum_rental_days > 1 %}
+                    <p class="text-xs text-on-surface-variant">Minimum rental: {{ vehicle.minimum_rental_days }} days</p>
+                    {% endif %}
+                    {% if vehicle.security_deposit %}
+                    <p class="text-xs text-on-surface-variant">Security deposit: {{ vehicle.security_deposit|inr }}</p>
+                    {% endif %}
+                </div>
                 {% endif %}
             </div>
 
             <!-- Specs Grid -->
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-3 sm:grid-cols-2 gap-3 sm:gap-4">
                 {% if vehicle.fuel_type %}
                 <div class="bg-surface-container-low p-4 rounded-xl">
                     <div class="flex items-center gap-2 mb-1">
