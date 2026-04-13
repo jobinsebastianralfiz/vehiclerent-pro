@@ -5,7 +5,7 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="relative min-h-[90vh] lg:min-h-[720px] flex flex-col lg:flex-row lg:items-center overflow-hidden -mt-24" x-data="heroCarousel()" x-init="start()">
+<section class="relative min-h-[70vh] lg:min-h-[620px] flex flex-col lg:flex-row lg:items-center overflow-hidden" x-data="heroCarousel()" x-init="start()">
     <!-- Ken Burns Background Slideshow -->
     {% if hero_bg_images %}
     <div class="absolute inset-0 z-0">
@@ -26,7 +26,7 @@
     {% endif %}
 
     <!-- Left: Text -->
-    <div class="relative z-10 px-4 sm:px-8 max-w-screen-2xl mx-auto w-full pt-32 sm:pt-36 lg:pt-0 pb-8 lg:pb-0">
+    <div class="relative z-10 px-4 sm:px-8 max-w-screen-2xl mx-auto w-full py-8 sm:py-12 lg:py-0">
         <div class="lg:w-[45%]">
             <p class="font-label text-[10px] sm:text-xs tracking-[0.2em] mb-3 uppercase text-primary-fixed">{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</p>
             <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-serif font-bold leading-[1.1] mb-4 tracking-tighter text-white">{{ config.hero_title|default:"Rent Your Perfect Vehicle" }}</h1>
@@ -69,10 +69,10 @@
 
     <!-- Right: Vehicle Showcase Carousel (desktop) -->
     {% if featured_vehicles %}
-    <div class="hidden lg:block absolute right-[3%] top-1/2 -translate-y-1/2 w-[42%] z-10">
+    <div class="hidden lg:block absolute right-[4%] top-1/2 -translate-y-1/2 w-[36%] z-10">
         <div class="relative">
             {% for vehicle in featured_vehicles %}
-            <div x-show="active === {{ forloop.counter0 }}" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-300 absolute inset-0" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="glass-nav bg-white/15 border border-white/20 p-4 rounded-2xl">
+            <div x-show="active === {{ forloop.counter0 }}" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-300 absolute inset-0" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="glass-nav bg-white/15 border border-white/20 p-3 rounded-xl">
                 <div class="relative rounded-xl overflow-hidden aspect-[16/10]">
                     {% if vehicle.thumbnail %}
                     <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover"/>
@@ -81,25 +81,25 @@
                         <span class="material-symbols-outlined text-[60px] text-white/20">directions_car</span>
                     </div>
                     {% endif %}
-                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full">
-                        <p class="text-base font-serif font-bold text-primary">{{ vehicle.primary_price_value|inr }}<span class="text-xs font-sans font-normal text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></p>
+                    <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full">
+                        <p class="text-sm font-serif font-bold text-primary">{{ vehicle.primary_price_value|inr }}<span class="text-[10px] font-sans font-normal text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></p>
                     </div>
                     {% if vehicle.rental_mode == "monthly" %}
                     <div class="absolute top-3 left-3 bg-primary/90 text-on-primary text-[9px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full">Monthly</div>
                     {% endif %}
                 </div>
-                <div class="flex items-center justify-between mt-3 px-1">
+                <div class="flex items-center justify-between mt-2.5 px-1">
                     <div>
-                        <p class="text-xs font-label tracking-widest uppercase text-white/50">{{ vehicle.brand }}</p>
-                        <h3 class="text-lg font-serif font-bold text-white">{{ vehicle.name }}</h3>
-                        <div class="flex items-center gap-3 mt-1.5 text-white/60 text-xs">
+                        <p class="text-[10px] font-label tracking-widest uppercase text-white/50">{{ vehicle.brand }}</p>
+                        <h3 class="text-base font-serif font-bold text-white">{{ vehicle.name }}</h3>
+                        <div class="flex items-center gap-2.5 mt-1 text-white/60 text-[11px]">
                             {% if vehicle.fuel_type %}<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" aria-hidden="true">{% if vehicle.fuel_type == 'electric' %}bolt{% else %}local_gas_station{% endif %}</span>{{ vehicle.get_fuel_type_display }}</span>{% endif %}
                             {% if vehicle.transmission %}<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" aria-hidden="true">settings</span>{{ vehicle.get_transmission_display }}</span>{% endif %}
                             {% if vehicle.seating_capacity %}<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm" aria-hidden="true">event_seat</span>{{ vehicle.seating_capacity }}</span>{% endif %}
                         </div>
                     </div>
-                    <a href="{{ vehicle.get_absolute_url }}" class="bg-white text-on-surface px-5 py-2.5 rounded-full text-sm font-bold hover:bg-stone-100 transition-colors flex items-center gap-2">
-                        View <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                    <a href="{{ vehicle.get_absolute_url }}" class="bg-white text-on-surface px-4 py-2 rounded-full text-xs font-bold hover:bg-stone-100 transition-colors flex items-center gap-1.5">
+                        View <span class="material-symbols-outlined text-base">arrow_forward</span>
                     </a>
                 </div>
             </div>
