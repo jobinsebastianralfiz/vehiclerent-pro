@@ -4,7 +4,7 @@
         <!-- Brand -->
         <div class="sm:col-span-2 lg:col-span-1">
             {% if SITE_CONFIG.logo %}
-            <img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-8 mb-4"/>
+            <img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-12 sm:h-14 mb-4"/>
             {% endif %}
             {% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}
             <div class="font-serif font-bold text-on-surface text-2xl mb-6">{{ BUSINESS_NAME }}</div>

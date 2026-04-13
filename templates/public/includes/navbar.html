@@ -3,7 +3,7 @@
     <div class="flex justify-between items-center px-4 sm:px-8 py-4 sm:py-6 max-w-screen-2xl mx-auto">
         <a href="{% url 'home' %}" class="flex items-center gap-2 sm:gap-3 min-w-0" aria-label="{{ BUSINESS_NAME }} - Home">
             {% if SITE_CONFIG.logo %}
-            <img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-7 sm:h-8 flex-shrink-0"/>
+            <img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-10 sm:h-12 flex-shrink-0"/>
             {% endif %}
             {% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}
             <span class="text-lg sm:text-2xl font-serif font-bold text-on-surface truncate">{{ BUSINESS_NAME }}</span>
