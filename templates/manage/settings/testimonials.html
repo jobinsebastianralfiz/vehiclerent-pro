@@ -3,69 +3,101 @@
 {% block page_title %}Testimonials{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-8">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
     <div>
-        <h1 class="text-2xl font-bold">Customer Testimonials</h1>
-        <p class="text-stone-500 text-sm mt-1">Manage customer reviews displayed on the website</p>
+        <h1 class="text-xl sm:text-2xl font-bold">Customer Testimonials</h1>
+        <p class="text-stone-500 text-xs sm:text-sm mt-1">Manage customer reviews displayed on the website</p>
     </div>
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3">
         <a href="{% url 'site_config_edit' %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
-            <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Settings
+            <span class="material-symbols-outlined text-lg">arrow_back</span> <span class="hidden sm:inline">Settings</span>
         </a>
-        <a href="{% url 'testimonial_add' %}" class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+        <a href="{% url 'testimonial_add' %}" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 flex-1 sm:flex-none justify-center sm:justify-start">
             <span class="material-symbols-outlined text-lg">add</span> Add Testimonial
         </a>
     </div>
 </div>
 
-<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
-    <table class="w-full">
-        <thead>
-            <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
-                <th class="text-left px-6 py-4">Customer</th>
-                <th class="text-left px-4 py-4">Quote</th>
-                <th class="text-center px-4 py-4">Rating</th>
-                <th class="text-center px-4 py-4">Active</th>
-                <th class="text-center px-4 py-4">Order</th>
-                <th class="text-right px-6 py-4">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for t in testimonials %}
-            <tr class="hover:bg-stone-50 transition-colors border-b border-stone-50">
-                <td class="px-6 py-4">
-                    <div class="flex items-center gap-3">
-                        {% if t.photo %}
-                        <img src="{{ t.photo.url }}" alt="" class="w-10 h-10 rounded-full object-cover"/>
-                        {% else %}
-                        <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-xs font-bold text-stone-500">{{ t.name|first }}</div>
-                        {% endif %}
-                        <div>
-                            <p class="font-medium text-sm">{{ t.name }}</p>
-                            <p class="text-xs text-stone-500">{{ t.role|default:"-" }}</p>
+<!-- Mobile: Card Layout -->
+<div class="sm:hidden space-y-3">
+    {% for t in testimonials %}
+    <div class="bg-white rounded-xl border border-stone-100 p-4">
+        <div class="flex items-center gap-3 mb-3">
+            {% if t.photo %}
+            <img src="{{ t.photo.url }}" alt="" class="w-10 h-10 rounded-full object-cover flex-shrink-0"/>
+            {% else %}
+            <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-xs font-bold text-stone-500 flex-shrink-0">{{ t.name|first }}</div>
+            {% endif %}
+            <div class="flex-1 min-w-0">
+                <p class="font-medium text-sm">{{ t.name }}</p>
+                <p class="text-xs text-stone-500">{{ t.role|default:"-" }}</p>
+            </div>
+            <span class="material-symbols-outlined text-lg {% if t.is_active %}text-green-600{% else %}text-stone-300{% endif %}">{% if t.is_active %}check_circle{% else %}cancel{% endif %}</span>
+        </div>
+        <p class="text-sm text-stone-600 mb-3 line-clamp-2">"{{ t.quote|truncatewords:20 }}"</p>
+        <div class="flex items-center justify-between pt-3 border-t border-stone-100">
+            <div class="text-amber-500 text-sm">{% for i in "12345" %}{% if forloop.counter <= t.rating %}&#9733;{% else %}&#9734;{% endif %}{% endfor %}</div>
+            <div class="flex items-center gap-1">
+                <a href="{% url 'testimonial_edit' t.pk %}" class="p-2 rounded-lg hover:bg-stone-100"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
+                <form method="post" action="{% url 'testimonial_delete' t.pk %}" class="inline" onsubmit="return confirm('Delete?')">{% csrf_token %}<button type="submit" class="p-2 rounded-lg hover:bg-red-50"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button></form>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="bg-white rounded-xl border border-stone-100 p-8 text-center text-stone-400">
+        No testimonials yet. <a href="{% url 'testimonial_add' %}" class="text-primary font-medium">Add your first one</a>.
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Desktop: Table Layout -->
+<div class="hidden sm:block bg-white rounded-2xl border border-stone-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
+                    <th class="text-left px-6 py-4">Customer</th>
+                    <th class="text-left px-4 py-4">Quote</th>
+                    <th class="text-center px-4 py-4">Rating</th>
+                    <th class="text-center px-4 py-4">Active</th>
+                    <th class="text-center px-4 py-4">Order</th>
+                    <th class="text-right px-6 py-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in testimonials %}
+                <tr class="hover:bg-stone-50 transition-colors border-b border-stone-50">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            {% if t.photo %}
+                            <img src="{{ t.photo.url }}" alt="" class="w-10 h-10 rounded-full object-cover"/>
+                            {% else %}
+                            <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-xs font-bold text-stone-500">{{ t.name|first }}</div>
+                            {% endif %}
+                            <div>
+                                <p class="font-medium text-sm">{{ t.name }}</p>
+                                <p class="text-xs text-stone-500">{{ t.role|default:"-" }}</p>
+                            </div>
                         </div>
-                    </div>
-                </td>
-                <td class="px-4 py-4 text-sm text-stone-600 max-w-xs truncate">{{ t.quote|truncatewords:15 }}</td>
-                <td class="px-4 py-4 text-center text-amber-500">{% for i in "12345" %}{% if forloop.counter <= t.rating %}&#9733;{% else %}&#9734;{% endif %}{% endfor %}</td>
-                <td class="px-4 py-4 text-center">
-                    <span class="material-symbols-outlined text-lg {% if t.is_active %}text-green-600{% else %}text-stone-300{% endif %}">{% if t.is_active %}check_circle{% else %}cancel{% endif %}</span>
-                </td>
-                <td class="px-4 py-4 text-center text-sm text-stone-500">{{ t.display_order }}</td>
-                <td class="px-6 py-4 text-right">
-                    <a href="{% url 'testimonial_edit' t.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100 inline-block"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
-                    <form method="post" action="{% url 'testimonial_delete' t.pk %}" class="inline" onsubmit="return confirm('Delete this testimonial?')">
-                        {% csrf_token %}
-                        <button type="submit" class="p-1.5 rounded-lg hover:bg-red-50"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button>
-                    </form>
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="6" class="px-8 py-16 text-center text-stone-400">
-                No testimonials yet. <a href="{% url 'testimonial_add' %}" class="text-primary font-medium">Add your first one</a>.
-            </td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                    </td>
+                    <td class="px-4 py-4 text-sm text-stone-600 max-w-xs truncate">{{ t.quote|truncatewords:15 }}</td>
+                    <td class="px-4 py-4 text-center text-amber-500">{% for i in "12345" %}{% if forloop.counter <= t.rating %}&#9733;{% else %}&#9734;{% endif %}{% endfor %}</td>
+                    <td class="px-4 py-4 text-center">
+                        <span class="material-symbols-outlined text-lg {% if t.is_active %}text-green-600{% else %}text-stone-300{% endif %}">{% if t.is_active %}check_circle{% else %}cancel{% endif %}</span>
+                    </td>
+                    <td class="px-4 py-4 text-center text-sm text-stone-500">{{ t.display_order }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'testimonial_edit' t.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100 inline-block"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
+                        <form method="post" action="{% url 'testimonial_delete' t.pk %}" class="inline" onsubmit="return confirm('Delete this testimonial?')">{% csrf_token %}<button type="submit" class="p-1.5 rounded-lg hover:bg-red-50"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button></form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="px-8 py-16 text-center text-stone-400">
+                    No testimonials yet. <a href="{% url 'testimonial_add' %}" class="text-primary font-medium">Add your first one</a>.
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

@@ -3,18 +3,18 @@
 {% block page_title %}Site Settings{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-8">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
     <div>
-        <h1 class="text-2xl font-bold">Site Settings</h1>
-        <p class="text-stone-500 text-sm mt-1">Configure your website branding, content, and SEO</p>
+        <h1 class="text-xl sm:text-2xl font-bold">Site Settings</h1>
+        <p class="text-stone-500 text-xs sm:text-sm mt-1">Configure your website branding, content, and SEO</p>
     </div>
-    <a href="{% url 'testimonial_list' %}" class="bg-stone-100 text-stone-700 px-5 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-stone-200 transition-colors">
+    <a href="{% url 'testimonial_list' %}" class="bg-stone-100 text-stone-700 px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 hover:bg-stone-200 transition-colors w-full sm:w-auto justify-center sm:justify-start">
         <span class="material-symbols-outlined text-lg">format_quote</span> Manage Testimonials
     </a>
 </div>
 
-<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
-    <form method="post" enctype="multipart/form-data" class="p-8">
+<div class="bg-white rounded-xl sm:rounded-2xl border border-stone-100 overflow-hidden">
+    <form method="post" enctype="multipart/form-data" class="p-4 sm:p-8">
         {% csrf_token %}
 
         {% if form.errors %}
@@ -22,7 +22,7 @@
         {% endif %}
 
         <!-- Branding -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12 mb-8 sm:mb-12">
             <div>
                 <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Branding</p>
                 <p class="text-xs text-stone-400 mt-1">Site name, logo, and tagline displayed across the website</p>
@@ -59,7 +59,7 @@
         </div>
 
         <!-- Contact -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12 mb-8 sm:mb-12 pt-8 border-t border-stone-100">
             <div>
                 <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Contact Info</p>
                 <p class="text-xs text-stone-400 mt-1">Displayed in footer, contact page, and enquiry emails</p>
@@ -93,7 +93,7 @@
         </div>
 
         <!-- Homepage Hero -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12 mb-8 sm:mb-12 pt-8 border-t border-stone-100">
             <div>
                 <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Homepage Hero</p>
                 <p class="text-xs text-stone-400 mt-1">The main banner area on the homepage</p>
@@ -146,7 +146,7 @@
         </div>
 
         <!-- About Page -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12 mb-8 sm:mb-12 pt-8 border-t border-stone-100">
             <div>
                 <p class="text-sm font-extrabold uppercase tracking-widest text-primary">About Page</p>
                 <p class="text-xs text-stone-400 mt-1">Content displayed on the About Us page</p>
@@ -195,7 +195,7 @@
         </div>
 
         <!-- SEO -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12 mb-8 sm:mb-12 pt-8 border-t border-stone-100">
             <div>
                 <p class="text-sm font-extrabold uppercase tracking-widest text-primary">SEO & Meta</p>
                 <p class="text-xs text-stone-400 mt-1">Search engine optimization and social sharing defaults</p>
@@ -222,7 +222,7 @@
         </div>
 
         <!-- Social -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12 mb-8 sm:mb-12 pt-8 border-t border-stone-100">
             <div>
                 <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Social Links</p>
                 <p class="text-xs text-stone-400 mt-1">Social media profile URLs</p>
@@ -248,7 +248,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12 mb-8 sm:mb-12 pt-8 border-t border-stone-100">
             <div>
                 <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Footer</p>
                 <p class="text-xs text-stone-400 mt-1">Footer description text</p>
