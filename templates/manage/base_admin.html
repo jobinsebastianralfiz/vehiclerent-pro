@@ -23,4 +23,113 @@
         </div>
     </div>
 </div>
+
+<!-- New Enquiry Notification Toast -->
+<div x-data="enquiryNotifier()" x-init="init()" x-show="showToast" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0 translate-y-4" class="fixed bottom-6 right-6 z-[100] bg-primary text-white rounded-2xl shadow-2xl px-5 py-4 flex items-center gap-3 max-w-sm cursor-pointer" x-on:click="goToEnquiries()" x-cloak>
+    <div class="bg-white/20 rounded-full p-2 flex-shrink-0">
+        <span class="material-symbols-outlined text-xl">mail</span>
+    </div>
+    <div class="min-w-0">
+        <p class="font-bold text-sm">New Enquiry Received!</p>
+        <p class="text-white/70 text-xs mt-0.5">Tap to view enquiries</p>
+    </div>
+    <button x-on:click.stop="showToast = false" class="text-white/60 hover:text-white flex-shrink-0 ml-2">
+        <span class="material-symbols-outlined text-lg">close</span>
+    </button>
+</div>
+
+<script>
+function enquiryNotifier() {
+    return {
+        lastId: 0,
+        showToast: false,
+        audioCtx: null,
+        enabled: false,
+
+        init() {
+            // Get initial state so we don't beep on page load
+            fetch("{% url 'enquiry_check_new' %}")
+                .then(r => r.json())
+                .then(data => { this.lastId = data.latest_id; })
+                .catch(() => {});
+
+            // Enable audio on first user interaction (mobile requirement)
+            const enableAudio = () => {
+                if (!this.audioCtx) {
+                    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    // Play silent sound to unlock audio on mobile
+                    const osc = this.audioCtx.createOscillator();
+                    const gain = this.audioCtx.createGain();
+                    gain.gain.value = 0;
+                    osc.connect(gain);
+                    gain.connect(this.audioCtx.destination);
+                    osc.start(); osc.stop(this.audioCtx.currentTime + 0.01);
+                }
+                this.enabled = true;
+            };
+            document.addEventListener('click', enableAudio, { once: true });
+            document.addEventListener('touchstart', enableAudio, { once: true });
+
+            // Poll every 15 seconds
+            setInterval(() => this.check(), 15000);
+        },
+
+        check() {
+            fetch("{% url 'enquiry_check_new' %}")
+                .then(r => r.json())
+                .then(data => {
+                    if (data.latest_id > this.lastId && this.lastId > 0) {
+                        this.lastId = data.latest_id;
+                        this.notify();
+                        // Update the badge in sidebar if present
+                        const badge = document.querySelector('[data-enquiry-badge]');
+                        if (badge) badge.textContent = data.new_count;
+                    }
+                    this.lastId = data.latest_id;
+                })
+                .catch(() => {});
+        },
+
+        notify() {
+            this.showToast = true;
+            this.playBeep();
+            // Try browser notification too
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('New Enquiry!', { body: 'You have a new vehicle rental enquiry.', icon: '/favicon.ico' });
+            }
+            // Auto-hide toast after 10 seconds
+            setTimeout(() => { this.showToast = false; }, 10000);
+        },
+
+        playBeep() {
+            if (!this.enabled || !this.audioCtx) return;
+            if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+            // Two-tone notification beep
+            const now = this.audioCtx.currentTime;
+            [0, 0.15].forEach((delay, i) => {
+                const osc = this.audioCtx.createOscillator();
+                const gain = this.audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = i === 0 ? 880 : 1100;
+                gain.gain.setValueAtTime(0.3, now + delay);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + delay + 0.12);
+                osc.connect(gain);
+                gain.connect(this.audioCtx.destination);
+                osc.start(now + delay);
+                osc.stop(now + delay + 0.15);
+            });
+        },
+
+        goToEnquiries() {
+            this.showToast = false;
+            window.location.href = "{% url 'enquiry_list' %}";
+        }
+    }
+}
+
+// Request notification permission on admin pages
+if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+}
+</script>
 {% endblock %}

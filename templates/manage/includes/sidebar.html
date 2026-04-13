@@ -29,9 +29,7 @@
         <a class="flex items-center space-x-3 {% if 'enquiry' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'enquiry_list' %}">
             <span class="material-symbols-outlined">mail</span>
             <span class="font-sans font-medium text-sm">Enquiries</span>
-            {% if new_enquiry_count %}
-            <span class="bg-primary text-[10px] text-white px-2 py-0.5 rounded-full ml-auto">{{ new_enquiry_count }}</span>
-            {% endif %}
+            <span data-enquiry-badge class="bg-primary text-[10px] text-white px-2 py-0.5 rounded-full ml-auto {% if not new_enquiry_count %}hidden{% endif %}">{{ new_enquiry_count|default:"0" }}</span>
         </a>
         <div class="mx-2 my-2 border-t border-stone-800"></div>
         <a class="flex items-center space-x-3 {% if 'site_config' in current_url or 'testimonial' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'site_config_edit' %}">

@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 
 from .forms import EnquiryPublicForm, EnquiryUpdateForm
 from .models import Enquiry
@@ -72,3 +73,11 @@ def enquiry_delete(request, pk):
         messages.success(request, "Enquiry deleted.")
         return redirect("enquiry_list")
     return redirect("enquiry_list")
+
+
+@login_required
+def enquiry_check_new(request):
+    """API endpoint polled by admin to detect new enquiries."""
+    count = Enquiry.objects.filter(status="new").count()
+    latest = Enquiry.objects.order_by("-id").values_list("id", flat=True).first() or 0
+    return JsonResponse({"new_count": count, "latest_id": latest})
