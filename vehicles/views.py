@@ -45,6 +45,14 @@ def vehicle_list(request):
     if featured == "1":
         qs = qs.filter(is_featured=True)
 
+    premium = request.GET.get("premium")
+    if premium == "1":
+        qs = qs.filter(is_premium=True)
+
+    wedding = request.GET.get("wedding")
+    if wedding == "1":
+        qs = qs.filter(is_wedding_service=True)
+
     rental_mode = request.GET.get("rental")
     if rental_mode:
         qs = qs.filter(rental_mode=rental_mode)

@@ -54,7 +54,7 @@
                                 {% endif %}
                             </div>
                             <div>
-                                <p class="font-medium text-sm">{{ vehicle.name }}</p>
+                                <p class="font-medium text-sm">{{ vehicle.name }}{% if vehicle.is_premium %} <span class="inline-flex items-center text-amber-500 text-xs" title="Premium"><span class="material-symbols-outlined text-sm">star</span></span>{% endif %}{% if vehicle.is_wedding_service %} <span class="inline-flex items-center text-pink-500 text-xs" title="Wedding Service"><span class="material-symbols-outlined text-sm">favorite</span></span>{% endif %}</p>
                                 <p class="text-xs text-stone-500">{{ vehicle.brand }} &middot; {{ vehicle.registration_number|default:"No Reg." }}</p>
                             </div>
                         </div>

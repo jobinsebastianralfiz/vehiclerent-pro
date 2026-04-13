@@ -113,6 +113,16 @@
                 {% endif %}
                 <h1 class="text-2xl sm:text-3xl md:text-4xl font-serif font-bold mb-2">{{ vehicle.name }}</h1>
                 <p class="text-on-surface-variant">{{ vehicle.brand }} {{ vehicle.model }}{% if vehicle.year %} &middot; {{ vehicle.year }}{% endif %}</p>
+                {% if vehicle.is_premium or vehicle.is_wedding_service %}
+                <div class="flex flex-wrap gap-2 mt-3">
+                    {% if vehicle.is_premium %}
+                    <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold px-3 py-1.5 rounded-full"><span class="material-symbols-outlined text-sm">star</span>Premium</span>
+                    {% endif %}
+                    {% if vehicle.is_wedding_service %}
+                    <span class="inline-flex items-center gap-1 bg-pink-50 text-pink-700 border border-pink-200 text-xs font-bold px-3 py-1.5 rounded-full"><span class="material-symbols-outlined text-sm">favorite</span>Wedding Service</span>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
 
             <!-- Price Card -->

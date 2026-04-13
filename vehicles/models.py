@@ -102,6 +102,8 @@ class Vehicle(models.Model):
     thumbnail = models.ImageField(upload_to="vehicles/thumbnails/", blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="available")
     is_featured = models.BooleanField(default=False)
+    is_premium = models.BooleanField(default=False, help_text="Mark as a premium/luxury vehicle")
+    is_wedding_service = models.BooleanField(default=False, help_text="Available for wedding services")
     is_published = models.BooleanField(default=True)
     total_trips = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)

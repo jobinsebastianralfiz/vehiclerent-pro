@@ -1,9 +1,17 @@
 {% load vehicle_tags %}
 <article class="vehicle-card bg-surface-container-low rounded-xl overflow-hidden group hover:shadow-xl" itemscope itemtype="https://schema.org/Product" aria-label="{{ vehicle.brand }} {{ vehicle.name }}">
     <div class="relative">
-        {% if vehicle.is_featured %}
-        <span class="absolute top-4 left-4 bg-primary/90 text-on-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full z-10" aria-label="Featured vehicle">Featured</span>
-        {% endif %}
+        <div class="absolute top-4 left-4 flex flex-wrap gap-1.5 z-10">
+            {% if vehicle.is_featured %}
+            <span class="bg-primary/90 text-on-primary text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full" aria-label="Featured vehicle">Featured</span>
+            {% endif %}
+            {% if vehicle.is_premium %}
+            <span class="bg-amber-500/90 text-white text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full flex items-center gap-1" aria-label="Premium vehicle"><span class="material-symbols-outlined text-xs">star</span>Premium</span>
+            {% endif %}
+            {% if vehicle.is_wedding_service %}
+            <span class="bg-pink-500/90 text-white text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full flex items-center gap-1" aria-label="Wedding service"><span class="material-symbols-outlined text-xs">favorite</span>Wedding</span>
+            {% endif %}
+        </div>
         <div class="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-white/80 backdrop-blur-md rounded-full z-10">
             <span class="w-1.5 h-1.5 rounded-full {% if vehicle.status == 'available' %}bg-green-500{% elif vehicle.status == 'rented' %}bg-blue-500{% else %}bg-amber-500{% endif %}" aria-hidden="true"></span>
             <span class="text-[10px] font-bold uppercase tracking-wider">{{ vehicle.get_status_display }}</span>
