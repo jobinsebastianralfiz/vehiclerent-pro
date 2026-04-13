@@ -10,9 +10,13 @@
             <span class="material-symbols-outlined">dashboard</span>
             <span class="font-sans font-medium text-sm">Dashboard</span>
         </a>
-        <a class="flex items-center space-x-3 {% if 'vehicle' in current_url or 'category' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'vehicle_manage_list' %}">
+        <a class="flex items-center space-x-3 {% if 'vehicle' in current_url and 'category' not in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'vehicle_manage_list' %}">
             <span class="material-symbols-outlined">directions_car</span>
             <span class="font-sans font-medium text-sm">Vehicles</span>
+        </a>
+        <a class="flex items-center space-x-3 {% if 'category' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'category_list' %}">
+            <span class="material-symbols-outlined">category</span>
+            <span class="font-sans font-medium text-sm">Categories</span>
         </a>
         <a class="flex items-center space-x-3 {% if 'customer' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'customer_list' %}">
             <span class="material-symbols-outlined">group</span>

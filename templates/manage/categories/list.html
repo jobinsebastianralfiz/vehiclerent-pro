@@ -19,6 +19,7 @@
             <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
                 <th class="text-left px-6 py-4">Name</th>
                 <th class="text-left px-4 py-4">Icon</th>
+                <th class="text-center px-4 py-4">Vehicles</th>
                 <th class="text-left px-4 py-4">Order</th>
                 <th class="text-center px-4 py-4">Active</th>
                 <th class="text-right px-6 py-4">Actions</th>
@@ -29,6 +30,7 @@
             <tr class="hover:bg-stone-50 transition-colors border-b border-stone-50">
                 <td class="px-6 py-4 font-medium text-sm">{{ cat.name }}</td>
                 <td class="px-4 py-4"><span class="material-symbols-outlined text-primary">{{ cat.icon|default:"category" }}</span></td>
+                <td class="px-4 py-4 text-center text-sm text-stone-600">{{ cat.vehicle_count }}</td>
                 <td class="px-4 py-4 text-sm text-stone-600">{{ cat.display_order }}</td>
                 <td class="px-4 py-4 text-center">
                     <span class="material-symbols-outlined text-lg {% if cat.is_active %}text-green-600{% else %}text-stone-300{% endif %}">{% if cat.is_active %}check_circle{% else %}cancel{% endif %}</span>
@@ -42,7 +44,7 @@
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="5" class="px-8 py-16 text-center text-stone-400">No categories yet. <a href="{% url 'category_add' %}" class="text-primary font-medium">Add one</a>.</td></tr>
+            <tr><td colspan="6" class="px-8 py-16 text-center text-stone-400">No categories yet. <a href="{% url 'category_add' %}" class="text-primary font-medium">Add one</a>.</td></tr>
             {% endfor %}
         </tbody>
     </table>
