@@ -39,6 +39,7 @@ class SiteConfig(models.Model):
     site_name = models.CharField(max_length=200, default="VehicleRent Pro")
     tagline = models.CharField(max_length=300, blank=True, default="The Digital Concierge")
     logo = models.ImageField(upload_to="site/", blank=True, help_text="Site logo image")
+    show_brand_name = models.BooleanField(default=True, help_text="Show brand name text next to the logo")
     favicon = models.ImageField(upload_to="site/", blank=True)
 
     # Contact

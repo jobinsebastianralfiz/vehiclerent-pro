@@ -5,7 +5,7 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="relative min-h-[60vh] sm:min-h-[50vh] lg:min-h-[700px] flex flex-col lg:flex-row lg:items-center overflow-visible px-4 sm:px-8 max-w-screen-2xl mx-auto py-10 sm:py-12 lg:py-0" x-data="heroCarousel()" x-init="start()">
+<section class="relative lg:min-h-[700px] flex flex-col lg:flex-row lg:items-center overflow-hidden px-4 sm:px-8 max-w-screen-2xl mx-auto py-8 sm:py-12 lg:py-0" x-data="heroCarousel()" x-init="start()">
     <!-- Left: Text -->
     <div class="z-10 w-full lg:w-1/2">
         <p class="text-primary font-label text-[10px] sm:text-xs tracking-[0.2em] mb-3 sm:mb-4 uppercase">{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</p>
@@ -98,10 +98,10 @@
 
     <!-- Mobile: Featured Vehicle Swipeable Cards -->
     {% if featured_vehicles %}
-    <div class="lg:hidden mt-8 sm:mt-10 w-full">
-        <div class="flex gap-4 overflow-x-auto no-scrollbar pb-4 -mx-4 px-4 snap-x snap-mandatory">
+    <div class="lg:hidden mt-6 sm:mt-10 w-full overflow-hidden">
+        <div class="flex gap-3 overflow-x-auto no-scrollbar pb-4 -mx-4 px-4 snap-x snap-mandatory">
             {% for vehicle in featured_vehicles %}
-            <div class="bg-surface-container-low rounded-2xl overflow-hidden flex-shrink-0 w-[75vw] max-w-[320px] sm:w-[280px] snap-start shadow-sm">
+            <a href="{{ vehicle.get_absolute_url }}" class="bg-surface-container-low rounded-2xl overflow-hidden flex-shrink-0 w-[68vw] max-w-[280px] snap-start shadow-sm block">
                 {% if vehicle.thumbnail %}
                 <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.name }}" class="w-full aspect-[16/10] object-cover"/>
                 {% else %}
@@ -109,15 +109,15 @@
                     <span class="material-symbols-outlined text-4xl text-outline/30">directions_car</span>
                 </div>
                 {% endif %}
-                <div class="p-4">
-                    <p class="text-[10px] text-on-surface-variant/60 uppercase tracking-widest">{{ vehicle.brand }}</p>
-                    <p class="font-serif font-bold text-sm">{{ vehicle.name }}</p>
-                    <div class="flex justify-between items-center mt-3">
+                <div class="p-3">
+                    <p class="text-[9px] text-on-surface-variant/60 uppercase tracking-widest truncate">{{ vehicle.brand }}</p>
+                    <p class="font-serif font-bold text-sm truncate">{{ vehicle.name }}</p>
+                    <div class="flex justify-between items-center mt-2">
                         <p class="text-primary font-bold text-sm">{{ vehicle.primary_price_value|inr }}<span class="text-[10px] font-normal text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></p>
-                        <a href="{{ vehicle.get_absolute_url }}" class="bg-primary text-on-primary px-4 py-1.5 rounded-full text-xs font-bold">View</a>
+                        <span class="bg-primary text-on-primary px-3 py-1 rounded-full text-xs font-bold flex-shrink-0">View</span>
                     </div>
                 </div>
-            </div>
+            </a>
             {% endfor %}
         </div>
     </div>

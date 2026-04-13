@@ -3,7 +3,12 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 px-4 sm:px-8 max-w-7xl mx-auto">
         <!-- Brand -->
         <div class="sm:col-span-2 lg:col-span-1">
+            {% if SITE_CONFIG.logo %}
+            <img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-8 mb-4"/>
+            {% endif %}
+            {% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}
             <div class="font-serif font-bold text-on-surface text-2xl mb-6">{{ BUSINESS_NAME }}</div>
+            {% endif %}
             <p class="text-stone-600 text-sm tracking-wide leading-relaxed mb-6">
                 Premium vehicle rental service. Flexible daily, weekly & monthly plans for cars, SUVs, bikes and more.
             </p>

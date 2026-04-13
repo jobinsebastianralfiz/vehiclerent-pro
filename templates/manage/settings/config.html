@@ -46,6 +46,15 @@
                     {% if config.favicon %}<img src="{{ config.favicon.url }}" alt="Current favicon" class="h-8 mb-2"/>{% endif %}
                     <input type="file" name="favicon" accept="image/*" class="text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700"/>
                 </div>
+                <div class="md:col-span-2">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" name="show_brand_name" {% if form.show_brand_name.value %}checked{% endif %} class="w-5 h-5 rounded border-stone-300 text-blue-600 focus:ring-blue-500"/>
+                        <div>
+                            <span class="text-sm font-medium text-stone-700">Show brand name text</span>
+                            <p class="text-xs text-stone-400 mt-0.5">Display the site name next to the logo in the navbar and footer. Turn off if your logo already contains the brand name.</p>
+                        </div>
+                    </label>
+                </div>
             </div>
         </div>
 

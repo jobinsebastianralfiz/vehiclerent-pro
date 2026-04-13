@@ -5,7 +5,9 @@
             {% if SITE_CONFIG.logo %}
             <img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-7 sm:h-8 flex-shrink-0"/>
             {% endif %}
+            {% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}
             <span class="text-lg sm:text-2xl font-serif font-bold text-on-surface truncate">{{ BUSINESS_NAME }}</span>
+            {% endif %}
         </a>
 
         <!-- Desktop Nav -->
