@@ -1,0 +1,53 @@
+{% extends "manage/base_admin.html" %}
+
+{% block page_title %}Booking Add-ons{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div>
+        <h1 class="text-xl sm:text-2xl font-bold">Booking Add-ons</h1>
+        <p class="text-stone-500 text-xs sm:text-sm mt-1">Optional extras (baby seat, GPS, additional driver, etc.)</p>
+    </div>
+    <a href="{% url 'addon_add' %}" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
+        <span class="material-symbols-outlined text-lg">add</span> Add Add-on
+    </a>
+</div>
+
+<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
+                    <th class="text-left px-6 py-4">Name</th>
+                    <th class="text-left px-4 py-4">Icon</th>
+                    <th class="text-left px-4 py-4">Price</th>
+                    <th class="text-left px-4 py-4">Pricing</th>
+                    <th class="text-left px-4 py-4">Order</th>
+                    <th class="text-center px-4 py-4">Active</th>
+                    <th class="text-right px-6 py-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for addon in addons %}
+                <tr class="hover:bg-stone-50 border-b border-stone-50">
+                    <td class="px-6 py-4 font-medium text-sm">{{ addon.name }}</td>
+                    <td class="px-4 py-4"><span class="material-symbols-outlined text-primary">{{ addon.icon|default:"add_circle" }}</span></td>
+                    <td class="px-4 py-4 text-sm font-bold">₹{{ addon.price }}</td>
+                    <td class="px-4 py-4 text-xs text-stone-600 uppercase tracking-widest">{{ addon.get_pricing_unit_display }}</td>
+                    <td class="px-4 py-4 text-sm text-stone-600">{{ addon.display_order }}</td>
+                    <td class="px-4 py-4 text-center">
+                        <span class="material-symbols-outlined text-lg {% if addon.is_active %}text-green-600{% else %}text-stone-300{% endif %}">{% if addon.is_active %}check_circle{% else %}cancel{% endif %}</span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{% url 'addon_edit' addon.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100 inline-block"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
+                        <form method="post" action="{% url 'addon_delete' addon.pk %}" class="inline" onsubmit="return confirm('Delete this add-on?')">{% csrf_token %}<button type="submit" class="p-1.5 rounded-lg hover:bg-red-50"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button></form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="px-8 py-16 text-center text-stone-400">No add-ons yet. <a href="{% url 'addon_add' %}" class="text-primary font-medium">Add one</a>.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

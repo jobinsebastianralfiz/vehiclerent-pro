@@ -5,8 +5,22 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from .models import Vehicle, VehicleCategory, VehicleImage
-from .forms import VehicleForm, CategoryForm, VehicleImageFormSet
+from .models import (
+    BookingAddon,
+    City,
+    Vehicle,
+    VehicleCategory,
+    VehicleImage,
+    WeddingDecorationPackage,
+)
+from .forms import (
+    BookingAddonForm,
+    CategoryForm,
+    CityForm,
+    VehicleForm,
+    VehicleImageFormSet,
+    WeddingDecorationPackageForm,
+)
 
 
 # ──────────────── Public Views ────────────────
@@ -58,6 +72,14 @@ def vehicle_list(request):
     if rental_mode:
         qs = qs.filter(rental_mode=rental_mode)
 
+    rental_type = request.GET.get("rental_type")  # "self_drive" or "with_driver"
+    if rental_type == "with_driver":
+        qs = qs.filter(is_chauffeur_available=True)
+
+    pickup_city = request.GET.get("pickup_city")
+    if pickup_city:
+        qs = qs.filter(available_cities__slug=pickup_city).distinct()
+
     sort = request.GET.get("sort", "-created_at")
     sort_map = {"price": "price_per_day", "-price": "-price_per_day", "name": "name", "-created": "-created_at"}
     qs = qs.order_by(sort_map.get(sort, "-created_at"))
@@ -67,6 +89,7 @@ def vehicle_list(request):
 
     categories = VehicleCategory.objects.filter(is_active=True).order_by("display_order")
     brands = Vehicle.objects.filter(is_published=True).exclude(status="inactive").values_list("brand", flat=True).distinct().order_by("brand")
+    cities = City.objects.filter(is_active=True)
 
     query_params = request.GET.copy()
     query_params.pop("page", None)
@@ -76,6 +99,7 @@ def vehicle_list(request):
         "page_obj": page_obj,
         "categories": categories,
         "brands": brands,
+        "cities": cities,
         "vehicle_types": Vehicle.VEHICLE_TYPE_CHOICES,
         "fuel_types": Vehicle.FUEL_TYPE_CHOICES,
         "transmission_types": Vehicle.TRANSMISSION_CHOICES,
@@ -87,6 +111,8 @@ def vehicle_list(request):
         "current_fuel": fuel,
         "current_transmission": transmission,
         "current_rental": rental_mode,
+        "current_rental_type": rental_type,
+        "current_pickup_city": pickup_city,
         "current_sort": sort,
         "query_string": query_string,
         "total_count": paginator.count,
@@ -101,10 +127,38 @@ def vehicle_detail(request, slug):
         .exclude(pk=vehicle.pk, status="inactive")
         .select_related("category")[:4]
     )
+    addons = BookingAddon.objects.filter(is_active=True)
+    cities = City.objects.filter(is_active=True)
     return render(request, "public/vehicle_detail.html", {
         "vehicle": vehicle,
         "images": images,
         "related_vehicles": related,
+        "addons": addons,
+        "cities": cities,
+    })
+
+
+def wedding_cars(request):
+    """Wedding Cars landing page with tier-segmented showcase."""
+    qs = (
+        Vehicle.objects.filter(is_published=True, is_wedding_service=True)
+        .exclude(status="inactive")
+        .select_related("category")
+    )
+    classic = qs.filter(wedding_tier="classic")[:6]
+    premium = qs.filter(wedding_tier="premium")[:6]
+    iconic = qs.filter(wedding_tier="iconic")[:6]
+    other = qs.exclude(wedding_tier__in=["classic", "premium", "iconic"])[:6]
+    decorations = WeddingDecorationPackage.objects.filter(is_active=True)
+    cities = City.objects.filter(is_active=True)
+    return render(request, "public/wedding_cars.html", {
+        "vehicles": qs,
+        "classic_cars": classic,
+        "premium_cars": premium,
+        "iconic_cars": iconic,
+        "other_cars": other,
+        "decorations": decorations,
+        "cities": cities,
     })
 
 
@@ -273,3 +327,117 @@ def category_delete(request, pk):
         category.delete()
         messages.success(request, "Category deleted.")
     return redirect("category_list")
+
+
+# ──────────────── City Admin Views ────────────────
+
+@login_required
+def city_list(request):
+    cities = City.objects.all()
+    return render(request, "manage/cities/list.html", {"cities": cities})
+
+
+@login_required
+def city_add(request):
+    form = CityForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "City added.")
+        return redirect("city_list")
+    return render(request, "manage/cities/form.html", {"form": form, "title": "Add City"})
+
+
+@login_required
+def city_edit(request, pk):
+    city = get_object_or_404(City, pk=pk)
+    form = CityForm(request.POST or None, instance=city)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "City updated.")
+        return redirect("city_list")
+    return render(request, "manage/cities/form.html", {"form": form, "title": f"Edit {city.name}", "city": city})
+
+
+@login_required
+def city_delete(request, pk):
+    city = get_object_or_404(City, pk=pk)
+    if request.method == "POST":
+        city.delete()
+        messages.success(request, "City deleted.")
+    return redirect("city_list")
+
+
+# ──────────────── Booking Addon Admin Views ────────────────
+
+@login_required
+def addon_list(request):
+    addons = BookingAddon.objects.all()
+    return render(request, "manage/addons/list.html", {"addons": addons})
+
+
+@login_required
+def addon_add(request):
+    form = BookingAddonForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Add-on added.")
+        return redirect("addon_list")
+    return render(request, "manage/addons/form.html", {"form": form, "title": "Add Booking Add-on"})
+
+
+@login_required
+def addon_edit(request, pk):
+    addon = get_object_or_404(BookingAddon, pk=pk)
+    form = BookingAddonForm(request.POST or None, instance=addon)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Add-on updated.")
+        return redirect("addon_list")
+    return render(request, "manage/addons/form.html", {"form": form, "title": f"Edit {addon.name}", "addon": addon})
+
+
+@login_required
+def addon_delete(request, pk):
+    addon = get_object_or_404(BookingAddon, pk=pk)
+    if request.method == "POST":
+        addon.delete()
+        messages.success(request, "Add-on deleted.")
+    return redirect("addon_list")
+
+
+# ──────────────── Wedding Decoration Package Admin ────────────────
+
+@login_required
+def decoration_list(request):
+    decorations = WeddingDecorationPackage.objects.all()
+    return render(request, "manage/decorations/list.html", {"decorations": decorations})
+
+
+@login_required
+def decoration_add(request):
+    form = WeddingDecorationPackageForm(request.POST or None, request.FILES or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Decoration package added.")
+        return redirect("decoration_list")
+    return render(request, "manage/decorations/form.html", {"form": form, "title": "Add Decoration Package"})
+
+
+@login_required
+def decoration_edit(request, pk):
+    decoration = get_object_or_404(WeddingDecorationPackage, pk=pk)
+    form = WeddingDecorationPackageForm(request.POST or None, request.FILES or None, instance=decoration)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Decoration package updated.")
+        return redirect("decoration_list")
+    return render(request, "manage/decorations/form.html", {"form": form, "title": f"Edit {decoration.name}", "decoration": decoration})
+
+
+@login_required
+def decoration_delete(request, pk):
+    decoration = get_object_or_404(WeddingDecorationPackage, pk=pk)
+    if request.method == "POST":
+        decoration.delete()
+        messages.success(request, "Decoration package deleted.")
+    return redirect("decoration_list")

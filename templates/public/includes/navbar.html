@@ -1,25 +1,31 @@
 {% load vehicle_tags %}
-<nav class="fixed top-0 w-full z-50 bg-stone-50/90 backdrop-blur-xl shadow-sm" role="navigation" aria-label="Main navigation">
-    <div class="flex justify-between items-center px-4 sm:px-8 py-4 sm:py-5 max-w-screen-2xl mx-auto">
+<nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30" role="navigation" aria-label="Main navigation">
+    <div class="flex justify-between items-center px-4 sm:px-12 py-4 sm:py-5 max-w-screen-2xl mx-auto">
         <a href="{% url 'home' %}" class="flex items-center gap-2 sm:gap-3 min-w-0" aria-label="{{ BUSINESS_NAME }} - Home">
             {% if SITE_CONFIG.logo %}
             <img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-10 sm:h-12 flex-shrink-0"/>
             {% endif %}
             {% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}
-            <span class="text-lg sm:text-2xl font-serif font-bold text-on-surface truncate">{{ BUSINESS_NAME }}</span>
+            <span class="text-xl sm:text-2xl font-serif font-bold text-primary-container truncate">{{ BUSINESS_NAME }}</span>
             {% endif %}
         </a>
 
-        <!-- Desktop Nav -->
-        <div class="hidden lg:flex items-center space-x-10" role="menubar">
-            <a class="font-serif text-on-surface hover:text-primary transition-colors tracking-tight" href="{% url 'home' %}" role="menuitem">Home</a>
-            <a class="font-serif text-stone-500 hover:text-primary transition-colors tracking-tight" href="{% url 'vehicle_list' %}" role="menuitem">Fleet</a>
-            <a class="font-serif text-stone-500 hover:text-primary transition-colors tracking-tight" href="{% url 'about' %}" role="menuitem">About</a>
-            <a class="font-serif text-stone-500 hover:text-primary transition-colors tracking-tight" href="{% url 'contact' %}" role="menuitem">Contact</a>
+        <!-- Desktop Nav: tiny all-caps tracked labels -->
+        {% with request.resolver_match.url_name as current %}
+        <div class="hidden lg:flex items-center gap-10 xl:gap-12" role="menubar">
+            <a class="label-tiny {% if current == 'home' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'home' %}" role="menuitem">Home</a>
+            <a class="label-tiny {% if current == 'vehicle_list' or current == 'vehicle_detail' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'vehicle_list' %}" role="menuitem">Fleet</a>
+            <a class="label-tiny {% if current == 'wedding_cars' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'wedding_cars' %}" role="menuitem">Wedding Cars</a>
+            <a class="label-tiny {% if current == 'about' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'about' %}" role="menuitem">About</a>
+            <a class="label-tiny {% if current == 'contact' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'contact' %}" role="menuitem">Contact</a>
         </div>
+        {% endwith %}
 
-        <div class="flex items-center gap-3">
-            <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-medium text-sm transition-transform active:scale-95 hidden lg:inline-block">Browse Fleet</a>
+        <div class="flex items-center gap-3 sm:gap-6">
+            {% if BUSINESS_PHONE %}
+            <a href="tel:{{ BUSINESS_PHONE }}" class="hidden xl:inline label-tiny text-on-surface-variant hover:text-primary-container transition-colors">{{ BUSINESS_PHONE }}</a>
+            {% endif %}
+            <a href="{% url 'vehicle_list' %}" class="bg-primary-container text-on-primary px-6 sm:px-8 py-2.5 sm:py-3 rounded-full label-tiny hover:opacity-80 active:scale-95 transition-all hidden lg:inline-block">Book Now</a>
             <button x-data x-on:click="$dispatch('toggle-mobile-menu')" class="lg:hidden p-1" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
                 <span class="material-symbols-outlined text-2xl" aria-hidden="true">menu</span>
             </button>
@@ -27,17 +33,18 @@
     </div>
 
     <!-- Mobile menu -->
-    <div id="mobile-menu" x-data="{ open: false }" x-on:toggle-mobile-menu.window="open = !open" x-show="open" x-transition class="lg:hidden bg-white border-t px-4 sm:px-8 py-4 space-y-1" role="menu">
-        <a class="block font-serif text-on-surface py-3 px-3 rounded-lg hover:bg-stone-50" href="{% url 'home' %}" role="menuitem">Home</a>
-        <a class="block font-serif text-stone-500 py-3 px-3 rounded-lg hover:bg-stone-50" href="{% url 'vehicle_list' %}" role="menuitem">Fleet</a>
-        <a class="block font-serif text-stone-500 py-3 px-3 rounded-lg hover:bg-stone-50" href="{% url 'about' %}" role="menuitem">About</a>
-        <a class="block font-serif text-stone-500 py-3 px-3 rounded-lg hover:bg-stone-50" href="{% url 'contact' %}" role="menuitem">Contact</a>
-        <a class="block font-serif text-stone-500 py-3 px-3 rounded-lg hover:bg-stone-50" href="{% url 'faq' %}" role="menuitem">FAQ</a>
-        <hr class="border-stone-100 my-2" role="separator"/>
+    <div id="mobile-menu" x-data="{ open: false }" x-on:toggle-mobile-menu.window="open = !open" x-show="open" x-transition class="lg:hidden bg-surface-container-low px-4 sm:px-8 py-4 space-y-1" role="menu">
+        <a class="block label-tiny text-on-surface py-3 px-3 rounded-2xl hover:bg-surface-container" href="{% url 'home' %}" role="menuitem">Home</a>
+        <a class="block label-tiny text-on-surface py-3 px-3 rounded-2xl hover:bg-surface-container" href="{% url 'vehicle_list' %}" role="menuitem">Fleet</a>
+        <a class="block label-tiny text-on-surface py-3 px-3 rounded-2xl hover:bg-surface-container" href="{% url 'wedding_cars' %}" role="menuitem">Wedding Cars</a>
+        <a class="block label-tiny text-on-surface py-3 px-3 rounded-2xl hover:bg-surface-container" href="{% url 'about' %}" role="menuitem">About</a>
+        <a class="block label-tiny text-on-surface py-3 px-3 rounded-2xl hover:bg-surface-container" href="{% url 'contact' %}" role="menuitem">Contact</a>
+        <a class="block label-tiny text-on-surface py-3 px-3 rounded-2xl hover:bg-surface-container" href="{% url 'faq' %}" role="menuitem">FAQ</a>
+        <hr class="border-outline-variant/30 my-2" role="separator"/>
         <div class="flex gap-4 px-3 py-2">
-            <a class="text-stone-400 text-xs hover:text-primary" href="{% url 'terms' %}">Terms</a>
-            <a class="text-stone-400 text-xs hover:text-primary" href="{% url 'privacy' %}">Privacy</a>
+            <a class="text-outline text-xs hover:text-primary-container" href="{% url 'terms' %}">Terms</a>
+            <a class="text-outline text-xs hover:text-primary-container" href="{% url 'privacy' %}">Privacy</a>
         </div>
-        <a href="{% url 'vehicle_list' %}" class="block bg-primary text-on-primary px-6 py-3 rounded-full font-medium text-center text-sm mt-2" role="menuitem">Browse Fleet</a>
+        <a href="{% url 'vehicle_list' %}" class="block bg-primary-container text-on-primary px-6 py-3 rounded-full label-tiny text-center mt-2" role="menuitem">Book Now</a>
     </div>
 </nav>

@@ -1,7 +1,14 @@
 import json
 
 from django import forms
-from .models import Vehicle, VehicleCategory, VehicleImage
+from .models import (
+    BookingAddon,
+    City,
+    Vehicle,
+    VehicleCategory,
+    VehicleImage,
+    WeddingDecorationPackage,
+)
 
 
 class VehicleForm(forms.ModelForm):
@@ -49,3 +56,27 @@ VehicleImageFormSet = forms.inlineformset_factory(
     extra=3,
     can_delete=True,
 )
+
+
+class CityForm(forms.ModelForm):
+    class Meta:
+        model = City
+        fields = ["name", "state", "is_hub", "display_order", "is_active"]
+
+
+class BookingAddonForm(forms.ModelForm):
+    class Meta:
+        model = BookingAddon
+        fields = ["name", "description", "icon", "price", "pricing_unit", "display_order", "is_active"]
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 2}),
+        }
+
+
+class WeddingDecorationPackageForm(forms.ModelForm):
+    class Meta:
+        model = WeddingDecorationPackage
+        fields = ["name", "description", "image", "price", "display_order", "is_active"]
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 3}),
+        }

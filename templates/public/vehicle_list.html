@@ -4,87 +4,237 @@
 {% block title %}Our Fleet - {{ BUSINESS_NAME }}{% endblock %}
 
 {% block content %}
-<section class="pt-4 sm:pt-8 pb-12 sm:pb-24 px-4 sm:px-8 max-w-screen-2xl mx-auto">
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 gap-4">
-        <div>
-            <p class="text-primary font-label text-[10px] sm:text-xs tracking-[0.2em] mb-2 sm:mb-4 uppercase">Exclusive Selection</p>
-            <h1 class="text-2xl sm:text-4xl md:text-5xl font-headline font-bold">Our Fleet</h1>
-            <p class="text-on-surface-variant text-sm mt-1 sm:mt-2">{{ total_count }} vehicle{{ total_count|pluralize }} available</p>
+<main class="pt-12 sm:pt-16 pb-24 px-4 sm:px-12 max-w-screen-2xl mx-auto">
+    <!-- ─── Page Header (asymmetric) ─── -->
+    <section class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 sm:mb-16 gap-8">
+        <div class="max-w-2xl">
+            <span class="label-tiny text-on-secondary-container block mb-4">EXCLUSIVE SELECTION</span>
+            <h1 class="display-hero text-5xl sm:text-7xl lg:text-[96px] text-on-surface mb-4">Our Fleet</h1>
+            <p class="text-body-lg text-base sm:text-lg text-outline">{{ total_count }} curated vehicle{{ total_count|pluralize }} across {{ cities.count }} Kerala cities, spanning timeless classics to modern engineering marvels.</p>
         </div>
-        <div class="relative w-full md:w-auto">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-lg">search</span>
-            <form method="get" action="{% url 'vehicle_list' %}">
-                <input type="text" name="search" value="{{ search }}" placeholder="Search by name or brand..." class="pl-10 pr-4 py-3 bg-surface-container-low rounded-full text-sm focus:ring-1 focus:ring-primary focus:outline-none w-full md:w-64 ghost-border"/>
-            </form>
+        <div class="text-right pb-2">
+            <div class="display-hero text-7xl sm:text-8xl text-on-primary-fixed-variant leading-none">{{ total_count }}</div>
+            <div class="label-tiny text-outline mt-2">Total Vehicles</div>
+        </div>
+    </section>
+
+    <!-- ─── Compact Booking Bar ─── -->
+    <section class="relative z-40 mb-16 sm:mb-24">
+        {% include "public/includes/booking_widget.html" with cities=cities %}
+    </section>
+
+    <!-- ─── Category Chip Strip (sticky) ─── -->
+    <section class="sticky top-20 z-30 bg-surface/95 backdrop-blur-md py-4 -mx-4 sm:-mx-12 px-4 sm:px-12 mb-12 border-b border-outline-variant/20">
+        <div class="flex items-center gap-3 overflow-x-auto pb-2 no-scrollbar">
+            <a href="{% url 'vehicle_list' %}" class="{% if not current_category %}bg-primary-container text-on-primary{% else %}bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high{% endif %} px-6 sm:px-8 py-3 rounded-full label-tiny whitespace-nowrap transition-colors">All Cars</a>
+            {% for cat in categories %}
+            <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="{% if current_category == cat.id|stringformat:'d' %}bg-primary-container text-on-primary{% else %}bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high{% endif %} px-6 sm:px-8 py-3 rounded-full label-tiny whitespace-nowrap transition-colors">{{ cat.name }}</a>
+            {% endfor %}
+        </div>
+    </section>
+
+    <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        <!-- ─── Sidebar Filters ─── -->
+        <aside class="lg:w-[320px] shrink-0" x-data="{ open: false }">
+            <button @click="open = !open" class="lg:hidden flex items-center gap-2 px-5 py-3 bg-primary-container text-on-primary rounded-full label-tiny mb-4">
+                <span class="material-symbols-outlined text-base">tune</span>
+                <span x-text="open ? 'Hide filters' : 'Show filters'">Filters</span>
+            </button>
+            <div :class="open ? 'block' : 'hidden lg:block'">
+                <form id="filter-form" method="get" action="{% url 'vehicle_list' %}" class="lg:sticky lg:top-44 bg-surface-container-low p-6 sm:p-8 rounded-3xl space-y-8">
+                    {% if search %}<input type="hidden" name="search" value="{{ search }}"/>{% endif %}
+
+                    <!-- Search input -->
+                    <div>
+                        <span class="label-tiny text-outline block mb-3">REFINE SEARCH</span>
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+                            <input type="text" name="search" value="{{ search }}" placeholder="Brand or model..." class="w-full pl-10 pr-4 py-3 bg-surface-container-lowest rounded-full text-sm focus:ring-1 focus:ring-primary-container focus:outline-none ghost-border"/>
+                        </div>
+                    </div>
+
+                    <!-- Body type -->
+                    <div>
+                        <span class="label-tiny text-outline block mb-3">BODY TYPE</span>
+                        <div class="grid grid-cols-2 gap-2">
+                            {% for val, label in vehicle_types %}
+                            <label class="cursor-pointer">
+                                <input type="radio" name="type" value="{{ val }}" {% if current_type == val %}checked{% endif %} class="peer sr-only" onchange="document.getElementById('filter-form').submit()"/>
+                                <span class="block px-3 py-2 text-xs font-bold rounded-2xl bg-surface-container-lowest text-on-surface-variant peer-checked:bg-primary-container peer-checked:text-on-primary text-center transition-colors">{{ label }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Transmission -->
+                    <div>
+                        <span class="label-tiny text-outline block mb-3">TRANSMISSION</span>
+                        <div class="flex gap-2 flex-wrap">
+                            {% for val, label in transmission_types %}
+                            <label class="cursor-pointer">
+                                <input type="radio" name="transmission" value="{{ val }}" {% if current_transmission == val %}checked{% endif %} class="peer sr-only" onchange="document.getElementById('filter-form').submit()"/>
+                                <span class="block px-4 py-2 text-xs font-bold rounded-full bg-surface-container-lowest text-on-surface-variant peer-checked:bg-primary-container peer-checked:text-on-primary transition-colors">{{ label }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Fuel -->
+                    <div>
+                        <span class="label-tiny text-outline block mb-3">FUEL</span>
+                        <div class="flex gap-2 flex-wrap">
+                            {% for val, label in fuel_types %}
+                            <label class="cursor-pointer">
+                                <input type="radio" name="fuel" value="{{ val }}" {% if current_fuel == val %}checked{% endif %} class="peer sr-only" onchange="document.getElementById('filter-form').submit()"/>
+                                <span class="block px-4 py-2 text-xs font-bold rounded-full bg-surface-container-lowest text-on-surface-variant peer-checked:bg-primary-container peer-checked:text-on-primary transition-colors">{{ label }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Brand -->
+                    {% if brands %}
+                    <div>
+                        <span class="label-tiny text-outline block mb-3">BRAND</span>
+                        <select name="brand" onchange="document.getElementById('filter-form').submit()" class="w-full bg-surface-container-lowest text-sm rounded-2xl px-4 py-3 ghost-border focus:ring-1 focus:ring-primary-container">
+                            <option value="">All brands</option>
+                            {% for b in brands %}
+                            <option value="{{ b }}" {% if current_brand == b %}selected{% endif %}>{{ b }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+
+                    <!-- Pickup City -->
+                    {% if cities %}
+                    <div>
+                        <span class="label-tiny text-outline block mb-3">PICKUP CITY</span>
+                        <select name="pickup_city" onchange="document.getElementById('filter-form').submit()" class="w-full bg-surface-container-lowest text-sm rounded-2xl px-4 py-3 ghost-border focus:ring-1 focus:ring-primary-container">
+                            <option value="">Any city</option>
+                            {% for city in cities %}
+                            <option value="{{ city.slug }}" {% if current_pickup_city == city.slug %}selected{% endif %}>{{ city.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+
+                    <!-- Special tags -->
+                    <div>
+                        <span class="label-tiny text-outline block mb-3">SPECIAL</span>
+                        <div class="flex flex-col gap-2">
+                            <label class="flex items-center gap-3 cursor-pointer text-sm">
+                                <input type="checkbox" name="premium" value="1" {% if request.GET.premium == '1' %}checked{% endif %} onchange="document.getElementById('filter-form').submit()" class="rounded text-primary-container focus:ring-primary-container">
+                                Premium / Luxury
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer text-sm">
+                                <input type="checkbox" name="wedding" value="1" {% if request.GET.wedding == '1' %}checked{% endif %} onchange="document.getElementById('filter-form').submit()" class="rounded text-primary-container focus:ring-primary-container">
+                                Wedding service
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer text-sm">
+                                <input type="checkbox" name="featured" value="1" {% if request.GET.featured == '1' %}checked{% endif %} onchange="document.getElementById('filter-form').submit()" class="rounded text-primary-container focus:ring-primary-container">
+                                Featured only
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-outline-variant/30 flex flex-col gap-3">
+                        <button type="submit" class="bg-primary-container text-on-primary rounded-full py-3 label-tiny hover:opacity-90">Apply Filters</button>
+                        <a href="{% url 'vehicle_list' %}" class="text-center text-sm text-outline hover:text-primary-container underline">Reset all</a>
+                    </div>
+                </form>
+            </div>
+        </aside>
+
+        <!-- ─── Content Grid ─── -->
+        <div class="flex-1 min-w-0">
+            <!-- Top bar -->
+            <div class="flex items-center justify-between mb-8 gap-4 flex-wrap">
+                <span class="label-tiny text-outline">Showing {{ page_obj|length }} of {{ total_count }} vehicles</span>
+                <form method="get" action="{% url 'vehicle_list' %}" class="flex items-center gap-3" id="sort-form">
+                    {% for k,v in request.GET.items %}{% if k != 'sort' and k != 'page' %}<input type="hidden" name="{{ k }}" value="{{ v }}"/>{% endif %}{% endfor %}
+                    <span class="label-tiny text-outline">Sort:</span>
+                    <select name="sort" onchange="document.getElementById('sort-form').submit()" class="bg-surface-container-low text-sm rounded-full px-4 py-2 ghost-border focus:ring-1 focus:ring-primary-container">
+                        <option value="-created" {% if current_sort == '-created' %}selected{% endif %}>Newest</option>
+                        <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="-price" {% if current_sort == '-price' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name: A–Z</option>
+                    </select>
+                </form>
+            </div>
+
+            <!-- Vehicle Grid -->
+            {% if page_obj %}
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
+                {% for vehicle in page_obj %}
+                <a href="{{ vehicle.get_absolute_url }}" class="group relative bg-surface-container-lowest p-5 sm:p-6 rounded-[2.5rem] hover:shadow-xl transition-all duration-500 vehicle-card block">
+                    <div class="relative overflow-hidden rounded-[2rem] h-56 mb-6 bg-surface-container-high">
+                        {% if vehicle.thumbnail %}
+                        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale" loading="lazy"/>
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[60px] text-outline-variant">directions_car</span></div>
+                        {% endif %}
+                        <div class="absolute top-4 right-4 glass-panel bg-surface-container-lowest/40 px-4 py-2 rounded-full font-bold text-sm">{{ vehicle.primary_price_value|inr }}<span class="font-light">/{{ vehicle.primary_price_label }}</span></div>
+                        <div class="absolute bottom-4 left-4 flex gap-2">
+                            {% if vehicle.is_wedding_service %}
+                            <span class="bg-primary-container/90 text-on-primary px-3 py-1 rounded-full label-tiny">Wedding</span>
+                            {% elif vehicle.is_premium %}
+                            <span class="bg-primary-container/90 text-on-primary px-3 py-1 rounded-full label-tiny">Premium</span>
+                            {% elif vehicle.category %}
+                            <span class="bg-primary-container/90 text-on-primary px-3 py-1 rounded-full label-tiny">{{ vehicle.category.name }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1 bg-surface-container-lowest/80 backdrop-blur-md rounded-full">
+                            <span class="w-1.5 h-1.5 rounded-full {% if vehicle.status == 'available' %}bg-emerald-500{% elif vehicle.status == 'rented' %}bg-blue-500{% else %}bg-amber-500{% endif %}"></span>
+                            <span class="label-tiny">{{ vehicle.get_status_display }}</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="label-tiny opacity-50">{{ vehicle.brand }}</p>
+                            <h3 class="headline-md text-xl sm:text-2xl mt-1">{{ vehicle.name }}</h3>
+                        </div>
+                        {% if vehicle.is_chauffeur_available %}
+                        <span class="material-symbols-outlined text-primary-container" title="With driver available">badge</span>
+                        {% endif %}
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 mb-6">
+                        {% if vehicle.transmission %}
+                        <div>
+                            <div class="label-tiny opacity-40">GEAR</div>
+                            <div class="font-serif text-sm sm:text-base mt-1">{{ vehicle.get_transmission_display|upper }}</div>
+                        </div>
+                        {% endif %}
+                        {% if vehicle.fuel_type %}
+                        <div>
+                            <div class="label-tiny opacity-40">FUEL</div>
+                            <div class="font-serif text-sm sm:text-base mt-1">{{ vehicle.get_fuel_type_display|upper }}</div>
+                        </div>
+                        {% endif %}
+                        {% if vehicle.seating_capacity %}
+                        <div>
+                            <div class="label-tiny opacity-40">SEATS</div>
+                            <div class="font-serif text-sm sm:text-base mt-1">{{ vehicle.seating_capacity }} ADULT</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex items-center justify-between pt-4 border-t border-outline-variant/20">
+                        <span class="label-tiny text-primary-container">View Details →</span>
+                        <span class="material-symbols-outlined text-primary-container transition-transform group-hover:translate-x-1">arrow_forward</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            {% include "public/includes/pagination.html" %}
+            {% else %}
+            <div class="text-center py-16 sm:py-24 bg-surface-container-low rounded-3xl">
+                <span class="material-symbols-outlined text-6xl text-outline-variant mb-4">search_off</span>
+                <h3 class="headline-md text-2xl sm:text-3xl mb-3">No vehicles found</h3>
+                <p class="text-on-surface-variant mb-8">Try adjusting your filters or search.</p>
+                <a href="{% url 'vehicle_list' %}" class="bg-primary-container text-on-primary px-8 py-3 rounded-full label-tiny inline-block">Reset All Filters</a>
+            </div>
+            {% endif %}
         </div>
     </div>
-
-    <!-- Filters -->
-    <div x-data="{ showFilters: false }" class="mb-6 sm:mb-10">
-        <button x-on:click="showFilters = !showFilters" class="flex items-center gap-2 text-sm font-medium text-on-surface-variant hover:text-primary transition-colors mb-3">
-            <span class="material-symbols-outlined text-lg">tune</span>
-            <span x-text="showFilters ? 'Hide Filters' : 'Show Filters'">Show Filters</span>
-        </button>
-        <div x-show="showFilters" x-transition class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            <form method="get" action="{% url 'vehicle_list' %}" class="contents" id="filter-form">
-                {% if search %}<input type="hidden" name="search" value="{{ search }}"/>{% endif %}
-                <select name="type" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-xs sm:text-sm ghost-border py-2.5 sm:py-3 px-3 bg-white focus:ring-1 focus:ring-primary">
-                    <option value="">All Types</option>
-                    {% for val, label in vehicle_types %}
-                    <option value="{{ val }}" {% if current_type == val %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-                <select name="category" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-xs sm:text-sm ghost-border py-2.5 sm:py-3 px-3 bg-white focus:ring-1 focus:ring-primary">
-                    <option value="">All Categories</option>
-                    {% for cat in categories %}
-                    <option value="{{ cat.id }}" {% if current_category == cat.id|stringformat:"d" %}selected{% endif %}>{{ cat.name }}</option>
-                    {% endfor %}
-                </select>
-                <select name="brand" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-xs sm:text-sm ghost-border py-2.5 sm:py-3 px-3 bg-white focus:ring-1 focus:ring-primary">
-                    <option value="">All Brands</option>
-                    {% for b in brands %}
-                    <option value="{{ b }}" {% if current_brand == b %}selected{% endif %}>{{ b }}</option>
-                    {% endfor %}
-                </select>
-                <select name="fuel" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-xs sm:text-sm ghost-border py-2.5 sm:py-3 px-3 bg-white focus:ring-1 focus:ring-primary">
-                    <option value="">All Fuel</option>
-                    {% for val, label in fuel_types %}
-                    <option value="{{ val }}" {% if current_fuel == val %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-                <select name="rental" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-xs sm:text-sm ghost-border py-2.5 sm:py-3 px-3 bg-white focus:ring-1 focus:ring-primary">
-                    <option value="">All Plans</option>
-                    {% for val, label in rental_modes %}
-                    <option value="{{ val }}" {% if current_rental == val %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-                <select name="sort" onchange="document.getElementById('filter-form').submit()" class="rounded-lg text-xs sm:text-sm ghost-border py-2.5 sm:py-3 px-3 bg-white focus:ring-1 focus:ring-primary">
-                    <option value="-created" {% if current_sort == '-created' %}selected{% endif %}>Newest</option>
-                    <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Price: Low</option>
-                    <option value="-price" {% if current_sort == '-price' %}selected{% endif %}>Price: High</option>
-                    <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name: A-Z</option>
-                </select>
-            </form>
-        </div>
-    </div>
-
-    <!-- Vehicle Grid -->
-    {% if page_obj %}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
-        {% for vehicle in page_obj %}
-            {% include "public/includes/vehicle_card.html" %}
-        {% endfor %}
-    </div>
-
-    {% include "public/includes/pagination.html" %}
-    {% else %}
-    <div class="text-center py-16 sm:py-24">
-        <span class="material-symbols-outlined text-5xl text-outline/30 mb-4">search_off</span>
-        <h3 class="text-xl sm:text-2xl font-serif font-bold mb-2">No Vehicles Found</h3>
-        <p class="text-on-surface-variant text-sm mb-6">Try adjusting your filters or search.</p>
-        <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-6 py-3 rounded-full font-medium text-sm">Clear Filters</a>
-    </div>
-    {% endif %}
-</section>
+</main>
 {% endblock %}

@@ -25,6 +25,11 @@ class Enquiry(models.Model):
     customer = models.ForeignKey(
         "customers.Customer", on_delete=models.SET_NULL, blank=True, null=True, related_name="enquiries"
     )
+    RENTAL_TYPE_CHOICES = [
+        ("self_drive", "Self-Drive"),
+        ("with_driver", "With Driver"),
+    ]
+
     name = models.CharField(max_length=200)
     phone = models.CharField(max_length=20)
     email = models.EmailField(blank=True)
@@ -32,6 +37,10 @@ class Enquiry(models.Model):
     source = models.CharField(max_length=50, choices=SOURCE_CHOICES, default="website")
     preferred_start_date = models.DateField(blank=True, null=True)
     preferred_end_date = models.DateField(blank=True, null=True)
+    pickup_city = models.CharField(max_length=120, blank=True, help_text="City slug from booking widget")
+    drop_city = models.CharField(max_length=120, blank=True, help_text="City slug from booking widget")
+    rental_type = models.CharField(max_length=20, choices=RENTAL_TYPE_CHOICES, blank=True)
+    requested_addons = models.JSONField(default=list, blank=True, help_text="List of addon slugs requested")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new")
     admin_notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

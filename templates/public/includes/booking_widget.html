@@ -1,0 +1,60 @@
+{% comment %}
+Reusable booking widget. Pass these vars in the include:
+  - cities (queryset of City)
+Mobile: stacked card (rounded-3xl). Desktop (lg+): horizontal pill (rounded-full).
+{% endcomment %}
+<form action="{% url 'vehicle_list' %}" method="get" class="w-full">
+    <!-- Top toggles row -->
+    <div class="flex items-center gap-3 mb-4 px-2 sm:px-4 flex-wrap">
+        <div class="flex bg-surface-container-low rounded-full p-1">
+            <label class="cursor-pointer">
+                <input type="radio" name="rental_type" value="self_drive" class="peer sr-only" checked>
+                <span class="block px-4 sm:px-6 py-2 rounded-full label-tiny peer-checked:bg-primary-container peer-checked:text-on-primary text-on-surface-variant transition-colors">Self-Drive</span>
+            </label>
+            <label class="cursor-pointer">
+                <input type="radio" name="rental_type" value="with_driver" class="peer sr-only">
+                <span class="block px-4 sm:px-6 py-2 rounded-full label-tiny peer-checked:bg-primary-container peer-checked:text-on-primary text-on-surface-variant transition-colors">With Driver</span>
+            </label>
+        </div>
+        <label class="ml-auto flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" name="same_location" value="1" checked class="rounded border-outline-variant text-primary-container focus:ring-primary-container">
+            <span class="label-tiny text-on-surface-variant">Same-location</span>
+        </label>
+    </div>
+
+    <!-- Fields container: stacked card on mobile, pill on desktop -->
+    <div class="glass-panel bg-surface-container-lowest/90 ghost-border rounded-3xl lg:rounded-full p-3 sm:p-4 lg:p-2 grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-nowrap gap-3 lg:gap-0 lg:items-center shadow-2xl shadow-on-surface/5">
+
+        <div class="lg:flex-1 lg:min-w-[140px] px-4 lg:px-6 lg:border-r lg:ghost-divider py-2 lg:py-0">
+            <span class="label-tiny text-outline block mb-1">PICKUP CITY</span>
+            <select name="pickup_city" class="bg-transparent border-none p-0 font-bold text-on-surface focus:ring-0 w-full appearance-none cursor-pointer">
+                <option value="">Any city</option>
+                {% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}
+            </select>
+        </div>
+
+        <div class="lg:flex-1 lg:min-w-[140px] px-4 lg:px-6 lg:border-r lg:ghost-divider py-2 lg:py-0">
+            <span class="label-tiny text-outline block mb-1">DROP CITY</span>
+            <select name="drop_city" class="bg-transparent border-none p-0 font-bold text-on-surface focus:ring-0 w-full appearance-none cursor-pointer">
+                <option value="">Same as pickup</option>
+                {% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}
+            </select>
+        </div>
+
+        <div class="lg:flex-1 lg:min-w-[140px] px-4 lg:px-6 lg:border-r lg:ghost-divider py-2 lg:py-0">
+            <span class="label-tiny text-outline block mb-1">PICKUP DATE</span>
+            <input type="date" name="pickup_date" class="bg-transparent border-none p-0 font-bold text-on-surface focus:ring-0 w-full">
+        </div>
+
+        <div class="lg:flex-1 lg:min-w-[140px] px-4 lg:px-6 lg:border-r lg:ghost-divider py-2 lg:py-0">
+            <span class="label-tiny text-outline block mb-1">RETURN DATE</span>
+            <input type="date" name="return_date" class="bg-transparent border-none p-0 font-bold text-on-surface focus:ring-0 w-full">
+        </div>
+
+        <button type="submit" class="bg-primary-container text-on-primary w-full lg:w-auto py-4 px-8 lg:px-10 rounded-full label-tiny hover:opacity-90 transition-all flex items-center justify-center gap-3 group whitespace-nowrap sm:col-span-2 lg:col-auto">
+            <span>Search Cars</span>
+            <span class="material-symbols-outlined text-base transition-transform group-hover:translate-x-1">arrow_forward</span>
+        </button>
+    </div>
+    <p class="text-center text-xs text-outline mt-4">Free cancellation · No hidden charges · 24×7 customer support</p>
+</form>

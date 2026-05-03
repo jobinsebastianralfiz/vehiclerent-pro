@@ -2,6 +2,30 @@ from django.db import models
 from django.utils.text import slugify
 
 
+class City(models.Model):
+    """A pickup/drop-off city served by the rental network."""
+
+    name = models.CharField(max_length=120, unique=True)
+    slug = models.SlugField(max_length=140, unique=True, blank=True)
+    state = models.CharField(max_length=80, default="Kerala")
+    is_active = models.BooleanField(default=True)
+    is_hub = models.BooleanField(default=False, help_text="Major delivery hub city (shown first)")
+    display_order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "Cities"
+        ordering = ["-is_hub", "display_order", "name"]
+
+    def __str__(self):
+        return f"{self.name}, {self.state}" if self.state else self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
 class VehicleCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=120, unique=True, blank=True)
@@ -94,6 +118,21 @@ class Vehicle(models.Model):
     price_per_day = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     price_per_week = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     price_per_month = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    with_driver_price_per_day = models.DecimalField(
+        max_digits=10, decimal_places=2, blank=True, null=True,
+        help_text="Daily rate when rented with a chauffeur (overrides price_per_day if set)",
+    )
+    per_km_charge = models.DecimalField(
+        max_digits=6, decimal_places=2, blank=True, null=True,
+        help_text="Charge per km after the daily included kilometres are exhausted",
+    )
+    included_km_per_day = models.PositiveIntegerField(
+        default=200, help_text="Free kilometres included in the daily rate",
+    )
+    wedding_decoration_charge = models.DecimalField(
+        max_digits=10, decimal_places=2, blank=True, null=True,
+        help_text="Default basic decoration charge for wedding service vehicles",
+    )
     minimum_rental_days = models.PositiveIntegerField(default=1, help_text="Minimum rental period in days")
     security_deposit = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     short_description = models.CharField(max_length=300, blank=True)
@@ -104,6 +143,21 @@ class Vehicle(models.Model):
     is_featured = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False, help_text="Mark as a premium/luxury vehicle")
     is_wedding_service = models.BooleanField(default=False, help_text="Available for wedding services")
+    is_chauffeur_available = models.BooleanField(default=False, help_text="Can be rented with a chauffeur")
+    wedding_tier = models.CharField(
+        max_length=20,
+        blank=True,
+        choices=[
+            ("classic", "Classic"),
+            ("premium", "Premium"),
+            ("iconic", "Iconic"),
+        ],
+        help_text="Wedding tier — only used if is_wedding_service is true",
+    )
+    available_cities = models.ManyToManyField(
+        City, blank=True, related_name="vehicles",
+        help_text="Cities where this vehicle can be picked up / delivered",
+    )
     is_published = models.BooleanField(default=True)
     total_trips = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -177,3 +231,57 @@ class VehicleImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.vehicle.name} (#{self.display_order})"
+
+
+class BookingAddon(models.Model):
+    """Optional extras that can be added to a rental (baby seat, GPS, additional driver, etc.)."""
+
+    PRICING_UNIT_CHOICES = [
+        ("per_day", "Per Day"),
+        ("per_trip", "Per Trip"),
+    ]
+
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=120, unique=True, blank=True)
+    description = models.CharField(max_length=300, blank=True)
+    icon = models.CharField(max_length=50, blank=True, help_text="Material Symbols icon name")
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    pricing_unit = models.CharField(max_length=20, choices=PRICING_UNIT_CHOICES, default="per_day")
+    display_order = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["display_order", "name"]
+
+    def __str__(self):
+        return f"{self.name} (₹{self.price} {self.get_pricing_unit_display()})"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+class WeddingDecorationPackage(models.Model):
+    """Floral / decoration packages for wedding car rentals."""
+
+    name = models.CharField(max_length=120)
+    slug = models.SlugField(max_length=140, unique=True, blank=True)
+    description = models.TextField(blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.ImageField(upload_to="weddings/decorations/", blank=True)
+    display_order = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["display_order", "name"]
+
+    def __str__(self):
+        return f"{self.name} (₹{self.price})"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)

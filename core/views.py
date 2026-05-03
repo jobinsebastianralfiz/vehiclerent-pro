@@ -1,12 +1,17 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.db.models import Count
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
-from vehicles.models import Vehicle, VehicleCategory
+from vehicles.models import City, Vehicle, VehicleCategory
 
+from . import chatbot
 from .forms import AdminLoginForm, SiteConfigForm, TestimonialForm
 from .models import SiteConfig, Testimonial
 
@@ -25,6 +30,13 @@ def home(request):
         .exclude(status="inactive")
         .select_related("category")[:8]
     )
+    premium_vehicles = (
+        Vehicle.objects.filter(is_premium=True, is_published=True)
+        .exclude(status="inactive")
+        .select_related("category")[:6]
+    )
+    cities = City.objects.filter(is_active=True)
+    total_vehicle_count = Vehicle.objects.filter(is_published=True).exclude(status="inactive").count()
     testimonials = Testimonial.objects.filter(is_active=True)[:6]
     # Collect hero background images
     hero_bg_images = []
@@ -36,6 +48,9 @@ def home(request):
         "config": config,
         "categories": categories,
         "featured_vehicles": featured_vehicles,
+        "premium_vehicles": premium_vehicles,
+        "cities": cities,
+        "total_vehicle_count": total_vehicle_count,
         "testimonials": testimonials,
         "hero_bg_images": hero_bg_images,
     })
@@ -79,6 +94,20 @@ def faq(request):
 def contact(request):
     config = SiteConfig.load()
     return render(request, "public/contact.html", {"config": config})
+
+
+@require_POST
+def chat_search(request):
+    """Public chatbot endpoint. Accepts JSON {"message": "..."} and returns matching cars."""
+    try:
+        data = json.loads(request.body.decode("utf-8") or "{}")
+    except json.JSONDecodeError:
+        return HttpResponseBadRequest("Invalid JSON")
+    message = (data.get("message") or "").strip()
+    if not message:
+        return JsonResponse({"reply": "Please type a question.", "vehicles": [], "filters_applied": []})
+    result = chatbot.search(message)
+    return JsonResponse(result)
 
 
 # ──────────────── Auth Views ────────────────

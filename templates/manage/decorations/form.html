@@ -1,0 +1,60 @@
+{% extends "manage/base_admin.html" %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <a href="{% url 'decoration_list' %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
+        <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Packages
+    </a>
+</div>
+
+<div class="bg-white rounded-2xl border border-stone-100">
+    <div class="px-8 py-6 border-b border-stone-100">
+        <h2 class="text-xl font-bold">{{ title }}</h2>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="p-8">
+        {% csrf_token %}
+        {% if form.errors %}<div class="mb-6 px-4 py-3 rounded-xl bg-red-50 text-red-800 text-sm">{{ form.errors }}</div>{% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2">
+                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Package Name *</label>
+                <input type="text" name="name" value="{{ form.name.value|default:'' }}" required class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. Traditional Kerala"/>
+            </div>
+            <div class="md:col-span-2">
+                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Description</label>
+                <textarea name="description" rows="3" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">{{ form.description.value|default:'' }}</textarea>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Price (₹) *</label>
+                <input type="number" step="0.01" name="price" value="{{ form.price.value|default:'' }}" required class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+            </div>
+            <div>
+                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Display Order</label>
+                <input type="number" name="display_order" value="{{ form.display_order.value|default:'0' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+            </div>
+            <div class="md:col-span-2">
+                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Image</label>
+                {% if decoration.image %}<img src="{{ decoration.image.url }}" alt="" class="w-32 h-32 rounded-lg object-cover mb-3"/>{% endif %}
+                <input type="file" name="image" accept="image/*" class="text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200"/>
+            </div>
+            <div class="md:col-span-2">
+                <label class="flex items-center gap-3 cursor-pointer p-4 bg-stone-50 rounded-xl">
+                    <input type="checkbox" name="is_active" {% if form.is_active.value or not form.instance.pk %}checked{% endif %} class="rounded border-stone-300 text-primary focus:ring-primary"/>
+                    <div>
+                        <span class="text-sm font-medium">Active</span>
+                        <p class="text-xs text-stone-500">Active packages appear on the wedding cars page</p>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-4 pt-8 mt-8 border-t border-stone-100">
+            <a href="{% url 'decoration_list' %}" class="px-6 py-3 bg-stone-100 text-stone-700 rounded-full font-medium hover:bg-stone-200">Cancel</a>
+            <button type="submit" class="px-8 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700">Save Package</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -20,10 +20,10 @@ def _get_whatsapp_config():
 
 
 @register.simple_tag
-def whatsapp_url(number=None):
+def whatsapp_url(message=None, number=None):
     wa_number, wa_message = _get_whatsapp_config()
     num = number or wa_number
-    msg = quote(wa_message)
+    msg = quote(message or wa_message)
     return f"https://wa.me/{num}?text={msg}"
 
 

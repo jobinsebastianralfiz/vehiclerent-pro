@@ -9,6 +9,7 @@ urlpatterns = [
     path("privacy/", views.privacy, name="privacy"),
     path("faq/", views.faq, name="faq"),
     path("contact/", views.contact, name="contact"),
+    path("api/chat/", views.chat_search, name="chat_search"),
     # Auth
     path("manage/login/", views.admin_login, name="admin_login"),
     path("manage/logout/", views.admin_logout, name="admin_logout"),

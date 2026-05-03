@@ -1,0 +1,43 @@
+{% extends "manage/base_admin.html" %}
+
+{% block page_title %}Wedding Decorations{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div>
+        <h1 class="text-xl sm:text-2xl font-bold">Wedding Decoration Packages</h1>
+        <p class="text-stone-500 text-xs sm:text-sm mt-1">Floral and trim packages for wedding car rentals</p>
+    </div>
+    <a href="{% url 'decoration_add' %}" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
+        <span class="material-symbols-outlined text-lg">add</span> Add Package
+    </a>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for d in decorations %}
+    <div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+        <div class="aspect-[4/3] bg-stone-100 overflow-hidden">
+            {% if d.image %}<img src="{{ d.image.url }}" alt="{{ d.name }}" class="w-full h-full object-cover"/>{% else %}<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-5xl text-stone-300">local_florist</span></div>{% endif %}
+        </div>
+        <div class="p-5">
+            <div class="flex items-start justify-between gap-3 mb-2">
+                <h3 class="font-bold text-base">{{ d.name }}</h3>
+                <span class="material-symbols-outlined text-lg {% if d.is_active %}text-green-600{% else %}text-stone-300{% endif %}">{% if d.is_active %}check_circle{% else %}cancel{% endif %}</span>
+            </div>
+            <p class="text-xs text-stone-500 mb-3 line-clamp-2">{{ d.description|default:"—" }}</p>
+            <div class="flex items-center justify-between pt-3 border-t border-stone-100">
+                <span class="text-base font-bold text-primary">₹{{ d.price }}</span>
+                <div class="flex gap-1">
+                    <a href="{% url 'decoration_edit' d.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
+                    <form method="post" action="{% url 'decoration_delete' d.pk %}" class="inline" onsubmit="return confirm('Delete this package?')">{% csrf_token %}<button type="submit" class="p-1.5 rounded-lg hover:bg-red-50"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button></form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full bg-white rounded-2xl border border-stone-100 p-12 text-center text-stone-400">
+        No decoration packages yet. <a href="{% url 'decoration_add' %}" class="text-primary font-medium">Add one</a>.
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
