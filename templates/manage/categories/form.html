@@ -81,6 +81,29 @@
             </div>
         </div>
 
+        <!-- SEO -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 pt-8 border-t border-stone-100">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">SEO</p>
+                <p class="text-xs text-stone-400 mt-1">Search-engine title, description, keywords for the category landing page.</p>
+            </div>
+            <div class="lg:col-span-2 space-y-6">
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Meta Title</label>
+                    <input type="text" name="meta_title" value="{{ form.meta_title.value|default:'' }}" maxlength="200" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. SUVs for Rent in Kerala"/>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Meta Description</label>
+                    <textarea name="meta_description" rows="2" maxlength="300" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">{{ form.meta_description.value|default:'' }}</textarea>
+                    <p class="text-xs text-stone-400 mt-1">150–160 chars.</p>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Meta Keywords</label>
+                    <input type="text" name="meta_keywords" value="{{ form.meta_keywords.value|default:'' }}" maxlength="300" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="suv rental Kerala, jeep rental, off-road car hire"/>
+                </div>
+            </div>
+        </div>
+
         <div class="flex justify-end gap-4 pt-8 border-t border-stone-100">
             <a href="{% url 'category_list' %}" class="px-6 py-3 bg-stone-100 text-stone-700 rounded-full font-medium hover:bg-stone-200 transition-colors">Cancel</a>
             <button type="submit" class="px-8 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors">Save Category</button>

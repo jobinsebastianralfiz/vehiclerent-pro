@@ -1,7 +1,9 @@
 {% extends "public/base_public.html" %}
 {% load vehicle_tags %}
 
-{% block title %}Our Fleet - {{ BUSINESS_NAME }}{% endblock %}
+{% block title %}{% if current_category and categories %}{% for c in categories %}{% if c.id|stringformat:'d' == current_category %}{{ c.meta_title|default:c.name }} | {{ BUSINESS_NAME }}{% endif %}{% endfor %}{% else %}Our Fleet | Car Rentals in Kerala — {{ BUSINESS_NAME }}{% endif %}{% endblock %}
+{% block meta_description %}{% if current_category and categories %}{% for c in categories %}{% if c.id|stringformat:'d' == current_category %}{{ c.meta_description|default:c.description|default:'Browse our fleet of '|add:c.name|add:' for rent in Kerala. Daily, weekly and monthly plans available.' }}{% endif %}{% endfor %}{% else %}Browse {{ total_count }} cars for rent across Kerala. Self-drive, chauffeur, wedding, premium SUVs and economy. Daily, weekly and monthly plans, doorstep delivery.{% endif %}{% endblock %}
+{% block meta_keywords %}{% if current_category and categories %}{% for c in categories %}{% if c.id|stringformat:'d' == current_category %}{{ c.meta_keywords|default:c.name|add:' rental Kerala, '|add:c.name|add:' for rent, '|add:c.name|add:' hire' }}{% endif %}{% endfor %}{% else %}car rental Kerala, self drive cars, SUV rental, sedan rental, hatchback rental, monthly car hire, Kochi car rental, Trivandrum, Kottayam, Calicut{% endif %}{% endblock %}
 
 {% block content %}
 <main class="pt-12 sm:pt-16 pb-24 px-4 sm:px-12 max-w-screen-2xl mx-auto">

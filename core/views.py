@@ -96,6 +96,73 @@ def contact(request):
     return render(request, "public/contact.html", {"config": config})
 
 
+def sitemap_xml(request):
+    """Generate sitemap.xml dynamically from published vehicles, categories, cities, and static pages."""
+    from django.urls import reverse
+    from django.utils.timezone import now
+    from vehicles.models import Vehicle, VehicleCategory, City
+
+    base = f"{request.scheme}://{request.get_host()}"
+    today = now().date().isoformat()
+
+    urls = [
+        # Static pages: (url, lastmod, changefreq, priority)
+        (reverse("home"), today, "daily", "1.0"),
+        (reverse("vehicle_list"), today, "daily", "0.9"),
+        (reverse("wedding_cars"), today, "weekly", "0.8"),
+        (reverse("premium_cars"), today, "weekly", "0.8"),
+        (reverse("about"), today, "monthly", "0.6"),
+        (reverse("faq"), today, "monthly", "0.6"),
+        (reverse("contact"), today, "monthly", "0.6"),
+        (reverse("terms"), today, "yearly", "0.3"),
+        (reverse("privacy"), today, "yearly", "0.3"),
+    ]
+
+    # Vehicle detail pages
+    for v in Vehicle.objects.filter(is_published=True).exclude(status="inactive").only("slug", "updated_at"):
+        urls.append((v.get_absolute_url(), v.updated_at.date().isoformat(), "weekly", "0.8"))
+
+    # Category-filtered listing pages
+    for c in VehicleCategory.objects.filter(is_active=True).only("id"):
+        urls.append((f"{reverse('vehicle_list')}?category={c.id}", today, "weekly", "0.7"))
+
+    # City-filtered listing pages
+    for city in City.objects.filter(is_active=True).only("slug"):
+        urls.append((f"{reverse('vehicle_list')}?pickup_city={city.slug}", today, "weekly", "0.7"))
+
+    # Build XML
+    xml_parts = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xml_parts.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    for path, lastmod, changefreq, priority in urls:
+        xml_parts.append(
+            f"<url><loc>{base}{path}</loc>"
+            f"<lastmod>{lastmod}</lastmod>"
+            f"<changefreq>{changefreq}</changefreq>"
+            f"<priority>{priority}</priority></url>"
+        )
+    xml_parts.append("</urlset>")
+    from django.http import HttpResponse
+    return HttpResponse("\n".join(xml_parts), content_type="application/xml")
+
+
+def robots_txt(request):
+    """Generate robots.txt pointing crawlers to the sitemap and disallowing /manage/."""
+    from django.http import HttpResponse
+    base = f"{request.scheme}://{request.get_host()}"
+    body = "\n".join([
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /manage/",
+        "Disallow: /enquiry/submit/",
+        "Disallow: /enquiry/thanks/",
+        "Disallow: /api/",
+        "",
+        f"Sitemap: {base}/sitemap.xml",
+        "",
+    ])
+    return HttpResponse(body, content_type="text/plain")
+
+
 @require_POST
 def chat_search(request):
     """Public chatbot endpoint. Accepts JSON {"message": "..."} and returns matching cars."""

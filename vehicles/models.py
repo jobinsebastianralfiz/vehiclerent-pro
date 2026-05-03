@@ -33,6 +33,10 @@ class VehicleCategory(models.Model):
     icon = models.CharField(max_length=50, blank=True, help_text="Material Symbols icon name")
     display_order = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    # SEO
+    meta_title = models.CharField(max_length=200, blank=True, help_text="Custom <title> for this category page")
+    meta_description = models.CharField(max_length=300, blank=True, help_text="Meta description (150–160 chars)")
+    meta_keywords = models.CharField(max_length=300, blank=True, help_text="Comma-separated keywords")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -159,6 +163,10 @@ class Vehicle(models.Model):
         help_text="Cities where this vehicle can be picked up / delivered",
     )
     is_published = models.BooleanField(default=True)
+    # SEO
+    meta_title = models.CharField(max_length=200, blank=True, help_text="Custom <title>; defaults to '{Brand} {Name} for Rent'")
+    meta_description = models.CharField(max_length=300, blank=True, help_text="Meta description for search engines (150–160 chars)")
+    meta_keywords = models.CharField(max_length=300, blank=True, help_text="Comma-separated keywords")
     total_trips = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -344,6 +344,31 @@
                 </div>
             </div>
 
+            <!-- SEO -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
+                <div class="col-span-1">
+                    <p class="text-sm font-extrabold uppercase tracking-widest text-primary">SEO</p>
+                    <p class="text-xs text-stone-400 mt-1">Search-engine title, description, keywords. Leave blank to use sensible defaults.</p>
+                </div>
+                <div class="lg:col-span-2 space-y-6">
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Meta Title</label>
+                        <input type="text" name="meta_title" value="{{ form.meta_title.value|default:'' }}" maxlength="200" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. Hyundai Creta SX for Rent in Kochi"/>
+                        <p class="text-xs text-stone-400 mt-1">50–60 chars. Leave blank to auto-generate from brand + name.</p>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Meta Description</label>
+                        <textarea name="meta_description" rows="3" maxlength="300" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="Rent the Hyundai Creta SX, automatic petrol SUV, in Kochi from ₹2,500/day. Doorstep delivery and 24x7 support.">{{ form.meta_description.value|default:'' }}</textarea>
+                        <p class="text-xs text-stone-400 mt-1">150–160 chars ideally. Leave blank for an auto-generated description.</p>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Meta Keywords</label>
+                        <input type="text" name="meta_keywords" value="{{ form.meta_keywords.value|default:'' }}" maxlength="300" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="hyundai creta rental, automatic SUV Kochi, self drive Kerala"/>
+                        <p class="text-xs text-stone-400 mt-1">Comma-separated. Modern SEO weighs this lightly — content & description matter more.</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Actions -->
             <div class="flex justify-end gap-4 pt-8 border-t border-stone-100">
                 <a href="{% url 'vehicle_manage_list' %}" class="px-6 py-3 bg-stone-100 text-stone-700 rounded-full font-medium hover:bg-stone-200 transition-colors">Cancel</a>

@@ -44,9 +44,13 @@ class VehicleForm(forms.ModelForm):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = VehicleCategory
-        fields = ["name", "description", "icon", "display_order", "is_active"]
+        fields = [
+            "name", "description", "icon", "display_order", "is_active",
+            "meta_title", "meta_description", "meta_keywords",
+        ]
         widgets = {
             "description": forms.Textarea(attrs={"rows": 3}),
+            "meta_description": forms.Textarea(attrs={"rows": 2, "maxlength": 300}),
         }
 
 
