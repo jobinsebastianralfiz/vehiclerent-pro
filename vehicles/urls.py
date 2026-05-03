@@ -5,6 +5,7 @@ urlpatterns = [
     # Public
     path("vehicles/", views.vehicle_list, name="vehicle_list"),
     path("wedding-cars/", views.wedding_cars, name="wedding_cars"),
+    path("premium-cars/", views.premium_cars, name="premium_cars"),
     path("vehicles/<slug:slug>/", views.vehicle_detail, name="vehicle_detail"),
     # Admin - Vehicles
     path("manage/vehicles/", views.vehicle_manage_list, name="vehicle_manage_list"),

@@ -138,6 +138,22 @@ def vehicle_detail(request, slug):
     })
 
 
+def premium_cars(request):
+    """Premium / luxury fleet landing page."""
+    qs = (
+        Vehicle.objects.filter(is_published=True, is_premium=True)
+        .exclude(status="inactive")
+        .select_related("category")
+        .order_by("-is_featured", "-price_per_day")
+    )
+    cities = City.objects.filter(is_active=True)
+    return render(request, "public/premium_cars.html", {
+        "vehicles": qs,
+        "featured_vehicles": qs.filter(is_featured=True)[:3],
+        "cities": cities,
+    })
+
+
 def wedding_cars(request):
     """Wedding Cars landing page with tier-segmented showcase."""
     qs = (

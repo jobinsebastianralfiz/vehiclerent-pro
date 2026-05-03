@@ -12,9 +12,10 @@
 
         <!-- Desktop Nav: tiny all-caps tracked labels -->
         {% with request.resolver_match.url_name as current %}
-        <div class="hidden lg:flex items-center gap-10 xl:gap-12" role="menubar">
+        <div class="hidden lg:flex items-center gap-8 xl:gap-12" role="menubar">
             <a class="label-tiny {% if current == 'home' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'home' %}" role="menuitem">Home</a>
             <a class="label-tiny {% if current == 'vehicle_list' or current == 'vehicle_detail' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'vehicle_list' %}" role="menuitem">Fleet</a>
+            <a class="label-tiny {% if current == 'premium_cars' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'premium_cars' %}" role="menuitem">Premium</a>
             <a class="label-tiny {% if current == 'wedding_cars' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'wedding_cars' %}" role="menuitem">Wedding Cars</a>
             <a class="label-tiny {% if current == 'about' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'about' %}" role="menuitem">About</a>
             <a class="label-tiny {% if current == 'contact' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'contact' %}" role="menuitem">Contact</a>
@@ -36,6 +37,7 @@
     <div id="mobile-menu" x-data="{ open: false }" x-on:toggle-mobile-menu.window="open = !open" x-show="open" x-transition class="lg:hidden bg-surface-container-low px-4 sm:px-8 py-4 space-y-1" role="menu">
         <a class="block label-tiny text-on-surface py-3 px-3 rounded-2xl hover:bg-surface-container" href="{% url 'home' %}" role="menuitem">Home</a>
         <a class="block label-tiny text-on-surface py-3 px-3 rounded-2xl hover:bg-surface-container" href="{% url 'vehicle_list' %}" role="menuitem">Fleet</a>
+        <a class="block label-tiny text-on-surface py-3 px-3 rounded-2xl hover:bg-surface-container" href="{% url 'premium_cars' %}" role="menuitem">Premium</a>
         <a class="block label-tiny text-on-surface py-3 px-3 rounded-2xl hover:bg-surface-container" href="{% url 'wedding_cars' %}" role="menuitem">Wedding Cars</a>
         <a class="block label-tiny text-on-surface py-3 px-3 rounded-2xl hover:bg-surface-container" href="{% url 'about' %}" role="menuitem">About</a>
         <a class="block label-tiny text-on-surface py-3 px-3 rounded-2xl hover:bg-surface-container" href="{% url 'contact' %}" role="menuitem">Contact</a>
