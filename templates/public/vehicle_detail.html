@@ -45,10 +45,10 @@
             <div class="relative aspect-[4/3] overflow-hidden rounded-3xl mb-4 bg-surface-container-high">
                 {% if images %}
                     {% for img in images %}
-                    <img x-show="activeImage === {{ forloop.counter0 }}" src="{{ img.image.url }}" alt="{{ vehicle.name }}" class="w-full h-full object-cover grayscale" x-transition/>
+                    <img x-show="activeImage === {{ forloop.counter0 }}" src="{{ img.image.url }}" alt="{{ vehicle.name }}" class="w-full h-full object-cover" x-transition/>
                     {% endfor %}
                 {% elif vehicle.thumbnail %}
-                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.name }}" class="w-full h-full object-cover grayscale"/>
+                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.name }}" class="w-full h-full object-cover"/>
                 {% else %}
                     <div class="w-full h-full flex items-center justify-center">
                         <span class="material-symbols-outlined text-[120px] text-outline-variant">directions_car</span>
@@ -71,7 +71,7 @@
             <div class="grid grid-cols-5 gap-3">
                 {% for img in images %}
                 <button x-on:click="activeImage = {{ forloop.counter0 }}" class="aspect-[4/3] rounded-xl overflow-hidden transition-all relative" x-bind:class="activeImage === {{ forloop.counter0 }} ? 'ring-2 ring-primary-container ring-offset-2 ring-offset-surface' : 'opacity-70 hover:opacity-100'">
-                    <img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover grayscale"/>
+                    <img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover"/>
                 </button>
                 {% endfor %}
             </div>
@@ -244,7 +244,7 @@
         </div>
         {% if vehicle.thumbnail %}
         <div class="rounded-3xl overflow-hidden bg-surface-container-high aspect-[4/3]">
-            <img src="{{ vehicle.thumbnail.url }}" alt="" class="w-full h-full object-cover grayscale"/>
+            <img src="{{ vehicle.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>
         </div>
         {% endif %}
     </section>
@@ -278,7 +278,7 @@
             <a href="{{ v.get_absolute_url }}" class="group bg-surface-container-lowest p-6 rounded-[2.5rem] hover:shadow-xl transition-all duration-500 vehicle-card">
                 <div class="relative aspect-[4/3] overflow-hidden rounded-[2rem] mb-6 bg-surface-container-high">
                     {% if v.thumbnail %}
-                    <img src="{{ v.thumbnail.url }}" alt="{{ v.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale" loading="lazy"/>
+                    <img src="{{ v.thumbnail.url }}" alt="{{ v.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy"/>
                     {% else %}
                     <div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[60px] text-outline-variant">directions_car</span></div>
                     {% endif %}

@@ -169,7 +169,7 @@
                 <a href="{{ vehicle.get_absolute_url }}" class="group relative bg-surface-container-lowest p-5 sm:p-6 rounded-[2.5rem] hover:shadow-xl transition-all duration-500 vehicle-card block">
                     <div class="relative overflow-hidden rounded-[2rem] h-56 mb-6 bg-surface-container-high">
                         {% if vehicle.thumbnail %}
-                        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale" loading="lazy"/>
+                        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy"/>
                         {% else %}
                         <div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[60px] text-outline-variant">directions_car</span></div>
                         {% endif %}

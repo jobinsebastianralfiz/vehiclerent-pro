@@ -35,7 +35,7 @@
     </div>
     <div class="lg:w-1/2 relative w-full">
         {% if config.hero_image %}
-        <img src="{{ config.hero_image.url }}" alt="" class="rounded-3xl w-full h-[420px] sm:h-[600px] lg:h-[700px] object-cover grayscale brightness-90 contrast-110"/>
+        <img src="{{ config.hero_image.url }}" alt="" class="rounded-3xl w-full h-[420px] sm:h-[600px] lg:h-[700px] object-cover"/>
         {% else %}
         <div class="rounded-3xl w-full h-[420px] sm:h-[600px] lg:h-[700px] bg-surface-container-high flex items-center justify-center">
             <span class="material-symbols-outlined text-[120px] text-outline-variant">directions_car</span>
@@ -88,7 +88,7 @@
             <a href="{{ vehicle.get_absolute_url }}" class="group relative bg-surface p-6 rounded-[2.5rem] hover:shadow-xl transition-all duration-500 vehicle-card block">
                 <div class="relative overflow-hidden rounded-[2rem] h-56 sm:h-64 mb-6 sm:mb-8 bg-surface-container-high">
                     {% if vehicle.thumbnail %}
-                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale" loading="lazy"/>
+                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy"/>
                     {% else %}
                     <div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[60px] text-outline-variant">directions_car</span></div>
                     {% endif %}
@@ -134,7 +134,7 @@
 <section class="flex flex-col md:flex-row px-4 sm:px-12 py-20 lg:py-32 items-center gap-12 lg:gap-24 max-w-screen-2xl mx-auto">
     <div class="md:w-[60%] w-full">
         <div class="rounded-[3rem] w-full h-[360px] sm:h-[500px] lg:h-[600px] bg-surface-container-high overflow-hidden">
-            <img alt="Wedding car" class="w-full h-full object-cover grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZgwFrJaAksLxSsQhHpCjDhbwCyabpXp2giB-buVWY7SmEP6ccL-KEt0_HxVMnxA-NXuS305c7T7D9vox5CwsZJlm6G_1LIn_ZwRRGXnzeaEOYvBGuC0vJXwAlyecq2vilTX-0Kus-4ePhYiyRvUxpXxz0Yv7N3t_QbmnrPa3UySmHumVc0NiyKp1-oCd_xoJouFjv7DnOLopW7yh0dstjWMMIj19svp_6U7pG9la32taPhJDR01OXO9_VWCmSuuvFuYuwyHDQAQ"/>
+            <img alt="Wedding car" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZgwFrJaAksLxSsQhHpCjDhbwCyabpXp2giB-buVWY7SmEP6ccL-KEt0_HxVMnxA-NXuS305c7T7D9vox5CwsZJlm6G_1LIn_ZwRRGXnzeaEOYvBGuC0vJXwAlyecq2vilTX-0Kus-4ePhYiyRvUxpXxz0Yv7N3t_QbmnrPa3UySmHumVc0NiyKp1-oCd_xoJouFjv7DnOLopW7yh0dstjWMMIj19svp_6U7pG9la32taPhJDR01OXO9_VWCmSuuvFuYuwyHDQAQ"/>
         </div>
     </div>
     <div class="md:w-[40%] space-y-6 lg:space-y-8">
@@ -158,7 +158,7 @@
         {% for vehicle in premium_vehicles %}
         <a href="{{ vehicle.get_absolute_url }}" class="min-w-[300px] sm:min-w-[400px] h-[400px] sm:h-[500px] relative rounded-[3rem] overflow-hidden group block bg-surface-container-highest">
             {% if vehicle.thumbnail %}
-            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale" loading="lazy"/>
+            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" loading="lazy"/>
             {% else %}
             <div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[80px] text-white/20">directions_car</span></div>
             {% endif %}

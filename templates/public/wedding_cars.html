@@ -7,7 +7,7 @@
 {% block content %}
 <!-- ─── Cinematic Hero ─── -->
 <section class="relative min-h-[80vh] sm:min-h-[90vh] flex items-end overflow-hidden">
-    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZgwFrJaAksLxSsQhHpCjDhbwCyabpXp2giB-buVWY7SmEP6ccL-KEt0_HxVMnxA-NXuS305c7T7D9vox5CwsZJlm6G_1LIn_ZwRRGXnzeaEOYvBGuC0vJXwAlyecq2vilTX-0Kus-4ePhYiyRvUxpXxz0Yv7N3t_QbmnrPa3UySmHumVc0NiyKp1-oCd_xoJouFjv7DnOLopW7yh0dstjWMMIj19svp_6U7pG9la32taPhJDR01OXO9_VWCmSuuvFuYuwyHDQAQ" alt="" class="absolute inset-0 w-full h-full object-cover grayscale brightness-90"/>
+    <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZgwFrJaAksLxSsQhHpCjDhbwCyabpXp2giB-buVWY7SmEP6ccL-KEt0_HxVMnxA-NXuS305c7T7D9vox5CwsZJlm6G_1LIn_ZwRRGXnzeaEOYvBGuC0vJXwAlyecq2vilTX-0Kus-4ePhYiyRvUxpXxz0Yv7N3t_QbmnrPa3UySmHumVc0NiyKp1-oCd_xoJouFjv7DnOLopW7yh0dstjWMMIj19svp_6U7pG9la32taPhJDR01OXO9_VWCmSuuvFuYuwyHDQAQ" alt="" class="absolute inset-0 w-full h-full object-cover"/>
     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10"></div>
     <div class="relative z-10 px-4 sm:px-12 max-w-screen-2xl mx-auto pb-20 sm:pb-32">
         <span class="label-tiny text-white/80 mb-4 block">WEDDING FLEET · KERALA</span>
@@ -73,7 +73,7 @@
         <!-- Classic -->
         <a href="?tier=classic" class="bg-surface-container-low rounded-3xl p-8 sm:p-10 group hover:shadow-xl transition-all">
             <div class="aspect-[4/3] rounded-2xl overflow-hidden mb-6 bg-surface-container-high">
-                {% if classic_cars %}{% with first=classic_cars.0 %}{% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 grayscale"/>{% endif %}{% endwith %}{% else %}<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[80px] text-outline-variant">favorite</span></div>{% endif %}
+                {% if classic_cars %}{% with first=classic_cars.0 %}{% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>{% endif %}{% endwith %}{% else %}<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[80px] text-outline-variant">favorite</span></div>{% endif %}
             </div>
             <span class="label-tiny text-on-secondary-container">CLASSIC</span>
             <h3 class="headline-md text-2xl sm:text-3xl mt-3 mb-4">Elegant sedans, traditional decor.</h3>
@@ -87,7 +87,7 @@
         <a href="?tier=premium" class="bg-on-surface text-on-primary rounded-3xl p-8 sm:p-10 group hover:shadow-xl transition-all relative">
             <div class="absolute top-6 right-6 bg-primary-fixed-dim text-on-primary-fixed px-3 py-1 rounded-full label-tiny">MOST BOOKED</div>
             <div class="aspect-[4/3] rounded-2xl overflow-hidden mb-6 bg-surface-container-high">
-                {% if premium_cars %}{% with first=premium_cars.0 %}{% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 grayscale"/>{% endif %}{% endwith %}{% else %}<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[80px] text-white/30">diamond</span></div>{% endif %}
+                {% if premium_cars %}{% with first=premium_cars.0 %}{% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>{% endif %}{% endwith %}{% else %}<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[80px] text-white/30">diamond</span></div>{% endif %}
             </div>
             <span class="label-tiny text-primary-fixed-dim">PREMIUM</span>
             <h3 class="headline-md text-2xl sm:text-3xl mt-3 mb-4">European luxury, the bridal entrance.</h3>
@@ -100,7 +100,7 @@
         <!-- Iconic -->
         <a href="?tier=iconic" class="bg-surface-container-low rounded-3xl p-8 sm:p-10 group hover:shadow-xl transition-all border-l-4 border-on-primary-container">
             <div class="aspect-[4/3] rounded-2xl overflow-hidden mb-6 bg-surface-container-high">
-                {% if iconic_cars %}{% with first=iconic_cars.0 %}{% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 grayscale"/>{% endif %}{% endwith %}{% else %}<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[80px] text-outline-variant">workspace_premium</span></div>{% endif %}
+                {% if iconic_cars %}{% with first=iconic_cars.0 %}{% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>{% endif %}{% endwith %}{% else %}<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[80px] text-outline-variant">workspace_premium</span></div>{% endif %}
             </div>
             <span class="label-tiny text-on-secondary-container">ICONIC</span>
             <h3 class="headline-md text-2xl sm:text-3xl mt-3 mb-4">Heirloom-grade. Reserved months ahead.</h3>
@@ -127,7 +127,7 @@
         <a href="{{ vehicle.get_absolute_url }}" class="group bg-surface-container-lowest p-5 rounded-[2.5rem] hover:shadow-xl transition-all duration-500 vehicle-card block">
             <div class="relative aspect-[4/3] overflow-hidden rounded-[2rem] mb-5 bg-surface-container-high">
                 {% if vehicle.thumbnail %}
-                <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale" loading="lazy"/>
+                <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy"/>
                 {% else %}
                 <div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[60px] text-outline-variant">favorite</span></div>
                 {% endif %}
@@ -163,7 +163,7 @@
         {% for pkg in decorations %}
         <div class="bg-surface-container-low p-6 rounded-3xl hover:shadow-xl transition-all">
             <div class="aspect-square rounded-2xl bg-surface-container-high mb-5 overflow-hidden">
-                {% if pkg.image %}<img src="{{ pkg.image.url }}" alt="{{ pkg.name }}" class="w-full h-full object-cover grayscale"/>{% else %}<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-5xl text-outline-variant">local_florist</span></div>{% endif %}
+                {% if pkg.image %}<img src="{{ pkg.image.url }}" alt="{{ pkg.name }}" class="w-full h-full object-cover"/>{% else %}<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-5xl text-outline-variant">local_florist</span></div>{% endif %}
             </div>
             <span class="label-tiny text-on-secondary-container">PACKAGE</span>
             <h3 class="headline-md text-xl mt-2 mb-2">{{ pkg.name }}</h3>
