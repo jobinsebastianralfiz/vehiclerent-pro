@@ -16,16 +16,49 @@ from .models import Enquiry
 def submit_enquiry(request):
     form = EnquiryPublicForm(request.POST)
     if form.is_valid():
-        form.save()
+        enquiry = form.save()
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return JsonResponse({"success": True})
-        messages.success(request, "Thank you! We've received your enquiry and will get back to you shortly.")
-        return redirect(request.META.get("HTTP_REFERER", "/"))
+            return JsonResponse({
+                "success": True,
+                "enquiry_id": enquiry.id,
+                "whatsapp_message": enquiry.whatsapp_message(),
+                "whatsapp_url": _build_whatsapp_url(enquiry),
+                "thanks_url": f"/enquiry/thanks/{enquiry.id}/",
+            })
+        messages.success(request, "Thank you! We've received your enquiry.")
+        return redirect("enquiry_thanks", pk=enquiry.id)
 
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return JsonResponse({"success": False, "errors": form.errors}, status=400)
     messages.error(request, "Please correct the errors in the form.")
     return redirect(request.META.get("HTTP_REFERER", "/"))
+
+
+def _build_whatsapp_url(enquiry):
+    """Compose a wa.me link with the enquiry details pre-filled."""
+    from urllib.parse import quote
+    from django.conf import settings as dj_settings
+    wa_number = dj_settings.WHATSAPP_NUMBER
+    try:
+        from core.models import SiteConfig
+        config = SiteConfig.load()
+        if config and config.whatsapp_number:
+            wa_number = config.whatsapp_number
+    except Exception:
+        pass
+    if not wa_number:
+        return ""
+    return f"https://wa.me/{wa_number}?text={quote(enquiry.whatsapp_message())}"
+
+
+def enquiry_thanks(request, pk):
+    """Public thank-you page after enquiry submission. Auto-opens WhatsApp with booking details."""
+    enquiry = get_object_or_404(Enquiry, pk=pk)
+    return render(request, "public/enquiry_thanks.html", {
+        "enquiry": enquiry,
+        "wa_url": _build_whatsapp_url(enquiry),
+        "wa_message": enquiry.whatsapp_message(),
+    })
 
 
 # ──────────────── Admin Views ────────────────

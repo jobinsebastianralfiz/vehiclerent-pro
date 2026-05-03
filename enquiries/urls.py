@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     # Public
     path("enquiry/submit/", views.submit_enquiry, name="submit_enquiry"),
+    path("enquiry/thanks/<int:pk>/", views.enquiry_thanks, name="enquiry_thanks"),
     # Admin
     path("manage/enquiries/", views.enquiry_list, name="enquiry_list"),
     path("manage/enquiries/<int:pk>/", views.enquiry_detail, name="enquiry_detail"),

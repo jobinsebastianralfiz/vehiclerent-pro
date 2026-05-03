@@ -59,6 +59,38 @@ class Enquiry(models.Model):
         if is_new:
             self._send_notification_email()
 
+    def whatsapp_message(self) -> str:
+        """Build a customer-facing WhatsApp message containing booking details."""
+        lines = [f"Hi! I'd like to book a rental from {self.name}."]
+        if self.vehicle_id:
+            lines.append(f"")
+            lines.append(f"🚗 *Vehicle:* {self.vehicle.brand} {self.vehicle.name}")
+            if self.vehicle.price_per_day:
+                lines.append(f"💰 *Listed at:* ₹{self.vehicle.price_per_day}/day")
+        if self.preferred_start_date and self.preferred_end_date:
+            lines.append(f"📅 *Dates:* {self.preferred_start_date:%d %b %Y} → {self.preferred_end_date:%d %b %Y}")
+        elif self.preferred_start_date:
+            lines.append(f"📅 *Pickup date:* {self.preferred_start_date:%d %b %Y}")
+        if self.pickup_city:
+            location = f"📍 *Pickup:* {self.pickup_city.title()}"
+            if self.drop_city and self.drop_city != self.pickup_city:
+                location += f" → *Drop:* {self.drop_city.title()}"
+            lines.append(location)
+        if self.rental_type:
+            lines.append(f"🎯 *Type:* {self.get_rental_type_display()}")
+        if self.requested_addons:
+            lines.append(f"➕ *Add-ons:* {', '.join(self.requested_addons)}")
+        lines.append(f"")
+        lines.append(f"📞 *Phone:* {self.phone}")
+        if self.email:
+            lines.append(f"✉️ *Email:* {self.email}")
+        if self.message:
+            lines.append(f"")
+            lines.append(f"📝 *Note:* {self.message}")
+        lines.append(f"")
+        lines.append(f"_Enquiry ref #{self.id}_")
+        return "\n".join(lines)
+
     def _send_notification_email(self):
         try:
             subject = f"New Enquiry from {self.name}"

@@ -1,0 +1,93 @@
+{% extends "public/base_public.html" %}
+{% load vehicle_tags %}
+
+{% block title %}Booking received — {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<main class="min-h-[80vh] flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-2xl">
+        <!-- Success card -->
+        <div class="bg-surface-container-lowest rounded-3xl p-8 sm:p-12 ghost-border text-center">
+            <div class="w-20 h-20 mx-auto bg-secondary-container rounded-full flex items-center justify-center mb-6">
+                <span class="material-symbols-outlined text-on-secondary-container text-5xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            </div>
+
+            <span class="label-tiny text-on-secondary-container block mb-3">REF #{{ enquiry.id }}</span>
+            <h1 class="display-hero text-3xl sm:text-5xl text-on-surface mb-4">You're all set, {{ enquiry.name|default:"there" }}.</h1>
+            <p class="text-body-lg text-base sm:text-lg text-on-surface-variant mb-8 max-w-lg mx-auto">
+                We've received your enquiry. Our team will be in touch within the hour. Confirm faster by sending the details on WhatsApp now.
+            </p>
+
+            <!-- Booking summary -->
+            <div class="bg-surface-container-low rounded-2xl p-5 sm:p-6 mb-8 text-left space-y-3">
+                {% if enquiry.vehicle %}
+                <div class="flex justify-between gap-4 pb-3 border-b border-outline-variant/20">
+                    <span class="label-tiny text-outline">VEHICLE</span>
+                    <span class="text-sm font-bold text-right">{{ enquiry.vehicle.brand }} {{ enquiry.vehicle.name }}</span>
+                </div>
+                {% endif %}
+                {% if enquiry.preferred_start_date %}
+                <div class="flex justify-between gap-4">
+                    <span class="label-tiny text-outline">DATES</span>
+                    <span class="text-sm font-bold text-right">{{ enquiry.preferred_start_date|date:"d M Y" }}{% if enquiry.preferred_end_date %} → {{ enquiry.preferred_end_date|date:"d M Y" }}{% endif %}</span>
+                </div>
+                {% endif %}
+                {% if enquiry.pickup_city %}
+                <div class="flex justify-between gap-4">
+                    <span class="label-tiny text-outline">PICKUP</span>
+                    <span class="text-sm font-bold text-right capitalize">{{ enquiry.pickup_city }}{% if enquiry.drop_city and enquiry.drop_city != enquiry.pickup_city %} → {{ enquiry.drop_city }}{% endif %}</span>
+                </div>
+                {% endif %}
+                {% if enquiry.rental_type %}
+                <div class="flex justify-between gap-4">
+                    <span class="label-tiny text-outline">TYPE</span>
+                    <span class="text-sm font-bold text-right">{{ enquiry.get_rental_type_display }}</span>
+                </div>
+                {% endif %}
+                {% if enquiry.requested_addons %}
+                <div class="flex justify-between gap-4">
+                    <span class="label-tiny text-outline">ADD-ONS</span>
+                    <span class="text-sm font-bold text-right">{{ enquiry.requested_addons|join:", " }}</span>
+                </div>
+                {% endif %}
+                <div class="flex justify-between gap-4">
+                    <span class="label-tiny text-outline">PHONE</span>
+                    <span class="text-sm font-bold text-right">{{ enquiry.phone }}</span>
+                </div>
+            </div>
+
+            {% if wa_url %}
+            <!-- Primary CTA: Open WhatsApp -->
+            <a id="wa-cta" href="{{ wa_url }}" target="_blank" rel="noopener" class="block bg-[#25D366] text-white py-4 px-6 rounded-full font-bold hover:opacity-90 transition-all flex items-center justify-center gap-3 text-base">
+                <svg fill="currentColor" height="22" viewBox="0 0 24 24" width="22" aria-hidden="true"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.91L4 20l4.2-1.1a7.93 7.93 0 0 0 3.79.97h.01a7.95 7.95 0 0 0 5.6-13.55zm-5.55 12.22a6.6 6.6 0 0 1-3.36-.92l-.24-.14-2.5.65.67-2.43-.16-.25a6.59 6.59 0 1 1 12.24-3.5 6.58 6.58 0 0 1-6.65 6.59zm3.62-4.93c-.2-.1-1.18-.58-1.36-.65-.18-.07-.32-.1-.45.1-.13.2-.51.65-.63.78-.12.13-.23.15-.43.05-.2-.1-.84-.31-1.6-.99-.59-.53-.99-1.18-1.1-1.38-.12-.2-.01-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.33.06-.13.03-.25-.02-.35-.05-.1-.45-1.08-.62-1.48-.16-.39-.32-.34-.45-.34-.12 0-.25-.02-.39-.02-.13 0-.35.05-.53.25-.18.2-.7.68-.7 1.66 0 .98.72 1.93.82 2.06.1.13 1.41 2.16 3.42 3.03.48.21.85.33 1.14.42.48.15.92.13 1.26.08.39-.06 1.18-.48 1.34-.95.17-.47.17-.86.12-.95-.05-.08-.18-.13-.39-.23z"/></svg>
+                Send on WhatsApp
+            </a>
+            <p class="text-xs text-outline mt-3" id="wa-hint">WhatsApp should open in a new tab. If it doesn't, click the button above.</p>
+
+            <script>
+                // Auto-open WhatsApp once on page load — best-effort, popup blockers may stop it.
+                (function() {
+                    var url = {{ wa_url|safe|escapejs|stringformat:"'%s'" }};
+                    if (!url) return;
+                    var win = window.open(url, '_blank', 'noopener');
+                    if (!win || win.closed || typeof win.closed === 'undefined') {
+                        // Popup blocked — leave button visible.
+                        var hint = document.getElementById('wa-hint');
+                        if (hint) hint.textContent = 'Tap the button to open WhatsApp.';
+                    }
+                })();
+            </script>
+            {% else %}
+            <p class="text-sm text-outline">Our team will call you back at <strong>{{ enquiry.phone }}</strong>.</p>
+            {% endif %}
+
+            <div class="mt-8 pt-6 border-t border-outline-variant/20">
+                <a href="{% url 'home' %}" class="label-tiny text-on-surface-variant hover:text-primary-container transition-colors">← Back to home</a>
+            </div>
+        </div>
+
+        <p class="text-center text-xs text-outline mt-6">A copy of this enquiry has been sent to our team. We'll reach out within an hour during business hours.</p>
+    </div>
+</main>
+{% endblock %}

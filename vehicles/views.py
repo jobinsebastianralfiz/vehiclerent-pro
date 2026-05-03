@@ -78,7 +78,11 @@ def vehicle_list(request):
 
     pickup_city = request.GET.get("pickup_city")
     if pickup_city:
-        qs = qs.filter(available_cities__slug=pickup_city).distinct()
+        # Match vehicles explicitly tagged with this city, OR vehicles with no
+        # cities set at all (treated as "available everywhere").
+        qs = qs.filter(
+            Q(available_cities__slug=pickup_city) | Q(available_cities__isnull=True)
+        ).distinct()
 
     sort = request.GET.get("sort", "-created_at")
     sort_map = {"price": "price_per_day", "-price": "-price_per_day", "name": "name", "-created": "-created_at"}

@@ -5,17 +5,31 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <meta name="theme-color" content="#1f2e00"/>
     <meta name="color-scheme" content="light"/>
-    <title>{% block title %}VehicleRent Pro{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}{{ BUSINESS_NAME }} - Premium vehicle rental service. Browse our fleet of cars, SUVs, bikes and more. Flexible daily, weekly & monthly rentals.{% endblock %}"/>
-    <meta name="robots" content="index, follow"/>
-    <link rel="canonical" href="{{ request.build_absolute_uri }}"/>
+    <title>{% block title %}{{ SITE_CONFIG.meta_title|default:BUSINESS_NAME }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ SITE_CONFIG.meta_description|default:'Premium car rentals across Kerala. Self-drive, chauffeur-driven, wedding cars and luxury SUVs. Daily, weekly and monthly plans. Doorstep delivery, transparent pricing.' }}{% endblock %}"/>
+    <meta name="keywords" content="{% block meta_keywords %}{{ SITE_CONFIG.meta_keywords|default:'car rental Kerala, self drive cars, wedding car rental, luxury car rental, chauffeur driven cars, Kochi car rental, Trivandrum car rental, Kottayam car rental, premium SUV rental, monthly car rental, airport pickup' }}{% endblock %}"/>
+    <meta name="author" content="{{ BUSINESS_NAME }}"/>
+    <meta name="robots" content="{% block meta_robots %}index, follow, max-image-preview:large{% endblock %}"/>
+    <meta name="geo.region" content="IN-KL"/>
+    <meta name="geo.placename" content="Kerala, India"/>
+    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}"/>
 
     <!-- Open Graph -->
-    <meta property="og:title" content="{% block og_title %}{{ BUSINESS_NAME }}{% endblock %}"/>
-    <meta property="og:description" content="{% block og_description %}Premium vehicle rental service with a wide fleet of cars, SUVs, bikes and more.{% endblock %}"/>
-    <meta property="og:type" content="website"/>
+    <meta property="og:title" content="{% block og_title %}{{ SITE_CONFIG.meta_title|default:BUSINESS_NAME }}{% endblock %}"/>
+    <meta property="og:description" content="{% block og_description %}{{ SITE_CONFIG.meta_description|default:'Premium car rentals across Kerala — self-drive, chauffeur, wedding cars and luxury fleet.' }}{% endblock %}"/>
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}"/>
     <meta property="og:url" content="{{ request.build_absolute_uri }}"/>
     <meta property="og:site_name" content="{{ BUSINESS_NAME }}"/>
+    <meta property="og:locale" content="en_IN"/>
+    {% block og_image %}{% if SITE_CONFIG.og_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ SITE_CONFIG.og_image.url }}"/>
+    <meta property="og:image:width" content="1200"/>
+    <meta property="og:image:height" content="630"/>{% endif %}{% endblock %}
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="{% block twitter_title %}{{ SITE_CONFIG.meta_title|default:BUSINESS_NAME }}{% endblock %}"/>
+    <meta name="twitter:description" content="{% block twitter_description %}{{ SITE_CONFIG.meta_description|default:'Premium car rentals across Kerala.' }}{% endblock %}"/>
+    {% block twitter_image %}{% if SITE_CONFIG.og_image %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ SITE_CONFIG.og_image.url }}"/>{% endif %}{% endblock %}
 
     <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
