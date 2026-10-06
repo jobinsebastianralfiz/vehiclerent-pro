@@ -440,7 +440,7 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
 </div>
 
 <div class="px-4 sm:px-8 max-w-screen-2xl mx-auto pt-4 overflow-hidden">
-    {% with wm=config.tagline|default:"Kerala, by road" %}<div class="font-serif font-bold italic text-tertiary leading-none tracking-tighter whitespace-nowrap text-center select-none" style="font-size: min(10vw, calc(150vw / {{ wm|length }}))" data-split="chars" aria-hidden="true">{{ wm }}</div>{% endwith %}
+    {% with wm=config.tagline|default:"Kerala, by road" %}<div class="font-serif font-bold italic leading-none tracking-tighter whitespace-nowrap text-center select-none" style="font-size: min(10vw, calc(150vw / {{ wm|length }})); color: rgba(19, 78, 74, .16)" data-split="chars" aria-hidden="true">{{ wm }}</div>{% endwith %}
 </div>
 {% endblock %}
 
