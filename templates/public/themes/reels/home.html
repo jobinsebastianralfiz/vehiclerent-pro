@@ -233,6 +233,7 @@
       <p class="lede">Pick up and drop off across Kerala, from the backwaters to the hills.</p>
     </div>
   </div>
+  <div style="padding:0 var(--gut);margin:8px 0 28px">{% include "public/themes/_kerala_map.html" with glow="51,69,13" maxh="520px" width="max-w-[440px]" %}</div>
   <div class="city-rows">
     <div class="m-marquee" data-marquee style="--dur:50s"><div class="m-marquee-track">
       {% for city in cities %}{% if forloop.counter0|divisibleby:2 %}{% cycle 'orange' 'blue' 'green' 'silver' 'amber' 'red' 'night' 'violet' 'teal' as tone silent %}<a href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="chip"><span class="dot t-{{ tone }}"></span>{{ city.name }}<span class="material-symbols-outlined">arrow_outward</span></a>{% endif %}{% endfor %}

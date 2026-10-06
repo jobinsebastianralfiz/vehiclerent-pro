@@ -325,11 +325,13 @@
       <span class="label-tiny text-primary-container block">Where we are</span>
       <h2 class="nd-head text-4xl sm:text-6xl mt-4 text-on-surface">Kerala at your fingertips.</h2>
       <p class="text-on-surface-variant mt-6 max-w-sm">Pickup and drop across the state. Ask for doorstep delivery when you book.</p>
+      <div class="mt-10 hidden lg:block">{% include "public/themes/_kerala_map.html" with glow="212,236,162" maxh="460px" width="max-w-[360px] lg:mx-0" %}</div>
       <div class="mt-10 flex items-baseline gap-3"><span class="nd-head text-6xl text-primary"><span data-slot>{{ cities.count }}</span></span><span class="label-tiny text-on-surface-variant">cit{{ cities.count|pluralize:"y,ies" }} served</span></div>
     </div>
     <ul class="neon-list lg:col-span-8 flex flex-wrap gap-x-6 sm:gap-x-10 gap-y-2 font-serif font-bold text-4xl sm:text-6xl lg:text-7xl leading-tight">
       {% for city in cities %}<li><a href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="neon">{{ city.name }}</a></li>{% endfor %}
     </ul>
+    <div class="lg:hidden">{% include "public/themes/_kerala_map.html" with glow="212,236,162" maxh="420px" width="max-w-[320px]" %}</div>
   </div>
 </section>
 {% endif %}

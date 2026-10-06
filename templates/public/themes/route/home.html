@@ -14,10 +14,6 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
 
 {% block extra_css %}
 <style>
-    /* illustrated Kerala map: floats in a backwater glow */
-    .kmap-glow { background: radial-gradient(closest-side, rgba(19,78,74,.38), rgba(19,78,74,.12) 60%, transparent); filter: blur(30px); }
-    .kmap-art img { filter: drop-shadow(0 30px 40px rgba(15,46,44,.25)); }
-    .kmap-art.m-glare::after { display: none; }
 
   .r-glow { background: radial-gradient(60% 70% at 85% 10%, rgba(227,155,60,.28), transparent 70%), radial-gradient(50% 60% at 0% 100%, rgba(19,78,74,.10), transparent 70%); }
 
@@ -384,11 +380,8 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
                 {% endif %}
             </div>
         </div>
-        <div class="kmap relative mx-auto w-full max-w-[520px] lg:max-w-none" data-no-parallax>
-            <div class="kmap-glow absolute inset-[6%] rounded-full" aria-hidden="true"></div>
-            <div class="kmap-art relative" data-tilt="0.6">
-                <img src="{% static 'themes/img/kerala-illustrated.webp' %}" alt="Illustrated map of Kerala: beaches, backwaters with houseboats, temples, tea hills and waterfalls" width="1138" height="1382" loading="lazy" class="relative w-full h-auto max-h-[760px] object-contain m-float"/>
-            </div>
+        <div class="relative">
+            {% include "public/themes/_kerala_map.html" with maxh="760px" %}
             <div class="absolute bottom-[8%] -left-3 sm:-left-6 bg-surface-container-lowest p-6 sm:p-7 rounded-3xl shadow-xl" data-parallax="-30">
                 <div class="headline-md text-4xl text-tertiary"><span data-slot>{{ cities.count }}</span></div>
                 <div class="label-tiny text-outline mt-2">Cit{{ cities.count|pluralize:"y,ies" }} served</div>
@@ -447,7 +440,7 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
 </div>
 
 <div class="px-4 sm:px-8 max-w-screen-2xl mx-auto pt-4 overflow-hidden">
-    <div class="font-serif font-bold italic text-tertiary leading-none tracking-tighter text-[10vw] whitespace-nowrap text-center select-none" data-split="chars" aria-hidden="true">Kerala, by road</div>
+    {% with wm=config.tagline|default:"Kerala, by road" %}<div class="font-serif font-bold italic text-tertiary leading-none tracking-tighter whitespace-nowrap text-center select-none" style="font-size: min(10vw, calc(150vw / {{ wm|length }}))" data-split="chars" aria-hidden="true">{{ wm }}</div>{% endwith %}
 </div>
 {% endblock %}
 
@@ -594,12 +587,6 @@ let roadResizeT; addEventListener("resize", () => { clearTimeout(roadResizeT); r
 
 /* page-specific motion */
 document.addEventListener("motion:ready", ({ detail: { G, ST } }) => {
-  /* illustrated map tilts down into place, glow swells behind it */
-  if (document.querySelector(".kmap")) {
-    G.from(".kmap-art", { scale: .82, rotation: -8, y: 70, opacity: 0, duration: 1.7, ease: "expo.out", scrollTrigger: { trigger: ".kmap", start: "top 80%", once: true } });
-    G.from(".kmap-glow", { scale: .4, opacity: 0, duration: 2, ease: "expo.out", scrollTrigger: { trigger: ".kmap", start: "top 80%", once: true } });
-    G.to(".kmap-art", { yPercent: -6, ease: "none", scrollTrigger: { trigger: ".kmap", start: "top bottom", end: "bottom top", scrub: true } });
-  }
   /* road: rebuilt on every refresh (pins and images change heights), drawn to wherever the reader is */
   Road.setAnimated(true);
   Road.J.classList.add("road-live");

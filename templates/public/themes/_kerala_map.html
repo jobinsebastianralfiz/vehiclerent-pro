@@ -1,0 +1,32 @@
+{% load static %}{% comment %}
+Illustrated Kerala map, shared by the themes. It floats in a soft glow, tilts into
+place when scrolled to, drifts with parallax and leans toward the cursor.
+  glow   "r,g,b" of the glow behind it (default backwater teal)
+  maxh   max image height (default 720px)
+  width  wrapper classes controlling width (default centred, max 520px on small screens)
+{% endcomment %}
+<div class="kmap relative mx-auto w-full {{ width|default:'max-w-[520px] lg:max-w-none' }}" style="--kmap-glow: {{ glow|default:'19,78,74' }}" data-no-parallax>
+    <div class="kmap-glow absolute inset-[6%] rounded-full pointer-events-none" aria-hidden="true"></div>
+    <div class="kmap-art relative" data-tilt="0.6">
+        <img src="{% static 'themes/img/kerala-illustrated.webp' %}" alt="Illustrated map of Kerala: beaches, backwaters with houseboats, temples, tea hills and waterfalls" width="797" height="1252" loading="lazy" class="relative w-full h-auto object-contain m-float" style="max-height: {{ maxh|default:'720px' }}"/>
+    </div>
+</div>
+<style>
+    .kmap-glow { background: radial-gradient(closest-side, rgba(var(--kmap-glow), .22), rgba(var(--kmap-glow), .06) 60%, transparent); filter: blur(30px); }
+    .kmap-art img { filter: drop-shadow(0 28px 26px rgba(0, 0, 0, .28)) drop-shadow(0 6px 6px rgba(0, 0, 0, .18)); }
+    .kmap-art.m-glare::after { display: none; }
+</style>
+<script>
+    if (!window.__kmap) {
+        window.__kmap = 1;
+        document.addEventListener("motion:ready", function (e) {
+            var G = e.detail.G;
+            document.querySelectorAll(".kmap").forEach(function (m) {
+                var art = m.querySelector(".kmap-art"), glow = m.querySelector(".kmap-glow"), st = { trigger: m, start: "top 80%", once: true };
+                G.from(art, { scale: .82, rotation: -8, y: 70, opacity: 0, duration: 1.7, ease: "expo.out", scrollTrigger: st });
+                G.from(glow, { scale: .4, opacity: 0, duration: 2, ease: "expo.out", scrollTrigger: st });
+                G.to(art, { yPercent: -6, ease: "none", scrollTrigger: { trigger: m, start: "top bottom", end: "bottom top", scrub: true } });
+            });
+        });
+    }
+</script>

@@ -442,7 +442,7 @@
             </div></div>
             {% endif %}
         </div>
-        <div class="tile lg:col-span-4 min-h-[300px] bg-[#0f3b38]" data-no-parallax><img src="{% static 'themes/img/kerala-map.jpg' %}" alt="Stylised map of Kerala" class="absolute inset-0 w-full h-full object-cover"/><div class="absolute top-5 left-5 b-glass rounded-2xl px-5 py-4"><div class="font-extrabold text-4xl text-primary leading-none"><span data-slot>{{ cities|length }}</span></div><div class="label-tiny text-on-surface-variant mt-2">Cit{{ cities|length|pluralize:"y,ies" }} served</div></div></div>
+        <div class="tile lg:col-span-4 min-h-[360px] bg-[radial-gradient(80%_70%_at_50%_45%,#0b2a35,#00111f)]" data-no-parallax><img src="{% static 'themes/img/kerala-illustrated.webp' %}" alt="Illustrated map of Kerala" class="absolute inset-0 w-full h-full object-contain p-6 drop-shadow-[0_20px_24px_rgba(0,0,0,.45)] transition-transform duration-[1.2s] ease-out hover:scale-[1.06]" loading="lazy"/><div class="absolute top-5 left-5 b-glass rounded-2xl px-5 py-4"><div class="font-extrabold text-4xl text-primary leading-none"><span data-slot>{{ cities|length }}</span></div><div class="label-tiny text-on-surface-variant mt-2">Cit{{ cities|length|pluralize:"y,ies" }} served</div></div></div>
     </div>
     {% endif %}
 </section>
