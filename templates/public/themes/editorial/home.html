@@ -253,13 +253,13 @@
             <h2 class="headline-lg text-4xl sm:text-6xl mt-4 mb-10">Kerala at your fingertips.</h2>
             <div class="grid grid-cols-2 gap-3 sm:gap-4" data-deal>
                 {% for city in cities|slice:":7" %}
-                <a class="m-tile flex items-center justify-between p-5 sm:p-6 bg-surface-container rounded-2xl" href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}"><span class="font-bold">{{ city.name }}</span><span class="material-symbols-outlined" aria-hidden="true">arrow_outward</span></a>
+                <a data-city-slug="{{ city.slug }}" class="m-tile flex items-center justify-between p-5 sm:p-6 bg-surface-container rounded-2xl" href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}"><span class="font-bold">{{ city.name }}</span><span class="material-symbols-outlined" aria-hidden="true">arrow_outward</span></a>
                 {% endfor %}
                 <a class="m-tile flex items-center justify-between p-5 sm:p-6 bg-primary-container text-on-primary rounded-2xl" href="{% url 'vehicle_list' %}"><span class="font-bold">All Cities</span><span class="material-symbols-outlined" aria-hidden="true">map</span></a>
             </div>
         </div>
         <div class="relative">
-            {% include "public/themes/_kerala_map.html" with glow="51,69,13" width="max-w-[520px] md:max-w-none" %}
+            {% include "public/themes/_city_map.html" with tiles="warm" pin="#33450d" %}
             <div class="absolute bottom-[8%] -left-4 sm:-left-8 glass-panel bg-surface-container-lowest/85 p-6 sm:p-8 rounded-3xl shadow-xl" data-parallax="-30">
                 <div class="headline-md text-4xl text-primary"><span data-slot>{{ cities.count }}</span></div>
                 <div class="label-tiny opacity-60 mt-2">Cities served</div>

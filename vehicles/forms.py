@@ -65,7 +65,7 @@ VehicleImageFormSet = forms.inlineformset_factory(
 class CityForm(forms.ModelForm):
     class Meta:
         model = City
-        fields = ["name", "state", "is_hub", "display_order", "is_active"]
+        fields = ["name", "state", "is_hub", "display_order", "is_active", "latitude", "longitude"]
 
 
 class BookingAddonForm(forms.ModelForm):

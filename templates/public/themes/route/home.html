@@ -364,7 +364,7 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
                 </div>
                 <div id="boardRows">
                     {% for city in cities|slice:":9" %}
-                    <a href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="board-row">
+                    <a data-city-slug="{{ city.slug }}" href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="board-row">
                         <span class="text-[#fffaf0]/40 text-xs font-bold">{{ forloop.counter|stringformat:"02d" }}</span>
                         <span class="min-w-0"><span class="sr-only">{{ city.name }}</span><span class="cells" aria-hidden="true" data-flap="{{ city.name|upper }}">{% for ch in city.name|upper %}<span class="cell">{% if ch != " " %}{{ ch }}{% endif %}</span>{% endfor %}</span></span>
                         <span class="material-symbols-outlined text-[#e39b3c]/70 text-lg" aria-hidden="true">arrow_outward</span>
@@ -381,7 +381,7 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
             </div>
         </div>
         <div class="relative">
-            {% include "public/themes/_kerala_map.html" with maxh="760px" %}
+            {% include "public/themes/_city_map.html" with tiles="warm" pin="#d9692f" box="h-[400px] sm:h-[600px] rounded-[2.5rem] shadow-2xl shadow-black/15 ring-8 ring-[#fffaf0]" %}
             <div class="absolute bottom-[8%] -left-3 sm:-left-6 bg-surface-container-lowest p-6 sm:p-7 rounded-3xl shadow-xl" data-parallax="-30">
                 <div class="headline-md text-4xl text-tertiary"><span data-slot>{{ cities.count }}</span></div>
                 <div class="label-tiny text-outline mt-2">Cit{{ cities.count|pluralize:"y,ies" }} served</div>

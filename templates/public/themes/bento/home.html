@@ -434,15 +434,15 @@
         <div class="tile b-glass lg:col-span-8 py-8 sm:py-10 flex flex-col justify-center gap-5 overflow-hidden">
             <div class="px-6 sm:px-10"><span class="label-tiny text-primary-container block">Where we are</span><div class="mt-3 font-extrabold text-3xl sm:text-4xl tracking-[-.04em] text-primary">Kerala at your <span class="serif-i">fingertips.</span></div></div>
             <div class="m-marquee" data-marquee style="--dur:50s"><div class="m-marquee-track !gap-2 !pr-2">
-                {% for city in cities %}{% if not forloop.counter|divisibleby:2 or cities|length < 6 %}<a href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="shrink-0 bg-white rounded-full px-5 py-3 font-bold hover:bg-primary hover:text-on-primary transition-colors">{{ city.name }}</a>{% endif %}{% endfor %}
+                {% for city in cities %}{% if not forloop.counter|divisibleby:2 or cities|length < 6 %}<a data-city-slug="{{ city.slug }}" href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="shrink-0 bg-white rounded-full px-5 py-3 font-bold hover:bg-primary hover:text-on-primary transition-colors">{{ city.name }}</a>{% endif %}{% endfor %}
             </div></div>
             {% if cities|length >= 6 %}
             <div class="m-marquee" data-marquee data-dir="-1" style="--dur:56s"><div class="m-marquee-track !gap-2 !pr-2">
-                {% for city in cities %}{% if forloop.counter|divisibleby:2 %}<a href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="shrink-0 bg-primary-fixed/70 rounded-full px-5 py-3 font-bold text-primary hover:bg-primary hover:text-on-primary transition-colors">{{ city.name }}</a>{% endif %}{% endfor %}
+                {% for city in cities %}{% if forloop.counter|divisibleby:2 %}<a data-city-slug="{{ city.slug }}" href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="shrink-0 bg-primary-fixed/70 rounded-full px-5 py-3 font-bold text-primary hover:bg-primary hover:text-on-primary transition-colors">{{ city.name }}</a>{% endif %}{% endfor %}
             </div></div>
             {% endif %}
         </div>
-        <div class="tile lg:col-span-4 min-h-[360px] bg-[radial-gradient(80%_70%_at_50%_45%,#0b2a35,#00111f)]" data-no-parallax><img src="{% static 'themes/img/kerala-illustrated.webp' %}" alt="Illustrated map of Kerala" class="absolute inset-0 w-full h-full object-contain p-6 drop-shadow-[0_20px_24px_rgba(0,0,0,.45)] transition-transform duration-[1.2s] ease-out hover:scale-[1.06]" loading="lazy"/><div class="absolute top-5 left-5 b-glass rounded-2xl px-5 py-4"><div class="font-extrabold text-4xl text-primary leading-none"><span data-slot>{{ cities|length }}</span></div><div class="label-tiny text-on-surface-variant mt-2">Cit{{ cities|length|pluralize:"y,ies" }} served</div></div></div>
+        <div class="tile lg:col-span-4 min-h-[360px] bg-surface-container" data-no-parallax>{% include "public/themes/_city_map.html" with tiles="light" pin="#33450d" box="absolute inset-0" %}<div class="absolute top-5 left-5 b-glass rounded-2xl px-5 py-4"><div class="font-extrabold text-4xl text-primary leading-none"><span data-slot>{{ cities|length }}</span></div><div class="label-tiny text-on-surface-variant mt-2">Cit{{ cities|length|pluralize:"y,ies" }} served</div></div></div>
     </div>
     {% endif %}
 </section>

@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
 
+from .geo import lookup
+
 
 class City(models.Model):
     """A pickup/drop-off city served by the rental network."""
@@ -11,6 +13,8 @@ class City(models.Model):
     is_active = models.BooleanField(default=True)
     is_hub = models.BooleanField(default=False, help_text="Major delivery hub city (shown first)")
     display_order = models.IntegerField(default=0)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, help_text="Map pin; filled automatically for known Kerala towns")
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -23,6 +27,10 @@ class City(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
+        if self.latitude is None and self.longitude is None:
+            coords = lookup(self.name)
+            if coords:
+                self.latitude, self.longitude = coords
         super().save(*args, **kwargs)
 
 

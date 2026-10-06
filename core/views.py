@@ -37,6 +37,10 @@ def home(request):
         .select_related("category")[:6]
     )
     cities = City.objects.filter(is_active=True)
+    city_points = [
+        {"name": c.name, "slug": c.slug, "lat": float(c.latitude), "lng": float(c.longitude), "hub": c.is_hub}
+        for c in cities if c.latitude is not None and c.longitude is not None
+    ]
     published = Vehicle.objects.filter(is_published=True).exclude(status="inactive")
     total_vehicle_count = published.count()
     starting_price = published.aggregate(m=Min("price_per_day"))["m"]
@@ -54,6 +58,7 @@ def home(request):
         "featured_vehicles": featured_vehicles,
         "premium_vehicles": premium_vehicles,
         "cities": cities,
+        "city_points": city_points,
         "total_vehicle_count": total_vehicle_count,
         "starting_price": starting_price,
         "testimonials": testimonials,
