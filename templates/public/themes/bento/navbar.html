@@ -1,0 +1,46 @@
+{% load vehicle_tags %}
+<!-- Bento theme: floating glass pill nav (home page only; inner pages use the shared navbar) -->
+<nav class="m-nav fixed top-3 sm:top-4 inset-x-0 z-50 px-3 sm:px-6 bg-transparent" role="navigation" aria-label="Main navigation" x-data>
+    <div class="b-glass max-w-screen-xl mx-auto rounded-full flex items-center justify-between gap-3 pl-3 sm:pl-5 pr-2 py-2">
+        <a href="{% url 'home' %}" class="flex items-center gap-2 font-extrabold text-lg text-primary min-w-0" aria-label="{{ BUSINESS_NAME }} - Home">
+            {% if SITE_CONFIG.logo %}
+            <img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-9 flex-shrink-0"/>
+            {% else %}
+            <span class="w-8 h-8 shrink-0 rounded-full bg-primary text-primary-fixed grid place-items-center" aria-hidden="true"><span class="material-symbols-outlined text-[18px]">directions_car</span></span>
+            {% endif %}
+            {% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}<span class="truncate">{{ BUSINESS_NAME }}</span>{% endif %}
+        </a>
+        <div class="hidden lg:flex items-center gap-1 text-sm font-bold text-on-surface-variant" role="menubar">
+            <a class="px-4 py-2 rounded-full bg-white text-primary" href="{% url 'home' %}" role="menuitem" aria-current="page">Home</a>
+            <a class="px-4 py-2 rounded-full hover:bg-white/70 transition-colors" href="{% url 'vehicle_list' %}" role="menuitem">Fleet</a>
+            <a class="px-4 py-2 rounded-full hover:bg-white/70 transition-colors" href="{% url 'premium_cars' %}" role="menuitem">Premium</a>
+            <a class="px-4 py-2 rounded-full hover:bg-white/70 transition-colors" href="{% url 'wedding_cars' %}" role="menuitem">Wedding</a>
+            <a class="px-4 py-2 rounded-full hover:bg-white/70 transition-colors" href="{% url 'about' %}" role="menuitem">About</a>
+            <a class="px-4 py-2 rounded-full hover:bg-white/70 transition-colors" href="{% url 'contact' %}" role="menuitem">Contact</a>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+            {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="hidden xl:inline text-sm font-bold text-on-surface-variant hover:text-primary px-2">{{ BUSINESS_PHONE }}</a>{% endif %}
+            <a href="{% url 'vehicle_list' %}" class="hidden sm:inline-flex items-center gap-2 bg-primary text-on-primary text-sm font-bold px-5 py-2.5 rounded-full m-shine" data-magnetic>Book now <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
+            <button x-on:click="$dispatch('toggle-mobile-menu')" class="lg:hidden w-10 h-10 rounded-full bg-white grid place-items-center" aria-label="Open menu" aria-controls="mobile-menu">
+                <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" x-data="{ open: false }" x-on:toggle-mobile-menu.window="open = !open" x-show="open" x-cloak x-transition.opacity class="lg:hidden b-glass max-w-screen-xl mx-auto mt-2 rounded-[28px] p-3 space-y-1" role="menu">
+        <a class="block font-bold text-primary py-3 px-4 rounded-2xl bg-white" href="{% url 'home' %}" role="menuitem">Home</a>
+        <a class="block font-bold text-on-surface py-3 px-4 rounded-2xl hover:bg-white/70" href="{% url 'vehicle_list' %}" role="menuitem">Fleet</a>
+        <a class="block font-bold text-on-surface py-3 px-4 rounded-2xl hover:bg-white/70" href="{% url 'premium_cars' %}" role="menuitem">Premium</a>
+        <a class="block font-bold text-on-surface py-3 px-4 rounded-2xl hover:bg-white/70" href="{% url 'wedding_cars' %}" role="menuitem">Wedding Cars</a>
+        <a class="block font-bold text-on-surface py-3 px-4 rounded-2xl hover:bg-white/70" href="{% url 'about' %}" role="menuitem">About</a>
+        <a class="block font-bold text-on-surface py-3 px-4 rounded-2xl hover:bg-white/70" href="{% url 'contact' %}" role="menuitem">Contact</a>
+        <a class="block font-bold text-on-surface py-3 px-4 rounded-2xl hover:bg-white/70" href="{% url 'faq' %}" role="menuitem">FAQ</a>
+        <div class="flex gap-4 px-4 py-2 text-xs text-outline">
+            <a class="hover:text-primary" href="{% url 'terms' %}">Terms</a>
+            <a class="hover:text-primary" href="{% url 'privacy' %}">Privacy</a>
+            {% if BUSINESS_PHONE %}<a class="hover:text-primary ml-auto" href="tel:{{ BUSINESS_PHONE }}">{{ BUSINESS_PHONE }}</a>{% endif %}
+        </div>
+        <a href="{% url 'vehicle_list' %}" class="block bg-primary text-on-primary px-6 py-3.5 rounded-full font-bold text-center" role="menuitem">Book now</a>
+    </div>
+</nav>

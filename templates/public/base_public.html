@@ -1,14 +1,52 @@
 {% extends "base.html" %}
-{% load vehicle_tags %}
+{% load static vehicle_tags %}
+
+{% block theme_head %}
+    <script>
+        window.THEME_TOKENS = {{ THEME_TOKENS|safe }};
+        /* motion layer: armed now, disarmed by motion.js or by this failsafe if GSAP never loads */
+        document.documentElement.classList.add("motion", "theme-{{ THEME.key }}");
+        setTimeout(function () { if (!window.__motionReady) document.documentElement.classList.remove("motion"); }, 3500);
+    </script>
+    {% if THEME.fonts %}<link href="https://fonts.googleapis.com/css2?{{ THEME.fonts }}&display=swap" rel="stylesheet"/>{% endif %}
+    <style>
+        :root {
+            --font-display: '{{ THEME.font_display }}', serif;
+            --font-body: '{{ THEME.font_body }}', sans-serif;
+            --page-bg: {{ THEME.page_bg }};
+            --page-fg: {{ THEME.page_fg }};
+        }
+        {% if THEME.dark %}
+        :root { color-scheme: dark; }
+        /* forms plugin paints fields white; keep them readable on a dark theme */
+        main input:not([type=checkbox]):not([type=radio]):not([type=range]):not(.bg-transparent), main select:not(.bg-transparent), main textarea:not(.bg-transparent) {
+            background-color: var(--field-bg, #1a1f14); color: var(--page-fg); border-color: #3a4030;
+        }
+        main input::placeholder, main textarea::placeholder { color: #8a8f7a; }
+        {% endif %}
+    </style>
+    <link rel="stylesheet" href="{% static 'themes/motion.css' %}"/>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+    <script defer src="{% static 'themes/motion.js' %}"></script>
+{% endblock %}
 
 {% block body %}
-{% include "public/includes/navbar.html" %}
+{% if THEME_PREVIEW %}
+<div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 sm:gap-3 bg-[#1b1c17] text-white text-xs font-bold pl-4 pr-2 py-2 rounded-full shadow-2xl whitespace-nowrap" role="status">
+    <span>Preview<span class="hidden sm:inline">ing theme</span>: {{ THEME.label }}</span>
+    <a href="{% url 'site_config_edit' %}#theme" class="hidden sm:inline px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25">Choose in settings</a>
+    <a href="?theme=off" class="px-3 py-1.5 rounded-full bg-white text-[#1b1c17]">Exit</a>
+</div>
+{% endif %}
 
-<main id="main-content" role="main" class="pt-24">
+{% block navbar %}{% include "public/includes/navbar.html" %}{% endblock %}
+
+<main id="main-content" role="main" class="{% block main_class %}pt-24{% endblock %}">
     {% block content %}{% endblock %}
 </main>
 
-{% include "public/includes/footer.html" %}
+{% block footer %}{% include "public/includes/footer.html" %}{% endblock %}
 {% include "public/includes/whatsapp_float.html" %}
 {% include "public/includes/cookie_banner.html" %}
 {% endblock %}

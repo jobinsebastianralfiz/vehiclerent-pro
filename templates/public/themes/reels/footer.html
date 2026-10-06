@@ -1,0 +1,42 @@
+{% load vehicle_tags %}
+<footer class="foot" role="contentinfo" aria-label="Site footer">
+  <div class="foot-grid">
+    <div>
+      <a href="{% url 'home' %}" class="logo" style="margin-bottom:10px">
+        {% if SITE_CONFIG.logo %}<img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}"/>{% endif %}
+        {% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}{{ BUSINESS_NAME }}{% endif %}
+      </a>
+      <p style="color:var(--muted);max-width:34ch;font-size:14px">{{ SITE_CONFIG.footer_text|default:"Premium vehicle rental service. Flexible daily, weekly & monthly plans for cars, SUVs, bikes and more." }}</p>
+      {% if BUSINESS_ADDRESS %}<p style="color:var(--muted);max-width:34ch;font-size:14px;margin-top:10px">{{ BUSINESS_ADDRESS }}</p>{% endif %}
+      {% if SITE_CONFIG.facebook_url or SITE_CONFIG.instagram_url or SITE_CONFIG.youtube_url or SITE_CONFIG.twitter_url %}
+      <div class="social">
+        {% if SITE_CONFIG.facebook_url %}<a href="{{ SITE_CONFIG.facebook_url }}" target="_blank" rel="noopener" aria-label="Facebook">FB</a>{% endif %}
+        {% if SITE_CONFIG.instagram_url %}<a href="{{ SITE_CONFIG.instagram_url }}" target="_blank" rel="noopener" aria-label="Instagram">IG</a>{% endif %}
+        {% if SITE_CONFIG.youtube_url %}<a href="{{ SITE_CONFIG.youtube_url }}" target="_blank" rel="noopener" aria-label="YouTube">YT</a>{% endif %}
+        {% if SITE_CONFIG.twitter_url %}<a href="{{ SITE_CONFIG.twitter_url }}" target="_blank" rel="noopener" aria-label="X / Twitter">X</a>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+    <nav aria-label="Fleet categories"><h6>Fleet</h6><ul>
+      <li><a href="{% url 'vehicle_list' %}?type=car">Cars</a></li>
+      <li><a href="{% url 'vehicle_list' %}?type=suv">SUVs</a></li>
+      <li><a href="{% url 'vehicle_list' %}?type=bike">Bikes</a></li>
+      <li><a href="{% url 'vehicle_list' %}?type=van">Vans</a></li>
+      <li><a href="{% url 'vehicle_list' %}">View all</a></li>
+    </ul></nav>
+    <nav aria-label="Legal and support links"><h6>Support</h6><ul>
+      <li><a href="{% url 'terms' %}">Terms of Service</a></li>
+      <li><a href="{% url 'privacy' %}">Privacy Policy</a></li>
+      <li><a href="{% url 'faq' %}">FAQ</a></li>
+      <li><a href="{% url 'contact' %}">Contact Us</a></li>
+    </ul></nav>
+    <div><h6>Get in touch</h6><ul>
+      {% if BUSINESS_PHONE %}<li><a href="tel:{{ BUSINESS_PHONE }}">{{ BUSINESS_PHONE }}</a></li>{% endif %}
+      {% if BUSINESS_EMAIL %}<li><a href="mailto:{{ BUSINESS_EMAIL }}">{{ BUSINESS_EMAIL }}</a></li>{% endif %}
+      {% if WHATSAPP_NUMBER %}<li><a href="{% whatsapp_url %}" target="_blank" rel="noopener">WhatsApp</a></li>{% endif %}
+      <li><a href="{% url 'contact' %}">Contact page</a></li>
+    </ul></div>
+  </div>
+  <div class="word" data-split="chars" aria-hidden="true" style="--n: {{ BUSINESS_NAME|length }}">{{ BUSINESS_NAME }}</div>
+  <div class="legal"><span>&copy; {% now "Y" %} {{ BUSINESS_NAME }}. All rights reserved.</span><span><a href="{% url 'terms' %}">Terms</a> · <a href="{% url 'privacy' %}">Privacy</a> · <a href="{% url 'faq' %}">FAQ</a></span></div>
+</footer>

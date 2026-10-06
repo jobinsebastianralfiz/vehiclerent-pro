@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
+from .themes import DEFAULT_THEME, THEME_CHOICES
+
 
 class AdminUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -41,6 +43,7 @@ class SiteConfig(models.Model):
     logo = models.ImageField(upload_to="site/", blank=True, help_text="Site logo image")
     show_brand_name = models.BooleanField(default=True, help_text="Show brand name text next to the logo")
     favicon = models.ImageField(upload_to="site/", blank=True)
+    theme = models.CharField(max_length=20, choices=THEME_CHOICES, default=DEFAULT_THEME, help_text="Design of the public website")
 
     # Contact
     phone = models.CharField(max_length=30, blank=True)

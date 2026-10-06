@@ -111,7 +111,7 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for t in testimonials %}
-                <div class="bg-white rounded-2xl p-8 border border-outline-variant/10">
+                <div class="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/10">
                     <div class="flex items-center gap-1 text-amber-500 mb-4">
                         {% for i in "12345" %}{% if forloop.counter <= t.rating %}<span>&#9733;</span>{% else %}<span class="text-stone-300">&#9734;</span>{% endif %}{% endfor %}
                     </div>
@@ -141,7 +141,7 @@
             <p class="text-on-surface-variant mb-8">Browse our fleet and find the perfect vehicle for your needs.</p>
             <div class="flex flex-col sm:flex-row justify-center gap-4">
                 <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold hover:bg-primary-container transition-colors">Browse Fleet</a>
-                <a href="{% url 'contact' %}" class="bg-white text-on-surface px-8 py-3 rounded-full font-bold hover:bg-stone-50 transition-colors">Contact Us</a>
+                <a href="{% url 'contact' %}" class="bg-surface-container-lowest text-on-surface px-8 py-3 rounded-full font-bold hover:bg-surface-container-low transition-colors">Contact Us</a>
             </div>
         </div>
     </section>

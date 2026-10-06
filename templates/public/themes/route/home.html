@@ -1,0 +1,626 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+{% comment %}
+Theme C · Kerala Route. The home page is a road trip: a road draws itself down the page
+between the sections (built in JS from the .road-gap[data-stop] markers, numbered in order),
+with a car riding along it. Each gap sits inside its section's {% if %}, so hidden sections
+leave no stop behind. Palette: tokens from core/themes.py (surface = sand, tertiary = teal)
+plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as literals.
+{% endcomment %}
+
+{% block title %}{{ BUSINESS_NAME }} | {{ config.tagline|default:"Premium Car Rentals in Kerala" }}{% endblock %}
+
+{% block navbar %}{% include "public/themes/route/navbar.html" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .r-glow { background: radial-gradient(60% 70% at 85% 10%, rgba(227,155,60,.28), transparent 70%), radial-gradient(50% 60% at 0% 100%, rgba(19,78,74,.10), transparent 70%); }
+
+  /* ---------- the road ---------- */
+  #journey { position: relative; }
+  .road-svg { position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none; overflow: visible; }
+  .road-pins, .road-car { position: absolute; left: 0; top: 0; pointer-events: none; }
+  .road-pins { z-index: 4; width: 100%; height: 100%; }
+  .road-pin { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--page-bg); border: 3px solid #b9ab8c; transition: background .5s, border-color .5s, transform .6s var(--spring), box-shadow .6s; }
+  .road-pin.on { background: #e39b3c; border-color: #fffaf0; transform: scale(1.3); box-shadow: 0 0 0 8px rgba(227,155,60,.22), 0 6px 14px -4px rgba(0,0,0,.35); }
+  .road-pin > span { position: absolute; left: 50%; bottom: calc(100% + 14px); transform: translate(-50%, 8px); white-space: nowrap; padding: 8px 14px; border-radius: 999px; background: #134e4a; color: #fffaf0; font: 700 10px/1 var(--font-body); letter-spacing: .18em; text-transform: uppercase; opacity: 0; transition: opacity .5s, transform .6s var(--spring); }
+  .road-pin.on > span { opacity: 1; transform: translate(-50%, 0); }
+  .road-pin.end > span { background: #e39b3c; color: #1b1c17; }
+  .road-car { z-index: 6; width: 38px; height: 22px; margin: -11px 0 0 -19px; opacity: 0; transition: opacity .4s; will-change: transform; filter: drop-shadow(0 4px 6px rgba(0,0,0,.35)); }
+  .road-car.on { opacity: 1; }
+  .motion #journey:not(.road-live) .road-svg > g, .motion #journey:not(.road-live) .road-pins { opacity: 0; }
+  .road-gap { height: 120px; }
+  @media (min-width: 768px) { .road-gap { height: 150px; } }
+  @media (min-width: 1024px) { .road-gap { height: 180px; } }
+  @media (max-width: 767px) { .road-pin > span { display: none; } .road-pin { width: 14px; height: 14px; margin: -7px 0 0 -7px; } }
+  /* content inside the journey leaves gutters for the road */
+  .lane { position: relative; z-index: 10; padding-left: 52px; padding-right: 16px; }
+  @media (min-width: 768px) { .lane { padding-left: 72px; padding-right: 72px; } }
+  @media (min-width: 1024px) { .lane { padding-left: 112px; padding-right: 112px; } }
+
+  /* ---------- postcards ---------- */
+  .pc { background: #fffaf0; padding: 10px 10px 34px; border-radius: 6px; box-shadow: 0 24px 40px -18px rgba(40,30,10,.5); position: relative; }
+  .pc img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 3px; }
+  .pc .pc-cap { position: absolute; left: 14px; bottom: 9px; font: italic 400 15px/1 var(--font-display); color: #4a4a3e; }
+  .pc .pc-stamp { position: absolute; right: 12px; bottom: 6px; width: 26px; height: 30px; border: 2px dashed #e39b3c; border-radius: 3px; display: grid; place-items: center; color: #d9692f; }
+  .pc .pc-stamp .material-symbols-outlined { font-size: 15px; }
+  .motion .pc { opacity: 0; }
+
+  /* ---------- booking connector ---------- */
+  .route-line path { stroke-dasharray: 3 7; animation: r-march 1.2s linear infinite; }
+  @keyframes r-march { to { stroke-dashoffset: -20; } }
+  .route-car { position: absolute; left: 0; top: 0; offset-path: path('M6 34 C 40 4, 84 4, 118 34'); offset-rotate: auto; animation: r-drive 3.4s ease-in-out infinite alternate; color: #d9692f; }
+  @keyframes r-drive { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+
+  /* ---------- luggage tags ---------- */
+  .tag { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 40px 14px 22px; border-radius: 0 0 22px 22px; clip-path: polygon(24% 0, 76% 0, 100% 16%, 100% 100%, 0 100%, 0 16%); transform-origin: 50% 6% !important; transition: box-shadow .4s; text-align: center; }
+  .tag .hole { position: absolute; top: 14px; left: 50%; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--page-bg); box-shadow: inset 0 0 0 2px rgba(0,0,0,.12); }
+  .tag:hover { animation: r-swing .9s ease; }
+  .tag .material-symbols-outlined { font-size: 32px; }
+  @keyframes r-swing { 20% { rotate: 8deg; } 45% { rotate: -6deg; } 70% { rotate: 3deg; } 100% { rotate: 0deg; } }
+
+  /* ---------- tickets ---------- */
+  .tk { transform-style: preserve-3d; backface-visibility: hidden; }
+  .tk-perf { position: relative; margin: 0 24px; border-top: 2px dashed #d6ccb5; }
+  .tk-perf::before, .tk-perf::after { content: ""; position: absolute; top: -13px; width: 24px; height: 24px; border-radius: 50%; background: var(--page-bg); }
+  .tk-perf::before { left: -37px; } .tk-perf::after { right: -37px; }
+
+  /* ---------- polaroids ---------- */
+  .pol { position: absolute; width: 56%; background: #fffaf0; padding: 10px 10px 44px; border-radius: 4px; box-shadow: 0 30px 50px -24px rgba(40,30,10,.55); margin: 0; }
+  .pol img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 2px; display: block; }
+  .pol figcaption { position: absolute; left: 0; right: 0; bottom: 14px; text-align: center; font: italic 400 15px/1 var(--font-display); color: #4a4a3e; }
+  .pol:nth-child(1) { left: 0; top: 12%; rotate: -9deg; }
+  .pol:nth-child(2) { left: 22%; top: 0; rotate: 2deg; z-index: 2; }
+  .pol:nth-child(3) { left: 44%; top: 16%; rotate: 9deg; z-index: 1; }
+
+  /* ---------- passport stamps ---------- */
+  .stamp { width: 168px; height: 168px; border-radius: 50%; border: 4px double currentColor; display: grid; place-items: center; text-align: center; position: relative; mix-blend-mode: multiply; }
+  .stamp::after { content: ""; position: absolute; inset: 10px; border-radius: 50%; border: 1.5px dashed currentColor; opacity: .7; }
+  .stamp b { display: block; font: 800 13px/1.15 var(--font-body); letter-spacing: .16em; text-transform: uppercase; margin-top: 6px; }
+  .stamp .material-symbols-outlined { font-size: 34px; }
+
+  /* ---------- departures board ---------- */
+  .board { background: #10201f; color: #f6d9a8; border-radius: 28px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 30px 60px -30px rgba(0,0,0,.6); }
+  .board-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid rgba(255,255,255,.07); }
+  .board-row:hover .cell { background: #24403d; }
+  .cells { display: flex; gap: 3px; overflow: hidden; }
+  .cell { width: 1.15em; height: 1.55em; flex: none; display: grid; place-items: center; background: #1b302e; border-radius: 4px; font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace; color: #fffaf0; position: relative; overflow: hidden; transition: background .3s; }
+  .cell::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(0,0,0,.45); }
+  @media (min-width: 480px) { .cell { font-size: 14px; } }
+  @media (min-width: 640px) { .cell { font-size: 18px; } }
+
+  .postmark { width: 120px; height: 120px; }
+
+  /* the enquiry include is built for a light card; keep its text dark inside the ivory panel */
+  .r-form { color: #1b1c17; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .motion .pc { opacity: 1 !important; }
+    .motion #journey .road-svg > g, .motion #journey .road-pins { opacity: 1 !important; }
+    .route-line path, .route-car, .tag:hover { animation: none !important; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ─── Hero ─── -->
+<section id="hero" class="r-glow px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 pb-20 lg:pt-14 lg:pb-28 flex flex-col lg:flex-row items-center gap-14 lg:gap-16">
+    <div class="hero-copy lg:w-[46%] w-full space-y-7 lg:space-y-9">
+        <span class="label-tiny text-[#d9692f] flex items-center gap-3" data-intro="0"><span class="w-8 h-px bg-[#d9692f]"></span>{{ config.hero_subtitle|default:"Premium Vehicle Rental · Kerala" }}</span>
+        <h1 class="display-hero text-5xl sm:text-7xl lg:text-[92px] text-tertiary" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Your journey, curated." }}</h1>
+        {% if cities %}
+        <p class="headline-md text-2xl sm:text-3xl text-on-surface-variant font-normal italic" data-intro="4">Your road to <span class="text-[#d9692f] not-italic font-bold" data-cycle="{% for city in cities|slice:':6' %}{{ city.name }}|{% endfor %}the wedding venue" data-wait="1">{{ cities.0.name }}</span></p>
+        {% endif %}
+        <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed font-light" data-intro="5">{{ config.hero_description|default:"From wedding-day Rolls Royces to weekend self-drive hatchbacks — one team, every road across Kerala." }}</p>
+        <div class="flex flex-wrap gap-4 sm:gap-5" data-intro="6">
+            <a href="{% url 'vehicle_list' %}" class="bg-primary-container text-on-primary px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold">{{ config.hero_cta_text|default:"Explore Fleet" }} <span class="material-symbols-outlined">arrow_forward</span></a>
+            <a href="{% url 'wedding_cars' %}" class="border border-outline-variant px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold hover:bg-surface-container-lowest transition-colors">Wedding Cars <span class="material-symbols-outlined" data-icon="favorite">favorite</span></a>
+        </div>
+        {% if config.years_in_business or total_vehicle_count or cities %}
+        <div class="flex flex-wrap gap-8 sm:gap-12 pt-7 border-t border-outline-variant" data-intro="7">
+            {% if config.years_in_business %}<div><div class="headline-md text-3xl sm:text-4xl text-tertiary"><span data-slot>{{ config.years_in_business }}</span></div><div class="label-tiny text-outline mt-2">Year{{ config.years_in_business|pluralize }}</div></div>{% endif %}
+            {% if total_vehicle_count %}<div><div class="headline-md text-3xl sm:text-4xl text-tertiary"><span data-slot>{{ total_vehicle_count }}</span></div><div class="label-tiny text-outline mt-2">Vehicle{{ total_vehicle_count|pluralize }}</div></div>{% endif %}
+            {% if cities %}<div><div class="headline-md text-3xl sm:text-4xl text-tertiary"><span data-slot>{{ cities.count }}</span></div><div class="label-tiny text-outline mt-2">Cit{{ cities.count|pluralize:"y,ies" }}</div></div>{% endif %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="lg:w-[54%] w-full relative pb-16 sm:pb-20">
+        <div class="m-hero-media rounded-[2.5rem] h-[420px] sm:h-[560px] lg:h-[640px]" data-intro="2" data-intro-kind="media">
+            {% if config.hero_image %}
+            <img src="{{ config.hero_image.url }}" alt="" class="w-full h-full object-cover"/>
+            {% else %}
+            <img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="An SUV beside a Kerala backwater at sunset" class="w-full h-full object-cover"/>
+            {% endif %}
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0f2e2c]/50 via-transparent to-transparent"></div>
+            {% if starting_price %}
+            <div class="absolute top-6 right-6 bg-surface-container-lowest/85 backdrop-blur px-5 py-3 rounded-full flex items-center gap-2 text-sm font-bold text-on-surface"><span class="material-symbols-outlined text-[#d9692f] text-lg">wb_twilight</span>From <span data-slot>{{ starting_price|inr }}</span>/day</div>
+            {% endif %}
+        </div>
+        <!-- postcard stack fans out on load, spreads as you scroll (decorative) -->
+        <div class="absolute left-0 sm:-left-6 lg:-left-16 bottom-0 w-[64%] sm:w-[52%] lg:w-[48%] h-[46%] pointer-events-none" data-no-parallax aria-hidden="true">
+            <div class="pcw absolute left-0 bottom-0 w-[62%]" style="rotate:-11deg"><div class="pc"><img src="{% static 'themes/img/ambassador.jpg' %}" alt=""><span class="pc-cap">Greetings from Kerala</span><span class="pc-stamp"><span class="material-symbols-outlined">directions_car</span></span></div></div>
+            <div class="pcw absolute left-[22%] bottom-[14%] w-[62%]" style="rotate:-2deg"><div class="pc"><img src="{% static 'themes/img/rolls-palms.jpg' %}" alt=""><span class="pc-cap">Wedding day</span><span class="pc-stamp"><span class="material-symbols-outlined">favorite</span></span></div></div>
+            <div class="pcw absolute left-[44%] bottom-[2%] w-[62%]" style="rotate:9deg"><div class="pc"><img src="{% static 'themes/img/palms.jpg' %}" alt=""><span class="pc-cap">Weekend escape</span><span class="pc-stamp"><span class="material-symbols-outlined">wb_sunny</span></span></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════ The journey: a road draws itself down the page ═══════════ -->
+<div id="journey">
+    <svg class="road-svg" aria-hidden="true">
+        <defs><mask id="roadMask" maskUnits="userSpaceOnUse"><path id="roadMaskPath" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"/></mask></defs>
+        <path id="roadPlan" fill="none" stroke="#c9b993" stroke-width="2" stroke-dasharray="1 9" stroke-linecap="round"/>
+        <g mask="url(#roadMask)">
+            <path id="roadShoulder" fill="none" stroke="#e8d9b8" stroke-linecap="round" stroke-linejoin="round"/>
+            <path id="roadAsphalt" fill="none" stroke="#2c302a" stroke-linecap="round" stroke-linejoin="round"/>
+            <path id="roadCenter" fill="none" stroke="#f2c14e" stroke-width="1.6" stroke-dasharray="9 13" stroke-linecap="round"/>
+        </g>
+    </svg>
+    <div class="road-pins" aria-hidden="true"></div>
+    <div class="road-car" aria-hidden="true">
+        <svg viewBox="0 0 40 22" width="38" height="22"><rect x="1" y="2" width="38" height="18" rx="7" fill="#d9692f"/><rect x="23" y="4.5" width="8" height="13" rx="3" fill="#fde9c9" opacity=".95"/><rect x="7" y="5" width="7" height="12" rx="2.5" fill="#fde9c9" opacity=".6"/><rect x="35.5" y="3.5" width="3" height="4" rx="1" fill="#fff7cc"/><rect x="35.5" y="14.5" width="3" height="4" rx="1" fill="#fff7cc"/></svg>
+    </div>
+
+    <div class="road-gap" data-stop="Plan your trip"></div>
+
+    <!-- ─── Booking: an itinerary (searches the fleet) ─── -->
+    <section id="plan" class="lane max-w-screen-2xl mx-auto" data-reveal>
+        <form action="{% url 'vehicle_list' %}" method="get" class="bg-surface-container-lowest rounded-[2rem] p-5 sm:p-7 shadow-2xl shadow-black/10 border border-outline-variant/50">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+                <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[#d9692f]">route</span><span class="label-tiny text-tertiary">Your itinerary</span></div>
+                <div class="flex bg-surface rounded-full p-1">
+                    <label class="cursor-pointer"><input type="radio" name="rental_type" value="self_drive" class="peer sr-only" checked><span class="block px-4 sm:px-5 py-2 rounded-full label-tiny peer-checked:bg-tertiary peer-checked:text-on-tertiary text-on-surface-variant transition-colors">Self-Drive</span></label>
+                    <label class="cursor-pointer"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only"><span class="block px-4 sm:px-5 py-2 rounded-full label-tiny peer-checked:bg-tertiary peer-checked:text-on-tertiary text-on-surface-variant transition-colors">With Driver</span></label>
+                </div>
+            </div>
+            <input type="hidden" name="same_location" value="1" id="sameLoc">
+            <div class="grid grid-cols-1 lg:grid-cols-[1fr_128px_1fr_1fr_1fr_auto] gap-3 lg:gap-0 lg:items-center">
+                <label class="block bg-surface/70 lg:bg-transparent rounded-2xl px-4 py-3 lg:py-0 min-w-0">
+                    <span class="label-tiny text-outline flex items-center gap-2 mb-1.5"><span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>From</span>
+                    <select id="fromCity" name="pickup_city" class="bg-transparent border-none p-0 font-serif text-xl font-bold focus:ring-0 w-full text-on-surface">
+                        <option value="">Any city</option>
+                        {% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}
+                    </select>
+                </label>
+                <div class="route-line relative hidden lg:block h-10 w-[124px]" aria-hidden="true">
+                    <svg viewBox="0 0 124 40" class="absolute inset-0"><path d="M6 34 C 40 4, 84 4, 118 34" fill="none" stroke="#e39b3c" stroke-width="2" stroke-linecap="round"/></svg>
+                    <span class="route-car material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 1">directions_car</span>
+                </div>
+                <div class="lg:hidden flex items-center gap-3 pl-6 text-outline" aria-hidden="true"><span class="h-8 border-l-2 border-dashed border-[#e39b3c]"></span><span class="material-symbols-outlined text-[#d9692f] text-lg">south</span></div>
+                <label class="block bg-surface/70 lg:bg-transparent rounded-2xl px-4 py-3 lg:py-0 lg:border-r border-outline-variant/60 min-w-0">
+                    <span class="label-tiny text-outline flex items-center gap-2 mb-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#d9692f]"></span>To</span>
+                    <select id="toCity" name="drop_city" class="bg-transparent border-none p-0 font-serif text-xl font-bold focus:ring-0 w-full text-on-surface">
+                        <option value="">Same as pickup</option>
+                        {% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}
+                    </select>
+                </label>
+                <label class="block bg-surface/70 lg:bg-transparent rounded-2xl px-4 lg:px-6 py-3 lg:py-0 lg:border-r border-outline-variant/60"><span class="label-tiny text-outline block mb-1.5">Pickup date</span><input type="date" name="pickup_date" class="bg-transparent border-none p-0 font-bold focus:ring-0 w-full text-on-surface"></label>
+                <label class="block bg-surface/70 lg:bg-transparent rounded-2xl px-4 lg:px-6 py-3 lg:py-0"><span class="label-tiny text-outline block mb-1.5">Return date</span><input type="date" name="return_date" class="bg-transparent border-none p-0 font-bold focus:ring-0 w-full text-on-surface"></label>
+                <button type="submit" class="m-shine m-btn bg-primary-container text-on-primary py-4 px-9 rounded-full label-tiny flex items-center justify-center gap-3" data-magnetic><span>Search Cars</span><span class="material-symbols-outlined text-base">arrow_forward</span></button>
+            </div>
+            <p class="mt-5 text-sm text-on-surface-variant flex flex-wrap items-center gap-x-6 gap-y-2"><span class="flex items-center gap-2"><span class="material-symbols-outlined text-tertiary text-lg">near_me</span>Route: <b id="routeSummary" class="text-tertiary">Any city → Same as pickup</b></span><span class="text-outline">Free cancellation · No hidden charges · 24×7 customer support</span></p>
+        </form>
+    </section>
+
+    {% if categories %}
+    <div class="road-gap" data-stop="Choose your trip"></div>
+
+    <!-- ─── Occasions: luggage tags ─── -->
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="flex flex-col items-center mb-12 lg:mb-14 text-center">
+            <span class="label-tiny text-[#d9692f]">Explore by occasion</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl mt-4 text-tertiary">Find your drive.</h2>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5" data-deal>
+            {% for cat in categories|slice:":11" %}
+            <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="tag {% cycle 'bg-surface-container-lowest text-tertiary' 'bg-[#f6d9a8] text-[#0f2e2c]' 'bg-tertiary text-on-tertiary' 'bg-[#d9692f] text-white' 'bg-surface-container-lowest text-tertiary' 'bg-primary-container text-on-primary' 'bg-tertiary-container text-[#0f2e2c]' %}">
+                <span class="hole"></span>
+                <span class="material-symbols-outlined">{{ cat.icon|default:"directions_car" }}</span>
+                <span class="label-tiny">{{ cat.name }}</span>
+                <span class="text-[10px] font-bold tracking-widest opacity-60 uppercase">{% if cat.count %}{{ cat.count }} listed{% else %}Ask us{% endif %}</span>
+            </a>
+            {% endfor %}
+            <a href="{% url 'vehicle_list' %}" class="tag bg-[#d9692f] text-white">
+                <span class="hole"></span>
+                <span class="material-symbols-outlined">apps</span>
+                <span class="label-tiny">All fleet</span>
+                <span class="text-[10px] font-bold tracking-widest opacity-70 uppercase">{{ total_vehicle_count }} vehicle{{ total_vehicle_count|pluralize }}</span>
+            </a>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if featured_vehicles %}
+    <div class="road-gap" data-stop="Pick your ride"></div>
+
+    <!-- ─── Featured fleet: tickets ─── -->
+    <section id="fleet" class="lane max-w-screen-2xl mx-auto">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-12 gap-6">
+            <div><span class="label-tiny text-[#d9692f]">Featured this week</span><h2 class="headline-lg text-4xl sm:text-6xl mt-4 text-tertiary">Your ticket to ride.</h2></div>
+            <a href="{% url 'vehicle_list' %}" class="self-start sm:self-auto border border-tertiary text-tertiary px-6 py-3 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-tertiary hover:text-on-tertiary transition-colors">All Cars <span class="material-symbols-outlined text-lg">arrow_forward</span></a>
+        </div>
+        <div id="tickets" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7 lg:gap-9">
+            {% for vehicle in featured_vehicles|slice:":6" %}
+            <div class="tkw rounded-[1.75rem]" data-tilt="0.6">
+                <a href="{{ vehicle.get_absolute_url }}" class="tk group block bg-surface-container-lowest rounded-[1.75rem] overflow-hidden shadow-xl shadow-black/10 text-on-surface">
+                    <div class="relative h-52 sm:h-56 overflow-hidden bg-surface-container">
+                        {% if vehicle.thumbnail %}
+                        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
+                        {% else %}
+                        <div class="w-full h-full flex flex-col items-center justify-center gap-2 text-outline" style="background:repeating-linear-gradient(135deg,transparent 0 14px,rgba(227,155,60,.08) 14px 28px)"><span class="material-symbols-outlined text-[64px] text-[#e39b3c]">directions_car</span><span class="label-tiny">Photo coming soon</span></div>
+                        {% endif %}
+                        <span class="absolute top-4 left-4 bg-surface-container-lowest/90 text-tertiary label-tiny px-3 py-2 rounded-full">{% if vehicle.is_premium %}Premium{% elif vehicle.is_wedding_service %}Wedding{% elif vehicle.category %}{{ vehicle.category.name }}{% else %}Fleet{% endif %}</span>
+                        <span class="absolute top-4 right-4 bg-[#0f2e2c]/70 text-white label-tiny px-3 py-2 rounded-full">No. {{ forloop.counter|stringformat:"02d" }}</span>
+                    </div>
+                    <div class="p-6 pb-5">
+                        <div class="flex justify-between items-start gap-3"><div class="min-w-0"><p class="label-tiny text-outline">{{ vehicle.brand }}</p><h3 class="headline-md text-2xl mt-2 text-tertiary">{{ vehicle.name }}</h3></div><span class="material-symbols-outlined text-[#e39b3c] text-3xl">confirmation_number</span></div>
+                        <div class="grid grid-cols-3 gap-3 mt-5">
+                            <div><div class="label-tiny text-outline">Gear</div><div class="font-serif mt-1.5">{{ vehicle.get_transmission_display|default:"—" }}</div></div>
+                            <div><div class="label-tiny text-outline">Fuel</div><div class="font-serif mt-1.5">{{ vehicle.get_fuel_type_display|default:"—" }}</div></div>
+                            <div><div class="label-tiny text-outline">Seats</div><div class="font-serif mt-1.5">{{ vehicle.seating_capacity|default:"—" }}</div></div>
+                        </div>
+                    </div>
+                    <div class="tk-perf"></div>
+                    <div class="px-6 py-5 flex items-center justify-between gap-4">
+                        <div>
+                            {% if vehicle.primary_price_value %}
+                            <span class="label-tiny text-outline block mb-1">{% if vehicle.rental_mode == "monthly" %}Monthly only{% elif vehicle.rental_mode == "weekly" %}Weekly minimum{% else %}Rate{% endif %}</span><span class="font-serif text-2xl font-bold text-tertiary">{{ vehicle.primary_price_value|inr }}</span><span class="text-sm text-outline">/{{ vehicle.primary_price_label }}</span>
+                            {% else %}
+                            <span class="label-tiny text-outline block mb-1">Rate</span><span class="font-serif text-lg font-bold text-tertiary">On enquiry</span>
+                            {% endif %}
+                        </div>
+                        <span class="bg-primary-container text-on-primary rounded-full px-5 py-3 font-bold text-sm m-shine"><span class="m-flip"><span>Rent Now</span><span>Details →</span></span></span>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <div class="road-gap" data-stop="The big day"></div>
+
+    <!-- ─── Wedding: polaroids that fan out (decorative photos) ─── -->
+    <section id="wedding" class="lane max-w-screen-2xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+        <div class="pol-stack relative h-[340px] sm:h-[480px] lg:h-[540px]" data-no-parallax aria-hidden="true">
+            <figure class="pol"><img src="{% static 'themes/img/couple.jpg' %}" alt=""><figcaption>Just married</figcaption></figure>
+            <figure class="pol"><img src="{% static 'themes/img/wedding-rolls.jpg' %}" alt=""><figcaption>The arrival</figcaption></figure>
+            <figure class="pol"><img src="{% static 'themes/img/jasmine-handle.jpg' %}" alt="" style="object-position:50% 70%"><figcaption>Every detail</figcaption></figure>
+        </div>
+        <div class="space-y-6 lg:space-y-8">
+            <span class="label-tiny text-[#d9692f] block">Wedding fleet · Kerala</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl text-tertiary">For the day you'll never forget.</h2>
+            <p class="text-lg text-on-surface-variant leading-relaxed font-light">From classic vintage icons to modern luxury flagships, our curated wedding fleet ensures your first journey together is legendary. Chauffeur included, decoration tailored.</p>
+            <ol class="space-y-4" data-deal>
+                <li class="flex items-start gap-4"><span class="w-9 h-9 rounded-full bg-tertiary text-on-tertiary grid place-items-center font-bold text-sm shrink-0">1</span><span class="pt-1.5">Chauffeur included</span></li>
+                <li class="flex items-start gap-4"><span class="w-9 h-9 rounded-full bg-[#e39b3c] text-[#0f2e2c] grid place-items-center font-bold text-sm shrink-0">2</span><span class="pt-1.5">Decoration tailored to your day</span></li>
+                <li class="flex items-start gap-4"><span class="w-9 h-9 rounded-full bg-[#d9692f] text-white grid place-items-center font-bold text-sm shrink-0">3</span><span class="pt-1.5">Vintage icons to modern flagships</span></li>
+            </ol>
+            <a href="{% url 'wedding_cars' %}" class="inline-flex bg-primary-container text-on-primary px-10 py-5 rounded-full font-bold items-center gap-3">View Wedding Fleet <span class="material-symbols-outlined" data-icon="favorite">favorite</span></a>
+        </div>
+    </section>
+
+    {% if premium_vehicles %}
+    <div class="road-gap" data-stop="Scenic route"></div>
+
+    <!-- ─── Luxury: pinned sideways scenic route ─── -->
+    <section id="luxury" class="relative z-10 bg-[#0f2e2c] text-[#f7f0e3] py-20 lg:py-0 lg:h-screen lg:flex lg:flex-col lg:justify-center overflow-hidden" data-hscroll>
+        <div class="absolute inset-0 opacity-30 pointer-events-none" style="background:radial-gradient(50% 60% at 90% 0%,rgba(227,155,60,.5),transparent 70%)"></div>
+        <div class="relative px-4 sm:px-12 mb-10 lg:mb-14 flex flex-wrap items-end gap-6 sm:gap-10 max-w-screen-2xl w-full mx-auto">
+            <div>
+                <span class="label-tiny text-[#e39b3c]">Elite collection · the scenic route</span>
+                <h2 class="headline-lg text-4xl sm:text-6xl text-[#fffaf0] mt-4">When ordinary won't do.</h2>
+            </div>
+            <div class="h-px flex-1 mb-4 hidden sm:block" style="background:repeating-linear-gradient(90deg,#e39b3c 0 10px,transparent 10px 22px)"></div>
+            <div class="font-serif text-4xl sm:text-5xl text-[#e39b3c] hidden lg:flex items-baseline gap-2"><span data-hscroll-count>01</span><span class="text-[#fffaf0]/30 text-2xl">/ {{ premium_vehicles|length|stringformat:"02d" }}</span></div>
+            <a href="{% url 'premium_cars' %}" class="label-tiny text-[#fffaf0] border border-[#fffaf0]/30 hover:bg-[#fffaf0] hover:text-[#0f2e2c] transition-colors px-5 py-3 rounded-full mb-2 flex items-center gap-2">All premium <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+        </div>
+        <div class="m-htrack relative flex gap-8 lg:gap-10 px-4 sm:px-12 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-px-4 sm:scroll-px-12 pb-4">
+            {% for vehicle in premium_vehicles %}
+            <a href="{{ vehicle.get_absolute_url }}" class="snap-start min-w-[290px] sm:min-w-[420px] lg:min-w-[36vw] h-[420px] sm:h-[520px] lg:h-[60vh] relative rounded-[2.5rem] overflow-hidden group block bg-[#163c39]" data-tilt="0.5">
+                {% if vehicle.thumbnail %}
+                <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover" loading="lazy"/>
+                {% else %}
+                <div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[96px] text-[#e39b3c]/40">diamond</span></div>
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
+                <span class="absolute top-6 left-6 label-tiny bg-[#fffaf0]/15 border border-[#fffaf0]/20 backdrop-blur px-4 py-2 rounded-full text-[#fffaf0]">Viewpoint {{ forloop.counter|stringformat:"02d" }}</span>
+                <div class="absolute bottom-8 left-8 right-8"><div class="headline-md text-3xl text-white">{{ vehicle.brand }} {{ vehicle.name }}</div><div class="text-[#e39b3c] label-tiny mt-3">{% if vehicle.primary_price_value %}{{ vehicle.primary_price_value|inr }} / {{ vehicle.primary_price_label }}{% elif vehicle.category %}{{ vehicle.category.name }}{% else %}Elite collection{% endif %}</div></div>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <div class="road-gap" data-stop="Travel essentials"></div>
+
+    <!-- ─── Why: passport stamps ─── -->
+    <section id="why" class="lane max-w-screen-2xl mx-auto">
+        <div class="flex flex-col items-center mb-14 lg:mb-16 text-center">
+            <span class="label-tiny text-[#d9692f]">Why book with us</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl mt-4 text-tertiary">Crafted for convenience.</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 justify-items-center text-center">
+            <div class="max-w-[240px]"><div class="stamp text-tertiary mx-auto" style="rotate:-8deg"><div><span class="material-symbols-outlined">local_shipping</span><b>Doorstep</b></div></div><div class="font-bold text-lg text-tertiary mt-6">Doorstep Delivery</div><p class="text-sm text-on-surface-variant mt-1">We bring the car to you.</p></div>
+            <div class="max-w-[240px]"><div class="stamp text-[#d9692f] mx-auto" style="rotate:6deg"><div><span class="material-symbols-outlined">support_agent</span><b>24 / 7</b></div></div><div class="font-bold text-lg text-tertiary mt-6">24/7 Support</div><p class="text-sm text-on-surface-variant mt-1">Real humans, on call.</p></div>
+            <div class="max-w-[240px]"><div class="stamp text-primary-container mx-auto" style="rotate:-4deg"><div><span class="material-symbols-outlined">receipt_long</span><b>No hidden<br>charges</b></div></div><div class="font-bold text-lg text-tertiary mt-6">Zero Hidden Charges</div><p class="text-sm text-on-surface-variant mt-1">Transparent pricing.</p></div>
+            <div class="max-w-[240px]"><div class="stamp text-[#e39b3c] mx-auto" style="rotate:10deg"><div><span class="material-symbols-outlined">map</span><b>All Kerala</b></div></div><div class="font-bold text-lg text-tertiary mt-6">All-Kerala Network</div><p class="text-sm text-on-surface-variant mt-1">{% if cities %}{{ cities.count }} location{{ cities.count|pluralize }} served.{% else %}Pickups across Kerala.{% endif %}</p></div>
+        </div>
+    </section>
+
+    {% if cities %}
+    <div class="road-gap" data-stop="Pickup points"></div>
+
+    <!-- ─── Cities: departures board ─── -->
+    <section class="lane max-w-screen-2xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-center">
+        <div class="min-w-0">
+            <span class="label-tiny text-[#d9692f] block">Where we are</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl mt-4 mb-8 text-tertiary">Kerala at your fingertips.</h2>
+            <div class="board p-5 sm:p-7">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <span class="label-tiny text-[#e39b3c] flex items-center gap-2"><span class="material-symbols-outlined text-lg">departure_board</span>Pickup points</span>
+                    <span class="label-tiny text-[#fffaf0]/60">Kerala <span id="clock" class="text-[#e39b3c]"></span></span>
+                </div>
+                <div id="boardRows">
+                    {% for city in cities|slice:":9" %}
+                    <a href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="board-row">
+                        <span class="text-[#fffaf0]/40 text-xs font-bold">{{ forloop.counter|stringformat:"02d" }}</span>
+                        <span class="min-w-0"><span class="sr-only">{{ city.name }}</span><span class="cells" aria-hidden="true" data-flap="{{ city.name|upper }}">{% for ch in city.name|upper %}<span class="cell">{% if ch != " " %}{{ ch }}{% endif %}</span>{% endfor %}</span></span>
+                        <span class="material-symbols-outlined text-[#e39b3c]/70 text-lg" aria-hidden="true">arrow_outward</span>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% if cities.count > 9 %}
+                <div class="board-row">
+                    <span class="text-[#fffaf0]/40 text-xs font-bold">+{{ cities.count|add:"-9" }}</span>
+                    <span class="text-[#fffaf0]/70 text-sm min-w-0">{% for city in cities|slice:"9:14" %}{{ city.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if cities.count > 14 %} and more{% endif %}</span>
+                    <a href="{% url 'vehicle_list' %}" class="label-tiny text-[#e39b3c] hover:text-[#fffaf0]">All →</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="relative">
+            <div class="rounded-[2.5rem] overflow-hidden h-[340px] sm:h-[560px]"><img src="{% static 'themes/img/kerala-map.jpg' %}" alt="Stylised map of the Kerala coast" class="w-full h-full object-cover"/></div>
+            <div class="absolute -bottom-6 -left-3 sm:-left-8 bg-surface-container-lowest p-6 sm:p-7 rounded-3xl shadow-xl" data-parallax="-30">
+                <div class="headline-md text-4xl text-tertiary"><span data-slot>{{ cities.count }}</span></div>
+                <div class="label-tiny text-outline mt-2">Cit{{ cities.count|pluralize:"y,ies" }} served</div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    {% if testimonials %}
+    {% with t=testimonials.0 %}
+    <div class="road-gap" data-stop="Postcards home"></div>
+
+    <!-- ─── Testimonial: the back of a postcard ─── -->
+    <section class="lane max-w-6xl mx-auto">
+        <div class="bg-surface-container-lowest rounded-[1.25rem] shadow-2xl shadow-black/10 p-7 sm:p-12 lg:p-16 grid md:grid-cols-[1.5fr_1fr] gap-10 md:gap-0 relative text-on-surface" style="background-image:repeating-linear-gradient(135deg,transparent 0 14px,rgba(227,155,60,.06) 14px 28px)">
+            <div class="md:pr-12 md:border-r border-outline-variant">
+                <span class="material-symbols-outlined text-[#d9692f] text-5xl mb-6 block" data-reveal>format_quote</span>
+                <p class="headline-lg text-3xl sm:text-4xl lg:text-5xl italic leading-tight text-tertiary" data-scrub-text data-no-split>"{{ t.quote }}"</p>
+            </div>
+            <div class="md:pl-12 flex flex-col justify-between gap-10">
+                <div class="flex justify-between items-start">
+                    <svg viewBox="0 0 120 120" class="postmark text-[#d9692f]/70" aria-hidden="true"><defs><path id="pm" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs><circle cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="60" cy="60" r="34" fill="none" stroke="currentColor" stroke-width="1.5"/><text fill="currentColor" font-size="11" font-weight="700" letter-spacing="4"><textPath href="#pm">KERALA · INDIA · KERALA · INDIA ·</textPath></text><path d="M44 60h32M48 52h24M48 68h24" stroke="currentColor" stroke-width="2"/></svg>
+                    <div class="w-20 h-24 border-2 border-dashed border-[#e39b3c] rounded p-1.5 rotate-3">{% if t.photo %}<img src="{{ t.photo.url }}" alt="" class="w-full h-full object-cover rounded-sm">{% else %}<img src="{% static 'themes/img/palms.jpg' %}" alt="" class="w-full h-full object-cover rounded-sm">{% endif %}</div>
+                </div>
+                <div class="space-y-4" data-reveal>
+                    <div class="border-b border-outline-variant pb-3"><span class="label-tiny text-outline">From</span><div class="font-serif text-2xl font-bold mt-1">{{ t.name }}</div></div>
+                    {% if t.role %}<div class="border-b border-outline-variant pb-3 text-on-surface-variant">{{ t.role }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endwith %}
+    {% endif %}
+
+    <div class="road-gap" data-stop="Plan with us"></div>
+
+    <!-- ─── Enquiry ─── -->
+    <section id="enquiry" class="lane max-w-screen-2xl mx-auto">
+        <div class="relative overflow-hidden rounded-[2.5rem] lg:rounded-[3rem] bg-tertiary text-[#fffaf0] p-6 sm:p-14 lg:p-20 grid lg:grid-cols-2 gap-12 items-center">
+            <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(45% 70% at 100% 100%,rgba(227,155,60,.45),transparent 70%)"></div>
+            <div class="relative min-w-0">
+                <span class="label-tiny text-[#e39b3c] block">Get in touch</span>
+                <h2 class="headline-lg text-4xl sm:text-6xl mt-4 mb-5">Tell us where you're headed.</h2>
+                <p class="text-[#fffaf0]/75 text-lg max-w-md font-light">Fill the form and our team will get back within the hour{% if WHATSAPP_NUMBER %}, or message us on WhatsApp{% endif %}.</p>
+                {% if cities %}
+                <div class="mt-8 m-marquee max-w-md" data-marquee style="--dur:28s" aria-hidden="true"><div class="m-marquee-track label-tiny text-[#e39b3c]/80 whitespace-nowrap gap-6 pr-6">{% for city in cities %}<span>{{ city.name }}</span><span>·</span>{% endfor %}</div></div>
+                {% endif %}
+            </div>
+            <div class="r-form relative bg-surface-container-lowest rounded-3xl p-5 sm:p-8 shadow-2xl min-w-0" data-reveal>
+                {% include "public/includes/enquiry_form.html" %}
+            </div>
+        </div>
+    </section>
+
+    <div class="road-gap" data-stop="Destination" data-stop-end></div>
+</div>
+
+<div class="px-4 sm:px-8 max-w-screen-2xl mx-auto pt-4 overflow-hidden">
+    <div class="font-serif font-bold italic text-tertiary leading-none tracking-tighter text-[10vw] whitespace-nowrap text-center select-none" data-split="chars" aria-hidden="true">Kerala, by road</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* booking: route summary follows the selects; a chosen drop city switches off "same location" */
+(() => {
+  const f = document.getElementById("fromCity"), t = document.getElementById("toCity"), out = document.getElementById("routeSummary"), same = document.getElementById("sameLoc");
+  if (!f || !t || !out) return;
+  const label = s => s.options[s.selectedIndex] ? s.options[s.selectedIndex].text : "";
+  const upd = () => { out.textContent = label(f) + " → " + label(t); if (same) same.disabled = !!t.value; };
+  f.addEventListener("change", upd); t.addEventListener("change", upd); upd();
+})();
+
+/* departures board: names are rendered by the server; pad rows to a common width, then flap them into place */
+(() => {
+  const host = document.getElementById("boardRows");
+  if (!host) return;
+  const rows = [...host.querySelectorAll("[data-flap]")];
+  const W = Math.max(10, ...rows.map(r => r.dataset.flap.length));
+  rows.forEach(r => { for (let i = r.dataset.flap.length; i < W; i++) { const c = document.createElement("span"); c.className = "cell"; r.appendChild(c); } });
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) return;
+  const A = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  rows.forEach(r => r.querySelectorAll(".cell").forEach(c => { c.textContent = ""; }));
+  const run = (row, delay) => {
+    const target = row.dataset.flap.padEnd(W, " "), cells = [...row.querySelectorAll(".cell")];
+    const start = performance.now() + delay;
+    const tick = now => {
+      let done = true;
+      cells.forEach((c, i) => {
+        const settle = start + 260 + i * 65;
+        if (now < start) { done = false; return; }
+        if (now >= settle) { c.textContent = target[i].trim(); return; }
+        done = false;
+        c.textContent = target[i] === " " ? "" : A[(Math.random() * 26) | 0];
+      });
+      if (!done) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    io.disconnect();
+    rows.forEach((r, i) => run(r, i * 110));
+  }), { threshold: .35 });
+  io.observe(host);
+})();
+
+/* local Kerala time on the board */
+(() => {
+  const el = document.getElementById("clock");
+  if (!el) return;
+  const fmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" });
+  const upd = () => { el.textContent = fmt.format(new Date()); };
+  upd(); setInterval(upd, 30000);
+})();
+
+/* ═══════════ the road: built from the stop markers, drawn by scroll, car rides along ═══════════ */
+const Road = (() => {
+  const J = document.getElementById("journey");
+  const svg = J.querySelector(".road-svg");
+  const plan = svg.querySelector("#roadPlan"), shoulder = svg.querySelector("#roadShoulder"), asphalt = svg.querySelector("#roadAsphalt"),
+        center = svg.querySelector("#roadCenter"), maskPath = svg.querySelector("#roadMaskPath"), mask = svg.querySelector("#roadMask");
+  const car = J.querySelector(".road-car"), pinsHost = J.querySelector(".road-pins");
+  const stops = [...J.querySelectorAll("[data-stop]")];
+  let L = 0, ys = [], N = 0, top = 0, H = 0, pinLen = [], cur = 0, animated = false;
+
+  /* stops are numbered in page order, so hidden sections never leave a gap in the count */
+  let n = 0;
+  const pins = stops.map(s => {
+    const end = s.hasAttribute("data-stop-end");
+    const p = document.createElement("div");
+    p.className = "road-pin" + (end ? " end" : "");
+    const lbl = document.createElement("span");
+    lbl.textContent = end ? s.dataset.stop : String(++n).padStart(2, "0") + " · " + s.dataset.stop;
+    p.appendChild(lbl);
+    pinsHost.appendChild(p);
+    return p;
+  });
+
+  function build() {
+    const W = J.clientWidth; H = J.offsetHeight;
+    const lg = W >= 1024, md = W >= 768;
+    const xa = lg ? 52 : md ? 34 : 20, xb = lg ? W - 52 : md ? W - 34 : 34, r = lg ? 82 : md ? 64 : 44;
+    top = J.getBoundingClientRect().top + scrollY;
+    const sw = lg ? 16 : md ? 13 : 9;
+    svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    mask.setAttribute("x", 0); mask.setAttribute("y", 0); mask.setAttribute("width", W); mask.setAttribute("height", H);
+    let side = 0; const X = () => (side ? xb : xa);
+    let d = `M ${xa} 0`;
+    const pts = [];
+    stops.forEach(s => {
+      const b = s.getBoundingClientRect(), y = b.top + scrollY - top + b.height / 2;
+      if (s.hasAttribute("data-stop-end")) {
+        const x0 = X(), xm = W / 2;
+        d += ` L ${x0} ${y - r} C ${x0} ${y} ${x0} ${y} ${xm} ${y}`;
+        pts.push([xm, y]);
+        return;
+      }
+      const x0 = X(); side ^= 1; const x1 = X();
+      d += ` L ${x0} ${y - r} C ${x0} ${y} ${x1} ${y} ${x1} ${y + r}`;
+      pts.push([(x0 + x1) / 2, y]);
+    });
+    [plan, shoulder, asphalt, center, maskPath].forEach(p => p.setAttribute("d", d));
+    shoulder.setAttribute("stroke-width", sw + 8); asphalt.setAttribute("stroke-width", sw); maskPath.setAttribute("stroke-width", sw + 14);
+    L = asphalt.getTotalLength();
+    N = Math.max(2, Math.ceil(L / 8)); ys = new Float32Array(N + 1);
+    for (let i = 0; i <= N; i++) ys[i] = asphalt.getPointAtLength(i * L / N).y;
+    pts.forEach(([x, y], i) => { pins[i].style.left = x + "px"; pins[i].style.top = y + "px"; });
+    pinLen = pts.map(([, y]) => lenAtY(y));
+    if (animated) { maskPath.style.strokeDasharray = `${L} ${L + 40}`; render(Math.min(cur, L)); }
+    else { maskPath.style.strokeDasharray = "none"; pins.forEach(p => p.classList.add("on")); }
+  }
+  /* path y only ever increases, so binary-search the sampled table */
+  function lenAtY(y) {
+    if (!N) return 0;
+    let lo = 0, hi = N;
+    if (y <= ys[0]) return 0;
+    if (y >= ys[N]) return L;
+    while (hi - lo > 1) { const m = (lo + hi) >> 1; if (ys[m] < y) lo = m; else hi = m; }
+    const f = (y - ys[lo]) / Math.max(.0001, ys[hi] - ys[lo]);
+    return (lo + f) * L / N;
+  }
+  function render(l) {
+    cur = l;
+    maskPath.style.strokeDashoffset = L - l;
+    if (l <= 1) { car.classList.remove("on"); }
+    else {
+      const p = asphalt.getPointAtLength(l), q = asphalt.getPointAtLength(Math.min(L, l + 3)), b = asphalt.getPointAtLength(Math.max(0, l - 3));
+      const a = Math.atan2(q.y - b.y, q.x - b.x) * 180 / Math.PI;
+      car.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${a}deg)`;
+      car.classList.add("on");
+    }
+    pins.forEach((p, i) => p.classList.toggle("on", l >= pinLen[i] - 2));
+  }
+  function target() { return lenAtY(scrollY + innerHeight * .58 - top); }
+  return { build, render, target, J, setAnimated(v) { animated = v; } };
+})();
+
+/* static road (no GSAP or reduced motion): fully drawn, every stop lit */
+Road.build();
+addEventListener("load", () => Road.build());
+let roadResizeT; addEventListener("resize", () => { clearTimeout(roadResizeT); roadResizeT = setTimeout(() => Road.build(), 150); });
+
+/* page-specific motion */
+document.addEventListener("motion:ready", ({ detail: { G, ST } }) => {
+  /* road: rebuilt on every refresh (pins and images change heights), drawn to wherever the reader is */
+  Road.setAnimated(true);
+  Road.J.classList.add("road-live");
+  const proxy = { l: 0 };
+  const go = G.quickTo(proxy, "l", { duration: .6, ease: "power3", onUpdate: () => Road.render(proxy.l) });
+  ST.addEventListener("refresh", () => { Road.build(); go(Road.target()); });
+  ST.create({ trigger: Road.J, start: "top bottom", end: "bottom top", onUpdate: () => go(Road.target()) });
+  Road.build(); Road.render(0);
+
+  /* postcards fan out after the hero opens, then spread as you scroll away */
+  const pcs = G.utils.toArray(".pc");
+  G.fromTo(pcs, { opacity: 0, y: 80, x: (i) => [90, 0, -90][i], rotation: (i) => [11, 2, -9][i], scale: .85 },
+    { opacity: 1, y: 0, x: 0, rotation: 0, scale: 1, duration: 1.3, ease: "back.out(1.4)", stagger: .14, delay: 1.1 });
+  G.to(".pcw", { y: (i) => -30 - i * 26, x: (i) => (i - 1) * 24, rotation: (i) => [-5, 2, 7][i], ease: "none",
+    scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true } });
+  G.to(".hero-copy", { yPercent: -14, opacity: .25, ease: "none", scrollTrigger: { trigger: "#hero", start: "center top+=40%", end: "bottom top", scrub: true } });
+
+  /* tickets flip over like boarding passes being handed out */
+  if (document.querySelector("#tickets .tk"))
+    G.from(".tk", { rotationY: -96, transformPerspective: 1200, transformOrigin: "0% 50%", opacity: 0, duration: 1.3, ease: "expo.out", stagger: .12,
+      scrollTrigger: { trigger: "#tickets", start: "clamp(top 82%)", once: true } });
+
+  /* polaroids: dealt as a pile, fan out as the section scrolls in */
+  G.fromTo(".pol", { xPercent: (i) => [40, 0, -40][i], rotation: (i) => [9, -2, -9][i], y: 40 },
+    { xPercent: 0, rotation: 0, y: 0, ease: "none", scrollTrigger: { trigger: ".pol-stack", start: "top 90%", end: "center 55%", scrub: .6 } });
+
+  /* passport stamps thump down one after another */
+  G.from(".stamp", { scale: 2.4, opacity: 0, rotation: -35, duration: .75, ease: "back.out(2.2)", stagger: .2,
+    scrollTrigger: { trigger: "#why", start: "clamp(top 62%)", once: true } });
+
+  /* booking: replay the route when the cities change */
+  ["fromCity", "toCity"].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener("change", () => {
+    G.fromTo(".route-car", { scale: 1.8 }, { scale: 1, duration: .7, ease: "back.out(2.5)" });
+    G.fromTo("#routeSummary", { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: .5, ease: "back.out(2)" });
+  }); });
+});
+</script>
+{% endblock %}

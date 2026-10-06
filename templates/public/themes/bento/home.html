@@ -1,0 +1,577 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}{{ BUSINESS_NAME }} | {{ config.tagline|default:"Premium Car Rentals in Kerala" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* sticky phone needs a non-scrolling overflow on the page */
+    html, body { overflow-x: clip !important; }
+    body { background-image: radial-gradient(60rem 40rem at 90% -10%, rgba(212,236,162,.45), transparent 60%), radial-gradient(50rem 30rem at -10% 40%, rgba(184,207,136,.18), transparent 60%); background-attachment: fixed; }
+    .theme-bento .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .theme-bento .label-tiny { font-weight: 800; letter-spacing: .18em; }
+    .b-glass { background: rgba(255,255,255,.62); backdrop-filter: blur(22px) saturate(1.3); -webkit-backdrop-filter: blur(22px) saturate(1.3); border: 1px solid rgba(255,255,255,.75); box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 24px 48px -32px rgba(31,46,0,.35); }
+    .tile { border-radius: 30px; position: relative; overflow: hidden; }
+    .m-nav.is-solid { box-shadow: none; }
+    .m-nav.is-solid > div:first-child { box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 18px 40px -20px rgba(31,46,0,.35); }
+    .serif-i { font-family: 'Noto Serif', serif; font-style: italic; font-weight: 400; letter-spacing: -.02em; }
+
+    /* hero tiles assemble in; hidden only while the motion layer is armed */
+    .motion .b-hero .tile { opacity: 0; }
+
+    @keyframes b-kb { 0% { transform: scale(1.02) translate(0,0); } 100% { transform: scale(1.14) translate(-2%, -2%); } }
+    .b-kb { animation: b-kb 20s ease-in-out infinite alternate; transform-origin: 60% 40%; }
+
+    .lift { transition: transform .55s var(--spring), box-shadow .55s; }
+    .lift:hover { transform: translateY(-6px); box-shadow: 0 36px 60px -36px rgba(31,46,0,.45); }
+
+    /* estimator */
+    #estimate:not(:has(.car-chip)) { display: none; }
+    .car-chip { transition: background-color .35s, color .35s, border-color .35s, transform .45s var(--spring); }
+    .car-chip:hover { transform: translateY(-2px); }
+    .car-chip[aria-checked="true"] { background: #1f2e00; color: #fff; border-color: #1f2e00; }
+    .car-chip[aria-checked="true"] .chip-price { color: #d4eca2; }
+    input[type=range].days { -webkit-appearance: none; appearance: none; width: 100%; height: 10px; border-radius: 99px; background: linear-gradient(90deg, #33450d var(--p, 7%), #e4e4db var(--p, 7%)); outline: none; }
+    input[type=range].days::-webkit-slider-thumb { -webkit-appearance: none; width: 30px; height: 30px; border-radius: 50%; background: #d4eca2; border: 6px solid #1f2e00; cursor: grab; box-shadow: 0 6px 16px -6px rgba(31,46,0,.6); transition: transform .3s var(--spring); }
+    input[type=range].days::-webkit-slider-thumb:active { transform: scale(1.18); cursor: grabbing; }
+    input[type=range].days::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #d4eca2; border: 5px solid #1f2e00; cursor: grab; }
+
+    /* luxury accordion: the hovered tile expands */
+    .lux { display: flex; gap: 14px; }
+    .lux > a { flex: 1 1 0; min-width: 0; transition: flex-grow .8s var(--expo); }
+    .lux > a .lux-more { opacity: 0; transform: translateY(10px); transition: opacity .5s, transform .6s var(--expo); }
+    @media (min-width: 1024px) {
+        .lux > a:hover, .lux:not(:hover) > a:first-child { flex-grow: 3.4; }
+        .lux > a:hover .lux-more, .lux:not(:hover) > a:first-child .lux-more { opacity: 1; transform: none; }
+        .lux > a .lux-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    }
+    @media (max-width: 1023px) { .lux { flex-direction: column; } .lux > a { min-height: 260px; } .lux > a .lux-more { opacity: 1; transform: none; } }
+
+    .occ .material-symbols-outlined { transition: transform .6s var(--spring); }
+    .occ:hover .material-symbols-outlined { transform: rotate(-12deg) scale(1.2); }
+    .occ .occ-go { transition: transform .5s var(--spring), background-color .3s; }
+    .occ:hover .occ-go { transform: rotate(-45deg); background: #1f2e00; color: #d4eca2; }
+
+    /* phone mock: screens swap as steps scroll past */
+    .ph-screen { position: absolute; inset: 0; opacity: 0; transform: translateY(6%) scale(.96); transition: opacity .55s ease, transform .7s var(--expo); pointer-events: none; }
+    .ph-screen.is-on { opacity: 1; transform: none; pointer-events: auto; }
+    .step { opacity: .32; transition: opacity .5s; }
+    .step.is-on { opacity: 1; }
+    .step-dot { transition: width .5s var(--expo), background-color .4s; }
+    .step-dot.is-on { width: 28px; background: #1f2e00; }
+
+    /* enquiry form inside the glass tile */
+    #enquiry form input, #enquiry form textarea { background: #fff; border-color: transparent; border-radius: 16px; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .b-kb { animation: none; }
+        .lift:hover, .car-chip:hover { transform: none; }
+        .ph-screen, .step, .lux > a { transition: none !important; }
+    }
+</style>
+{% endblock %}
+
+{% block navbar %}{% include "public/themes/bento/navbar.html" %}{% endblock %}
+{% block main_class %}pt-24 sm:pt-28 px-3 sm:px-6{% endblock %}
+{% block footer %}{% include "public/themes/bento/footer.html" %}{% endblock %}
+
+{% block content %}
+<!-- ─── Hero bento ─── -->
+<section class="b-hero max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 lg:auto-rows-[150px]" aria-label="Introduction">
+    <!-- headline -->
+    <div class="tile b-glass p-7 sm:p-10 sm:col-span-2 lg:col-span-7 lg:row-span-3 flex flex-col justify-between gap-8">
+        <div>
+            <span class="inline-flex items-center gap-2 bg-primary-fixed text-primary label-tiny px-3 py-2 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</span>
+            <h1 class="b-title mt-6 font-extrabold text-[44px] sm:text-6xl lg:text-[72px] leading-[.95] tracking-[-.045em] text-primary" data-no-split>{{ config.hero_title|default:"Rent Your Perfect Vehicle" }}</h1>
+            <p class="mt-5 text-xl sm:text-2xl font-semibold text-on-surface-variant">Ready for the <span class="text-primary bg-primary-fixed/70 px-2 rounded-lg" data-cycle="wedding day|weekend escape|airport run|monthly commute|outstation trip" data-wait="1.4">wedding day</span></p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+            <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-7 py-4 rounded-full font-bold flex items-center gap-2">{{ config.hero_cta_text|default:"Browse Fleet" }} <span class="material-symbols-outlined">arrow_forward</span></a>
+            <a href="#estimate" class="bg-white px-7 py-4 rounded-full font-bold flex items-center gap-2 border border-outline-variant/50 hover:border-primary transition-colors">Price a trip <span class="material-symbols-outlined">calculate</span></a>
+            {% if config.hero_description %}<p class="w-full text-sm text-on-surface-variant font-medium max-w-xl">{{ config.hero_description }}</p>{% endif %}
+        </div>
+    </div>
+    <!-- photo -->
+    <div class="tile sm:col-span-2 lg:col-span-5 lg:row-span-4 min-h-[380px] bg-primary" data-no-parallax>
+        {% if config.hero_image %}
+        <img src="{{ config.hero_image.url }}" alt="" class="b-kb absolute inset-0 w-full h-full object-cover"/>
+        {% elif hero_bg_images %}
+        <img src="{{ hero_bg_images.0 }}" alt="" class="b-kb absolute inset-0 w-full h-full object-cover"/>
+        {% else %}
+        <img src="{% static 'themes/img/palms.jpg' %}" alt="" class="b-kb absolute inset-0 w-full h-full object-cover"/>
+        {% endif %}
+        <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/10"></div>
+        <div class="absolute top-4 left-4 right-4 flex justify-between items-start gap-3">
+            {% if starting_price %}
+            <span class="b-glass rounded-2xl px-4 py-3"><span class="label-tiny block text-on-surface-variant mb-1">Starting at</span><span class="font-extrabold text-2xl text-primary"><span data-bslot>{{ starting_price|inr }}</span><span class="text-sm font-semibold text-on-surface-variant"> /day</span></span></span>
+            {% else %}<span></span>{% endif %}
+            <a href="{% url 'vehicle_list' %}" class="w-11 h-11 shrink-0 rounded-full b-glass grid place-items-center" aria-label="Browse the fleet"><span class="material-symbols-outlined text-primary">north_east</span></a>
+        </div>
+        <div class="absolute bottom-5 left-5 right-5 text-white">
+            <span class="label-tiny opacity-80">Self-drive · Chauffeur · Wedding</span>
+            <div class="serif-i text-3xl mt-2">Every road across Kerala.</div>
+        </div>
+    </div>
+    <!-- fleet count -->
+    {% if total_vehicle_count %}
+    <div class="tile bg-primary text-on-primary p-6 lg:col-span-3 lg:row-span-1 flex items-center justify-between gap-4 lift">
+        <div><div class="font-extrabold text-5xl tracking-tight leading-none"><span data-bslot>{{ total_vehicle_count }}</span></div><div class="label-tiny mt-2 opacity-70">Vehicle{{ total_vehicle_count|pluralize }} in fleet</div></div>
+        <span class="material-symbols-outlined text-5xl text-primary-fixed/80" aria-hidden="true">garage</span>
+    </div>
+    {% endif %}
+    <!-- city ticker -->
+    {% if cities %}
+    <div class="tile b-glass p-6 {% if total_vehicle_count %}lg:col-span-4{% else %}lg:col-span-7{% endif %} lg:row-span-1 flex items-center gap-4 lift">
+        <span class="w-14 h-14 shrink-0 rounded-2xl bg-primary-fixed grid place-items-center"><span class="material-symbols-outlined text-primary text-3xl">location_on</span></span>
+        <div class="min-w-0"><div class="label-tiny text-outline">Pick up in · <span data-bslot>{{ cities|length }}</span> cit{{ cities|length|pluralize:"y,ies" }}</div><div class="font-extrabold text-2xl sm:text-3xl text-primary mt-2 tracking-tight truncate" data-cycle="{% for c in cities|slice:':8' %}{{ c.name }}{% if not forloop.last %}|{% endif %}{% endfor %}" data-every="1.8">{{ cities.0.name }}</div></div>
+    </div>
+    {% endif %}
+    <!-- booking search (real search: GET to the fleet list) -->
+    <form action="{% url 'vehicle_list' %}" method="get" class="tile b-glass p-5 sm:p-6 sm:col-span-2 lg:col-span-8 lg:row-span-2 flex flex-col justify-between gap-4" aria-label="Search vehicles">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex bg-surface-container rounded-full p-1">
+                <label class="cursor-pointer"><input type="radio" name="rental_type" value="self_drive" class="peer sr-only" checked><span class="block px-4 py-2 rounded-full text-sm font-bold peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">Self-drive</span></label>
+                <label class="cursor-pointer"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only"><span class="block px-4 py-2 rounded-full text-sm font-bold peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">With driver</span></label>
+            </div>
+            <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-on-surface-variant">
+                <input type="checkbox" name="same_location" value="1" checked class="rounded border-outline-variant text-primary focus:ring-primary"> Same-location return
+            </label>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2">
+            <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Pickup</span>
+                <select name="pickup_city" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"><option value="">Any city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
+            <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Drop</span>
+                <select name="drop_city" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"><option value="">Same as pickup</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
+            <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">From</span><input type="date" name="pickup_date" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+            <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">To</span><input type="date" name="return_date" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+            <button type="submit" class="col-span-2 lg:col-span-1 bg-primary text-on-primary rounded-2xl px-6 py-4 font-bold flex items-center justify-center gap-2 m-shine m-btn" data-magnetic>Search <span class="material-symbols-outlined">search</span></button>
+        </div>
+        <p class="text-xs text-on-surface-variant font-semibold">Free cancellation · No hidden charges · 24×7 customer support</p>
+    </form>
+    <!-- wedding mini -->
+    <a href="{% url 'wedding_cars' %}" class="tile sm:col-span-2 lg:col-span-4 lg:row-span-2 min-h-[220px] group block" data-no-parallax>
+        <img src="{% static 'themes/img/rolls-palms.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-110"/>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
+        <div class="absolute inset-0 p-6 flex flex-col justify-between text-white">
+            <span class="label-tiny bg-white/20 backdrop-blur px-3 py-2 rounded-full self-start">Wedding fleet</span>
+            <div class="flex items-end justify-between gap-4"><div class="serif-i text-3xl leading-tight">For the day you'll<br/>never forget.</div><span class="w-11 h-11 shrink-0 rounded-full bg-primary-fixed text-primary grid place-items-center transition-transform duration-500 group-hover:-rotate-45"><span class="material-symbols-outlined">arrow_forward</span></span></div>
+        </div>
+    </a>
+</section>
+
+<!-- ─── Occasion bento ─── -->
+{% if categories %}
+<section class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        <div><span class="label-tiny text-primary-container block">Explore by occasion</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Find your <span class="serif-i">drive.</span></h2></div>
+        <a href="{% url 'vehicle_list' %}" class="font-bold text-primary inline-flex items-center gap-2 hover:gap-3 transition-all">All {{ categories|length }} categor{{ categories|length|pluralize:"y,ies" }} <span class="material-symbols-outlined">arrow_forward</span></a>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4" data-deal>
+        {% for cat in categories|slice:":9" %}
+        {% if forloop.counter == 1 %}
+        <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="occ tile bg-primary text-on-primary p-6 col-span-2 row-span-2 min-h-[260px] flex flex-col justify-between lift">
+            <div class="flex justify-between"><span class="material-symbols-outlined text-5xl text-primary-fixed">{{ cat.icon|default:"directions_car" }}</span><span class="occ-go w-11 h-11 rounded-full bg-white/10 grid place-items-center"><span class="material-symbols-outlined">arrow_outward</span></span></div>
+            <div><div class="font-extrabold text-3xl tracking-tight">{{ cat.name }}</div><div class="text-white/70 mt-1 text-sm">{{ cat.count }} vehicle{{ cat.count|pluralize }} in fleet</div></div>
+        </a>
+        {% elif forloop.counter == 2 %}
+        <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="occ tile bg-primary-fixed text-primary p-6 col-span-2 min-h-[124px] flex items-center justify-between lift"><div><span class="material-symbols-outlined text-4xl">{{ cat.icon|default:"directions_car" }}</span><div class="font-extrabold text-2xl tracking-tight mt-2">{{ cat.name }}</div></div><span class="occ-go w-11 h-11 rounded-full bg-white/60 grid place-items-center"><span class="material-symbols-outlined">arrow_outward</span></span></a>
+        {% elif forloop.counter == 3 %}
+        <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="occ tile b-glass p-6 col-span-2 min-h-[124px] flex items-center justify-between lift"><div><span class="material-symbols-outlined text-4xl text-primary">{{ cat.icon|default:"directions_car" }}</span><div class="font-extrabold text-2xl tracking-tight mt-2 text-primary">{{ cat.name }}</div></div><span class="occ-go w-11 h-11 rounded-full bg-white grid place-items-center"><span class="material-symbols-outlined">arrow_outward</span></span></a>
+        {% else %}
+        <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="occ tile b-glass p-5 min-h-[124px] flex flex-col justify-between lift"><span class="material-symbols-outlined text-3xl text-primary">{{ cat.icon|default:"directions_car" }}</span><div class="font-extrabold text-primary leading-tight">{{ cat.name }}</div></a>
+        {% endif %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── Rental estimator: days x the car's listed day rate (hidden by CSS when no car has a day rate) ─── -->
+<section id="estimate" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+        <div class="tile b-glass p-6 sm:p-10 lg:col-span-7">
+            <span class="label-tiny text-primary-container block">Rental estimator</span>
+            <h2 class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em] text-primary">Price your trip <span class="serif-i">in seconds.</span></h2>
+            <p class="mt-3 text-on-surface-variant">Pick a car, drag the days. We multiply by the listed day rate, nothing hidden.</p>
+            <div class="mt-8">
+                <div class="label-tiny text-outline mb-3" id="carLabel">Choose a car</div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" role="radiogroup" aria-labelledby="carLabel" id="carChips">
+                    {% for v in featured_vehicles %}{% if v.price_per_day %}
+                    <button type="button" role="radio" aria-checked="false" class="car-chip text-left bg-white border border-outline-variant/40 rounded-2xl px-4 py-3"
+                        data-id="{{ v.pk }}" data-price="{{ v.price_per_day|floatformat:0 }}" data-name="{{ v.name }}" data-brand="{{ v.brand }}" data-img="{% if v.thumbnail %}{{ v.thumbnail.url }}{% endif %}">
+                        <span class="block font-extrabold text-sm leading-tight">{{ v.name }}</span><span class="chip-price block text-xs font-bold text-outline mt-1">{{ v.price_per_day|inr }}/day</span>
+                    </button>
+                    {% endif %}{% endfor %}
+                    {% for v in premium_vehicles %}{% if v.price_per_day %}
+                    <button type="button" role="radio" aria-checked="false" class="car-chip text-left bg-white border border-outline-variant/40 rounded-2xl px-4 py-3"
+                        data-id="{{ v.pk }}" data-price="{{ v.price_per_day|floatformat:0 }}" data-name="{{ v.name }}" data-brand="{{ v.brand }}" data-img="{% if v.thumbnail %}{{ v.thumbnail.url }}{% endif %}">
+                        <span class="block font-extrabold text-sm leading-tight">{{ v.name }}</span><span class="chip-price block text-xs font-bold text-outline mt-1">{{ v.price_per_day|inr }}/day</span>
+                    </button>
+                    {% endif %}{% endfor %}
+                </div>
+            </div>
+            <div class="mt-8">
+                <div class="flex justify-between items-baseline mb-4"><label for="days" class="label-tiny text-outline">Number of days</label><span class="font-extrabold text-2xl text-primary"><span id="daysOut">3</span> <span class="text-sm text-on-surface-variant font-semibold" id="daysWord">days</span></span></div>
+                <input id="days" type="range" min="1" max="30" value="3" class="days" aria-describedby="estNote"/>
+                <div class="flex justify-between text-xs font-bold text-outline mt-2"><span>1 day</span><span>1 week</span><span>2 weeks</span><span>30 days</span></div>
+            </div>
+        </div>
+        <div class="tile bg-primary text-on-primary p-6 sm:p-10 lg:col-span-5 flex flex-col justify-between gap-8 min-h-[420px]">
+            <div class="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-primary-fixed/10 blur-2xl" aria-hidden="true"></div>
+            <div class="relative">
+                <span class="label-tiny text-primary-fixed">Estimate · final price on confirmation</span>
+                <div class="mt-6 flex items-center gap-4">
+                    <div class="relative w-20 h-20 rounded-2xl overflow-hidden bg-white/10 shrink-0 grid place-items-center" data-no-parallax>
+                        <span class="material-symbols-outlined text-4xl text-primary-fixed/70" id="estIcon" aria-hidden="true">directions_car</span>
+                        <img id="estImg" src="" alt="" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 hidden"/>
+                    </div>
+                    <div class="min-w-0"><div class="label-tiny text-white/60" id="estBrand"></div><div class="font-extrabold text-2xl tracking-tight truncate" id="estName"></div></div>
+                </div>
+            </div>
+            <div class="relative" aria-live="polite">
+                <div class="text-white/60 font-semibold" id="estBreak"></div>
+                <div class="font-extrabold text-6xl sm:text-7xl tracking-[-.04em] leading-none mt-2" id="estTotal"></div>
+                <p id="estNote" class="text-white/60 text-sm mt-4 max-w-xs">Estimate only, at the listed day rate. Our team confirms availability and the final price before you book.</p>
+            </div>
+            <div class="relative grid gap-2">
+                <a href="#enquiry" id="estSend" class="bg-primary-fixed text-primary rounded-full py-4 font-bold flex items-center justify-center gap-2 m-shine m-btn" data-magnetic>Send this as an enquiry <span class="material-symbols-outlined">arrow_forward</span></a>
+                {% if WHATSAPP_NUMBER %}{% whatsapp_url "__MSG__" as wa_tpl %}
+                <a href="{{ wa_tpl }}" id="estWa" data-tpl="{{ wa_tpl }}" target="_blank" rel="noopener" class="rounded-full py-3 font-bold flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 transition-colors text-sm"><span class="material-symbols-outlined text-[18px]">chat</span> Or ask on WhatsApp</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Featured fleet bento ─── -->
+{% if featured_vehicles %}
+<section id="fleet" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        <div><span class="label-tiny text-primary-container block">Featured this week</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">The new <span class="serif-i">collection.</span></h2></div>
+        <div class="flex flex-wrap gap-2">
+            <a href="{% url 'vehicle_list' %}" class="px-5 py-2.5 rounded-full bg-primary text-on-primary font-bold text-sm">All cars</a>
+            <a href="{% url 'vehicle_list' %}?premium=1" class="px-5 py-2.5 rounded-full b-glass font-bold text-sm">Premium</a>
+            <a href="{% url 'vehicle_list' %}?type=suv" class="px-5 py-2.5 rounded-full b-glass font-bold text-sm">SUV</a>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" data-deal>
+        {% for v in featured_vehicles %}
+        <a href="{{ v.get_absolute_url }}" class="vehicle-card tile b-glass group block p-3 {% if forloop.first %}sm:col-span-2 lg:row-span-2{% endif %}" aria-label="{{ v.brand }} {{ v.name }}">
+            <div class="relative overflow-hidden rounded-[22px] {% if forloop.first %}h-64 sm:h-[420px]{% else %}h-48{% endif %} bg-surface-container grid place-items-center">
+                {% if v.thumbnail %}
+                <img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
+                {% else %}
+                <span class="material-symbols-outlined text-[64px] text-outline-variant" aria-hidden="true">directions_car</span>
+                {% endif %}
+                <span class="absolute top-3 left-3 b-glass rounded-full px-3 py-1.5 label-tiny text-primary">{% if v.is_premium %}Premium{% elif v.is_wedding_service %}Wedding{% elif v.category %}{{ v.category.name }}{% else %}Fleet{% endif %}</span>
+                {% if v.primary_price_value %}<span class="absolute top-3 right-3 bg-primary text-on-primary rounded-full px-3 py-1.5 text-sm font-extrabold">{{ v.primary_price_value|inr }}<span class="font-semibold text-white/70">/{{ v.primary_price_label }}</span></span>{% endif %}
+            </div>
+            <div class="px-3 pt-4 pb-2">
+                <div class="label-tiny text-outline">{{ v.brand }}</div>
+                <div class="flex items-center justify-between gap-3 mt-1.5">
+                    <h3 class="font-extrabold {% if forloop.first %}text-3xl{% else %}text-xl{% endif %} tracking-tight text-primary">{{ v.name }}</h3>
+                    <span class="w-10 h-10 shrink-0 rounded-full bg-primary-fixed text-primary grid place-items-center transition-transform duration-500 group-hover:-rotate-45" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></span>
+                </div>
+                <div class="flex flex-wrap gap-1.5 mt-3 text-xs font-bold text-on-surface-variant">
+                    {% if v.transmission %}<span class="bg-white rounded-full px-3 py-1.5">{{ v.get_transmission_display }}</span>{% endif %}
+                    {% if v.fuel_type %}<span class="bg-white rounded-full px-3 py-1.5">{{ v.get_fuel_type_display }}</span>{% endif %}
+                    {% if v.seating_capacity %}<span class="bg-white rounded-full px-3 py-1.5">{{ v.seating_capacity }} seats</span>{% endif %}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── How it works: sticky phone ─── -->
+<section id="how" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+    <div class="tile b-glass p-6 sm:p-10 lg:p-14" style="overflow:clip">
+        <div class="grid lg:grid-cols-2 gap-10 lg:gap-16">
+            <div class="hidden lg:block">
+                <div class="sticky top-[14vh]">
+                    <div class="relative mx-auto w-[300px] h-[610px] rounded-[48px] bg-primary p-3 shadow-[0_50px_80px_-40px_rgba(31,46,0,.6)]" aria-hidden="true">
+                        <div class="absolute top-5 left-1/2 -translate-x-1/2 w-24 h-6 rounded-full bg-primary z-10"></div>
+                        <div class="relative w-full h-full rounded-[38px] overflow-hidden bg-surface" data-no-parallax>
+                            <!-- screen 1: search -->
+                            <div class="ph-screen is-on p-5 pt-12 flex flex-col gap-3">
+                                <div class="font-extrabold text-xl text-primary">Where to?</div>
+                                <div class="bg-white rounded-2xl p-3"><div class="label-tiny text-outline">Pickup</div><div class="font-bold mt-1">{{ cities.0.name|default:"Your city" }}</div></div>
+                                <div class="grid grid-cols-2 gap-2"><div class="bg-white rounded-2xl p-3"><div class="label-tiny text-outline">From</div><div class="font-bold mt-1 text-sm text-outline">Pick a date</div></div><div class="bg-white rounded-2xl p-3"><div class="label-tiny text-outline">To</div><div class="font-bold mt-1 text-sm text-outline">Return date</div></div></div>
+                                <div class="flex bg-surface-container rounded-full p-1 text-xs font-bold"><span class="flex-1 text-center py-2 rounded-full bg-primary text-on-primary">Self-drive</span><span class="flex-1 text-center py-2">With driver</span></div>
+                                <div class="mt-auto bg-primary text-on-primary rounded-2xl py-3.5 text-center font-bold text-sm">Search cars</div>
+                                <div class="rounded-2xl overflow-hidden h-28"><img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="" class="w-full h-full object-cover"/></div>
+                            </div>
+                            <!-- screen 2: choose (real featured cars) -->
+                            <div class="ph-screen p-5 pt-12 flex flex-col gap-3">
+                                <div class="font-extrabold text-xl text-primary">Choose your car</div>
+                                {% for v in featured_vehicles|slice:":4" %}
+                                <div class="bg-white rounded-2xl p-2 flex gap-3 items-center {% if forloop.first %}ring-2 ring-primary{% endif %}">
+                                    <div class="w-16 h-14 rounded-xl overflow-hidden bg-surface-container grid place-items-center shrink-0">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-outline">directions_car</span>{% endif %}</div>
+                                    <div class="flex-1 min-w-0"><div class="font-bold text-sm truncate">{{ v.name }}</div><div class="text-xs text-outline truncate">{% if v.transmission %}{{ v.get_transmission_display }}{% endif %}{% if v.fuel_type %} · {{ v.get_fuel_type_display }}{% endif %}{% if v.seating_capacity %} · {{ v.seating_capacity }}{% endif %}</div></div>
+                                    {% if v.primary_price_value %}<div class="font-extrabold text-sm text-primary">{{ v.primary_price_value|inr }}</div>{% endif %}
+                                </div>
+                                {% empty %}
+                                <div class="bg-white rounded-2xl p-4 flex gap-3 items-center"><span class="material-symbols-outlined text-outline">directions_car</span><div class="font-bold text-sm">Cars from our fleet</div></div>
+                                <div class="bg-white rounded-2xl p-4 flex gap-3 items-center"><span class="material-symbols-outlined text-outline">no_crash</span><div class="font-bold text-sm">SUVs and MPVs</div></div>
+                                {% endfor %}
+                                <div class="mt-auto text-center text-xs text-outline font-semibold">listed rates</div>
+                            </div>
+                            <!-- screen 3: enquiry (first featured car) -->
+                            <div class="ph-screen p-5 pt-12 flex flex-col gap-3">
+                                <div class="font-extrabold text-xl text-primary">Send enquiry</div>
+                                {% with v=featured_vehicles.0 %}
+                                <div class="rounded-2xl overflow-hidden h-32 bg-surface-container grid place-items-center">{% if v and v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-5xl text-outline-variant">directions_car</span>{% endif %}</div>
+                                <div class="bg-white rounded-2xl p-4 text-sm space-y-2">
+                                    <div class="flex justify-between gap-2"><span class="text-outline">Car</span><b class="truncate">{{ v.name|default:"Your pick" }}</b></div>
+                                    <div class="flex justify-between gap-2"><span class="text-outline">Dates</span><b>Your dates</b></div>
+                                    <div class="flex justify-between gap-2"><span class="text-outline">Pickup</span><b>{{ cities.0.name|default:"Your city" }}</b></div>
+                                    {% if v and v.primary_price_value %}<div class="flex justify-between gap-2 border-t pt-2"><span class="text-outline">Rate</span><b class="text-primary">{{ v.primary_price_value|inr }}/{{ v.primary_price_label }}</b></div>{% endif %}
+                                </div>
+                                {% endwith %}
+                                <div class="mt-auto bg-[#25D366] text-white rounded-2xl py-3.5 text-center font-bold text-sm">Continue on WhatsApp</div>
+                                <div class="text-center text-xs text-outline font-semibold">Our team confirms availability</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-center gap-2 mt-6" aria-hidden="true"><span class="step-dot is-on h-2 w-2 rounded-full bg-outline-variant"></span><span class="step-dot h-2 w-2 rounded-full bg-outline-variant"></span><span class="step-dot h-2 w-2 rounded-full bg-outline-variant"></span></div>
+                </div>
+            </div>
+            <div>
+                <span class="label-tiny text-primary-container block">How it works</span>
+                <h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Three steps <span class="serif-i">to the road.</span></h2>
+                <div class="mt-10 lg:mt-0">
+                    <div class="step is-on lg:min-h-[70vh] flex flex-col justify-center py-8 lg:py-0">
+                        <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-xl">01</span>
+                        <h3 class="mt-5 font-extrabold text-3xl tracking-tight text-primary">Tell us where and when.</h3>
+                        <p class="mt-3 text-on-surface-variant text-lg max-w-md">Pick your city, your dates, and whether you'll drive or want a chauffeur.</p>
+                    </div>
+                    <div class="step lg:min-h-[70vh] flex flex-col justify-center py-8 lg:py-0">
+                        <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-xl">02</span>
+                        <h3 class="mt-5 font-extrabold text-3xl tracking-tight text-primary">Choose your car.</h3>
+                        <p class="mt-3 text-on-surface-variant text-lg max-w-md">Compare the fleet side by side, with the listed rate on every car.</p>
+                    </div>
+                    <div class="step lg:min-h-[70vh] flex flex-col justify-center py-8 lg:py-0">
+                        <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-xl">03</span>
+                        <h3 class="mt-5 font-extrabold text-3xl tracking-tight text-primary">Send the enquiry.</h3>
+                        <p class="mt-3 text-on-surface-variant text-lg max-w-md">Send it from the site and WhatsApp opens with your details. Our team confirms availability and the final price.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Wedding bento ─── -->
+<section id="wedding" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 lg:auto-rows-[170px]">
+        <div class="tile b-glass p-7 sm:p-10 sm:col-span-2 lg:col-span-5 lg:row-span-3 flex flex-col justify-between gap-8">
+            <div>
+                <span class="label-tiny text-primary-container block">Wedding fleet · Kerala</span>
+                <h2 class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em] text-primary">For the day you'll <span class="serif-i">never forget.</span></h2>
+                <p class="mt-4 text-on-surface-variant text-lg">From classic vintage icons to modern luxury flagships, our curated wedding fleet makes your first journey together legendary.</p>
+            </div>
+            <ul class="grid gap-2" data-deal>
+                <li class="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 font-semibold"><span class="material-symbols-outlined text-primary-container">check_circle</span>Chauffeur included</li>
+                <li class="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 font-semibold"><span class="material-symbols-outlined text-primary-container">local_florist</span>Decoration tailored to you</li>
+                <li class="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 font-semibold"><span class="material-symbols-outlined text-primary-container">diamond</span>Vintage icons and modern flagships</li>
+            </ul>
+            <a href="{% url 'wedding_cars' %}" class="bg-primary text-on-primary rounded-full py-4 px-7 font-bold inline-flex items-center justify-center gap-2 self-start">View wedding fleet <span class="material-symbols-outlined" data-icon="favorite">favorite</span></a>
+        </div>
+        <div class="tile sm:col-span-2 lg:col-span-7 lg:row-span-2 min-h-[320px]"><img src="{% static 'themes/img/wedding-venue.jpg' %}" alt="" class="w-full h-full object-cover absolute inset-0"/></div>
+        <div class="tile lg:col-span-3 lg:row-span-1 min-h-[200px]" data-no-parallax><img src="{% static 'themes/img/jasmine-handle.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover object-[50%_70%] transition-transform duration-1000 hover:scale-110"/></div>
+        <div class="tile lg:col-span-4 lg:row-span-1 min-h-[200px]" data-no-parallax><img src="{% static 'themes/img/ambassador.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 hover:scale-110"/><span class="absolute bottom-4 left-4 b-glass rounded-full px-4 py-2 label-tiny text-primary">Decorated to your story</span></div>
+    </div>
+</section>
+
+<!-- ─── Luxury accordion (premium vehicles) ─── -->
+{% if premium_vehicles %}
+<section id="luxury" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+    <div class="tile bg-[#141611] text-white p-5 sm:p-8 lg:p-10">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <div><span class="label-tiny text-primary-fixed block">Elite collection</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em]">When ordinary <span class="serif-i text-primary-fixed">won't do.</span></h2></div>
+            <a href="{% url 'premium_cars' %}" class="text-white/70 hover:text-white font-bold text-sm inline-flex items-center gap-2">All premium cars <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
+        </div>
+        <div class="lux lg:h-[520px]" data-no-parallax>
+            {% for v in premium_vehicles %}
+            <a href="{{ v.get_absolute_url }}" class="tile block group bg-black">
+                {% if v.thumbnail %}
+                <img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}" class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy"/>
+                {% else %}
+                <span class="absolute inset-0 grid place-items-center"><span class="material-symbols-outlined text-[80px] text-white/15" aria-hidden="true">directions_car</span></span>
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
+                <div class="absolute bottom-0 inset-x-0 p-6"><div class="lux-name font-extrabold text-2xl tracking-tight">{{ v.brand }} {{ v.name }}</div><div class="lux-more mt-2 flex items-center justify-between gap-4"><span class="label-tiny text-primary-fixed">{% if v.primary_price_value %}{{ v.primary_price_value|inr }}/{{ v.primary_price_label }}{% elif v.category %}{{ v.category.name }}{% else %}Premium{% endif %}</span><span class="w-11 h-11 rounded-full bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined">arrow_outward</span></span></div></div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── Why + cities bento ─── -->
+<section id="why" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+    <div class="mb-8"><span class="label-tiny text-primary-container block">Why book with us</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Crafted for <span class="serif-i">convenience.</span></h2></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 lg:auto-rows-[190px]" data-deal>
+        <div class="tile b-glass p-6 lg:col-span-4 flex flex-col justify-between lift" data-tilt="0.6"><span class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined">local_shipping</span></span><div><div class="font-extrabold text-xl text-primary">Doorstep delivery</div><div class="text-on-surface-variant mt-1">We bring the car to you.</div></div></div>
+        <div class="tile lg:col-span-4 lg:row-span-2 min-h-[300px] bg-primary" data-no-parallax><img src="{% static 'themes/img/steering.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-80"/><div class="absolute inset-0 bg-gradient-to-t from-primary via-primary/20 to-transparent"></div>
+            <div class="absolute bottom-6 left-6 right-6 text-white">
+                {% if config.years_in_business %}
+                <div class="font-extrabold text-6xl tracking-tight leading-none"><span data-slot>{{ config.years_in_business }}</span><span class="text-primary-fixed">+</span></div><div class="label-tiny mt-2 text-white/70">Year{{ config.years_in_business|pluralize }} on Kerala roads</div>
+                {% elif total_vehicle_count %}
+                <div class="font-extrabold text-6xl tracking-tight leading-none"><span data-slot>{{ total_vehicle_count }}</span></div><div class="label-tiny mt-2 text-white/70">Vehicle{{ total_vehicle_count|pluralize }} ready to go</div>
+                {% else %}
+                <div class="serif-i text-3xl leading-tight">Every detail considered.</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="tile b-glass p-6 lg:col-span-4 flex flex-col justify-between lift" data-tilt="0.6"><span class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined">support_agent</span></span><div><div class="font-extrabold text-xl text-primary">24/7 support</div><div class="text-on-surface-variant mt-1">Real humans, on call.</div></div></div>
+        <div class="tile b-glass p-6 lg:col-span-4 flex flex-col justify-between lift" data-tilt="0.6"><span class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined">receipt_long</span></span><div><div class="font-extrabold text-xl text-primary">Zero hidden charges</div><div class="text-on-surface-variant mt-1">Transparent pricing, upfront.</div></div></div>
+        <div class="tile bg-primary-fixed p-6 lg:col-span-4 flex flex-col justify-between lift" data-tilt="0.6"><span class="w-12 h-12 rounded-2xl bg-primary text-primary-fixed grid place-items-center"><span class="material-symbols-outlined">map</span></span><div><div class="font-extrabold text-xl text-primary">All-Kerala network</div><div class="text-primary/70 mt-1">{% if cities %}{{ cities|length }} location{{ cities|length|pluralize }} served.{% else %}Across Kerala.{% endif %}</div></div></div>
+    </div>
+
+    {% if cities %}
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 mt-3 sm:mt-4">
+        <div class="tile b-glass lg:col-span-8 py-8 sm:py-10 flex flex-col justify-center gap-5 overflow-hidden">
+            <div class="px-6 sm:px-10"><span class="label-tiny text-primary-container block">Where we are</span><div class="mt-3 font-extrabold text-3xl sm:text-4xl tracking-[-.04em] text-primary">Kerala at your <span class="serif-i">fingertips.</span></div></div>
+            <div class="m-marquee" data-marquee style="--dur:50s"><div class="m-marquee-track !gap-2 !pr-2">
+                {% for city in cities %}{% if not forloop.counter|divisibleby:2 or cities|length < 6 %}<a href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="shrink-0 bg-white rounded-full px-5 py-3 font-bold hover:bg-primary hover:text-on-primary transition-colors">{{ city.name }}</a>{% endif %}{% endfor %}
+            </div></div>
+            {% if cities|length >= 6 %}
+            <div class="m-marquee" data-marquee data-dir="-1" style="--dur:56s"><div class="m-marquee-track !gap-2 !pr-2">
+                {% for city in cities %}{% if forloop.counter|divisibleby:2 %}<a href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="shrink-0 bg-primary-fixed/70 rounded-full px-5 py-3 font-bold text-primary hover:bg-primary hover:text-on-primary transition-colors">{{ city.name }}</a>{% endif %}{% endfor %}
+            </div></div>
+            {% endif %}
+        </div>
+        <div class="tile lg:col-span-4 min-h-[300px] bg-[#0f3b38]" data-no-parallax><img src="{% static 'themes/img/kerala-map.jpg' %}" alt="Stylised map of Kerala" class="absolute inset-0 w-full h-full object-cover"/><div class="absolute top-5 left-5 b-glass rounded-2xl px-5 py-4"><div class="font-extrabold text-4xl text-primary leading-none"><span data-slot>{{ cities|length }}</span></div><div class="label-tiny text-on-surface-variant mt-2">Cit{{ cities|length|pluralize:"y,ies" }} served</div></div></div>
+    </div>
+    {% endif %}
+</section>
+
+<!-- ─── Testimonial ─── -->
+{% if testimonials %}
+{% with t=testimonials.0 %}
+<section class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+    <div class="tile b-glass p-8 sm:p-14 lg:p-20 grid lg:grid-cols-12 gap-8 items-center">
+        <span class="material-symbols-outlined text-7xl text-primary-container lg:col-span-1 self-start" style="font-variation-settings:'FILL' 1" aria-hidden="true">format_quote</span>
+        <div class="lg:col-span-11">
+            <p class="font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-[-.035em] leading-[1.05] text-primary" data-scrub-text data-no-split>"{{ t.quote }}"</p>
+            <div class="mt-10 flex items-center gap-4" data-reveal>
+                {% if t.photo %}<img src="{{ t.photo.url }}" alt="" class="w-12 h-12 rounded-full object-cover"/>{% else %}<span class="w-12 h-12 rounded-full bg-primary-fixed text-primary grid place-items-center font-extrabold" aria-hidden="true">{{ t.name|slice:":1"|upper }}</span>{% endif %}
+                <div><div class="font-extrabold">{{ t.name }}</div>{% if t.role %}<div class="label-tiny text-outline mt-1">{{ t.role }}</div>{% endif %}</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endwith %}
+{% endif %}
+
+<!-- ─── Enquiry bento ─── -->
+<section id="enquiry" class="max-w-screen-xl mx-auto pt-24 lg:pt-32 pb-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+        <div class="tile bg-primary text-on-primary p-7 sm:p-10 lg:col-span-5 flex flex-col justify-between gap-8 min-h-[360px]">
+            <div><span class="label-tiny text-primary-fixed block">Get in touch</span><h2 class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em]">Send us an <span class="serif-i text-primary-fixed">enquiry.</span></h2><p class="mt-4 text-white/70 text-lg">Fill the form and our team will get back within the hour.</p></div>
+            {% if WHATSAPP_NUMBER or BUSINESS_PHONE %}
+            <div class="grid grid-cols-2 gap-3">
+                {% if WHATSAPP_NUMBER %}<a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="bg-[#25D366] text-white rounded-2xl p-4 font-bold flex flex-col gap-6 lift"><span class="material-symbols-outlined">chat</span>WhatsApp</a>{% endif %}
+                {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="bg-white/10 rounded-2xl p-4 font-bold flex flex-col gap-6 lift break-all"><span class="material-symbols-outlined">call</span>{{ BUSINESS_PHONE }}</a>{% endif %}
+            </div>
+            {% endif %}
+        </div>
+        <div class="tile b-glass p-6 sm:p-10 lg:col-span-7">
+            {% include "public/includes/enquiry_form.html" %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* headline: the last word becomes the serif italic accent (text only, no HTML injection) */
+(() => {
+    const h = document.querySelector(".b-title"); if (!h) return;
+    const words = h.textContent.trim().split(/\s+/); if (words.length < 2) return;
+    const last = words.pop();
+    h.textContent = words.join(" ") + " ";
+    const em = document.createElement("span"); em.className = "serif-i text-primary-container"; em.textContent = last;
+    h.appendChild(em);
+})();
+
+/* rental estimator: days x the car's listed day rate, nothing else */
+(() => {
+    const sec = document.getElementById("estimate"), chips = document.getElementById("carChips"), range = document.getElementById("days");
+    if (!sec || !chips || !range) return;
+    /* featured and premium lists can overlap: keep the first chip per vehicle, max 6 */
+    const seen = new Set();
+    [...chips.querySelectorAll(".car-chip")].forEach(b => { if (seen.has(b.dataset.id) || seen.size >= 6) b.remove(); else seen.add(b.dataset.id); });
+    const cars = [...chips.querySelectorAll(".car-chip")];
+    if (!cars.length) { sec.remove(); return; }
+    const $ = id => document.getElementById(id);
+    const inr = n => "₹" + Math.round(n).toLocaleString("en-IN");
+    const est = { car: 0, days: 3 };
+    let slot = null; /* set once the motion layer is ready */
+    function render() {
+        const b = cars[est.car], d = b.dataset, price = +d.price, total = price * est.days, word = est.days === 1 ? "day" : "days";
+        cars.forEach((x, i) => x.setAttribute("aria-checked", i === est.car));
+        $("daysOut").textContent = est.days; $("daysWord").textContent = word;
+        $("estBreak").textContent = `${inr(price)} × ${est.days} ${word}`;
+        $("estBrand").textContent = d.brand; $("estName").textContent = d.name;
+        const img = $("estImg"), icon = $("estIcon");
+        if (d.img) { if (img.getAttribute("src") !== d.img) { img.style.opacity = 0; setTimeout(() => { img.src = d.img; img.style.opacity = 1; }, 180); } img.classList.remove("hidden"); icon.classList.add("hidden"); }
+        else { img.classList.add("hidden"); icon.classList.remove("hidden"); }
+        range.style.setProperty("--p", ((est.days - 1) / 29 * 100) + "%");
+        if (slot) slot($("estTotal"), inr(total), { dur: .7 }); else $("estTotal").textContent = inr(total);
+        const msg = `Hi, I'd like the ${d.brand} ${d.name} for ${est.days} ${word}. Estimate at the listed rate: ${inr(price)} x ${est.days} = ${inr(total)}. Please confirm availability and the final price.`;
+        sec.dataset.msg = msg;
+        const wa = $("estWa"); if (wa) wa.href = wa.dataset.tpl.replace("__MSG__", encodeURIComponent(msg));
+    }
+    chips.addEventListener("click", e => { const b = e.target.closest(".car-chip"); if (!b) return; est.car = cars.indexOf(b); render(); });
+    chips.addEventListener("keydown", e => {
+        if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(e.key)) return;
+        e.preventDefault();
+        est.car = (est.car + (e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1) + cars.length) % cars.length;
+        render(); cars[est.car].focus();
+    });
+    let t = null;
+    range.addEventListener("input", () => { est.days = +range.value; clearTimeout(t); t = setTimeout(render, 60); $("daysOut").textContent = est.days; range.style.setProperty("--p", ((est.days - 1) / 29 * 100) + "%"); });
+    /* "send as enquiry" prefills the real enquiry form's message */
+    const send = $("estSend");
+    if (send) send.addEventListener("click", () => {
+        const ta = document.querySelector("#enquiry textarea[name=message]");
+        if (ta && !ta.value.trim()) ta.value = sec.dataset.msg || "";
+        setTimeout(() => { const n = document.querySelector("#enquiry input[name=name]"); if (n) n.focus({ preventScroll: true }); }, 600);
+    });
+    render();
+    document.addEventListener("motion:ready", ({ detail }) => { slot = detail.slotTo; });
+})();
+
+/* how it works: the phone swaps screens as each step crosses the middle of the viewport (works without GSAP) */
+(() => {
+    const steps = [...document.querySelectorAll("#how .step")], screens = [...document.querySelectorAll("#how .ph-screen")], dots = [...document.querySelectorAll("#how .step-dot")];
+    if (!steps.length || !("IntersectionObserver" in window)) return;
+    const show = i => {
+        steps.forEach((s, j) => s.classList.toggle("is-on", j === i));
+        screens.forEach((s, j) => s.classList.toggle("is-on", j === i));
+        dots.forEach((d, j) => d.classList.toggle("is-on", j === i));
+    };
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) show(steps.indexOf(e.target)); }), { rootMargin: "-45% 0px -45% 0px" });
+    if (matchMedia("(min-width: 1024px)").matches) steps.forEach(s => io.observe(s));
+    else steps.forEach(s => s.classList.add("is-on"));
+})();
+
+/* hero bento assembles: tiles scale and unclip in a stagger, headline rolls up, numbers spin */
+document.addEventListener("motion:ready", ({ detail: { G, split, slotTo } }) => {
+    const tiles = G.utils.toArray(".b-hero .tile");
+    const tl = G.timeline({ delay: .15 });
+    tl.fromTo(tiles, { opacity: 0, scale: .86, y: 40, clipPath: "inset(18% 18% 18% 18% round 30px)" },
+        { opacity: 1, scale: 1, y: 0, clipPath: "inset(0% 0% 0% 0% round 30px)", duration: 1.2, ease: "expo.out", stagger: { each: .09, from: "start" }, clearProps: "clipPath,transform" });
+    const title = document.querySelector(".b-title");
+    if (title) tl.from(split(title), { yPercent: 118, rotation: 5, transformOrigin: "0% 100%", duration: 1.2, stagger: .06, ease: "expo.out" }, .2);
+    document.querySelectorAll("[data-bslot]").forEach((s, i) => tl.add(() => slotTo(s, s.textContent.trim(), { from: "0" }), .6 + i * .12));
+
+    G.to(".b-hero .b-kb", { yPercent: 8, ease: "none", scrollTrigger: { trigger: ".b-hero", start: "top top", end: "bottom top", scrub: true } });
+    if (document.querySelector("#luxury")) G.from("#luxury .lux > a", { y: 120, opacity: 0, rotation: (i) => (i - 2) * 3, duration: 1.2, ease: "expo.out", stagger: .08, scrollTrigger: { trigger: "#luxury", start: "clamp(top 75%)", once: true } });
+    if (document.querySelector("#estimate")) G.from("#estimate .tile", { y: 60, opacity: 0, duration: 1.1, stagger: .12, scrollTrigger: { trigger: "#estimate", start: "clamp(top 80%)", once: true } });
+    ["#wedding", "#enquiry"].forEach(sel => G.from(`${sel} > div > .tile`, { opacity: 0, scale: .9, y: 50, duration: 1.1, ease: "expo.out", stagger: .1, scrollTrigger: { trigger: sel, start: "clamp(top 78%)", once: true }, clearProps: "transform" }));
+});
+</script>
+{% endblock %}

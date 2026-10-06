@@ -1,0 +1,475 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}{{ BUSINESS_NAME }} | {{ config.tagline|default:"Premium Car Rentals in Kerala" }}{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Night Drive home. Colours come from the night theme tokens (core/themes.py); hex here only for light effects. */
+  html, body { overflow-x: clip; }
+  .nd-display { font-family: var(--font-display); font-weight: 700; line-height: .95; letter-spacing: -.04em; }
+  .nd-head { font-family: var(--font-display); font-weight: 700; line-height: 1.08; letter-spacing: -.02em; }
+  .nd option { background: #151910; color: #eef0e4; }
+  .m-progress { background: linear-gradient(90deg, #33450d, #b8cf88, #d4eca2); box-shadow: 0 0 12px rgba(212,236,162,.6); }
+
+  /* hero: headlight beam */
+  .beam-stage { --bx: 60%; --by: 58%; --br: 48%; position: relative; overflow: hidden; background: #050604; }
+  .motion .beam-stage { --br: 0%; }
+  .beam-stage .dim, .beam-stage .lit { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .beam-stage .dim { filter: brightness(.18) saturate(.6); }
+  .beam-stage .lit { -webkit-mask: radial-gradient(circle at var(--bx) var(--by), #000 0, #000 calc(var(--br) * .45), transparent var(--br));
+                             mask: radial-gradient(circle at var(--bx) var(--by), #000 0, #000 calc(var(--br) * .45), transparent var(--br)); }
+  .beam-cone { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+    background: radial-gradient(circle at var(--bx) var(--by), rgba(212,236,162,.22), rgba(212,236,162,.06) calc(var(--br) * .8), transparent calc(var(--br) + 12%)); }
+  .beam-shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(13,15,10,.95) 0%, rgba(13,15,10,.6) 38%, transparent 70%), linear-gradient(0deg, #0d0f0a 0%, transparent 35%); }
+  @media (max-width: 1023px) { .beam-shade { background: linear-gradient(0deg, #0d0f0a 8%, rgba(13,15,10,.55) 55%, rgba(13,15,10,.2) 100%); } }
+
+  /* glowing cards: lime edge light that follows the cursor */
+  .glow { position: relative; background: #151910; border: 1px solid rgba(212,236,162,.08); transition: box-shadow .5s, border-color .5s; }
+  .glow::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 6;
+    background: radial-gradient(280px circle at var(--gx, 50%) var(--gy, 0%), rgba(212,236,162,.95), transparent 60%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0; transition: opacity .4s; }
+  .glow:hover::before { opacity: 1; }
+  .glow:hover { box-shadow: 0 30px 80px -30px rgba(184,207,136,.35); border-color: rgba(212,236,162,.2); }
+  .glow.m-glare::after { background: radial-gradient(40% 35% at var(--gx, 50%) var(--gy, 0%), rgba(212,236,162,.12), transparent 70%); }
+  @media (hover: none) { .glow::before { opacity: .35; } }
+
+  .m-tile.ntile { background: #151910; border: 1px solid rgba(212,236,162,.08); color: #eef0e4; }
+  .m-tile.ntile::before { background: #33450d; }
+  .m-tile.ntile .material-symbols-outlined { color: #d4eca2; text-shadow: 0 0 18px rgba(212,236,162,.55); }
+  .m-tile.ntile:hover { box-shadow: 0 24px 50px -24px rgba(184,207,136,.5); }
+
+  /* drive-by */
+  .streak { position: absolute; left: 0; height: 2px; border-radius: 2px; background: linear-gradient(90deg, transparent, rgba(212,236,162,.85), transparent); opacity: .55; will-change: transform; }
+  .streak.thin { height: 1px; opacity: .35; }
+  .car-frame { will-change: transform, filter; box-shadow: 0 60px 120px -40px rgba(0,0,0,.9), 0 0 0 1px rgba(212,236,162,.08); }
+  .gauge-arc { filter: drop-shadow(0 0 10px rgba(212,236,162,.7)); }
+  .ticks line { stroke: rgba(242,241,232,.25); }
+
+  /* wedding spotlight */
+  .spot { --sr: 70%; position: relative; overflow: hidden; }
+  .motion .spot { --sr: 0%; }
+  .spot .dim, .spot .lit { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .spot .dim { filter: brightness(.22) saturate(.5); }
+  .spot .lit { -webkit-mask: radial-gradient(circle at 50% 55%, #000 0, #000 calc(var(--sr) * .55), transparent var(--sr)); mask: radial-gradient(circle at 50% 55%, #000 0, #000 calc(var(--sr) * .55), transparent var(--sr)); }
+
+  /* stacked luxury */
+  .stack-card { position: sticky; transform-origin: 50% 0; }
+
+  /* neon cities */
+  .neon { color: transparent; -webkit-text-stroke: 1px rgba(242,241,232,.28); }
+  .neon.on, .neon:hover { color: #d4eca2; -webkit-text-stroke: 1px #d4eca2; text-shadow: 0 0 24px rgba(212,236,162,.55); }
+
+  /* why rings */
+  .ring-fg { stroke-dasharray: 302; stroke-dashoffset: 0; filter: drop-shadow(0 0 6px rgba(212,236,162,.6)); }
+  .motion .ring-fg { stroke-dashoffset: 302; }
+  .m-scrub-word { opacity: .12; }
+
+  /* the shared enquiry form on a dark panel */
+  .nd-enquiry input, .nd-enquiry select, .nd-enquiry textarea { background: #0d0f0a; color: #eef0e4; border-color: rgba(242,241,232,.12); }
+  .nd-enquiry input::placeholder, .nd-enquiry textarea::placeholder { color: rgba(180,184,165,.5); }
+  .nd-enquiry input[type="date"] { color-scheme: dark; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .motion .beam-stage { --br: 48%; } .motion .spot { --sr: 70%; } .motion .ring-fg { stroke-dashoffset: 0; }
+    .neon { color: #d4eca2; -webkit-text-stroke: 1px #d4eca2; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="nd">
+
+<!-- ─── Hero: headlight beam reveals the car ─── -->
+{% static 'themes/img/thar-dusk.jpg' as hero_fallback %}
+<section id="hero" class="beam-stage min-h-[100svh] flex items-end lg:items-center" data-no-parallax>
+  <img class="dim" src="{% if config.hero_image %}{{ config.hero_image.url }}{% else %}{{ hero_fallback }}{% endif %}" alt=""/>
+  <img class="lit" src="{% if config.hero_image %}{{ config.hero_image.url }}{% else %}{{ hero_fallback }}{% endif %}" alt=""/>
+  <div class="beam-cone" aria-hidden="true"></div>
+  <div class="beam-shade" aria-hidden="true"></div>
+  <div class="relative z-10 w-full px-4 sm:px-12 max-w-screen-2xl mx-auto pt-32 pb-14 lg:py-0">
+    <div class="max-w-2xl space-y-7 lg:space-y-9">
+      <span class="label-tiny text-primary-container flex items-center gap-3" data-intro="0"><i class="w-8 h-px bg-primary-container inline-block"></i>{{ config.hero_subtitle|default:"Premium vehicle rental · Kerala" }}</span>
+      <h1 class="nd-display text-5xl sm:text-7xl lg:text-[104px] text-on-surface" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Rent Your Perfect Vehicle" }}</h1>
+      <p class="nd-head text-2xl sm:text-3xl text-on-surface-variant font-normal italic" data-intro="4">for the <span class="text-primary not-italic font-bold" data-cycle="night out|wedding day|weekend escape|airport run|monthly commute" data-wait="1.6">night out</span></p>
+      <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed font-light" data-intro="5">{{ config.hero_description|default:"Explore our premium fleet. Flexible daily, weekly, and monthly rentals with 24/7 roadside support." }}</p>
+      <div class="flex flex-wrap gap-4" data-intro="6">
+        <a href="{% url 'vehicle_list' %}" class="m-shine bg-primary text-on-primary px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold shadow-[0_0_40px_-8px_rgba(212,236,162,.7)] m-btn" data-magnetic>{{ config.hero_cta_text|default:"Explore Fleet" }} <span class="material-symbols-outlined">arrow_forward</span></a>
+        <a href="{% url 'wedding_cars' %}" class="border border-white/15 text-on-surface px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold hover:bg-white/5 transition-colors m-btn">Wedding Cars <span class="material-symbols-outlined">favorite</span></a>
+      </div>
+      {% if config.years_in_business or total_vehicle_count or cities %}
+      <div class="flex flex-wrap gap-x-10 gap-y-6 pt-7 border-t border-white/10 max-w-xl" data-intro="7">
+        {% if config.years_in_business %}<div><div class="nd-head text-3xl sm:text-4xl text-on-surface"><span data-slot>{{ config.years_in_business }}</span>+</div><div class="label-tiny text-on-surface-variant mt-2">Years</div></div>{% endif %}
+        {% if total_vehicle_count %}<div><div class="nd-head text-3xl sm:text-4xl text-on-surface"><span data-slot>{{ total_vehicle_count }}</span></div><div class="label-tiny text-on-surface-variant mt-2">Vehicle{{ total_vehicle_count|pluralize }}</div></div>{% endif %}
+        {% if cities %}<div><div class="nd-head text-3xl sm:text-4xl text-on-surface"><span data-slot>{{ cities.count }}</span></div><div class="label-tiny text-on-surface-variant mt-2">Cit{{ cities.count|pluralize:"y,ies" }}</div></div>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% if starting_price %}
+  <div class="absolute z-10 top-28 right-4 sm:right-12 lg:top-auto lg:bottom-14 bg-surface/60 backdrop-blur-md border border-primary/20 rounded-2xl px-5 py-4" data-intro="8" data-intro-kind="pop">
+    <span class="label-tiny text-on-surface-variant block mb-1">Starting at</span>
+    <span class="nd-head text-2xl text-primary">₹<span data-slot>{{ starting_price|inr|slice:"1:" }}</span><span class="text-sm font-light text-on-surface-variant"> / day</span></span>
+  </div>
+  {% endif %}
+  <div class="absolute z-10 bottom-6 left-1/2 -translate-x-1/2 hidden lg:flex" data-intro="9"><span class="m-scrollcue label-tiny text-on-surface-variant"><i style="background:rgba(242,241,232,.2)"></i>Scroll</span></div>
+</section>
+
+<!-- ─── Booking ─── -->
+<section class="px-4 sm:px-12 max-w-screen-2xl mx-auto -mt-2 lg:-mt-10 relative z-20" data-reveal>
+  <form action="{% url 'vehicle_list' %}" method="get" class="w-full">
+    <div class="flex items-center gap-3 mb-4 px-2 flex-wrap">
+      <div class="flex bg-surface-container-low border border-white/5 rounded-full p-1">
+        <label class="cursor-pointer"><input type="radio" name="rental_type" value="self_drive" class="peer sr-only" checked><span class="block px-5 py-2 rounded-full label-tiny peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">Self-Drive</span></label>
+        <label class="cursor-pointer"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only"><span class="block px-5 py-2 rounded-full label-tiny peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">With Driver</span></label>
+      </div>
+      <label class="ml-auto flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" name="same_location" value="1" checked class="rounded border-white/20 bg-transparent text-primary-container focus:ring-primary">
+        <span class="label-tiny text-on-surface-variant">Same-location</span>
+      </label>
+    </div>
+    <div class="glow backdrop-blur-xl rounded-3xl lg:rounded-full p-3 sm:p-4 lg:p-2 grid grid-cols-1 sm:grid-cols-2 lg:flex gap-3 lg:gap-0 lg:items-center shadow-2xl shadow-black/60" data-tilt="0.15">
+      <label class="lg:flex-1 lg:min-w-[140px] px-4 lg:px-6 lg:border-r border-white/10 py-2 lg:py-0 block"><span class="label-tiny text-on-surface-variant block mb-1">Pickup city</span>
+        <select name="pickup_city" class="bg-transparent border-none p-0 font-bold text-on-surface focus:ring-0 w-full cursor-pointer"><option value="">Any city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
+      <label class="lg:flex-1 lg:min-w-[140px] px-4 lg:px-6 lg:border-r border-white/10 py-2 lg:py-0 block"><span class="label-tiny text-on-surface-variant block mb-1">Drop city</span>
+        <select name="drop_city" class="bg-transparent border-none p-0 font-bold text-on-surface focus:ring-0 w-full cursor-pointer"><option value="">Same as pickup</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
+      <label class="lg:flex-1 lg:min-w-[140px] px-4 lg:px-6 lg:border-r border-white/10 py-2 lg:py-0 block"><span class="label-tiny text-on-surface-variant block mb-1">Pickup date</span>
+        <input type="date" name="pickup_date" class="bg-transparent border-none p-0 font-bold text-on-surface focus:ring-0 w-full [color-scheme:dark]"></label>
+      <label class="lg:flex-1 lg:min-w-[140px] px-4 lg:px-6 lg:border-r border-white/10 py-2 lg:py-0 block"><span class="label-tiny text-on-surface-variant block mb-1">Return date</span>
+        <input type="date" name="return_date" class="bg-transparent border-none p-0 font-bold text-on-surface focus:ring-0 w-full [color-scheme:dark]"></label>
+      <button type="submit" class="m-shine m-btn bg-primary text-on-primary py-4 px-10 rounded-full label-tiny flex items-center justify-center gap-3 whitespace-nowrap sm:col-span-2 lg:col-auto" data-magnetic><span>Search Cars</span><span class="material-symbols-outlined text-base">arrow_forward</span></button>
+    </div>
+    <p class="text-center text-xs text-on-surface-variant/70 mt-4">Free cancellation · No hidden charges · 24×7 customer support</p>
+  </form>
+</section>
+
+<!-- ─── Occasions ─── -->
+{% if categories %}
+<section class="px-4 sm:px-12 max-w-screen-2xl mx-auto py-24 lg:py-36">
+  <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12 lg:mb-16">
+    <div><span class="label-tiny text-primary-container block">Explore by occasion</span><h2 class="nd-head text-4xl sm:text-6xl mt-4 text-on-surface">Find your drive.</h2></div>
+    <p class="text-on-surface-variant max-w-sm">Self-drive or chauffeur, one night or one month. Pick the occasion and we will match the car.</p>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4" data-deal>
+    {% for cat in categories|slice:":11" %}
+    <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="m-tile ntile p-6 sm:p-8 rounded-3xl flex flex-col gap-6">
+      <span class="material-symbols-outlined text-3xl">{{ cat.icon|default:"directions_car" }}</span>
+      <span><span class="label-tiny block">{{ cat.name }}</span><span class="m-count block mt-2">{% if cat.count %}{{ cat.count|stringformat:"02d" }} vehicle{{ cat.count|pluralize }}{% else %}On request{% endif %}</span></span>
+    </a>
+    {% endfor %}
+    <a href="{% url 'vehicle_list' %}" class="m-tile ntile p-6 sm:p-8 rounded-3xl flex flex-col gap-6 !bg-primary !text-on-primary">
+      <span class="material-symbols-outlined text-3xl !text-on-primary" style="text-shadow:none">apps</span>
+      <span><span class="label-tiny block">All fleet</span><span class="m-count block mt-2">{{ total_vehicle_count|stringformat:"02d" }} vehicle{{ total_vehicle_count|pluralize }}</span></span>
+    </a>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Drive-by: pinned, the car crosses as you scroll; the dial counts ─── -->
+<section id="driveby" class="relative h-[100svh] overflow-hidden bg-[#080906] flex items-center justify-center" data-no-parallax aria-label="Fleet at a glance">
+  <div class="streaks absolute inset-0 pointer-events-none" aria-hidden="true"></div>
+  <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-surface to-transparent pointer-events-none"></div>
+  <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-surface to-transparent pointer-events-none"></div>
+  <div class="car-frame relative w-[88vw] sm:w-[68vw] max-w-[980px] aspect-[16/10] rounded-[2rem] sm:rounded-[3rem] overflow-hidden">
+    <img src="{% static 'themes/img/sclass-mist.jpg' %}" alt="" class="w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+  </div>
+  <div class="gauge absolute left-4 sm:left-12 top-24 sm:top-auto sm:bottom-14 flex items-center gap-5"
+       data-stages='[{% if total_vehicle_count %}{"v":"{{ total_vehicle_count }}","u":"","l":"vehicle{{ total_vehicle_count|pluralize }} in the fleet"}{% endif %}{% if cities %}{% if total_vehicle_count %},{% endif %}{"v":"{{ cities.count }}","u":"","l":"cit{{ cities.count|pluralize:"y,ies" }} across Kerala"}{% endif %}{% if config.years_in_business %}{% if total_vehicle_count or cities %},{% endif %}{"v":"{{ config.years_in_business }}","u":"+","l":"years on the road"}{% endif %}]'>
+    <div class="relative w-28 h-28 sm:w-44 sm:h-44 shrink-0">
+      <svg viewBox="0 0 200 200" class="absolute inset-0 w-full h-full" aria-hidden="true">
+        <g class="ticks" transform="translate(100 100)"></g>
+        <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(242,241,232,.08)" stroke-width="6" stroke-dasharray="377 503" stroke-linecap="round" transform="rotate(135 100 100)"/>
+        <circle class="gauge-arc" cx="100" cy="100" r="80" fill="none" stroke="#d4eca2" stroke-width="6" stroke-dasharray="377 503" stroke-linecap="round" transform="rotate(135 100 100)"/>
+      </svg>
+      <div class="absolute inset-0 grid place-items-center text-center">
+        <div class="nd-head text-3xl sm:text-5xl text-on-surface leading-none"><span id="gNum">{{ total_vehicle_count }}</span><span id="gUnit" class="text-primary"></span></div>
+      </div>
+    </div>
+    <div>
+      <span class="label-tiny text-primary-container block mb-2">On the road</span>
+      <span id="gLabel" class="nd-head text-xl sm:text-3xl text-on-surface block"><span>vehicle{{ total_vehicle_count|pluralize }} in the fleet</span></span>
+    </div>
+  </div>
+  {% if cities %}<p class="absolute right-4 sm:right-12 top-24 sm:top-auto sm:bottom-16 label-tiny text-on-surface-variant text-right max-w-[11rem] hidden sm:block">Doorstep delivery<br/>across {{ cities.count }} Kerala cit{{ cities.count|pluralize:"y,ies" }}</p>{% endif %}
+</section>
+
+<!-- ─── The new collection ─── -->
+{% if featured_vehicles %}
+<section id="fleet" class="px-4 sm:px-12 py-24 lg:py-36 max-w-screen-2xl mx-auto">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-12 lg:mb-16 gap-6">
+    <div><span class="label-tiny text-primary-container block">Featured this week</span><h2 class="nd-head text-4xl sm:text-6xl mt-4 text-on-surface">The New Collection</h2></div>
+    <div class="flex flex-wrap gap-3" data-deal>
+      <a href="{% url 'vehicle_list' %}" class="px-6 py-2.5 rounded-full border border-primary text-primary font-bold text-sm">All Cars</a>
+      <a href="{% url 'vehicle_list' %}?premium=1" class="px-6 py-2.5 rounded-full bg-surface-container-low border border-white/5 text-on-surface-variant font-bold text-sm hover:text-on-surface transition-colors">Premium</a>
+      <a href="{% url 'vehicle_list' %}?type=suv" class="px-6 py-2.5 rounded-full bg-surface-container-low border border-white/5 text-on-surface-variant font-bold text-sm hover:text-on-surface transition-colors">SUV</a>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+    {% for vehicle in featured_vehicles|slice:":6" %}
+    <a href="{{ vehicle.get_absolute_url }}" class="vehicle-card glow group block rounded-[2rem] p-4 sm:p-5">
+      <div class="relative overflow-hidden rounded-[1.5rem] h-56 sm:h-60 mb-6 bg-surface-container">
+        {% if vehicle.thumbnail %}
+        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover brightness-[.85] transition-all duration-[1.2s] ease-out group-hover:scale-110 group-hover:brightness-100" loading="lazy"/>
+        {% else %}
+        <div class="w-full h-full grid place-items-center"><span class="material-symbols-outlined text-[64px] text-primary/30">directions_car</span></div>
+        {% endif %}
+        <div class="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent"></div>
+        <div class="absolute top-4 left-4 font-serif text-primary/80 text-sm">{{ forloop.counter|stringformat:"02d" }}</div>
+        {% if vehicle.primary_price_value %}<div class="absolute top-4 right-4 bg-surface/70 backdrop-blur-md border border-primary/20 px-4 py-2 rounded-full font-bold text-sm text-primary">{{ vehicle.primary_price_value|inr }}<span class="font-light text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></div>{% endif %}
+      </div>
+      <div class="px-2">
+        <p class="label-tiny text-on-surface-variant mb-2">{{ vehicle.brand }}{% if vehicle.category %} · {{ vehicle.category.name }}{% endif %}</p>
+        <h3 class="nd-head text-2xl text-on-surface mb-5">{{ vehicle.name }}</h3>
+        <div class="flex flex-wrap gap-2 mb-6 text-xs text-on-surface-variant">
+          {% if vehicle.transmission %}<span class="border border-white/10 rounded-full px-3 py-1.5">{{ vehicle.get_transmission_display }}</span>{% endif %}
+          {% if vehicle.fuel_type %}<span class="border border-white/10 rounded-full px-3 py-1.5">{{ vehicle.get_fuel_type_display }}</span>{% endif %}
+          {% if vehicle.seating_capacity %}<span class="border border-white/10 rounded-full px-3 py-1.5">{{ vehicle.seating_capacity }} seats</span>{% endif %}
+          {% if vehicle.is_premium %}<span class="border border-primary/30 text-primary rounded-full px-3 py-1.5">Premium</span>{% endif %}
+          {% if vehicle.is_wedding_service %}<span class="border border-primary/30 text-primary rounded-full px-3 py-1.5">Wedding</span>{% endif %}
+        </div>
+        <div class="w-full border border-primary/30 text-primary py-3.5 rounded-full font-bold text-center transition-colors duration-500 group-hover:bg-primary group-hover:text-on-primary"><span class="m-flip"><span>Rent Now</span><span>View details →</span></span></div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Wedding: a spotlight opens on the car as you scroll ─── -->
+<section id="wedding" class="px-4 sm:px-12 py-24 lg:py-36 max-w-screen-2xl mx-auto grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+  <div class="lg:col-span-7">
+    <div class="spot rounded-[2.5rem] sm:rounded-[3rem] h-[380px] sm:h-[540px] lg:h-[660px]" data-no-parallax>
+      <img class="dim" src="{% static 'themes/img/wedding-rolls.jpg' %}" alt=""/>
+      <img class="lit" src="{% static 'themes/img/wedding-rolls.jpg' %}" alt="A vintage wedding car with white floral garlands"/>
+      <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(circle at 50% 55%, rgba(212,236,162,.12), transparent 60%)"></div>
+      <div class="absolute left-6 bottom-6 sm:left-8 sm:bottom-8 flex items-center gap-3 bg-surface/70 backdrop-blur-md border border-white/10 rounded-full pl-2 pr-5 py-2">
+        <span class="w-9 h-9 rounded-full bg-primary text-on-primary grid place-items-center"><span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 1">favorite</span></span>
+        <span class="label-tiny text-on-surface">Chauffeur included</span>
+      </div>
+    </div>
+  </div>
+  <div class="lg:col-span-5 space-y-7">
+    <span class="label-tiny text-primary-container block">Wedding fleet · Kerala</span>
+    <h2 class="nd-head text-4xl sm:text-6xl text-on-surface">For the day you'll never forget.</h2>
+    <p class="text-lg text-on-surface-variant leading-relaxed font-light">From classic vintage icons to modern luxury flagships, our curated wedding fleet ensures your first journey together is legendary. Chauffeur included, decoration tailored.</p>
+    <div class="grid grid-cols-3 gap-3" data-deal aria-hidden="true">
+      <div class="glow rounded-2xl overflow-hidden aspect-[4/5]"><img src="{% static 'themes/img/jasmine-handle.jpg' %}" alt="" class="w-full h-full object-cover object-[50%_70%]"/></div>
+      <div class="glow rounded-2xl overflow-hidden aspect-[4/5]"><img src="{% static 'themes/img/ambassador.jpg' %}" alt="" class="w-full h-full object-cover"/></div>
+      <div class="glow rounded-2xl overflow-hidden aspect-[4/5]"><img src="{% static 'themes/img/wedding-venue.jpg' %}" alt="" class="w-full h-full object-cover"/></div>
+    </div>
+    <a href="{% url 'wedding_cars' %}" class="m-shine m-btn inline-flex bg-primary text-on-primary px-10 py-5 rounded-full font-bold items-center gap-3" data-magnetic>View Wedding Fleet <span class="material-symbols-outlined">arrow_forward</span></a>
+  </div>
+</section>
+
+<!-- ─── Luxury: cards stack like cars pulling into a garage ─── -->
+{% if premium_vehicles %}
+<section id="luxury" class="px-4 sm:px-12 pt-12 pb-24 lg:pb-36 max-w-screen-2xl mx-auto">
+  <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12 lg:mb-16">
+    <div><span class="label-tiny text-primary-container block">Elite collection</span><h2 class="nd-head text-4xl sm:text-6xl mt-4 text-on-surface">When ordinary won't do.</h2></div>
+    <a href="{% url 'premium_cars' %}" class="text-primary font-bold inline-flex items-center gap-2 hover:gap-3 transition-all">See the premium fleet <span class="material-symbols-outlined">arrow_forward</span></a>
+  </div>
+  <div class="stack space-y-8" data-no-parallax>
+    {% for vehicle in premium_vehicles %}
+    <a href="{{ vehicle.get_absolute_url }}" class="stack-card block h-[62vh] sm:h-[70vh] rounded-[2.5rem] overflow-hidden relative bg-surface-container-low border border-white/5" style="top:calc(14vh + {{ forloop.counter0 }} * 16px)">
+      {% if vehicle.thumbnail %}
+      <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="absolute inset-0 w-full h-full object-cover"/>
+      {% else %}
+      <div class="absolute inset-0 grid place-items-center bg-surface-container"><span class="material-symbols-outlined text-[120px] text-primary/20">diamond</span></div>
+      {% endif %}
+      <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-transparent"></div>
+      <div class="relative h-full flex flex-col justify-end p-8 sm:p-14 max-w-xl">
+        <span class="font-serif text-primary text-xl">{{ forloop.counter|stringformat:"02d" }}</span>
+        <h3 class="nd-head text-4xl sm:text-6xl text-white mt-3">{{ vehicle.brand }} {{ vehicle.name }}</h3>
+        <p class="label-tiny text-primary-container mt-5">{% if vehicle.is_wedding_service %}Wedding flagship{% elif vehicle.category %}{{ vehicle.category.name }}{% else %}Elite collection{% endif %}{% if vehicle.primary_price_value %} · {{ vehicle.primary_price_value|inr }}/{{ vehicle.primary_price_label }}{% endif %}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Why: dashboard rings ─── -->
+<section id="why" class="px-4 sm:px-12 py-24 lg:py-36 max-w-screen-2xl mx-auto border-t border-white/5">
+  <div class="text-center mb-16 lg:mb-20">
+    <span class="label-tiny text-primary-container block">Why book with us</span>
+    <h2 class="nd-head text-4xl sm:text-6xl mt-4 text-on-surface">Crafted for convenience.</h2>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" data-deal>
+    <div class="glow rounded-3xl p-8 text-center" data-tilt="0.6">
+      <div class="relative w-28 h-28 mx-auto mb-6"><svg viewBox="0 0 110 110" class="absolute inset-0 -rotate-90" aria-hidden="true"><circle cx="55" cy="55" r="48" fill="none" stroke="rgba(242,241,232,.08)" stroke-width="3"/><circle class="ring-fg" cx="55" cy="55" r="48" fill="none" stroke="#d4eca2" stroke-width="3" stroke-linecap="round"/></svg><span class="absolute inset-0 grid place-items-center material-symbols-outlined text-4xl text-primary">local_shipping</span></div>
+      <div class="font-bold text-lg text-on-surface mb-2">Doorstep Delivery</div><div class="text-sm text-on-surface-variant">We bring the car to you.</div>
+    </div>
+    <div class="glow rounded-3xl p-8 text-center" data-tilt="0.6">
+      <div class="relative w-28 h-28 mx-auto mb-6"><svg viewBox="0 0 110 110" class="absolute inset-0 -rotate-90" aria-hidden="true"><circle cx="55" cy="55" r="48" fill="none" stroke="rgba(242,241,232,.08)" stroke-width="3"/><circle class="ring-fg" cx="55" cy="55" r="48" fill="none" stroke="#d4eca2" stroke-width="3" stroke-linecap="round"/></svg><span class="absolute inset-0 grid place-items-center material-symbols-outlined text-4xl text-primary">support_agent</span></div>
+      <div class="font-bold text-lg text-on-surface mb-2">24/7 Support</div><div class="text-sm text-on-surface-variant">Real humans, on call.</div>
+    </div>
+    <div class="glow rounded-3xl p-8 text-center" data-tilt="0.6">
+      <div class="relative w-28 h-28 mx-auto mb-6"><svg viewBox="0 0 110 110" class="absolute inset-0 -rotate-90" aria-hidden="true"><circle cx="55" cy="55" r="48" fill="none" stroke="rgba(242,241,232,.08)" stroke-width="3"/><circle class="ring-fg" cx="55" cy="55" r="48" fill="none" stroke="#d4eca2" stroke-width="3" stroke-linecap="round"/></svg><span class="absolute inset-0 grid place-items-center material-symbols-outlined text-4xl text-primary">receipt_long</span></div>
+      <div class="font-bold text-lg text-on-surface mb-2">Zero Hidden Charges</div><div class="text-sm text-on-surface-variant">Transparent pricing.</div>
+    </div>
+    <div class="glow rounded-3xl p-8 text-center" data-tilt="0.6">
+      <div class="relative w-28 h-28 mx-auto mb-6"><svg viewBox="0 0 110 110" class="absolute inset-0 -rotate-90" aria-hidden="true"><circle cx="55" cy="55" r="48" fill="none" stroke="rgba(242,241,232,.08)" stroke-width="3"/><circle class="ring-fg" cx="55" cy="55" r="48" fill="none" stroke="#d4eca2" stroke-width="3" stroke-linecap="round"/></svg><span class="absolute inset-0 grid place-items-center material-symbols-outlined text-4xl text-primary">map</span></div>
+      <div class="font-bold text-lg text-on-surface mb-2">All-Kerala Network</div><div class="text-sm text-on-surface-variant">{% if cities %}{{ cities.count }} location{{ cities.count|pluralize }} served.{% else %}Pickup and drop across Kerala.{% endif %}</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Cities: neon signs light up as you scroll ─── -->
+{% if cities %}
+<section id="cities" class="py-24 lg:py-36 bg-surface-container-low/60 border-y border-white/5 overflow-hidden">
+  <div class="px-4 sm:px-12 max-w-screen-2xl mx-auto grid lg:grid-cols-12 gap-12 items-start">
+    <div class="lg:col-span-4">
+      <span class="label-tiny text-primary-container block">Where we are</span>
+      <h2 class="nd-head text-4xl sm:text-6xl mt-4 text-on-surface">Kerala at your fingertips.</h2>
+      <p class="text-on-surface-variant mt-6 max-w-sm">Pickup and drop across the state. Ask for doorstep delivery when you book.</p>
+      <div class="mt-10 flex items-baseline gap-3"><span class="nd-head text-6xl text-primary"><span data-slot>{{ cities.count }}</span></span><span class="label-tiny text-on-surface-variant">cit{{ cities.count|pluralize:"y,ies" }} served</span></div>
+    </div>
+    <ul class="neon-list lg:col-span-8 flex flex-wrap gap-x-6 sm:gap-x-10 gap-y-2 font-serif font-bold text-4xl sm:text-6xl lg:text-7xl leading-tight">
+      {% for city in cities %}<li><a href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="neon">{{ city.name }}</a></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Testimonial ─── -->
+{% if testimonials %}
+<section class="px-4 sm:px-12 py-28 lg:py-44 max-w-6xl mx-auto text-center">
+  <span class="material-symbols-outlined text-primary text-6xl mb-8 block" style="text-shadow:0 0 24px rgba(212,236,162,.5)" data-reveal>format_quote</span>
+  <p class="nd-head text-3xl sm:text-5xl lg:text-6xl italic leading-tight text-primary" data-scrub-text data-no-split>"{{ testimonials.0.quote }}"</p>
+  <div class="mt-12" data-reveal><div class="font-bold text-lg text-on-surface">{{ testimonials.0.name }}</div>{% if testimonials.0.role %}<div class="label-tiny text-on-surface-variant mt-2">{{ testimonials.0.role }}</div>{% endif %}</div>
+</section>
+{% endif %}
+
+<!-- ─── Enquiry ─── -->
+<section id="enquiry" class="px-4 sm:px-12 pb-24 lg:pb-32 max-w-screen-2xl mx-auto">
+  <div class="relative overflow-hidden rounded-[2.5rem] lg:rounded-[3.5rem] border border-white/5 bg-surface-container-low p-8 sm:p-14 lg:p-20 grid lg:grid-cols-2 gap-12 items-center">
+    <div class="absolute -top-40 -right-40 w-[520px] h-[520px] rounded-full pointer-events-none" style="background:radial-gradient(circle, rgba(212,236,162,.16), transparent 65%)" data-parallax="60" aria-hidden="true"></div>
+    <div class="relative z-10">
+      <span class="label-tiny text-primary-container block">Get in touch</span>
+      <h2 class="nd-head text-4xl sm:text-6xl mt-4 mb-5 text-on-surface">Send us an enquiry.</h2>
+      <p class="text-on-surface-variant text-lg max-w-md font-light">Fill the form and our team will get back within the hour.{% if WHATSAPP_NUMBER %} Or message us on WhatsApp.{% endif %}</p>
+    </div>
+    <div class="nd-enquiry relative z-10 glow rounded-3xl p-6 sm:p-8 !bg-surface" data-reveal>
+      {% include "public/includes/enquiry_form.html" %}
+    </div>
+  </div>
+</section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* static extras that work without GSAP: gauge ticks, speed streaks */
+(function () {
+  var g = document.querySelector(".ticks"), t = "";
+  for (var i = 0; i <= 18; i++) {
+    var a = (135 + i * 15) * Math.PI / 180, r1 = i % 3 ? 90 : 86, r2 = 95;
+    t += '<line x1="' + (Math.cos(a) * r1).toFixed(1) + '" y1="' + (Math.sin(a) * r1).toFixed(1) + '" x2="' + (Math.cos(a) * r2).toFixed(1) + '" y2="' + (Math.sin(a) * r2).toFixed(1) + '" stroke-width="' + (i % 3 ? 1 : 2) + '"/>';
+  }
+  if (g) g.innerHTML = t;
+  var s = document.querySelector(".streaks"), h = "";
+  for (var j = 0; j < 18; j++) {
+    var top = (6 + (j * 53) % 88).toFixed(1), w = 14 + (j * 37) % 30;
+    h += '<span class="streak' + (j % 3 ? " thin" : "") + '" style="top:' + top + '%;width:' + w + 'vw" data-speed="' + (0.6 + (j % 5) * 0.25).toFixed(2) + '"></span>';
+  }
+  if (s) s.innerHTML = h;
+})();
+
+document.addEventListener("motion:ready", function (ev) {
+  var G = ev.detail.G, ST = ev.detail.ST, slotTo = ev.detail.slotTo, roll = ev.detail.roll;
+  var fine = matchMedia("(pointer: fine)").matches;
+
+  /* hero: the headlight sweeps in, then softly follows the cursor */
+  var stage = document.getElementById("hero");
+  if (stage) {
+    var beam = { x: -15, y: 62, r: 0 };
+    var paint = function () { stage.style.setProperty("--bx", beam.x + "%"); stage.style.setProperty("--by", beam.y + "%"); stage.style.setProperty("--br", beam.r + "%"); };
+    var follow = function () {
+      if (!fine) return;
+      var qx = G.quickTo(beam, "x", { duration: 1.4, ease: "power3", onUpdate: paint });
+      var qy = G.quickTo(beam, "y", { duration: 1.4, ease: "power3", onUpdate: paint });
+      stage.addEventListener("pointermove", function (e) {
+        var r = stage.getBoundingClientRect();
+        qx(64 + (((e.clientX - r.left) / r.width) * 100 - 64) * .55);
+        qy(60 + (((e.clientY - r.top) / r.height) * 100 - 60) * .45);
+      });
+      stage.addEventListener("pointerleave", function () { qx(64); qy(60); });
+    };
+    paint();
+    G.timeline({ delay: .35, onUpdate: paint, onComplete: follow })
+      .to(beam, { r: 30, duration: .6, ease: "power2.out" })
+      .to(beam, { x: 88, y: 50, duration: 1.4, ease: "power2.inOut" }, 0)
+      .to(beam, { x: 64, y: 60, r: 48, duration: 1.2, ease: "power3.out" });
+    G.to(beam, { r: 22, ease: "none", onUpdate: paint, scrollTrigger: { trigger: stage, start: "top top", end: "bottom top", scrub: true } });
+  }
+
+  /* drive-by: pinned; car crosses, streaks rush the other way, the dial counts real numbers */
+  var sec = document.getElementById("driveby");
+  if (sec) {
+    var gauge = sec.querySelector(".gauge"), STAGES = [];
+    try { STAGES = JSON.parse(gauge.dataset.stages || "[]"); } catch (e) { STAGES = []; }
+    if (!STAGES.length) gauge.style.display = "none";
+    var num = document.getElementById("gNum"), unit = document.getElementById("gUnit"), label = document.getElementById("gLabel");
+    label.classList.add("m-reel");
+    var cur = 0;
+    var setStage = function (i, from) {
+      var st = STAGES[i];
+      var prev = from != null ? from : STAGES[cur].v;
+      slotTo(num, st.v, { from: String(prev).padStart(st.v.length, "0").slice(-st.v.length), dur: .7 });
+      unit.textContent = st.u;
+      roll(label, st.l);
+      cur = i;
+    };
+    var tl = G.timeline({ defaults: { ease: "none" }, scrollTrigger: {
+      trigger: sec, start: "top top", end: "+=220%", pin: true, scrub: .6, anticipatePin: 1, invalidateOnRefresh: true,
+      onUpdate: function (self) {
+        if (!STAGES.length) return;
+        var i = Math.min(STAGES.length - 1, Math.floor(self.progress * STAGES.length));
+        if (i !== cur) setStage(i);
+      } } });
+    tl.fromTo(".car-frame", { xPercent: -135, skewX: -6, filter: "blur(6px)" }, { xPercent: 0, skewX: 0, filter: "blur(0px)", duration: .4, ease: "power2.out" })
+      .to(".car-frame", { xPercent: 0, duration: .2 })
+      .to(".car-frame", { xPercent: 135, skewX: 6, filter: "blur(6px)", duration: .4, ease: "power2.in" })
+      .fromTo(".gauge-arc", { strokeDasharray: "0 503" }, { strokeDasharray: "377 503", duration: 1 }, 0);
+    G.utils.toArray(".streak").forEach(function (s) {
+      var sp = +s.dataset.speed;
+      tl.fromTo(s, { x: function () { return innerWidth * 1.1; } }, { x: function () { return -innerWidth * .9 * sp; }, duration: 1 }, 0);
+    });
+    if (STAGES.length) {
+      unit.textContent = STAGES[0].u;
+      label.innerHTML = "<span>" + STAGES[0].l + "</span>";
+      slotTo(num, STAGES[0].v, { from: "0".repeat(STAGES[0].v.length) });
+    }
+  }
+
+  /* wedding: the spotlight opens as the image scrolls into view */
+  var spot = document.querySelector(".spot");
+  if (spot) {
+    var sp = { r: 0 };
+    G.to(sp, { r: 78, ease: "none", onUpdate: function () { spot.style.setProperty("--sr", sp.r + "%"); },
+      scrollTrigger: { trigger: spot, start: "top 85%", end: "center 45%", scrub: .8 } });
+  }
+
+  /* luxury: each card shrinks back as the next one stacks over it */
+  var cards = G.utils.toArray(".stack-card");
+  cards.forEach(function (c, i) {
+    var im = c.querySelector("img");
+    if (im) G.fromTo(im, { scale: 1.2 }, { scale: 1, ease: "none", scrollTrigger: { trigger: c, start: "top bottom", end: "top 20%", scrub: true } });
+    if (i === cards.length - 1) return;
+    G.to(c, { scale: .92, opacity: .45, ease: "none", scrollTrigger: { trigger: cards[i + 1], start: "top bottom", end: "top 20%", scrub: true } });
+  });
+
+  /* why: rings fill */
+  G.to(".ring-fg", { strokeDashoffset: 0, duration: 1.6, ease: "power3.out", stagger: .15, scrollTrigger: { trigger: "#why", start: "clamp(top 65%)", once: true } });
+
+  /* cities: neon signs flick on one after another as you scroll */
+  var neons = G.utils.toArray(".neon");
+  if (neons.length) ST.create({ trigger: ".neon-list", start: "top 75%", end: "bottom 45%", scrub: true,
+    onUpdate: function (self) { var n = Math.round(self.progress * neons.length); neons.forEach(function (el, i) { el.classList.toggle("on", i < n); }); } });
+});
+</script>
+{% endblock %}

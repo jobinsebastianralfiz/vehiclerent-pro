@@ -1,0 +1,38 @@
+<nav class="nav m-nav" aria-label="Main navigation">
+  <a href="{% url 'home' %}" class="logo" aria-label="{{ BUSINESS_NAME }} - Home">
+    {% if SITE_CONFIG.logo %}<img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}"/>{% endif %}
+    {% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}{{ BUSINESS_NAME }}{% endif %}
+  </a>
+  <div class="links">
+    <a href="{% url 'home' %}" aria-current="page">Home</a>
+    <a href="{% url 'vehicle_list' %}">Fleet</a>
+    <a href="{% url 'premium_cars' %}">Premium</a>
+    <a href="{% url 'wedding_cars' %}">Wedding Cars</a>
+    <a href="{% url 'about' %}">About</a>
+    <a href="{% url 'contact' %}">Contact</a>
+  </div>
+  <div class="nav-right">
+    {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="nav-phone">{{ BUSINESS_PHONE }}</a>{% endif %}
+    <a href="{% url 'vehicle_list' %}" class="nav-cta" data-magnetic><i></i>Book now</a>
+    <button type="button" class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="sheet"><span class="material-symbols-outlined">menu</span></button>
+  </div>
+</nav>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="sheet-top">
+    <span class="logo">{% if SITE_CONFIG.logo %}<img src="{{ SITE_CONFIG.logo.url }}" alt=""/>{% endif %}{% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}{{ BUSINESS_NAME }}{% endif %}</span>
+    <button type="button" class="menu-btn" style="display:grid" id="sheetClose" aria-label="Close menu"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <nav aria-label="Mobile navigation">
+    <a href="{% url 'vehicle_list' %}" class="t-orange"><span><i></i>Fleet</span><small>{% if total_vehicle_count %}{{ total_vehicle_count|stringformat:"02d" }}{% else %}All{% endif %}</small></a>
+    <a href="{% url 'premium_cars' %}" class="t-night"><span><i></i>Premium</span><small>{% if premium_vehicles %}{{ premium_vehicles|length|stringformat:"02d" }}{% else %}Cars{% endif %}</small></a>
+    <a href="{% url 'wedding_cars' %}" class="t-violet"><span><i></i>Wedding</span><small>Cars</small></a>
+    <a href="{% url 'about' %}" class="t-blue"><span><i></i>About</span><small>Us</small></a>
+    <a href="{% url 'contact' %}" class="t-green"><span><i></i>Contact</span><small>Enquire</small></a>
+    <a href="{% url 'faq' %}" class="t-amber"><span><i></i>FAQ</span><small>Help</small></a>
+  </nav>
+  <div class="sheet-legal">
+    {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}">{{ BUSINESS_PHONE }}</a>{% endif %}
+    <a href="{% url 'terms' %}">Terms</a><a href="{% url 'privacy' %}">Privacy</a>
+  </div>
+  <a href="{% url 'vehicle_list' %}" class="btn btn-main" style="justify-content:center;margin-top:24px">Book now <span class="material-symbols-outlined">arrow_forward</span></a>
+</div>

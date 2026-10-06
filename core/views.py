@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, Min
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
@@ -14,6 +14,7 @@ from vehicles.models import City, Vehicle, VehicleCategory
 from . import chatbot
 from .forms import AdminLoginForm, SiteConfigForm, TestimonialForm
 from .models import SiteConfig, Testimonial
+from .themes import THEMES, active_theme
 
 
 # ──────────────── Public Views ────────────────
@@ -36,7 +37,9 @@ def home(request):
         .select_related("category")[:6]
     )
     cities = City.objects.filter(is_active=True)
-    total_vehicle_count = Vehicle.objects.filter(is_published=True).exclude(status="inactive").count()
+    published = Vehicle.objects.filter(is_published=True).exclude(status="inactive")
+    total_vehicle_count = published.count()
+    starting_price = published.aggregate(m=Min("price_per_day"))["m"]
     testimonials = Testimonial.objects.filter(is_active=True)[:6]
     # Collect hero background images
     hero_bg_images = []
@@ -44,13 +47,15 @@ def home(request):
         for field in [config.hero_bg_1, config.hero_bg_2, config.hero_bg_3]:
             if field:
                 hero_bg_images.append(field.url)
-    return render(request, "public/home.html", {
+    theme = active_theme(request, config)
+    return render(request, [f"public/themes/{theme['key']}/home.html", "public/home.html"], {
         "config": config,
         "categories": categories,
         "featured_vehicles": featured_vehicles,
         "premium_vehicles": premium_vehicles,
         "cities": cities,
         "total_vehicle_count": total_vehicle_count,
+        "starting_price": starting_price,
         "testimonials": testimonials,
         "hero_bg_images": hero_bg_images,
     })
@@ -214,7 +219,7 @@ def site_config_edit(request):
             return redirect("site_config_edit")
     else:
         form = SiteConfigForm(instance=config)
-    return render(request, "manage/settings/config.html", {"form": form, "config": config})
+    return render(request, "manage/settings/config.html", {"form": form, "config": config, "themes": THEMES.items()})
 
 
 # ──────────────── Admin: Testimonials ────────────────

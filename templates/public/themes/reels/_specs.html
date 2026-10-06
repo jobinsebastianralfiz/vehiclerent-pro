@@ -1,0 +1,1 @@
+{% if v.transmission %}{{ v.get_transmission_display }}{% endif %}{% if v.transmission and v.fuel_type %} · {% endif %}{% if v.fuel_type %}{{ v.get_fuel_type_display }}{% endif %}{% if v.seating_capacity %}{% if v.transmission or v.fuel_type %} · {% endif %}{{ v.seating_capacity }} seats{% endif %}

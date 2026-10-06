@@ -1,0 +1,333 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}{{ BUSINESS_NAME }} | {{ config.tagline|default:"Premium Car Rentals in Kerala" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ed-hero-copy, .ed-hero-media { will-change: transform; }
+    .ed-tile-count { font: 700 10px/1 var(--font-body); letter-spacing: .12em; opacity: .55; text-transform: uppercase; }
+    .ed-ph { display: grid; place-items: center; width: 100%; height: 100%; background: radial-gradient(90% 70% at 50% 35%, #efeee6, #c5c8b8); color: #75786b; }
+    .ed-ph-dark { background: radial-gradient(90% 70% at 50% 35%, #2a2f22, #141611); color: rgba(255,255,255,.25); }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ─── Hero ─── -->
+<section id="ed-hero" class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 pb-16 lg:pt-14 lg:pb-24 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+    <div class="ed-hero-copy lg:w-1/2 space-y-8 lg:space-y-10 w-full">
+        <span class="label-tiny text-primary-container block" data-intro="0">{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</span>
+        <h1 class="display-hero text-5xl sm:text-7xl lg:text-[96px] text-primary" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Rent Your Perfect Vehicle" }}</h1>
+        <p class="headline-md text-2xl sm:text-3xl text-on-surface-variant font-normal italic" data-intro="4">for the <span class="text-primary-container not-italic font-bold" data-cycle="wedding day|weekend escape|airport run|monthly commute|Munnar drive" data-wait="1">wedding day</span></p>
+        <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed font-light" data-intro="5">{{ config.hero_description|default:"Explore our premium fleet. Flexible daily, weekly, and monthly rentals with 24/7 roadside support." }}</p>
+        <div class="flex flex-wrap gap-4 sm:gap-6" data-intro="6">
+            <a href="{% url 'vehicle_list' %}" class="bg-primary-container text-on-primary px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold">{{ config.hero_cta_text|default:"Explore Fleet" }} <span class="material-symbols-outlined">arrow_forward</span></a>
+            <a href="{% url 'wedding_cars' %}" class="border border-outline-variant px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold hover:bg-surface-container-low transition-colors">Wedding Cars <span class="material-symbols-outlined" data-icon="favorite">favorite</span></a>
+        </div>
+        <div class="grid grid-cols-3 gap-6 sm:gap-8 pt-8 sm:pt-10 border-t border-outline-variant/40" data-intro="7">
+            {% if config.years_in_business %}
+            <div><div class="headline-md text-2xl sm:text-4xl text-primary"><span data-slot>{{ config.years_in_business }}</span>+</div><div class="label-tiny opacity-60 mt-2">Years</div></div>
+            {% endif %}
+            {% if total_vehicle_count %}
+            <div><div class="headline-md text-2xl sm:text-4xl text-primary"><span data-slot>{{ total_vehicle_count }}</span></div><div class="label-tiny opacity-60 mt-2">Vehicles in fleet</div></div>
+            {% endif %}
+            {% if cities %}
+            <div><div class="headline-md text-2xl sm:text-4xl text-primary"><span data-slot>{{ cities.count }}</span></div><div class="label-tiny opacity-60 mt-2">Kerala cities</div></div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="lg:w-1/2 relative w-full">
+        <div class="ed-hero-media m-hero-media h-[440px] sm:h-[600px] lg:h-[720px]" data-intro="2" data-intro-kind="media">
+            {% if config.hero_image %}
+            <img src="{{ config.hero_image.url }}" alt="" class="w-full h-full object-cover"/>
+            {% else %}
+            <img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="" class="w-full h-full object-cover"/>
+            {% endif %}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+        </div>
+        {% if starting_price %}
+        <div class="absolute top-6 left-6 sm:top-8 sm:left-8 glass-panel bg-white/40 text-[#1b1c17] px-6 py-4 rounded-2xl border border-white/30 m-float" data-intro="8" data-intro-kind="pop">
+            <span class="label-tiny block mb-1">Starting at</span>
+            <span class="headline-md text-2xl"><span data-slot>{{ starting_price|inr }}</span> <span class="text-base font-light">/ day</span></span>
+        </div>
+        {% endif %}
+        <div class="absolute bottom-6 right-6 sm:bottom-8 sm:right-8 glass-panel bg-[#1f2e00]/70 text-white px-5 py-4 rounded-2xl border border-white/10 flex items-center gap-4 m-float d2" data-intro="9" data-intro-kind="pop">
+            <span class="w-11 h-11 rounded-full bg-[#d4eca2] text-[#1f2e00] grid place-items-center"><span class="material-symbols-outlined">support_agent</span></span>
+            <span><span class="label-tiny block opacity-70 mb-1">Roadside support</span><span class="font-bold">24 × 7, every road</span></span>
+        </div>
+    </div>
+</section>
+<div class="px-4 sm:px-12 max-w-screen-2xl mx-auto -mt-6 mb-6 hidden lg:flex" data-intro="10"><span class="m-scrollcue label-tiny text-on-surface-variant"><i></i>Scroll</span></div>
+
+<!-- ─── Booking widget ─── -->
+<section class="px-4 sm:px-12 max-w-screen-2xl mx-auto relative z-20" data-reveal>
+    {% include "public/includes/booking_widget.html" with cities=cities %}
+</section>
+
+<!-- ─── Services marquee ─── -->
+<section class="py-16 lg:py-24" aria-label="Services">
+    <div class="m-marquee" data-marquee style="--dur:45s">
+        <div class="m-marquee-track items-center font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-primary whitespace-nowrap">
+            <span>Self-drive</span><span class="material-symbols-outlined text-primary-fixed-dim text-4xl" aria-hidden="true">asterisk</span>
+            <span class="italic font-normal text-on-surface-variant">Chauffeur driven</span><span class="material-symbols-outlined text-primary-fixed-dim text-4xl" aria-hidden="true">asterisk</span>
+            <span>Wedding cars</span><span class="material-symbols-outlined text-primary-fixed-dim text-4xl" aria-hidden="true">asterisk</span>
+            <span class="italic font-normal text-on-surface-variant">Airport transfers</span><span class="material-symbols-outlined text-primary-fixed-dim text-4xl" aria-hidden="true">asterisk</span>
+            <span>Monthly plans</span><span class="material-symbols-outlined text-primary-fixed-dim text-4xl" aria-hidden="true">asterisk</span>
+            <span class="italic font-normal text-on-surface-variant">Outstation</span><span class="material-symbols-outlined text-primary-fixed-dim text-4xl" aria-hidden="true">asterisk</span>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Browse by occasion ─── -->
+{% if categories %}
+<section class="px-4 sm:px-12 max-w-screen-2xl mx-auto pb-20 lg:pb-32">
+    <div class="flex flex-col items-center mb-12 lg:mb-16 text-center">
+        <span class="label-tiny text-primary-container">Explore by occasion</span>
+        <h2 class="headline-lg text-4xl sm:text-6xl mt-4">Find your drive.</h2>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6" data-deal>
+        {% for cat in categories|slice:":11" %}
+        <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="m-tile bg-surface-container-high p-6 sm:p-10 rounded-3xl flex flex-col items-center gap-3">
+            <span class="material-symbols-outlined text-4xl" aria-hidden="true">{{ cat.icon|default:"directions_car" }}</span>
+            <span class="label-tiny text-center">{{ cat.name }}</span>
+            {% if cat.count %}<span class="ed-tile-count">{{ cat.count|stringformat:"02d" }} {% if cat.count == 1 %}vehicle{% else %}vehicles{% endif %}</span>{% endif %}
+        </a>
+        {% endfor %}
+        <a href="{% url 'vehicle_list' %}" class="m-tile bg-primary-container text-on-primary p-6 sm:p-10 rounded-3xl flex flex-col items-center gap-3">
+            <span class="material-symbols-outlined text-4xl" aria-hidden="true">apps</span>
+            <span class="label-tiny text-center">All fleet</span>
+            {% if total_vehicle_count %}<span class="ed-tile-count">{{ total_vehicle_count|stringformat:"02d" }} vehicles</span>{% endif %}
+        </a>
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── The new collection ─── -->
+{% if featured_vehicles %}
+<section id="fleet" class="px-4 sm:px-12 py-20 lg:py-32 bg-surface-container-lowest">
+    <div class="max-w-screen-2xl mx-auto">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-12 lg:mb-16 gap-6">
+            <div><span class="label-tiny text-primary-container">Featured this week</span><h2 class="headline-lg text-4xl sm:text-6xl mt-4">The New Collection</h2></div>
+            <div class="flex flex-wrap gap-3" data-deal>
+                <a href="{% url 'vehicle_list' %}" class="px-6 py-2.5 rounded-full border border-primary-container text-primary-container font-bold text-sm">All Cars</a>
+                <a href="{% url 'vehicle_list' %}?premium=1" class="px-6 py-2.5 rounded-full bg-surface-container text-on-surface-variant font-bold text-sm hover:bg-surface-container-high transition-colors">Premium</a>
+                <a href="{% url 'vehicle_list' %}?type=suv" class="px-6 py-2.5 rounded-full bg-surface-container text-on-surface-variant font-bold text-sm hover:bg-surface-container-high transition-colors">SUV</a>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10" data-deal>
+            {% for vehicle in featured_vehicles|slice:":6" %}
+            <a href="{{ vehicle.get_absolute_url }}" class="vehicle-card group relative bg-surface p-5 sm:p-6 rounded-[2.5rem] hover:shadow-2xl block">
+                <div class="relative overflow-hidden rounded-[2rem] h-56 sm:h-64 mb-6 bg-surface-container-high">
+                    {% if vehicle.thumbnail %}
+                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
+                    {% else %}
+                    <div class="ed-ph"><span class="material-symbols-outlined text-[64px]" aria-hidden="true">directions_car</span></div>
+                    {% endif %}
+                    {% if vehicle.primary_price_value %}
+                    <div class="absolute top-4 right-4 glass-panel bg-white/60 text-[#1b1c17] px-4 py-2 rounded-full font-bold text-sm">{{ vehicle.primary_price_value|inr }}<span class="font-light">/{{ vehicle.primary_price_label }}</span></div>
+                    {% endif %}
+                    {% if vehicle.is_premium %}
+                    <div class="absolute bottom-4 left-4 bg-primary-container/85 text-on-primary px-4 py-1.5 rounded-full label-tiny">Premium</div>
+                    {% elif vehicle.is_wedding_service %}
+                    <div class="absolute bottom-4 left-4 bg-primary-container/85 text-on-primary px-4 py-1.5 rounded-full label-tiny">Wedding</div>
+                    {% elif vehicle.category %}
+                    <div class="absolute bottom-4 left-4 bg-primary-container/85 text-on-primary px-4 py-1.5 rounded-full label-tiny">{{ vehicle.category.name }}</div>
+                    {% endif %}
+                </div>
+                <p class="label-tiny text-outline mb-2">{{ vehicle.brand }}</p>
+                <h3 class="headline-md text-2xl mb-5">{{ vehicle.name }}</h3>
+                <div class="grid grid-cols-3 gap-4 mb-6 pb-6 border-b border-outline-variant/30">
+                    {% if vehicle.transmission %}<div><div class="label-tiny opacity-40">Gear</div><div class="font-serif text-base mt-1.5">{{ vehicle.get_transmission_display }}</div></div>{% endif %}
+                    {% if vehicle.fuel_type %}<div><div class="label-tiny opacity-40">Fuel</div><div class="font-serif text-base mt-1.5">{{ vehicle.get_fuel_type_display }}</div></div>{% endif %}
+                    {% if vehicle.seating_capacity %}<div><div class="label-tiny opacity-40">Seats</div><div class="font-serif text-base mt-1.5">{{ vehicle.seating_capacity }} adult</div></div>{% endif %}
+                </div>
+                <div class="w-full bg-primary-container text-on-primary py-4 rounded-full font-bold text-center m-shine"><span class="m-flip"><span>Rent Now</span><span>View details →</span></span></div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── Wedding feature ─── -->
+<section id="wedding" class="flex flex-col md:flex-row px-4 sm:px-12 py-24 lg:py-40 items-center gap-16 lg:gap-24 max-w-screen-2xl mx-auto">
+    <div class="md:w-[58%] w-full relative">
+        <div class="rounded-[3rem] w-full h-[380px] sm:h-[520px] lg:h-[640px] overflow-hidden">
+            <img alt="A vintage wedding car with white floral garlands at a Kerala backwater estate" class="w-full h-full object-cover" src="{% static 'themes/img/wedding-rolls.jpg' %}" loading="lazy"/>
+        </div>
+        <div class="absolute -bottom-10 -right-4 sm:-right-10 w-40 sm:w-56 aspect-[4/5] rounded-[2rem] overflow-hidden border-[6px] border-surface shadow-2xl" data-parallax="-50" data-no-parallax>
+            <img alt="Jasmine strings on a wedding car door handle" class="w-full h-full object-cover object-[50%_70%]" src="{% static 'themes/img/jasmine-handle.jpg' %}" loading="lazy"/>
+        </div>
+        <div class="absolute -top-6 -left-2 sm:-left-6 bg-[#33450d] text-white rounded-full w-28 h-28 sm:w-32 sm:h-32 grid place-items-center text-center shadow-xl" data-parallax="40" aria-hidden="true">
+            <svg viewBox="0 0 120 120" class="absolute inset-0 m-orbit-ring"><defs><path id="ed-wring" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0"/></defs><text fill="#d4eca2" font-size="9.5" font-weight="700" letter-spacing="3.2"><textPath href="#ed-wring">CHAUFFEUR · DECOR · ON TIME · </textPath></text></svg>
+            <span class="material-symbols-outlined text-3xl" style="font-variation-settings:'FILL' 1">favorite</span>
+        </div>
+    </div>
+    <div class="md:w-[42%] space-y-6 lg:space-y-8">
+        <span class="label-tiny text-primary-container block">Wedding fleet · Kerala</span>
+        <h2 class="headline-lg text-4xl sm:text-6xl">For the day you'll never forget.</h2>
+        <p class="text-lg text-on-surface-variant leading-relaxed font-light">From classic vintage icons to modern luxury flagships, our curated wedding fleet ensures your first journey together is legendary. Chauffeur included, decoration tailored.</p>
+        <ul class="space-y-3 text-on-surface-variant" data-deal>
+            <li class="flex items-center gap-3"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span> Chauffeur included</li>
+            <li class="flex items-center gap-3"><span class="material-symbols-outlined text-primary-container" aria-hidden="true">check_circle</span> Decoration tailored to your day</li>
+        </ul>
+        <a href="{% url 'wedding_cars' %}" class="inline-flex bg-primary-container text-on-primary px-10 py-5 rounded-full font-bold items-center gap-3">View Wedding Fleet <span class="material-symbols-outlined" data-icon="favorite">favorite</span></a>
+    </div>
+</section>
+
+<!-- ─── Luxury showcase: pinned sideways scroll ─── -->
+{% if premium_vehicles %}
+<section id="luxury" class="bg-[#141611] text-[#fbfaf1] py-20 lg:py-0 lg:h-screen lg:flex lg:flex-col lg:justify-center overflow-hidden" data-hscroll>
+    <div class="px-4 sm:px-12 mb-10 lg:mb-14 flex items-end gap-6 sm:gap-10 max-w-screen-2xl w-full mx-auto">
+        <div>
+            <span class="label-tiny text-[#b8cf88]">Elite collection</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl text-[#e9e8e0] mt-4">When ordinary won't do.</h2>
+        </div>
+        <div class="h-px flex-1 bg-white/10 mb-4 hidden sm:block"></div>
+        <div class="font-serif text-4xl sm:text-5xl text-[#b8cf88] hidden lg:flex items-baseline gap-2"><span data-hscroll-count>01</span><span class="text-white/30 text-2xl">/ {{ premium_vehicles|length|stringformat:"02d" }}</span></div>
+    </div>
+    <div class="m-htrack flex gap-8 lg:gap-10 px-4 sm:px-12 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-px-4 sm:scroll-px-12 lg:snap-none pb-4">
+        {% for vehicle in premium_vehicles %}
+        <a href="{{ vehicle.get_absolute_url }}" class="snap-start min-w-[300px] sm:min-w-[420px] lg:min-w-[34vw] h-[420px] sm:h-[520px] lg:h-[62vh] relative rounded-[3rem] overflow-hidden group block bg-[#22261c]" data-tilt="0.5">
+            {% if vehicle.thumbnail %}
+            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover" loading="lazy"/>
+            {% else %}
+            <div class="ed-ph ed-ph-dark"><span class="material-symbols-outlined text-[80px]" aria-hidden="true">directions_car</span></div>
+            {% endif %}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+            <div class="absolute bottom-8 left-8 right-8 flex justify-between items-end gap-4">
+                <div><div class="headline-md text-3xl text-white">{{ vehicle.brand }} {{ vehicle.name }}</div><div class="text-[#b8cf88] label-tiny mt-3">{% if vehicle.category %}{{ vehicle.category.name }}{% else %}Elite collection{% endif %}</div></div>
+                <span class="shrink-0 w-12 h-12 rounded-full bg-white/10 border border-white/20 text-white grid place-items-center transition-transform duration-500 group-hover:rotate-45 group-hover:bg-[#d4eca2] group-hover:text-[#1f2e00]"><span class="material-symbols-outlined">arrow_outward</span></span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── Why choose us: orbit ─── -->
+<section id="ed-why" class="px-4 sm:px-12 py-24 lg:py-40 max-w-screen-2xl mx-auto relative">
+    <div class="flex flex-col items-center mb-16 lg:mb-20 text-center">
+        <span class="label-tiny text-primary-container">Why book with us</span>
+        <h2 class="headline-lg text-4xl sm:text-6xl mt-4">Crafted for convenience.</h2>
+    </div>
+    <div class="relative max-w-5xl mx-auto lg:h-[620px] grid grid-cols-1 sm:grid-cols-2 lg:block gap-5">
+        <div class="hidden lg:grid absolute inset-0 place-items-center pointer-events-none" aria-hidden="true">
+            <div class="ed-why-core relative w-[420px] h-[420px]">
+                <svg viewBox="0 0 420 420" class="absolute inset-0 m-orbit-ring"><defs><path id="ed-ring" d="M210,210 m-196,0 a196,196 0 1,1 392,0 a196,196 0 1,1 -392,0"/></defs><text fill="#33450d" font-size="13" font-weight="700" letter-spacing="7.2"><textPath href="#ed-ring">DOORSTEP DELIVERY · 24/7 SUPPORT · ZERO HIDDEN CHARGES · ALL-KERALA NETWORK · </textPath></text></svg>
+                <svg viewBox="0 0 420 420" class="absolute inset-0 m-orbit-ring rev"><circle cx="210" cy="210" r="168" fill="none" stroke="#c5c8b8" stroke-dasharray="2 10"/><circle cx="210" cy="42" r="6" fill="#33450d"/><circle cx="378" cy="210" r="4" fill="#9cb36f"/></svg>
+                <div class="absolute inset-[64px] rounded-full overflow-hidden border-8 border-surface-container shadow-2xl"><img src="{% static 'themes/img/steering.jpg' %}" alt="" class="w-full h-full object-cover" loading="lazy"/></div>
+            </div>
+        </div>
+        <div class="ed-why-card lg:absolute lg:top-6 lg:left-0 glass-panel bg-surface-container-lowest/70 ghost-border p-6 rounded-3xl lg:w-72 shadow-xl shadow-black/5" data-tilt>
+            <span class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary grid place-items-center mb-4"><span class="material-symbols-outlined" aria-hidden="true">local_shipping</span></span>
+            <div class="font-bold text-lg text-primary-container mb-1">Doorstep Delivery</div><div class="text-sm text-on-surface-variant">We bring the car to you.</div>
+        </div>
+        <div class="ed-why-card lg:absolute lg:top-6 lg:right-0 glass-panel bg-surface-container-lowest/70 ghost-border p-6 rounded-3xl lg:w-72 shadow-xl shadow-black/5" data-tilt>
+            <span class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary grid place-items-center mb-4"><span class="material-symbols-outlined" aria-hidden="true">support_agent</span></span>
+            <div class="font-bold text-lg text-primary-container mb-1">24/7 Support</div><div class="text-sm text-on-surface-variant">Real humans, on call.</div>
+        </div>
+        <div class="ed-why-card lg:absolute lg:bottom-6 lg:left-0 glass-panel bg-surface-container-lowest/70 ghost-border p-6 rounded-3xl lg:w-72 shadow-xl shadow-black/5" data-tilt>
+            <span class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary grid place-items-center mb-4"><span class="material-symbols-outlined" aria-hidden="true">receipt_long</span></span>
+            <div class="font-bold text-lg text-primary-container mb-1">Zero Hidden Charges</div><div class="text-sm text-on-surface-variant">Transparent pricing.</div>
+        </div>
+        <div class="ed-why-card lg:absolute lg:bottom-6 lg:right-0 glass-panel bg-surface-container-lowest/70 ghost-border p-6 rounded-3xl lg:w-72 shadow-xl shadow-black/5" data-tilt>
+            <span class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary grid place-items-center mb-4"><span class="material-symbols-outlined" aria-hidden="true">map</span></span>
+            <div class="font-bold text-lg text-primary-container mb-1">All-Kerala Network</div><div class="text-sm text-on-surface-variant">{% if cities %}{{ cities.count }} locations served.{% else %}Locations across Kerala.{% endif %}</div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Locations ─── -->
+{% if cities %}
+<section class="py-20 lg:py-32 bg-surface-container-low overflow-hidden">
+    <div class="space-y-4 mb-16 lg:mb-24" aria-hidden="true">
+        <div class="m-marquee" data-marquee style="--dur:60s"><div class="m-marquee-track font-serif text-5xl sm:text-7xl font-bold text-primary/90 whitespace-nowrap">{% for city in cities|slice:":8" %}<span>{{ city.name }}</span><span class="text-primary-fixed-dim">·</span>{% endfor %}</div></div>
+        {% if cities.count > 8 %}
+        <div class="m-marquee" data-marquee data-dir="-1" style="--dur:70s"><div class="m-marquee-track font-serif italic text-5xl sm:text-7xl text-transparent whitespace-nowrap" style="-webkit-text-stroke:1.5px #75786b">{% for city in cities|slice:"8:" %}<span>{{ city.name }}</span><span>·</span>{% endfor %}</div></div>
+        {% endif %}
+    </div>
+    <div class="px-4 sm:px-12 max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 items-center">
+        <div>
+            <span class="label-tiny text-primary-container block">Where we are</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl mt-4 mb-10">Kerala at your fingertips.</h2>
+            <div class="grid grid-cols-2 gap-3 sm:gap-4" data-deal>
+                {% for city in cities|slice:":7" %}
+                <a class="m-tile flex items-center justify-between p-5 sm:p-6 bg-surface-container rounded-2xl" href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}"><span class="font-bold">{{ city.name }}</span><span class="material-symbols-outlined" aria-hidden="true">arrow_outward</span></a>
+                {% endfor %}
+                <a class="m-tile flex items-center justify-between p-5 sm:p-6 bg-primary-container text-on-primary rounded-2xl" href="{% url 'vehicle_list' %}"><span class="font-bold">All Cities</span><span class="material-symbols-outlined" aria-hidden="true">map</span></a>
+            </div>
+        </div>
+        <div class="relative">
+            <div class="rounded-[3rem] overflow-hidden h-[340px] sm:h-[540px]"><img src="{% static 'themes/img/kerala-map.jpg' %}" alt="Stylised map of the Kerala coast" class="w-full h-full object-cover" loading="lazy"/></div>
+            <div class="absolute -bottom-6 -left-4 sm:-left-8 glass-panel bg-surface-container-lowest/85 p-6 sm:p-8 rounded-3xl shadow-xl" data-parallax="-30">
+                <div class="headline-md text-4xl text-primary"><span data-slot>{{ cities.count }}</span></div>
+                <div class="label-tiny opacity-60 mt-2">Cities served</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── Testimonial: words light up as you scroll ─── -->
+{% if testimonials %}
+<section class="px-4 sm:px-12 py-24 lg:py-44 max-w-6xl mx-auto text-center">
+    <span class="material-symbols-outlined text-primary-container text-6xl mb-8 block" data-reveal aria-hidden="true">format_quote</span>
+    <p class="headline-lg text-3xl sm:text-5xl lg:text-6xl italic leading-tight text-primary" data-scrub-text data-no-split>"{{ testimonials.0.quote }}"</p>
+    <div class="mt-12 flex flex-col items-center" data-reveal>
+        <div class="font-bold text-lg">{{ testimonials.0.name }}</div>
+        {% if testimonials.0.role %}<div class="label-tiny opacity-60 mt-2">{{ testimonials.0.role }}</div>{% endif %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── CTA band + enquiry ─── -->
+<section id="enquiry" class="px-4 sm:px-12 pb-20 lg:pb-28 max-w-screen-2xl mx-auto">
+    <div class="relative overflow-hidden rounded-[2.5rem] lg:rounded-[3.5rem] bg-[#1f2e00] text-white p-6 sm:p-14 lg:p-20 grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+        <div class="absolute -right-10 -top-10 -bottom-10 w-[55%] hidden md:grid grid-cols-2 gap-4 opacity-25 pointer-events-none" style="rotate:-10deg;-webkit-mask:linear-gradient(to right,transparent,#000 45%);mask:linear-gradient(to right,transparent,#000 45%)" aria-hidden="true">
+            <div class="m-runway-col">{% for i in "12" %}<img src="{% static 'themes/img/rolls-palms.jpg' %}" class="rounded-3xl aspect-[4/5] object-cover" alt=""><img src="{% static 'themes/img/wedding-venue.jpg' %}" class="rounded-3xl aspect-[4/5] object-cover" alt=""><img src="{% static 'themes/img/ambassador.jpg' %}" class="rounded-3xl aspect-[4/5] object-cover" alt="">{% endfor %}</div>
+            <div class="m-runway-col">{% for i in "12" %}<img src="{% static 'themes/img/palms.jpg' %}" class="rounded-3xl aspect-[4/5] object-cover" alt=""><img src="{% static 'themes/img/procession.jpg' %}" class="rounded-3xl aspect-[4/5] object-cover" alt=""><img src="{% static 'themes/img/suv-munnar.jpg' %}" class="rounded-3xl aspect-[4/5] object-cover" alt="">{% endfor %}</div>
+        </div>
+        <div class="relative z-10">
+            <span class="label-tiny text-[#b8cf88] block">Get in touch</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl mt-4 mb-5">Send us an enquiry.</h2>
+            <p class="text-white/70 text-lg max-w-md font-light">Fill the form and our team will get back within the hour{% if WHATSAPP_NUMBER %}, or message us on WhatsApp{% endif %}.</p>
+            {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="inline-flex items-center gap-2 mt-8 label-tiny text-white/80 hover:text-white"><span class="material-symbols-outlined text-base" aria-hidden="true">call</span>{{ BUSINESS_PHONE }}</a>{% endif %}
+        </div>
+        <div class="relative z-10 bg-[#ffffff] text-[#1b1c17] rounded-3xl p-6 sm:p-8 shadow-2xl" data-reveal>
+            {% include "public/includes/enquiry_form.html" %}
+        </div>
+    </div>
+</section>
+
+<!-- ─── Wordmark ─── -->
+<div class="px-4 sm:px-8 max-w-screen-2xl mx-auto overflow-hidden" aria-hidden="true">
+    <div class="font-serif font-bold text-primary leading-none tracking-tighter whitespace-nowrap text-center select-none pt-4" style="font-size: min(13vw, calc(160vw / {{ BUSINESS_NAME|length|default:10 }}))" data-split="chars">{{ BUSINESS_NAME }}</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* editorial theme: hero scroll-out, why-cards fly in from the corners */
+document.addEventListener("motion:ready", function (e) {
+    var G = e.detail.G;
+    if (document.getElementById("ed-hero")) {
+        var st = { trigger: "#ed-hero", start: "top top", end: "bottom top", scrub: true };
+        G.to(".ed-hero-media", { scale: .9, borderRadius: "56px", ease: "none", scrollTrigger: st });
+        G.to(".ed-hero-media img", { yPercent: 12, ease: "none", scrollTrigger: st });
+        G.to(".ed-hero-copy", { yPercent: -18, opacity: .2, ease: "none", scrollTrigger: { trigger: "#ed-hero", start: "center top+=40%", end: "bottom top", scrub: true } });
+    }
+    var mm = G.matchMedia();
+    mm.add("(min-width: 1024px)", function () {
+        var from = [[-160, -80, -8], [160, -80, 8], [-160, 80, 8], [160, 80, -8]];
+        G.utils.toArray(".ed-why-card").forEach(function (c, i) {
+            G.from(c, { x: from[i][0], y: from[i][1], rotation: from[i][2], opacity: 0, duration: 1.3, ease: "expo.out", delay: i * .08, scrollTrigger: { trigger: "#ed-why", start: "top 55%", once: true } });
+        });
+        G.from(".ed-why-core", { scale: .6, opacity: 0, rotation: -40, duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: "#ed-why", start: "top 60%", once: true } });
+    });
+    mm.add("(max-width: 1023px)", function () {
+        G.from(".ed-why-card", { y: 60, opacity: 0, stagger: .1, duration: 1, scrollTrigger: { trigger: "#ed-why", start: "top 70%", once: true } });
+    });
+});
+</script>
+{% endblock %}

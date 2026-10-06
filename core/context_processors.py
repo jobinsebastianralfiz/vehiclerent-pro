@@ -1,4 +1,8 @@
+import json
+
 from django.conf import settings
+
+from .themes import active_theme
 
 
 def site_settings(request):
@@ -8,8 +12,16 @@ def site_settings(request):
     except Exception:
         config = None
 
+    theme = active_theme(request, config)
+    theme_ctx = {
+        "THEME": theme,
+        "THEME_TOKENS": json.dumps({"colors": theme["colors"], "display": theme["font_display"], "body": theme["font_body"]}),
+        "THEME_PREVIEW": theme["key"] != (config.theme if config else theme["key"]),
+    }
+
     if config:
         return {
+            **theme_ctx,
             "SITE_CONFIG": config,
             "BUSINESS_NAME": config.site_name,
             "BUSINESS_PHONE": config.phone,
@@ -21,6 +33,7 @@ def site_settings(request):
 
     # Fallback to env vars
     return {
+        **theme_ctx,
         "SITE_CONFIG": None,
         "BUSINESS_NAME": settings.BUSINESS_NAME,
         "BUSINESS_PHONE": settings.BUSINESS_PHONE,

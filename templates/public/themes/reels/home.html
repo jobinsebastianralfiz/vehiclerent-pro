@@ -1,0 +1,298 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}{{ BUSINESS_NAME }} | {{ config.tagline|default:"Premium Car Rentals in Kerala" }}{% endblock %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'themes/reels/reels.css' %}"/>{% endblock %}
+
+{% block navbar %}{% include "public/themes/reels/navbar.html" %}{% endblock %}
+{% block footer %}{% include "public/themes/reels/footer.html" %}{% endblock %}
+{% block main_class %}{% endblock %}
+
+{% block content %}
+<div data-no-parallax>
+
+{% with heroes=featured_vehicles|slice:":6" %}
+<!-- ─── Hero ─── -->
+{% if heroes %}
+{% with first=heroes.0 %}
+<section class="hero" id="hero">
+  <div class="hero-copy">
+    <span class="kicker" data-intro="0"><i></i>{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</span>
+    <h1 class="hero-h" data-intro="1" data-intro-kind="split">Rent a <span class="reel-line" id="reelLine"><span class="m-reel hero-reel" id="heroReel"><span>{{ first.name }}</span></span></span></h1>
+    <p class="hero-price" data-intro="3">
+      {% if first.primary_price_value %}<span id="heroPriceWrap">from <b>₹<span id="heroPrice">{{ first.primary_price_value|inr|slice:"1:" }}</span></b> a <span id="heroLabel">{{ first.primary_price_label }}</span></span>{% else %}<span id="heroPriceWrap">Price on request</span>{% endif %}
+      <span class="meta" id="heroMeta">{% with v=first %}{% include "public/themes/reels/_specs.html" %}{% endwith %}</span>
+    </p>
+    <p class="sub" data-intro="4">{{ config.hero_description|default:"Explore our premium fleet. Flexible daily, weekly, and monthly rentals with 24/7 roadside support." }}</p>
+    <div class="ctas" data-intro="5">
+      <a href="{% url 'vehicle_list' %}" class="btn btn-main" data-magnetic>{{ config.hero_cta_text|default:"Explore Fleet" }} <span class="material-symbols-outlined">arrow_forward</span></a>
+      <a href="{% url 'wedding_cars' %}" class="btn btn-line">Wedding cars <span class="material-symbols-outlined">favorite</span></a>
+    </div>
+    {% include "public/themes/reels/_stats.html" %}
+  </div>
+  <div class="stage" id="stage" data-intro="2" data-intro-kind="pop">
+    <div class="ct hero-tile t-orange" id="heroTile" data-tilt="0.6">
+      <div class="stack" id="heroStack">
+        {% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="{{ first.brand }} {{ first.name }}"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ first.category.icon|default:"directions_car" }}</span></span>{% endif %}
+      </div>
+      <span class="pbadge" id="heroCat"{% if not first.category %} hidden{% endif %}>{{ first.category.name }}</span>
+      <span class="ct-tag"><span id="heroName"><b>{{ first.brand }} {{ first.name }}</b></span><span id="heroIdx">01 / {{ heroes|length|stringformat:"02d" }}</span></span>
+    </div>
+    {% include "public/themes/reels/_orbit.html" %}
+    {% if heroes|length > 1 %}
+    <div class="thumbs" id="thumbs" role="group" aria-label="Choose a car">
+      {% for v in heroes %}{% cycle 'orange' 'blue' 'green' 'silver' 'amber' 'red' as tone silent %}
+      <button type="button" class="th t-{{ tone }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="Show {{ v.brand }} {{ v.name }}"
+        data-name="{{ v.name }}" data-full="{{ v.brand }} {{ v.name }}" data-cat="{{ v.category.name|default:'' }}" data-icon="{{ v.category.icon|default:'directions_car' }}"
+        data-img="{% if v.thumbnail %}{{ v.thumbnail.url }}{% endif %}" data-price="{% if v.primary_price_value %}{{ v.primary_price_value|inr|slice:'1:' }}{% endif %}" data-label="{{ v.primary_price_label }}"
+        data-meta="{% include 'public/themes/reels/_specs.html' %}">
+        {% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt=""/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ v.category.icon|default:"directions_car" }}</span></span>{% endif %}
+      </button>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endwith %}
+{% else %}
+<!-- no featured vehicles: a static hero driven by the site settings -->
+<section class="hero hero-fallback" id="hero">
+  <div class="hero-copy">
+    <span class="kicker" data-intro="0"><i></i>{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</span>
+    <h1 class="hero-h" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Rent Your Perfect Vehicle" }}</h1>
+    {% if starting_price %}<p class="hero-price" data-intro="3"><span>from <b>{{ starting_price|inr }}</b> a day</span></p>{% endif %}
+    <p class="sub" data-intro="4">{{ config.hero_description|default:"Explore our premium fleet. Flexible daily, weekly, and monthly rentals with 24/7 roadside support." }}</p>
+    <div class="ctas" data-intro="5">
+      <a href="{% url 'vehicle_list' %}" class="btn btn-main" data-magnetic>{{ config.hero_cta_text|default:"Explore Fleet" }} <span class="material-symbols-outlined">arrow_forward</span></a>
+      <a href="{% url 'wedding_cars' %}" class="btn btn-line">Wedding cars <span class="material-symbols-outlined">favorite</span></a>
+    </div>
+    {% include "public/themes/reels/_stats.html" %}
+  </div>
+  <div class="stage" data-intro="2" data-intro-kind="pop">
+    <div class="ct hero-tile t-orange" data-tilt="0.6">
+      <div class="stack"><img src="{% if config.hero_image %}{{ config.hero_image.url }}{% else %}{% static 'themes/img/thar-backwater.jpg' %}{% endif %}" alt=""/></div>
+      <span class="ct-tag"><span><b>{{ BUSINESS_NAME }}</b></span><span>{{ config.tagline }}</span></span>
+    </div>
+    {% include "public/themes/reels/_orbit.html" %}
+  </div>
+</section>
+{% endif %}
+{% endwith %}
+
+<!-- ─── Services ribbon ─── -->
+<div class="ribbon-wrap" aria-label="Services">
+  <div class="ribbon m-marquee" data-marquee style="--dur:38s">
+    <div class="m-marquee-track"><span>Self-drive</span><i></i><span>Chauffeur driven</span><i></i><span>Wedding cars</span><i></i><span>Airport transfers</span><i></i><span>Monthly plans</span><i></i><span>Outstation</span><i></i></div>
+  </div>
+</div>
+
+<!-- ─── Booking search ─── -->
+<section class="px-[var(--gut)] pt-6" data-reveal>
+  <form class="search" action="{% url 'vehicle_list' %}" method="get" aria-label="Search cars">
+    <div class="search-top">
+      <div class="chips" role="radiogroup" aria-label="Rental type">
+        <label class="chip"><input type="radio" name="rental_type" value="self_drive" class="sr-only" checked/>Self-drive</label>
+        <label class="chip"><input type="radio" name="rental_type" value="with_driver" class="sr-only"/>With driver</label>
+      </div>
+      <label class="same"><input type="checkbox" name="same_location" value="1" checked/>Same location</label>
+    </div>
+    <div class="search-grid">
+      <label class="field"><span>Pickup city</span><select name="pickup_city"><option value="">Any city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
+      <label class="field"><span>Drop city</span><select name="drop_city"><option value="">Same as pickup</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
+      <label class="field"><span>Pickup date</span><input type="date" name="pickup_date"/></label>
+      <label class="field"><span>Return date</span><input type="date" name="return_date"/></label>
+      <button type="submit" class="btn btn-main" data-magnetic>Search cars <span class="material-symbols-outlined">arrow_forward</span></button>
+    </div>
+    <p class="search-note">Free cancellation · No hidden charges · 24×7 customer support</p>
+  </form>
+</section>
+
+<!-- ─── Occasions (categories) ─── -->
+{% if categories %}
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="kicker"><i></i>Explore by occasion</span><h2 class="h2">Pick the <span class="ol">occasion.</span></h2></div>
+      <p class="lede">From a weekend self-drive to a chauffeur-driven wedding morning. Tap a tile to see what fits.</p>
+    </div>
+    <div class="occ-grid" data-deal>
+      {% for cat in categories|slice:":8" %}{% cycle 'orange' 'blue' 'red' 'violet' 'night' 'teal' 'green' 'amber' as tone silent %}
+      <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="ct occ t-{{ tone }}{% if tone == 'night' %} dk{% endif %}" data-tilt>
+        <span class="material-symbols-outlined">{{ cat.icon|default:"directions_car" }}</span>
+        <span><b>{{ cat.name }}</b><small>{% if cat.count %}{{ cat.count|stringformat:"02d" }} in fleet{% else %}Enquire{% endif %}</small></span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Fleet ─── -->
+{% if featured_vehicles %}
+<section class="sec" id="fleet" style="background:var(--paper)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="kicker"><i></i>Featured this week</span><h2 class="h2">The fleet, <span class="ol">on a reel.</span></h2></div>
+      <div class="chips" id="fleetChips" role="group" aria-label="Filter fleet"></div>
+    </div>
+    <div class="cards" id="cards">
+      {% for v in featured_vehicles %}{% cycle 'orange' 'blue' 'green' 'silver' 'amber' 'red' as tone silent %}
+      <article class="card m-flip-host" data-cat="{{ v.category.name|default:'Other' }}" data-tone="{{ tone }}">
+        <a class="card-a" href="{{ v.get_absolute_url }}">
+          <span class="ct t-{{ tone }}" data-tilt="0.7">
+            <span class="ph">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}" loading="lazy"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ v.category.icon|default:"directions_car" }}</span></span>{% endif %}</span>
+            {% if v.is_premium %}<span class="pbadge">Premium</span>{% elif v.is_wedding_service %}<span class="pbadge">Wedding</span>{% endif %}
+            <span class="ct-tag"><span>{{ v.category.name }}</span>{% if v.seating_capacity %}<span>{{ v.seating_capacity }} seats</span>{% endif %}</span>
+          </span>
+          <span class="meta">
+            <span class="brand">{{ v.brand }}</span>
+            <span class="name">{{ v.name }}</span>
+            <span class="specs">{% include "public/themes/reels/_specs.html" %}</span>
+            <span class="mfoot">
+              {% if v.primary_price_value %}<span class="price">₹<span class="pr">{{ v.primary_price_value|inr|slice:"1:" }}</span><small> /{{ v.primary_price_label }}</small></span>{% else %}<span class="price">Price on request</span>{% endif %}
+              <span class="m-flip"><span>Rent now</span><span>View car →</span></span>
+            </span>
+          </span>
+        </a>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Wedding ─── -->
+<section class="sec" id="wedding">
+  <div class="wrap wed">
+    <div class="ct wed-tile" id="wedTile" data-tilt="0.5">
+      <div class="wreel"><div class="wreel-strip" id="wreel">
+        <img src="{% static 'themes/img/wedding-rolls.jpg' %}" alt="Vintage car with white floral garlands"/>
+        <img src="{% static 'themes/img/ambassador.jpg' %}" alt="Cream classic car with marigold strands"/>
+        <img src="{% static 'themes/img/wedding-venue.jpg' %}" alt="Classic white car under a marigold canopy"/>
+      </div></div>
+      <div class="wcaps" id="wcaps"><span class="on">01 Vintage</span><span>02 Classic</span><span>03 Floral</span></div>
+    </div>
+    <div>
+      <span class="kicker"><i></i>Wedding fleet · Kerala</span>
+      <h2 class="h2">For the day you'll <span class="ol">never forget.</span></h2>
+      <p class="lede">From classic vintage icons to modern luxury flagships, our curated wedding fleet ensures your first journey together is legendary. Chauffeur included, decoration tailored.</p>
+      <ul class="ticks" data-deal>
+        <li><i><span class="material-symbols-outlined">check</span></i>Chauffeur included</li>
+        <li><i><span class="material-symbols-outlined">check</span></i>Decoration tailored to your day</li>
+        <li><i><span class="material-symbols-outlined">check</span></i>Classic and modern luxury cars</li>
+      </ul>
+      <a href="{% url 'wedding_cars' %}" class="btn btn-main" data-magnetic>View wedding fleet <span class="material-symbols-outlined">arrow_forward</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Luxury: pinned sideways reel ─── -->
+{% if premium_vehicles %}
+<section class="lux" id="luxury" data-hscroll>
+  <div class="head">
+    <div>
+      <span class="kicker"><i></i>Elite collection</span>
+      <h2 class="h2" style="color:#fff">When ordinary <span style="color:var(--lime)">won't do.</span></h2>
+      <a href="{% url 'premium_cars' %}" class="all">All premium cars <span class="material-symbols-outlined" style="font-size:16px">arrow_forward</span></a>
+    </div>
+    <div class="count"><span data-hscroll-count>01</span><small>/ {{ premium_vehicles|length|stringformat:"02d" }}</small></div>
+  </div>
+  <div class="m-htrack">
+    {% for v in premium_vehicles %}
+    <a href="{{ v.get_absolute_url }}" class="ct lx dk t-night" data-tilt="0.4">
+      <span class="ph">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ v.category.icon|default:"diamond" }}</span></span>{% endif %}</span>
+      <span class="cap"><span><b>{{ v.brand }} {{ v.name }}</b><small>{% if v.primary_price_value %}{{ v.primary_price_value|inr }} / {{ v.primary_price_label }}{% else %}{{ v.category.name|default:"Premium" }}{% endif %}</small></span><span class="go"><span class="material-symbols-outlined">arrow_outward</span></span></span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Why ─── -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="kicker"><i></i>Why book with us</span><h2 class="h2">Crafted for <span class="ol">convenience.</span></h2></div>
+    </div>
+    <div class="why-grid" data-deal>
+      <div class="ct why t-orange" data-tilt><span class="n" data-slot>01</span><div><span class="material-symbols-outlined" style="font-size:30px">local_shipping</span><b>Doorstep delivery</b><p>We bring the car to you.</p></div></div>
+      <div class="ct why t-blue" data-tilt><span class="n" data-slot>02</span><div><span class="material-symbols-outlined" style="font-size:30px">support_agent</span><b>24/7 support</b><p>Real humans, on call.</p></div></div>
+      <div class="ct why t-green" data-tilt><span class="n" data-slot>03</span><div><span class="material-symbols-outlined" style="font-size:30px">receipt_long</span><b>Zero hidden charges</b><p>Transparent pricing.</p></div></div>
+      <div class="ct why dk t-night" data-tilt><span class="n" data-slot>04</span><div><span class="material-symbols-outlined" style="font-size:30px">map</span><b>All-Kerala network</b><p>{% if cities %}{{ cities|length }}+ locations served.{% else %}Pickups across Kerala.{% endif %}</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Cities ─── -->
+{% if cities %}
+<section class="sec" id="cities" style="background:var(--paper);padding-left:0;padding-right:0;overflow:hidden">
+  <div class="wrap" style="padding:0 var(--gut)">
+    <div class="sec-head">
+      <div><span class="kicker"><i></i>Where we are</span><h2 class="h2"><span data-slot>{{ cities|length }}</span> {{ cities|length|pluralize:"city,cities" }}. <span class="ol">One fleet.</span></h2></div>
+      <p class="lede">Pick up and drop off across Kerala, from the backwaters to the hills.</p>
+    </div>
+  </div>
+  <div class="city-rows">
+    <div class="m-marquee" data-marquee style="--dur:50s"><div class="m-marquee-track">
+      {% for city in cities %}{% if forloop.counter0|divisibleby:2 %}{% cycle 'orange' 'blue' 'green' 'silver' 'amber' 'red' 'night' 'violet' 'teal' as tone silent %}<a href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="chip"><span class="dot t-{{ tone }}"></span>{{ city.name }}<span class="material-symbols-outlined">arrow_outward</span></a>{% endif %}{% endfor %}
+    </div></div>
+    {% if cities|length > 1 %}
+    <div class="m-marquee" data-marquee data-dir="-1" style="--dur:58s"><div class="m-marquee-track">
+      {% for city in cities %}{% if not forloop.counter0|divisibleby:2 %}{% cycle 'amber' 'red' 'night' 'violet' 'teal' 'orange' 'blue' 'green' 'silver' as tone silent %}<a href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="chip"><span class="dot t-{{ tone }}"></span>{{ city.name }}<span class="material-symbols-outlined">arrow_outward</span></a>{% endif %}{% endfor %}
+    </div></div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Testimonial ─── -->
+{% if testimonials %}
+<section class="sec">
+  <div class="wrap">
+    <figure class="ct quote">
+      <span class="kicker" style="color:var(--ink)"><i></i>From a customer</span>
+      <p data-scrub-text>"{{ testimonials.0.quote }}"</p>
+      <figcaption class="who" data-reveal><b>{{ testimonials.0.name }}</b>{{ testimonials.0.role }}</figcaption>
+    </figure>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── CTA band + enquiry ─── -->
+<section class="sec" id="enquiry" style="padding-top:0">
+  <div class="wrap">
+    <div class="band">
+      <div class="band-run" aria-hidden="true">
+        {% for col in "ab" %}
+        <div class="m-runway-col">
+          {% if col == "a" %}{% for n in "xy" %}
+          <span class="ct t-violet"><span class="ph"><img src="{% static 'themes/img/rolls-palms.jpg' %}" alt=""/></span></span>
+          <span class="ct t-orange"><span class="ph"><img src="{% static 'themes/img/thar-backwater.jpg' %}" alt=""/></span></span>
+          <span class="ct t-amber"><span class="ph"><img src="{% static 'themes/img/ambassador.jpg' %}" alt=""/></span></span>
+          <span class="ct t-blue"><span class="ph"><img src="{% static 'themes/img/suv-munnar.jpg' %}" alt=""/></span></span>
+          {% endfor %}{% else %}{% for n in "xy" %}
+          <span class="ct t-red"><span class="ph"><img src="{% static 'themes/img/mini.jpg' %}" alt=""/></span></span>
+          <span class="ct t-green"><span class="ph"><img src="{% static 'themes/img/procession.jpg' %}" alt=""/></span></span>
+          <span class="ct t-silver"><span class="ph"><img src="{% static 'themes/img/porsche.jpg' %}" alt=""/></span></span>
+          <span class="ct t-teal"><span class="ph"><img src="{% static 'themes/img/rangerover.jpg' %}" alt=""/></span></span>
+          {% endfor %}{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <div>
+        <span class="kicker"><i></i>Get in touch</span>
+        <h2>Send us an enquiry.</h2>
+        <p>Fill the form and our team will get back within the hour{% if WHATSAPP_NUMBER %}, or message us on WhatsApp{% endif %}.</p>
+      </div>
+      <div class="form-card" data-reveal>
+        {% include "public/includes/enquiry_form.html" %}
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}<script defer src="{% static 'themes/reels/reels.js' %}"></script>{% endblock %}

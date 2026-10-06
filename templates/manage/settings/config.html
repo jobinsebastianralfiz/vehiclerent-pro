@@ -1,4 +1,5 @@
 {% extends "manage/base_admin.html" %}
+{% load static %}
 
 {% block page_title %}Site Settings{% endblock %}
 
@@ -21,8 +22,32 @@
         <div class="mb-8 px-4 py-3 rounded-xl bg-red-50 text-red-800 text-sm">{{ form.errors }}</div>
         {% endif %}
 
+        <!-- Website Theme -->
+        <div id="theme" class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12 mb-8 sm:mb-12 scroll-mt-24">
+            <div>
+                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Website Theme</p>
+                <p class="text-xs text-stone-400 mt-1">The design of your public website. Preview opens the live site in that theme for you only; visitors see the saved theme.</p>
+            </div>
+            <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {% for key, t in themes %}
+                <label class="group relative block cursor-pointer rounded-xl border-2 overflow-hidden transition-colors has-[:checked]:border-primary border-stone-200 hover:border-stone-300">
+                    <input type="radio" name="theme" value="{{ key }}" class="peer sr-only" {% if form.theme.value == key %}checked{% endif %}/>
+                    <img src="{% static 'themes/thumbs/'|add:key|add:'.jpg' %}" alt="" class="w-full aspect-[16/10] object-cover object-top bg-stone-100" loading="lazy"/>
+                    <span class="absolute top-2 right-2 hidden peer-checked:flex items-center gap-1 bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full"><span class="material-symbols-outlined text-sm">check</span>Selected</span>
+                    <span class="block p-3">
+                        <span class="flex items-center justify-between gap-2">
+                            <span class="text-sm font-bold">{{ t.label }}</span>
+                            <a href="{% url 'home' %}?theme={{ key }}" target="_blank" rel="noopener" class="text-[11px] font-bold text-primary hover:underline flex items-center gap-1">Preview <span class="material-symbols-outlined text-sm">open_in_new</span></a>
+                        </span>
+                        <span class="block text-xs text-stone-500 mt-1 leading-snug">{{ t.description }}</span>
+                    </span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
         <!-- Branding -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12 mb-8 sm:mb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12 mb-8 sm:mb-12 pt-8 border-t border-stone-100">
             <div>
                 <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Branding</p>
                 <p class="text-xs text-stone-400 mt-1">Site name, logo, and tagline displayed across the website</p>

@@ -1,0 +1,7 @@
+{% if config.years_in_business or total_vehicle_count or cities %}
+<div class="stats" data-intro="6">
+  {% if config.years_in_business %}<div><b><span data-slot>{{ config.years_in_business }}</span>+</b><small>Years</small></div>{% endif %}
+  {% if total_vehicle_count %}<div><b><span data-slot>{{ total_vehicle_count }}</span></b><small>Vehicles in fleet</small></div>{% endif %}
+  {% if cities %}<div><b><span data-slot>{{ cities|length }}</span></b><small>Kerala {{ cities|length|pluralize:"city,cities" }}</small></div>{% endif %}
+</div>
+{% endif %}

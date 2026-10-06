@@ -1,24 +1,25 @@
 {% load vehicle_tags %}
-<nav class="m-nav fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30" role="navigation" aria-label="Main navigation">
+<nav class="m-nav fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/50" role="navigation" aria-label="Main navigation">
     <div class="flex justify-between items-center px-4 sm:px-12 py-4 sm:py-5 max-w-screen-2xl mx-auto">
         <a href="{% url 'home' %}" class="flex items-center gap-2 sm:gap-3 min-w-0" aria-label="{{ BUSINESS_NAME }} - Home">
             {% if SITE_CONFIG.logo %}
             <img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-10 sm:h-12 flex-shrink-0"/>
             {% endif %}
+            {% if not SITE_CONFIG.logo %}<span class="material-symbols-outlined text-[#e39b3c] text-2xl flex-shrink-0" style="font-variation-settings:'FILL' 1" aria-hidden="true">signpost</span>{% endif %}
             {% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}
-            <span class="text-xl sm:text-2xl font-serif font-bold text-primary-container truncate">{{ BUSINESS_NAME }}</span>
+            <span class="text-xl sm:text-2xl font-serif font-bold text-tertiary truncate">{{ BUSINESS_NAME }}</span>
             {% endif %}
         </a>
 
         <!-- Desktop Nav: tiny all-caps tracked labels -->
         {% with request.resolver_match.url_name as current %}
         <div class="hidden lg:flex items-center gap-8 xl:gap-12" role="menubar">
-            <a class="m-link label-tiny {% if current == 'home' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'home' %}" role="menuitem">Home</a>
-            <a class="m-link label-tiny {% if current == 'vehicle_list' or current == 'vehicle_detail' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'vehicle_list' %}" role="menuitem">Fleet</a>
-            <a class="m-link label-tiny {% if current == 'premium_cars' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'premium_cars' %}" role="menuitem">Premium</a>
-            <a class="m-link label-tiny {% if current == 'wedding_cars' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'wedding_cars' %}" role="menuitem">Wedding Cars</a>
-            <a class="m-link label-tiny {% if current == 'about' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'about' %}" role="menuitem">About</a>
-            <a class="m-link label-tiny {% if current == 'contact' %}text-primary-container border-b border-primary-container pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'contact' %}" role="menuitem">Contact</a>
+            <a class="m-link label-tiny {% if current == 'home' %}text-tertiary border-b border-tertiary pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'home' %}" role="menuitem">Home</a>
+            <a class="m-link label-tiny {% if current == 'vehicle_list' or current == 'vehicle_detail' %}text-tertiary border-b border-tertiary pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'vehicle_list' %}" role="menuitem">Fleet</a>
+            <a class="m-link label-tiny {% if current == 'premium_cars' %}text-tertiary border-b border-tertiary pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'premium_cars' %}" role="menuitem">Premium</a>
+            <a class="m-link label-tiny {% if current == 'wedding_cars' %}text-tertiary border-b border-tertiary pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'wedding_cars' %}" role="menuitem">Wedding Cars</a>
+            <a class="m-link label-tiny {% if current == 'about' %}text-tertiary border-b border-tertiary pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'about' %}" role="menuitem">About</a>
+            <a class="m-link label-tiny {% if current == 'contact' %}text-tertiary border-b border-tertiary pb-1{% else %}text-on-surface-variant hover:text-primary-container{% endif %} transition-colors" href="{% url 'contact' %}" role="menuitem">Contact</a>
         </div>
         {% endwith %}
 
@@ -26,7 +27,7 @@
             {% if BUSINESS_PHONE %}
             <a href="tel:{{ BUSINESS_PHONE }}" class="hidden xl:inline label-tiny text-on-surface-variant hover:text-primary-container transition-colors">{{ BUSINESS_PHONE }}</a>
             {% endif %}
-            <a href="{% url 'vehicle_list' %}" class="bg-primary-container text-on-primary px-6 sm:px-8 py-2.5 sm:py-3 rounded-full label-tiny hover:opacity-80 active:scale-95 transition-all hidden lg:inline-block">Book Now</a>
+            <a href="#plan" class="m-shine bg-tertiary text-on-tertiary px-6 sm:px-8 py-2.5 sm:py-3 rounded-full label-tiny hover:opacity-90 active:scale-95 transition-all hidden lg:inline-block" data-magnetic>Plan a trip</a>
             <button x-data x-on:click="$dispatch('toggle-mobile-menu')" class="lg:hidden p-1" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
                 <span class="material-symbols-outlined text-2xl" aria-hidden="true">menu</span>
             </button>

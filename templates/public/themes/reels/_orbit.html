@@ -1,0 +1,5 @@
+{% load vehicle_tags %}
+<div class="orbit" aria-hidden="true">
+  <svg viewBox="0 0 128 128" class="m-orbit-ring"><defs><path id="oring" d="M64,64 m-49,0 a49,49 0 1,1 98,0 a49,49 0 1,1 -98,0"/></defs><text fill="#C6E36B" font-size="10" font-weight="700" font-family="Space Mono, monospace" letter-spacing="2"><textPath href="#oring" textLength="300" lengthAdjust="spacing">{% if starting_price %}FROM {{ starting_price|inr }} A DAY · DOORSTEP DELIVERY · {% else %}DOORSTEP DELIVERY · 24/7 SUPPORT · {% endif %}</textPath></text></svg>
+  <span class="material-symbols-outlined">key</span>
+</div>
