@@ -12,14 +12,12 @@ from .models import (
     City,
     Vehicle,
     VehicleCategory,
-    VehicleImage,
     WeddingDecorationPackage,
 )
 from .forms import (
     BookingAddonForm,
     CategoryForm,
     CityForm,
-    VehicleForm,
     VehicleImageFormSet,
     WeddingDecorationPackageForm,
 )
@@ -195,6 +193,9 @@ def vehicle_manage_list(request):
     status = request.GET.get("status")
     if status:
         qs = qs.filter(status=status)
+    category = request.GET.get("category", "")
+    if category.isdigit():
+        qs = qs.filter(category_id=int(category))
 
     paginator = Paginator(qs, 20)
     page_obj = paginator.get_page(request.GET.get("page"))
@@ -205,50 +206,6 @@ def vehicle_manage_list(request):
         "current_status": status,
         "status_choices": Vehicle.STATUS_CHOICES,
     })
-
-
-def _save_gallery_images(request, vehicle):
-    """Save multiple uploaded gallery images to a vehicle."""
-    files = request.FILES.getlist("gallery_images")
-    start_order = vehicle.images.count()
-    for i, f in enumerate(files):
-        VehicleImage.objects.create(
-            vehicle=vehicle,
-            image=f,
-            display_order=start_order + i,
-        )
-
-
-@login_required
-def vehicle_add(request):
-    if request.method == "POST":
-        form = VehicleForm(request.POST, request.FILES)
-        if form.is_valid():
-            vehicle = form.save()
-            _save_gallery_images(request, vehicle)
-            img_count = request.FILES.getlist("gallery_images")
-            messages.success(request, f"Vehicle '{vehicle.name}' created with {len(img_count)} gallery image(s).")
-            return redirect("vehicle_manage_list")
-    else:
-        form = VehicleForm()
-
-    return render(request, "manage/vehicles/form.html", {"form": form, "title": "Add New Vehicle"})
-
-
-@login_required
-def vehicle_edit(request, pk):
-    vehicle = get_object_or_404(Vehicle, pk=pk)
-    if request.method == "POST":
-        form = VehicleForm(request.POST, request.FILES, instance=vehicle)
-        if form.is_valid():
-            form.save()
-            _save_gallery_images(request, vehicle)
-            messages.success(request, f"Vehicle '{vehicle.name}' updated successfully.")
-            return redirect("vehicle_manage_list")
-    else:
-        form = VehicleForm(instance=vehicle)
-
-    return render(request, "manage/vehicles/form.html", {"form": form, "title": f"Edit {vehicle.name}", "vehicle": vehicle})
 
 
 @login_required
@@ -307,12 +264,50 @@ def vehicle_toggle_status(request, pk):
 
 @login_required
 def category_list(request):
-    categories = (
-        VehicleCategory.objects.all()
-        .annotate(vehicle_count=Count("vehicles", filter=models.Q(vehicles__is_published=True)))
-        .order_by("display_order")
+    all_cats = VehicleCategory.objects.annotate(
+        vehicle_count=Count("vehicles", distinct=True),
+        published_count=Count("vehicles", filter=models.Q(vehicles__is_published=True), distinct=True),
     )
-    return render(request, "manage/categories/list.html", {"categories": categories})
+    total_vehicles = Vehicle.objects.count()
+    # one real photo per category for the list (first vehicle with a thumbnail)
+    photos = {}
+    for v in Vehicle.objects.exclude(thumbnail="").exclude(category=None).order_by("-is_featured", "id"):
+        photos.setdefault(v.category_id, v.thumbnail.url)
+
+    q = request.GET.get("q", "").strip()[:100]
+    status = request.GET.get("status", "")
+    sort = request.GET.get("sort", "order")
+    qs = all_cats
+    if q:
+        qs = qs.filter(models.Q(name__icontains=q) | models.Q(description__icontains=q))
+    if status == "active":
+        qs = qs.filter(is_active=True)
+    elif status == "inactive":
+        qs = qs.filter(is_active=False)
+    qs = qs.order_by({"name": "name", "vehicles": "-vehicle_count", "newest": "-created_at"}.get(sort, "display_order"), "name")
+
+    tones = ["emerald", "sky", "amber", "violet", "rose", "teal"]
+    tone_of = {pk: tones[i % len(tones)] for i, pk in enumerate(all_cats.order_by("display_order", "name").values_list("id", flat=True))}
+    paginator = Paginator(qs, 12)
+    page_obj = paginator.get_page(request.GET.get("page"))
+    for c in page_obj:
+        c.photo = photos.get(c.id)
+        c.tone = tone_of.get(c.id, "emerald")
+    summary = list(all_cats.order_by("display_order", "name")[:6])
+    for c in summary:
+        c.tone = tone_of.get(c.id, "emerald")
+        c.share = round(c.vehicle_count * 100 / total_vehicles, 1) if total_vehicles else 0
+    params = request.GET.copy()
+    params.pop("page", None)
+    return render(request, "manage/categories/list.html", {
+        "page_obj": page_obj,
+        "summary": summary,
+        "total_vehicles": total_vehicles,
+        "q": q,
+        "current_status": status,
+        "current_sort": sort,
+        "query_string": params.urlencode(),
+    })
 
 
 @login_required

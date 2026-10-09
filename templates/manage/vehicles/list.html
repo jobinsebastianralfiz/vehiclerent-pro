@@ -44,11 +44,11 @@
                 <p class="font-medium text-sm truncate">{{ vehicle.name }}{% if vehicle.is_premium %} <span class="text-amber-500"><span class="material-symbols-outlined text-sm">star</span></span>{% endif %}{% if vehicle.is_wedding_service %} <span class="text-pink-500"><span class="material-symbols-outlined text-sm">favorite</span></span>{% endif %}</p>
                 <p class="text-xs text-stone-500 truncate">{{ vehicle.brand }} &middot; {{ vehicle.registration_number|default:"No Reg." }}</p>
             </div>
-            {% status_badge vehicle.status %}
+            {% if vehicle.is_draft %}<a href="{% url 'vehicle_edit' vehicle.pk %}" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 hover:bg-amber-200" title="Continue the add-vehicle steps"><span class="material-symbols-outlined text-[14px]">edit_note</span>Draft · step {{ vehicle.wizard_step }}/6</a>{% else %}{% status_badge vehicle.status %}{% endif %}
         </div>
         <div class="flex items-center justify-between text-xs text-stone-500 mb-3 pb-3 border-b border-stone-100">
             <span>{{ vehicle.get_vehicle_type_display }}</span>
-            <span class="font-medium text-on-surface text-sm">{{ vehicle.primary_price_value|inr }}<span class="text-stone-400 font-normal">/{{ vehicle.primary_price_label }}</span></span>
+            <span class="font-medium text-on-surface text-sm">{% if vehicle.primary_price_value %}{{ vehicle.primary_price_value|inr }}<span class="text-stone-400 font-normal">/{{ vehicle.primary_price_label }}</span>{% else %}<span class="text-stone-400">No price yet</span>{% endif %}</span>
         </div>
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -105,11 +105,11 @@
                         </div>
                     </td>
                     <td class="px-4 py-4 text-sm text-stone-600">{{ vehicle.get_vehicle_type_display }}</td>
-                    <td class="px-4 py-4">{% status_badge vehicle.status %}</td>
+                    <td class="px-4 py-4">{% if vehicle.is_draft %}<a href="{% url 'vehicle_edit' vehicle.pk %}" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 hover:bg-amber-200" title="Continue the add-vehicle steps"><span class="material-symbols-outlined text-[14px]">edit_note</span>Draft · step {{ vehicle.wizard_step }}/6</a>{% else %}{% status_badge vehicle.status %}{% endif %}</td>
                     <td class="px-4 py-4 text-xs">
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full font-medium {% if vehicle.rental_mode == 'monthly' %}bg-purple-100 text-purple-800{% elif vehicle.rental_mode == 'weekly' %}bg-blue-100 text-blue-800{% elif vehicle.rental_mode == 'daily' %}bg-green-100 text-green-800{% else %}bg-stone-100 text-stone-600{% endif %}">{{ vehicle.get_rental_mode_display }}</span>
                     </td>
-                    <td class="px-4 py-4 text-sm font-medium">{{ vehicle.primary_price_value|inr }}<span class="text-xs text-stone-400 font-normal">/{{ vehicle.primary_price_label }}</span></td>
+                    <td class="px-4 py-4 text-sm font-medium">{% if vehicle.primary_price_value %}{{ vehicle.primary_price_value|inr }}<span class="text-xs text-stone-400 font-normal">/{{ vehicle.primary_price_label }}</span>{% else %}<span class="text-stone-400 font-normal">—</span>{% endif %}</td>
                     <td class="px-4 py-4 text-center">
                         <form method="post" action="{% url 'vehicle_toggle_status' vehicle.pk %}" class="inline">{% csrf_token %}<input type="hidden" name="action" value="toggle_featured"/><button type="submit" class="text-lg">{% if vehicle.is_featured %}<span class="text-amber-500">&#9733;</span>{% else %}<span class="text-stone-300">&#9734;</span>{% endif %}</button></form>
                     </td>

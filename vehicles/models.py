@@ -171,6 +171,9 @@ class Vehicle(models.Model):
         help_text="Cities where this vehicle can be picked up / delivered",
     )
     is_published = models.BooleanField(default=True)
+    # Add-vehicle wizard: a draft is saved after step 1 and stays off the public site
+    is_draft = models.BooleanField(default=False)
+    wizard_step = models.PositiveSmallIntegerField(default=6, help_text="Furthest wizard step reached")
     # SEO
     meta_title = models.CharField(max_length=200, blank=True, help_text="Custom <title>; defaults to '{Brand} {Name} for Rent'")
     meta_description = models.CharField(max_length=300, blank=True, help_text="Meta description for search engines (150–160 chars)")
@@ -194,6 +197,8 @@ class Vehicle(models.Model):
                 slug = f"{base_slug}-{counter}"
                 counter += 1
             self.slug = slug
+        if self.is_draft:
+            self.is_published = False  # drafts never show on the public site
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):

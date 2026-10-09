@@ -1,0 +1,319 @@
+{% extends "manage/base_admin.html" %}
+{% load vehicle_tags %}
+
+{% block title %}{% if is_edit %}Edit {{ vehicle.name }}{% else %}Add New Vehicle{% endif %} - {{ BUSINESS_NAME }}{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
+    <div>
+        <a href="{% url 'vehicle_manage_list' %}" class="inline-flex items-center gap-1 text-sm text-stone-500 hover:text-[#145c38] mb-2"><span class="material-symbols-outlined text-[18px]">arrow_back</span>Vehicles</a>
+        <h1 class="text-2xl sm:text-[32px] font-extrabold tracking-tight">{% if is_edit %}Edit {{ vehicle.name }}{% else %}Add New Vehicle{% endif %}</h1>
+        <p class="text-stone-500 mt-1">{% if is_edit %}Jump to any step. Each step saves on its own.{% else %}Add the details step by step. Every step is saved as you go, so you can stop and continue later.{% endif %}</p>
+    </div>
+    {% if vehicle.is_draft %}<span class="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 text-xs font-bold ring-1 ring-amber-200"><span class="material-symbols-outlined text-[16px]">edit_note</span>Draft · not on the website yet</span>{% endif %}
+</div>
+
+<form method="post" action="{{ post_url }}" enctype="multipart/form-data" id="wizard" data-draft-key="{{ draft_key }}" data-has-errors="{% if form.errors %}1{% endif %}" novalidate>
+    {% csrf_token %}
+
+    <!-- ─── Stepper ─── -->
+    <ol class="flex items-start gap-1 sm:gap-2 overflow-x-auto pb-2 mb-5 -mx-1 px-1" aria-label="Steps">
+        {% for s in steps %}
+        <li class="flex items-center gap-1 sm:gap-2 {% if not forloop.last %}flex-1 min-w-[56px] sm:min-w-[120px]{% endif %}">
+            {% if s.reachable and s.n != step %}
+            <button type="submit" name="action" value="goto:{{ s.n }}" formnovalidate class="group flex items-center gap-2.5 text-left shrink-0">
+            {% else %}<div class="flex items-center gap-2.5 shrink-0" {% if s.n == step %}aria-current="step"{% endif %}>{% endif %}
+                <span class="w-9 h-9 rounded-full grid place-items-center text-sm font-bold shrink-0 transition-colors
+                    {% if s.n == step %}bg-[#145c38] text-white ring-4 ring-[#145c38]/15{% elif s.done %}bg-[#145c38] text-white group-hover:bg-[#0f4a2d]{% elif s.reachable %}bg-white text-stone-700 ring-1 ring-stone-300 group-hover:ring-[#145c38]{% else %}bg-stone-100 text-stone-400{% endif %}">
+                    {% if s.done %}<span class="material-symbols-outlined text-[18px]">check</span>{% else %}{{ s.n }}{% endif %}
+                </span>
+                <span class="hidden lg:block leading-tight">
+                    <span class="block text-sm font-bold {% if s.n == step %}text-[#145c38]{% elif s.reachable %}text-stone-800{% else %}text-stone-400{% endif %}">{{ s.title }}</span>
+                    <span class="block text-[11px] text-stone-500">{{ s.sub }}</span>
+                </span>
+            {% if s.reachable and s.n != step %}</button>{% else %}</div>{% endif %}
+            {% if not forloop.last %}<span class="flex-1 h-0.5 rounded-full {% if s.done or s.n < step %}bg-[#145c38]{% else %}bg-stone-200{% endif %}"></span>{% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+
+    <!-- restored-from-browser notice -->
+    <div id="draft-restored" class="hidden mb-4 flex items-center gap-3 rounded-2xl bg-sky-50 ring-1 ring-sky-200 px-4 py-3 text-sm text-sky-900" role="status">
+        <span class="material-symbols-outlined">history</span>
+        <span class="flex-1">We restored what you typed on this step before leaving. Click <b>Next</b> or <b>Save as Draft</b> to keep it.</span>
+        <button type="button" id="draft-discard" class="font-bold underline">Discard</button>
+    </div>
+
+    <!-- ─── Step panel ─── -->
+    <section class="bg-white rounded-3xl shadow-sm ring-1 ring-black/5 p-5 sm:p-8">
+        <div class="flex items-center gap-4 mb-6">
+            <span class="w-12 h-12 rounded-2xl bg-[#ecf7f0] text-[#145c38] grid place-items-center"><span class="material-symbols-outlined">{{ current.icon }}</span></span>
+            <div><h2 class="font-bold text-xl text-stone-900">{{ current.heading }}</h2><p class="text-stone-500 text-sm">{{ current.lede }}</p></div>
+        </div>
+        {% if form.non_field_errors %}<div class="mb-4 rounded-xl bg-red-50 text-red-800 px-4 py-3 text-sm">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+
+        {% if step == 1 %}
+        <div class="grid lg:grid-cols-[1fr_260px] gap-6">
+            <div class="grid sm:grid-cols-2 gap-4 sm:gap-5">
+                {% include "manage/vehicles/_wf.html" with f=form.name %}
+                {% include "manage/vehicles/_wf.html" with f=form.brand %}
+                {% include "manage/vehicles/_wf.html" with f=form.model %}
+                {% include "manage/vehicles/_wf.html" with f=form.year %}
+                {% include "manage/vehicles/_wf.html" with f=form.registration_number %}
+                {% include "manage/vehicles/_wf.html" with f=form.color %}
+            </div>
+            <div class="rounded-2xl bg-stone-50 ring-1 ring-stone-200/70 p-4 flex flex-col items-center justify-center text-center min-h-[180px]">
+                {% if vehicle.thumbnail %}<img src="{{ vehicle.thumbnail.url }}" alt="" class="w-full h-36 object-cover rounded-xl"/><p class="mt-2 text-xs text-stone-500">Main photo · change it in step 5</p>
+                {% else %}<span class="material-symbols-outlined text-5xl text-stone-300">directions_car</span><p class="mt-2 text-xs text-stone-500">You'll add the main photo in step 5.</p>{% endif %}
+            </div>
+        </div>
+
+        {% elif step == 2 %}
+        <fieldset>
+            <legend class="block text-sm font-semibold text-stone-700 mb-2">Vehicle type <span class="text-red-500">*</span></legend>
+            <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-10 gap-2">
+                {% for r in form.vehicle_type %}
+                <label class="cursor-pointer">
+                    <input type="radio" name="{{ r.data.name }}" value="{{ r.data.value }}" class="peer sr-only" {% if r.data.selected %}checked{% endif %}/>
+                    <span class="flex flex-col items-center gap-1.5 rounded-2xl ring-1 ring-stone-200 py-3.5 px-1 text-xs font-semibold text-stone-600 transition peer-checked:ring-2 peer-checked:ring-[#145c38] peer-checked:bg-[#ecf7f0] peer-checked:text-[#145c38] hover:bg-stone-50 peer-focus-visible:ring-2 peer-focus-visible:ring-[#145c38]/50">
+                        <span class="material-symbols-outlined text-[26px]">{% if r.data.value == 'car' %}directions_car{% elif r.data.value == 'suv' %}airport_shuttle{% elif r.data.value == 'bike' %}two_wheeler{% elif r.data.value == 'scooter' %}moped{% elif r.data.value == 'van' %}airport_shuttle{% elif r.data.value == 'truck' %}local_shipping{% elif r.data.value == 'bus' %}directions_bus{% elif r.data.value == 'tempo' %}rv_hookup{% elif r.data.value == 'auto' %}electric_rickshaw{% else %}more_horiz{% endif %}</span>
+                        {{ r.choice_label }}
+                    </span>
+                </label>
+                {% endfor %}
+            </div>
+            {% if form.vehicle_type.errors %}<p class="mt-1 text-xs font-semibold text-red-600">{{ form.vehicle_type.errors|join:" " }}</p>{% endif %}
+        </fieldset>
+        <div class="grid sm:grid-cols-2 gap-4 sm:gap-5 mt-6">
+            {% include "manage/vehicles/_wf.html" with f=form.category help="Manage the list under Categories." %}
+            {% include "manage/vehicles/_wf.html" with f=form.seating_capacity post="seats" %}
+        </div>
+
+        {% elif step == 3 %}
+        <div class="grid lg:grid-cols-2 gap-6" x-data="{ fuel: '{{ form.fuel_type.value|default:'' }}' }">
+            <div class="grid sm:grid-cols-2 gap-4 sm:gap-5 content-start" x-on:change="if ($event.target.name === 'fuel_type') fuel = $event.target.value">
+                {% include "manage/vehicles/_wf.html" with f=form.fuel_type %}
+                {% include "manage/vehicles/_wf.html" with f=form.transmission %}
+                {% include "manage/vehicles/_wf.html" with f=form.engine_cc post="cc" %}
+                {% include "manage/vehicles/_wf.html" with f=form.mileage_kmpl post="km/L" %}
+            </div>
+            <div class="rounded-2xl ring-1 transition-colors p-4 sm:p-5" :class="['electric','hybrid'].includes(fuel) ? 'ring-[#145c38]/30 bg-[#f4faf6]' : 'ring-stone-200 bg-stone-50/60'">
+                <p class="font-bold text-[#145c38] flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">bolt</span>EV / Hybrid specifications</p>
+                <p class="text-xs text-stone-500 mb-4" x-text="['electric','hybrid'].includes(fuel) ? 'Fill these in for this electric or hybrid vehicle.' : 'Only needed for electric or hybrid vehicles.'">Only needed for electric or hybrid vehicles.</p>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    {% include "manage/vehicles/_wf.html" with f=form.battery_capacity_kwh post="kWh" %}
+                    {% include "manage/vehicles/_wf.html" with f=form.range_km post="km" %}
+                    {% include "manage/vehicles/_wf.html" with f=form.motor_power_kw post="kW" %}
+                    {% include "manage/vehicles/_wf.html" with f=form.charging_time_hours post="hrs" %}
+                </div>
+                <label class="mt-4 inline-flex items-center gap-2.5 text-sm font-semibold text-stone-700">{{ form.fast_charging }} Fast charging support</label>
+            </div>
+        </div>
+
+        {% elif step == 4 %}
+        <div class="grid sm:grid-cols-2 gap-4 sm:gap-5">
+            {% include "manage/vehicles/_wf.html" with f=form.rental_mode help="Controls which prices show on the website." %}
+            {% include "manage/vehicles/_wf.html" with f=form.minimum_rental_days post="days" %}
+            {% include "manage/vehicles/_wf.html" with f=form.price_per_day pre="₹" %}
+            {% include "manage/vehicles/_wf.html" with f=form.price_per_week pre="₹" %}
+            {% include "manage/vehicles/_wf.html" with f=form.price_per_month pre="₹" %}
+            {% include "manage/vehicles/_wf.html" with f=form.security_deposit pre="₹" %}
+            {% include "manage/vehicles/_wf.html" with f=form.with_driver_price_per_day pre="₹" help="Daily rate when a chauffeur is hired." %}
+            {% include "manage/vehicles/_wf.html" with f=form.per_km_charge pre="₹" help="After the included kilometres." %}
+            {% include "manage/vehicles/_wf.html" with f=form.included_km_per_day post="km/day" %}
+            {% include "manage/vehicles/_wf.html" with f=form.wedding_decoration_charge pre="₹" help="Basic decoration fee for wedding hire." %}
+        </div>
+
+        {% elif step == 5 %}
+        <div class="grid lg:grid-cols-[1fr_300px] gap-6">
+            <div class="space-y-5">
+                <div x-data="{ n: ($refs.sd && $refs.sd.value.length) || 0 }" x-init="n = $el.querySelector('textarea').value.length" x-on:input="n = $event.target.value.length">
+                    {% include "manage/vehicles/_wf.html" with f=form.short_description %}
+                    <p class="text-right text-[11px] text-stone-400 -mt-0.5"><span x-text="n">0</span>/300</p>
+                </div>
+                {% include "manage/vehicles/_wf.html" with f=form.description %}
+            </div>
+            <div>
+                <p class="block text-sm font-semibold text-stone-700 mb-1.5">Main photo</p>
+                <label class="block cursor-pointer rounded-2xl ring-1 ring-stone-200 overflow-hidden hover:ring-[#145c38]/50" x-data="{ src: '{% if vehicle.thumbnail %}{{ vehicle.thumbnail.url }}{% endif %}' }">
+                    <div class="h-44 bg-stone-50 grid place-items-center">
+                        <img x-show="src" :src="src" alt="" class="w-full h-full object-cover"/>
+                        <span x-show="!src" class="flex flex-col items-center text-stone-400 text-xs"><span class="material-symbols-outlined text-4xl">add_photo_alternate</span>Choose a photo</span>
+                    </div>
+                    <span class="flex items-center justify-center gap-1.5 py-2.5 text-sm font-semibold text-[#145c38] border-t border-stone-100"><span class="material-symbols-outlined text-[18px]">photo_camera</span><span x-text="src ? 'Change photo' : 'Upload photo'">Upload photo</span></span>
+                    <input type="file" name="thumbnail" accept="image/*" class="sr-only" x-on:change="const f = $event.target.files[0]; if (f) src = URL.createObjectURL(f)"/>
+                </label>
+                {% if form.thumbnail.errors %}<p class="mt-1 text-xs font-semibold text-red-600">{{ form.thumbnail.errors|join:" " }}</p>{% endif %}
+                <p class="mt-1.5 text-xs text-stone-500">Shown on fleet cards and as the first gallery photo.</p>
+            </div>
+        </div>
+        <div class="mt-6" x-data="featureChips({{ form.features.value|default:'[]' }})">
+            <p class="block text-sm font-semibold text-stone-700 mb-2">Features</p>
+            <input type="hidden" name="features" :value="JSON.stringify(selected)" value="{{ form.features.value|default:'[]' }}"/>
+            <div class="flex flex-wrap gap-2">
+                <template x-for="f in presets.concat(selected.filter(s => !presets.includes(s)))" :key="f">
+                    <button type="button" x-on:click="toggle(f)" :class="selected.includes(f) ? 'bg-[#145c38] text-white ring-[#145c38]' : 'bg-white text-stone-600 ring-stone-200 hover:ring-[#145c38]/50'" class="px-3 py-1.5 rounded-full ring-1 text-xs font-semibold transition-colors" x-text="f"></button>
+                </template>
+            </div>
+            <div class="mt-3 flex gap-2 max-w-sm">
+                <input type="text" x-ref="customFeature" x-on:keydown.enter.prevent="addCustom()" placeholder="Add your own feature" class="flex-1 rounded-xl border-stone-200 text-sm py-2 px-3 focus:border-[#145c38] focus:ring-[#145c38]/20" data-no-draft/>
+                <button type="button" x-on:click="addCustom()" class="px-4 rounded-xl bg-[#ecf7f0] text-[#145c38] text-sm font-bold">+ Add</button>
+            </div>
+        </div>
+
+        {% elif step == 6 %}
+        <div class="grid lg:grid-cols-[1fr_360px] gap-6">
+            <div class="space-y-6">
+                <div x-data="{ previews: [] }">
+                    <p class="block text-sm font-semibold text-stone-700 mb-2">Gallery images</p>
+                    <label class="block cursor-pointer rounded-2xl border-2 border-dashed border-stone-200 hover:border-[#145c38]/50 p-6 text-center">
+                        <span class="material-symbols-outlined text-4xl text-stone-400">cloud_upload</span>
+                        <span class="block mt-1 text-sm font-semibold text-stone-700">Upload more photos</span>
+                        <span class="block text-xs text-stone-500">PNG or JPG, up to 10 MB each. They're added when you save this step.</span>
+                        <input type="file" name="gallery_images" accept="image/*" multiple class="sr-only" data-no-draft x-on:change="previews = [...$event.target.files].map(f => URL.createObjectURL(f))"/>
+                    </label>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-2.5 mt-3">
+                        {% for img in images %}
+                        <label class="relative block rounded-xl overflow-hidden ring-1 ring-stone-200 aspect-[4/3] group cursor-pointer" title="Tick to remove when you save">
+                            <img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover"/>
+                            <input type="checkbox" name="delete_image" value="{{ img.pk }}" class="peer sr-only" data-no-draft/>
+                            <span class="absolute inset-0 bg-red-900/0 peer-checked:bg-red-900/55 transition-colors"></span>
+                            <span class="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-white/90 text-red-600 grid place-items-center shadow peer-checked:bg-red-600 peer-checked:text-white"><span class="material-symbols-outlined text-[16px]">close</span></span>
+                            <span class="absolute bottom-1.5 left-1.5 hidden peer-checked:block text-[11px] font-bold text-white">Will be removed</span>
+                        </label>
+                        {% endfor %}
+                        <template x-for="p in previews" :key="p"><div class="relative rounded-xl overflow-hidden ring-2 ring-[#145c38]/40 aspect-[4/3]"><img :src="p" alt="" class="w-full h-full object-cover"/><span class="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-full bg-[#145c38] text-white text-[10px] font-bold">New</span></div></template>
+                    </div>
+                </div>
+                <div>
+                    <p class="font-bold text-stone-900 mb-3">SEO details</p>
+                    <div class="space-y-4">
+                        {% include "manage/vehicles/_wf.html" with f=form.meta_title help="Leave empty to use “Brand Name for Rent”." %}
+                        {% include "manage/vehicles/_wf.html" with f=form.meta_description help="150–160 characters works best." %}
+                        {% include "manage/vehicles/_wf.html" with f=form.meta_keywords %}
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-2xl bg-stone-50/70 ring-1 ring-stone-200/70 p-5 space-y-5 content-start">
+                {% include "manage/vehicles/_wf.html" with f=form.status %}
+                <div class="space-y-2.5">
+                    <p class="text-sm font-semibold text-stone-700">Visibility</p>
+                    <label class="flex items-center gap-2.5 text-sm">{{ publish_form.publish }} <span><b>Published</b> <span class="text-stone-500">· {% if vehicle.is_draft %}goes live when you click Save Vehicle{% else %}shown on the website{% endif %}</span></span></label>
+                    <label class="flex items-center gap-2.5 text-sm">{{ form.is_featured }} <b>Featured</b> <span class="text-stone-500">· on the home page</span></label>
+                </div>
+                <div class="space-y-2.5">
+                    <p class="text-sm font-semibold text-stone-700">Badges</p>
+                    <label class="flex items-center gap-2.5 text-sm">{{ form.is_premium }} Premium</label>
+                    <label class="flex items-center gap-2.5 text-sm">{{ form.is_wedding_service }} Wedding service</label>
+                    <label class="flex items-center gap-2.5 text-sm">{{ form.is_chauffeur_available }} Chauffeur available</label>
+                </div>
+                {% include "manage/vehicles/_wf.html" with f=form.wedding_tier help="Only used for wedding cars." %}
+                <div>
+                    <p class="block text-sm font-semibold text-stone-700 mb-2">Available cities</p>
+                    <div class="flex flex-wrap gap-2">
+                        {% for c in form.available_cities %}
+                        <label class="cursor-pointer"><input type="checkbox" name="{{ c.data.name }}" value="{{ c.data.value }}" class="peer sr-only" {% if c.data.selected %}checked{% endif %}/><span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full ring-1 ring-stone-200 bg-white text-xs font-semibold text-stone-600 peer-checked:bg-[#145c38] peer-checked:text-white peer-checked:ring-[#145c38]"><span class="material-symbols-outlined text-[14px]">location_on</span>{{ c.choice_label }}</span></label>
+                        {% empty %}<p class="text-xs text-stone-500">No cities yet. Add them under Cities.</p>{% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- ─── Actions ─── -->
+    <div class="sticky bottom-0 z-10 mt-5 -mx-4 sm:mx-0 px-4 sm:px-5 py-3.5 bg-[#f6f5ef]/90 sm:bg-white backdrop-blur sm:rounded-2xl sm:shadow-sm sm:ring-1 sm:ring-black/5 flex items-center gap-2 sm:gap-3">
+        {% if step > 1 %}
+        <button type="submit" name="action" value="prev" formnovalidate class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-3 rounded-xl ring-1 ring-stone-300 bg-white text-stone-700 font-semibold hover:bg-stone-50"><span class="material-symbols-outlined text-[20px]">arrow_back</span><span class="hidden sm:inline">Previous</span></button>
+        {% else %}
+        <a href="{% url 'vehicle_manage_list' %}" class="px-4 sm:px-5 py-3 rounded-xl bg-stone-100 text-stone-700 font-semibold hover:bg-stone-200">Cancel</a>
+        {% endif %}
+        <span class="hidden md:block flex-1 text-xs text-stone-500 text-center">Step {{ step }} of {{ last }} · {% if vehicle %}saved steps stay saved{% else %}the draft is created when you continue{% endif %}</span>
+        <span class="md:hidden flex-1"></span>
+        {% if is_edit %}
+        <button type="submit" name="action" value="stay" class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-3 rounded-xl text-[#145c38] font-bold hover:bg-[#ecf7f0]"><span class="material-symbols-outlined text-[20px]">save</span><span class="hidden sm:inline">Save</span></button>
+        {% else %}
+        <button type="submit" name="action" value="draft" class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-3 rounded-xl text-[#145c38] font-bold hover:bg-[#ecf7f0]"><span class="material-symbols-outlined text-[20px]">save</span><span class="hidden sm:inline">Save as Draft</span><span class="sm:hidden">Draft</span></button>
+        {% endif %}
+        {% if step < last %}
+        <button type="submit" name="action" value="next" class="inline-flex items-center gap-1.5 px-5 sm:px-7 py-3 rounded-xl bg-[#145c38] hover:bg-[#0f4a2d] text-white font-bold shadow-sm">Next <span class="material-symbols-outlined text-[20px]">arrow_forward</span></button>
+        {% else %}
+        <button type="submit" name="action" value="finish" class="inline-flex items-center gap-1.5 px-5 sm:px-7 py-3 rounded-xl bg-[#145c38] hover:bg-[#0f4a2d] text-white font-bold shadow-sm"><span class="material-symbols-outlined text-[20px]">check_circle</span>Save Vehicle</button>
+        {% endif %}
+    </div>
+</form>
+
+<script>
+function featureChips(initial) {
+    return {
+        selected: Array.isArray(initial) ? [...initial] : [],
+        presets: ['AC', 'GPS Navigation', 'Bluetooth', 'USB Charging', 'Music System', 'Power Steering', 'Power Windows',
+            'Central Locking', 'Reverse Camera', 'Airbags', 'ABS', 'Sunroof', 'Touchscreen', 'Cruise Control', 'Alloy Wheels',
+            'Leather Seats', 'Rear AC Vents', 'Parking Sensors', 'Keyless Entry', 'Push Start', 'Helmet (2)', 'First Aid Kit', 'Spare Tyre'],
+        toggle(f) { const i = this.selected.indexOf(f); i === -1 ? this.selected.push(f) : this.selected.splice(i, 1); this.$nextTick(() => document.getElementById('wizard').dispatchEvent(new Event('input'))); },
+        addCustom() { const el = this.$refs.customFeature, v = el.value.trim(); if (v && !this.selected.includes(v)) this.selected.push(v); el.value = ''; this.$nextTick(() => document.getElementById('wizard').dispatchEvent(new Event('input'))); },
+    };
+}
+
+/* Keep what's typed on this step in the browser until it is saved, so closing the tab
+   or losing the connection doesn't lose it. Saved steps live in the database. */
+(() => {
+    const form = document.getElementById("wizard");
+    const key = form.dataset.draftKey;
+    let store = null;
+    try { store = window.localStorage; store.getItem("x"); } catch (e) { store = null; }
+    const fields = () => [...form.elements].filter(el => el.name && el.type !== "file" && el.type !== "submit" && el.name !== "csrfmiddlewaretoken" && !el.hasAttribute("data-no-draft"));
+    const snapshot = () => {
+        const out = {};
+        fields().forEach(el => {
+            if (el.type === "checkbox") (out[el.name] = out[el.name] || []).push(el.checked ? el.value : null);
+            else if (el.type === "radio") { if (el.checked) out[el.name] = el.value; }
+            else out[el.name] = el.value;
+        });
+        return out;
+    };
+    const initial = JSON.stringify(snapshot());
+    let dirty = false, submitting = false;
+
+    const restore = data => {
+        const boxIdx = {};
+        fields().forEach(el => {
+            if (!(el.name in data)) return;
+            if (el.type === "checkbox") { const i = boxIdx[el.name] = (boxIdx[el.name] || 0); el.checked = data[el.name][i] !== null && data[el.name][i] !== undefined; boxIdx[el.name]++; }
+            else if (el.type === "radio") el.checked = el.value === data[el.name];
+            else el.value = data[el.name];
+            if (el.name === "features" && window.Alpine) {
+                try { Alpine.$data(el.closest("[x-data]")).selected = JSON.parse(data.features || "[]"); } catch (e) {}
+            }
+            el.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+    };
+
+    if (store && !form.dataset.hasErrors) {
+        const saved = store.getItem(key);
+        if (saved && saved !== initial) {
+            try {
+                const data = JSON.parse(saved);
+                // Alpine-driven widgets (features) read their value on init; restore after Alpine starts
+                document.addEventListener("alpine:initialized", () => restore(data));
+                if (window.Alpine) restore(data);
+                const note = document.getElementById("draft-restored");
+                note.classList.remove("hidden");
+                document.getElementById("draft-discard").addEventListener("click", () => { store.removeItem(key); location.reload(); });
+                dirty = true;
+            } catch (e) { store.removeItem(key); }
+        }
+    }
+    const save = () => {
+        const now = JSON.stringify(snapshot());
+        dirty = now !== initial;
+        if (!store) return;
+        dirty ? store.setItem(key, now) : store.removeItem(key);
+    };
+    form.addEventListener("input", save);
+    form.addEventListener("change", save);
+    form.addEventListener("submit", () => { submitting = true; if (store) store.removeItem(key); });
+    window.addEventListener("beforeunload", e => { if (dirty && !submitting) { e.preventDefault(); e.returnValue = ""; } });
+})();
+</script>
+{% endblock %}
