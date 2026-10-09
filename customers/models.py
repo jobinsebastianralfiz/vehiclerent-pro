@@ -14,8 +14,8 @@ def _private_upload(folder):
     return upload_to
 
 
-upload_id_proof = _private_upload("id_proofs")
-upload_license = _private_upload("licenses")
+upload_id_proofs = _private_upload("id_proofs")
+upload_licenses = _private_upload("licenses")
 
 
 class Customer(models.Model):
@@ -32,10 +32,10 @@ class Customer(models.Model):
     address = models.TextField(blank=True)
     id_proof_type = models.CharField(max_length=50, choices=ID_PROOF_CHOICES, blank=True)
     id_proof_number = models.CharField(max_length=100, blank=True)
-    id_proof_image = models.ImageField(upload_to=upload_id_proof, blank=True)
+    id_proof_image = models.ImageField(upload_to=upload_id_proofs, blank=True)
     license_number = models.CharField(max_length=100, blank=True)
     license_expiry = models.DateField(blank=True, null=True)
-    license_image = models.ImageField(upload_to=upload_license, blank=True)
+    license_image = models.ImageField(upload_to=upload_licenses, blank=True)
     notes = models.TextField(blank=True, help_text="Admin notes")
     is_blacklisted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
