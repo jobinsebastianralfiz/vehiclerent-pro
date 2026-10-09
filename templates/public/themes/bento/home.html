@@ -55,8 +55,12 @@
     /* phone mock: screens swap as steps scroll past */
     .ph-screen { position: absolute; inset: 0; opacity: 0; transform: translateY(6%) scale(.96); transition: opacity .55s ease, transform .7s var(--expo); pointer-events: none; }
     .ph-screen.is-on { opacity: 1; transform: none; pointer-events: auto; }
-    .step { opacity: .32; transition: opacity .5s; }
-    .step.is-on { opacity: 1; }
+    .step { opacity: .45; transition: opacity .5s, background-color .5s, box-shadow .5s; cursor: pointer; }
+    .step.is-on { opacity: 1; background: #fff; box-shadow: 0 24px 50px -30px rgba(31,46,0,.35); }
+    .step .step-num { transition: background-color .4s, color .4s; }
+    .step.is-on .step-num { background: #1f2e00; color: #d4eca2; }
+    .steps-rail { position: absolute; left: 47px; top: 40px; bottom: 40px; width: 2px; background: rgba(31,46,0,.12); border-radius: 2px; }
+    .steps-rail i { position: absolute; inset: 0 0 auto 0; height: var(--fill, 0%); background: #1f2e00; border-radius: 2px; transition: height .6s var(--expo); }
     .step-dot { transition: width .5s var(--expo), background-color .4s; }
     .step-dot.is-on { width: 28px; background: #1f2e00; }
 
@@ -255,8 +259,8 @@
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" data-deal>
         {% for v in featured_vehicles %}
-        <a href="{{ v.get_absolute_url }}" class="vehicle-card tile b-glass group block p-3 {% if forloop.first %}sm:col-span-2 lg:row-span-2{% endif %}" aria-label="{{ v.brand }} {{ v.name }}">
-            <div class="relative overflow-hidden rounded-[22px] {% if forloop.first %}h-64 sm:h-[420px]{% else %}h-48{% endif %} bg-surface-container grid place-items-center">
+        <a href="{{ v.get_absolute_url }}" class="vehicle-card tile b-glass group block p-3 {% if forloop.first %}sm:col-span-2 lg:row-span-2 lg:flex lg:flex-col{% endif %}" aria-label="{{ v.brand }} {{ v.name }}">
+            <div class="relative overflow-hidden rounded-[22px] {% if forloop.first %}h-64 sm:h-[420px] lg:h-auto lg:flex-1 lg:min-h-[420px]{% else %}h-48{% endif %} bg-surface-container grid place-items-center">
                 {% if v.thumbnail %}
                 <img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
                 {% else %}
@@ -289,7 +293,7 @@
         <div class="grid lg:grid-cols-2 gap-10 lg:gap-16">
             <div class="hidden lg:block">
                 <div class="sticky top-[14vh]">
-                    <div class="relative mx-auto w-[300px] h-[610px] rounded-[48px] bg-primary p-3 shadow-[0_50px_80px_-40px_rgba(31,46,0,.6)]" aria-hidden="true">
+                    <div class="relative mx-auto w-[290px] h-[560px] rounded-[48px] bg-primary p-3 shadow-[0_50px_80px_-40px_rgba(31,46,0,.6)]" aria-hidden="true">
                         <div class="absolute top-5 left-1/2 -translate-x-1/2 w-24 h-6 rounded-full bg-primary z-10"></div>
                         <div class="relative w-full h-full rounded-[38px] overflow-hidden bg-surface" data-no-parallax>
                             <!-- screen 1: search -->
@@ -298,8 +302,8 @@
                                 <div class="bg-white rounded-2xl p-3"><div class="label-tiny text-outline">Pickup</div><div class="font-bold mt-1">{{ cities.0.name|default:"Your city" }}</div></div>
                                 <div class="grid grid-cols-2 gap-2"><div class="bg-white rounded-2xl p-3"><div class="label-tiny text-outline">From</div><div class="font-bold mt-1 text-sm text-outline">Pick a date</div></div><div class="bg-white rounded-2xl p-3"><div class="label-tiny text-outline">To</div><div class="font-bold mt-1 text-sm text-outline">Return date</div></div></div>
                                 <div class="flex bg-surface-container rounded-full p-1 text-xs font-bold"><span class="flex-1 text-center py-2 rounded-full bg-primary text-on-primary">Self-drive</span><span class="flex-1 text-center py-2">With driver</span></div>
-                                <div class="mt-auto bg-primary text-on-primary rounded-2xl py-3.5 text-center font-bold text-sm">Search cars</div>
-                                <div class="rounded-2xl overflow-hidden h-28"><img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="" class="w-full h-full object-cover"/></div>
+                                <div class="rounded-2xl overflow-hidden flex-1 min-h-0"><img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="" class="w-full h-full object-cover"/></div>
+                                <div class="bg-primary text-on-primary rounded-2xl py-3.5 text-center font-bold text-sm">Search cars</div>
                             </div>
                             <!-- screen 2: choose (real featured cars) -->
                             <div class="ph-screen p-5 pt-12 flex flex-col gap-3">
@@ -320,7 +324,7 @@
                             <div class="ph-screen p-5 pt-12 flex flex-col gap-3">
                                 <div class="font-extrabold text-xl text-primary">Send enquiry</div>
                                 {% with v=featured_vehicles.0 %}
-                                <div class="rounded-2xl overflow-hidden h-32 bg-surface-container grid place-items-center">{% if v and v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-5xl text-outline-variant">directions_car</span>{% endif %}</div>
+                                <div class="rounded-2xl overflow-hidden flex-1 min-h-[8rem] bg-surface-container grid place-items-center">{% if v and v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-5xl text-outline-variant">directions_car</span>{% endif %}</div>
                                 <div class="bg-white rounded-2xl p-4 text-sm space-y-2">
                                     <div class="flex justify-between gap-2"><span class="text-outline">Car</span><b class="truncate">{{ v.name|default:"Your pick" }}</b></div>
                                     <div class="flex justify-between gap-2"><span class="text-outline">Dates</span><b>Your dates</b></div>
@@ -339,23 +343,31 @@
             <div>
                 <span class="label-tiny text-primary-container block">How it works</span>
                 <h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Three steps <span class="serif-i">to the road.</span></h2>
-                <div class="mt-10 lg:mt-0">
-                    <div class="step is-on lg:min-h-[70vh] flex flex-col justify-center py-8 lg:py-0">
-                        <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-xl">01</span>
-                        <h3 class="mt-5 font-extrabold text-3xl tracking-tight text-primary">Tell us where and when.</h3>
-                        <p class="mt-3 text-on-surface-variant text-lg max-w-md">Pick your city, your dates, and whether you'll drive or want a chauffeur.</p>
+                <div class="relative mt-8 sm:mt-10 space-y-3">
+                    <span class="steps-rail hidden lg:block" aria-hidden="true"><i></i></span>
+                    <div class="step is-on relative flex gap-5 rounded-[28px] p-5 sm:p-6" data-step="0">
+                        <span class="step-num relative z-[1] w-12 h-12 shrink-0 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-lg">01</span>
+                        <div>
+                            <h3 class="font-extrabold text-2xl tracking-tight text-primary">Tell us where and when.</h3>
+                            <p class="mt-1.5 text-on-surface-variant leading-relaxed max-w-md">Pick your city, your dates, and whether you'll drive or want a chauffeur.</p>
+                        </div>
                     </div>
-                    <div class="step lg:min-h-[70vh] flex flex-col justify-center py-8 lg:py-0">
-                        <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-xl">02</span>
-                        <h3 class="mt-5 font-extrabold text-3xl tracking-tight text-primary">Choose your car.</h3>
-                        <p class="mt-3 text-on-surface-variant text-lg max-w-md">Compare the fleet side by side, with the listed rate on every car.</p>
+                    <div class="step relative flex gap-5 rounded-[28px] p-5 sm:p-6" data-step="1">
+                        <span class="step-num relative z-[1] w-12 h-12 shrink-0 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-lg">02</span>
+                        <div>
+                            <h3 class="font-extrabold text-2xl tracking-tight text-primary">Choose your car.</h3>
+                            <p class="mt-1.5 text-on-surface-variant leading-relaxed max-w-md">Compare the fleet side by side, with the listed rate on every car.</p>
+                        </div>
                     </div>
-                    <div class="step lg:min-h-[70vh] flex flex-col justify-center py-8 lg:py-0">
-                        <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-xl">03</span>
-                        <h3 class="mt-5 font-extrabold text-3xl tracking-tight text-primary">Send the enquiry.</h3>
-                        <p class="mt-3 text-on-surface-variant text-lg max-w-md">Send it from the site and WhatsApp opens with your details. Our team confirms availability and the final price.</p>
+                    <div class="step relative flex gap-5 rounded-[28px] p-5 sm:p-6" data-step="2">
+                        <span class="step-num relative z-[1] w-12 h-12 shrink-0 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-lg">03</span>
+                        <div>
+                            <h3 class="font-extrabold text-2xl tracking-tight text-primary">Send the enquiry.</h3>
+                            <p class="mt-1.5 text-on-surface-variant leading-relaxed max-w-md">Send it from the site and WhatsApp opens with your details. Our team confirms availability and the final price.</p>
+                        </div>
                     </div>
                 </div>
+                <a href="{% url 'vehicle_list' %}" class="mt-8 inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-primary text-on-primary font-bold">Find your car <span class="material-symbols-outlined text-[20px]">arrow_forward</span></a>
             </div>
         </div>
     </div>
@@ -548,14 +560,17 @@
 (() => {
     const steps = [...document.querySelectorAll("#how .step")], screens = [...document.querySelectorAll("#how .ph-screen")], dots = [...document.querySelectorAll("#how .step-dot")];
     if (!steps.length || !("IntersectionObserver" in window)) return;
+    const rail = document.querySelector("#how .steps-rail");
     const show = i => {
         steps.forEach((s, j) => s.classList.toggle("is-on", j === i));
         screens.forEach((s, j) => s.classList.toggle("is-on", j === i));
         dots.forEach((d, j) => d.classList.toggle("is-on", j === i));
+        if (rail) rail.style.setProperty("--fill", (i / (steps.length - 1)) * 100 + "%");
     };
-    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) show(steps.indexOf(e.target)); }), { rootMargin: "-45% 0px -45% 0px" });
-    if (matchMedia("(min-width: 1024px)").matches) steps.forEach(s => io.observe(s));
-    else steps.forEach(s => s.classList.add("is-on"));
+    if (!matchMedia("(min-width: 1024px)").matches) { steps.forEach(s => s.classList.add("is-on")); return; }
+    steps.forEach((s, i) => s.addEventListener("click", () => show(i)));
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) show(steps.indexOf(e.target)); }), { rootMargin: "-40% 0px -40% 0px" });
+    steps.forEach(s => io.observe(s));
 })();
 
 /* hero bento assembles: tiles scale and unclip in a stagger, headline rolls up, numbers spin */
