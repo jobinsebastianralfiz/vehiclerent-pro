@@ -2,7 +2,7 @@
 {% load static vehicle_tags %}
 {% comment %}
 Theme C · Kerala Route. The home page is a road trip: a road draws itself down the page
-between the sections (built in JS from the .road-gap[data-stop] markers, numbered in order),
+between the sections (route.js builds it from the .road-gap[data-stop] markers, numbered in order),
 with a car riding along it. Each gap sits inside its section's {% if %}, so hidden sections
 leave no stop behind. Palette: tokens from core/themes.py (surface = sand, tertiary = teal)
 plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as literals.
@@ -12,28 +12,14 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
 
 {% block navbar %}{% include "public/themes/route/navbar.html" %}{% endblock %}
 
-{% block extra_css %}
+{% block extra_css %}{% include "public/themes/route/_assets.html" %}
 <style>
 
-  .r-glow { background: radial-gradient(60% 70% at 85% 10%, rgba(227,155,60,.28), transparent 70%), radial-gradient(50% 60% at 0% 100%, rgba(19,78,74,.10), transparent 70%); }
-
-  /* ---------- the road ---------- */
-  #journey { position: relative; }
-  .road-svg { position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none; overflow: visible; }
-  .road-pins, .road-car { position: absolute; left: 0; top: 0; pointer-events: none; }
-  .road-pins { z-index: 4; width: 100%; height: 100%; }
-  .road-pin { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: var(--page-bg); border: 3px solid #b9ab8c; transition: background .5s, border-color .5s, transform .6s var(--spring), box-shadow .6s; }
-  .road-pin.on { background: #e39b3c; border-color: #fffaf0; transform: scale(1.3); box-shadow: 0 0 0 8px rgba(227,155,60,.22), 0 6px 14px -4px rgba(0,0,0,.35); }
-  .road-pin > span { position: absolute; left: 50%; bottom: calc(100% + 14px); transform: translate(-50%, 8px); white-space: nowrap; padding: 8px 14px; border-radius: 999px; background: #134e4a; color: #fffaf0; font: 700 10px/1 var(--font-body); letter-spacing: .18em; text-transform: uppercase; opacity: 0; transition: opacity .5s, transform .6s var(--spring); }
-  .road-pin.on > span { opacity: 1; transform: translate(-50%, 0); }
-  .road-pin.end > span { background: #e39b3c; color: #1b1c17; }
-  .road-car { z-index: 6; width: 38px; height: 22px; margin: -11px 0 0 -19px; opacity: 0; transition: opacity .4s; will-change: transform; filter: drop-shadow(0 4px 6px rgba(0,0,0,.35)); }
-  .road-car.on { opacity: 1; }
-  .motion #journey:not(.road-live) .road-svg > g, .motion #journey:not(.road-live) .road-pins { opacity: 0; }
+  /* the road, the car and the glow come from route.css; the home page spaces its stops a little wider */
   .road-gap { height: 120px; }
   @media (min-width: 768px) { .road-gap { height: 150px; } }
   @media (min-width: 1024px) { .road-gap { height: 180px; } }
-  @media (max-width: 767px) { .road-pin > span { display: none; } .road-pin { width: 14px; height: 14px; margin: -7px 0 0 -7px; } }
+
   /* content inside the journey leaves gutters for the road */
   .lane { position: relative; z-index: 10; padding-left: 52px; padding-right: 16px; }
   @media (min-width: 768px) { .lane { padding-left: 72px; padding-right: 72px; } }
@@ -97,7 +83,6 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
 
   @media (prefers-reduced-motion: reduce) {
     .motion .pc { opacity: 1 !important; }
-    .motion #journey .road-svg > g, .motion #journey .road-pins { opacity: 1 !important; }
     .route-line path, .route-car, .tag:hover { animation: none !important; }
   }
 </style>
@@ -148,19 +133,7 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
 
 <!-- ═══════════ The journey: a road draws itself down the page ═══════════ -->
 <div id="journey">
-    <svg class="road-svg" aria-hidden="true">
-        <defs><mask id="roadMask" maskUnits="userSpaceOnUse"><path id="roadMaskPath" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"/></mask></defs>
-        <path id="roadPlan" fill="none" stroke="#c9b993" stroke-width="2" stroke-dasharray="1 9" stroke-linecap="round"/>
-        <g mask="url(#roadMask)">
-            <path id="roadShoulder" fill="none" stroke="#e8d9b8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path id="roadAsphalt" fill="none" stroke="#2c302a" stroke-linecap="round" stroke-linejoin="round"/>
-            <path id="roadCenter" fill="none" stroke="#f2c14e" stroke-width="1.6" stroke-dasharray="9 13" stroke-linecap="round"/>
-        </g>
-    </svg>
-    <div class="road-pins" aria-hidden="true"></div>
-    <div class="road-car" aria-hidden="true">
-        <svg viewBox="0 0 40 22" width="38" height="22"><rect x="1" y="2" width="38" height="18" rx="7" fill="#d9692f"/><rect x="23" y="4.5" width="8" height="13" rx="3" fill="#fde9c9" opacity=".95"/><rect x="7" y="5" width="7" height="12" rx="2.5" fill="#fde9c9" opacity=".6"/><rect x="35.5" y="3.5" width="3" height="4" rx="1" fill="#fff7cc"/><rect x="35.5" y="14.5" width="3" height="4" rx="1" fill="#fff7cc"/></svg>
-    </div>
+    {% include "public/themes/route/_road.html" %}
 
     <div class="road-gap" data-stop="Plan your trip"></div>
 
@@ -444,7 +417,7 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block extra_js %}{% include "public/themes/route/_js.html" %}
 <script>
 /* booking: route summary follows the selects; a chosen drop city switches off "same location" */
 (() => {
@@ -498,104 +471,8 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
   upd(); setInterval(upd, 30000);
 })();
 
-/* ═══════════ the road: built from the stop markers, drawn by scroll, car rides along ═══════════ */
-const Road = (() => {
-  const J = document.getElementById("journey");
-  const svg = J.querySelector(".road-svg");
-  const plan = svg.querySelector("#roadPlan"), shoulder = svg.querySelector("#roadShoulder"), asphalt = svg.querySelector("#roadAsphalt"),
-        center = svg.querySelector("#roadCenter"), maskPath = svg.querySelector("#roadMaskPath"), mask = svg.querySelector("#roadMask");
-  const car = J.querySelector(".road-car"), pinsHost = J.querySelector(".road-pins");
-  const stops = [...J.querySelectorAll("[data-stop]")];
-  let L = 0, ys = [], N = 0, top = 0, H = 0, pinLen = [], cur = 0, animated = false;
-
-  /* stops are numbered in page order, so hidden sections never leave a gap in the count */
-  let n = 0;
-  const pins = stops.map(s => {
-    const end = s.hasAttribute("data-stop-end");
-    const p = document.createElement("div");
-    p.className = "road-pin" + (end ? " end" : "");
-    const lbl = document.createElement("span");
-    lbl.textContent = end ? s.dataset.stop : String(++n).padStart(2, "0") + " · " + s.dataset.stop;
-    p.appendChild(lbl);
-    pinsHost.appendChild(p);
-    return p;
-  });
-
-  function build() {
-    const W = J.clientWidth; H = J.offsetHeight;
-    const lg = W >= 1024, md = W >= 768;
-    const xa = lg ? 52 : md ? 34 : 20, xb = lg ? W - 52 : md ? W - 34 : 34, r = lg ? 82 : md ? 64 : 44;
-    top = J.getBoundingClientRect().top + scrollY;
-    const sw = lg ? 16 : md ? 13 : 9;
-    svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-    mask.setAttribute("x", 0); mask.setAttribute("y", 0); mask.setAttribute("width", W); mask.setAttribute("height", H);
-    let side = 0; const X = () => (side ? xb : xa);
-    let d = `M ${xa} 0`;
-    const pts = [];
-    stops.forEach(s => {
-      const b = s.getBoundingClientRect(), y = b.top + scrollY - top + b.height / 2;
-      if (s.hasAttribute("data-stop-end")) {
-        const x0 = X(), xm = W / 2;
-        d += ` L ${x0} ${y - r} C ${x0} ${y} ${x0} ${y} ${xm} ${y}`;
-        pts.push([xm, y]);
-        return;
-      }
-      const x0 = X(); side ^= 1; const x1 = X();
-      d += ` L ${x0} ${y - r} C ${x0} ${y} ${x1} ${y} ${x1} ${y + r}`;
-      pts.push([(x0 + x1) / 2, y]);
-    });
-    [plan, shoulder, asphalt, center, maskPath].forEach(p => p.setAttribute("d", d));
-    shoulder.setAttribute("stroke-width", sw + 8); asphalt.setAttribute("stroke-width", sw); maskPath.setAttribute("stroke-width", sw + 14);
-    L = asphalt.getTotalLength();
-    N = Math.max(2, Math.ceil(L / 8)); ys = new Float32Array(N + 1);
-    for (let i = 0; i <= N; i++) ys[i] = asphalt.getPointAtLength(i * L / N).y;
-    pts.forEach(([x, y], i) => { pins[i].style.left = x + "px"; pins[i].style.top = y + "px"; });
-    pinLen = pts.map(([, y]) => lenAtY(y));
-    if (animated) { maskPath.style.strokeDasharray = `${L} ${L + 40}`; render(Math.min(cur, L)); }
-    else { maskPath.style.strokeDasharray = "none"; pins.forEach(p => p.classList.add("on")); }
-  }
-  /* path y only ever increases, so binary-search the sampled table */
-  function lenAtY(y) {
-    if (!N) return 0;
-    let lo = 0, hi = N;
-    if (y <= ys[0]) return 0;
-    if (y >= ys[N]) return L;
-    while (hi - lo > 1) { const m = (lo + hi) >> 1; if (ys[m] < y) lo = m; else hi = m; }
-    const f = (y - ys[lo]) / Math.max(.0001, ys[hi] - ys[lo]);
-    return (lo + f) * L / N;
-  }
-  function render(l) {
-    cur = l;
-    maskPath.style.strokeDashoffset = L - l;
-    if (l <= 1) { car.classList.remove("on"); }
-    else {
-      const p = asphalt.getPointAtLength(l), q = asphalt.getPointAtLength(Math.min(L, l + 3)), b = asphalt.getPointAtLength(Math.max(0, l - 3));
-      const a = Math.atan2(q.y - b.y, q.x - b.x) * 180 / Math.PI;
-      car.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${a}deg)`;
-      car.classList.add("on");
-    }
-    pins.forEach((p, i) => p.classList.toggle("on", l >= pinLen[i] - 2));
-  }
-  function target() { return lenAtY(scrollY + innerHeight * .58 - top); }
-  return { build, render, target, J, setAnimated(v) { animated = v; } };
-})();
-
-/* static road (no GSAP or reduced motion): fully drawn, every stop lit */
-Road.build();
-addEventListener("load", () => Road.build());
-let roadResizeT; addEventListener("resize", () => { clearTimeout(roadResizeT); roadResizeT = setTimeout(() => Road.build(), 150); });
-
 /* page-specific motion */
 document.addEventListener("motion:ready", ({ detail: { G, ST } }) => {
-  /* road: rebuilt on every refresh (pins and images change heights), drawn to wherever the reader is */
-  Road.setAnimated(true);
-  Road.J.classList.add("road-live");
-  const proxy = { l: 0 };
-  const go = G.quickTo(proxy, "l", { duration: .6, ease: "power3", onUpdate: () => Road.render(proxy.l) });
-  ST.addEventListener("refresh", () => { Road.build(); go(Road.target()); });
-  ST.create({ trigger: Road.J, start: "top bottom", end: "bottom top", onUpdate: () => go(Road.target()) });
-  Road.build(); Road.render(0);
-
   /* postcards fan out after the hero opens, then spread as you scroll away */
   const pcs = G.utils.toArray(".pc");
   G.fromTo(pcs, { opacity: 0, y: 80, x: (i) => [90, 0, -90][i], rotation: (i) => [11, 2, -9][i], scale: .85 },
@@ -608,10 +485,6 @@ document.addEventListener("motion:ready", ({ detail: { G, ST } }) => {
   if (document.querySelector("#tickets .tk"))
     G.from(".tk", { rotationY: -28, rotation: -2, x: -36, y: 40, transformPerspective: 2400, transformOrigin: "0% 50%", opacity: 0, duration: 1.1, ease: "power3.out", clearProps: "transform", stagger: .12,
       scrollTrigger: { trigger: "#tickets", start: "clamp(top 82%)", once: true } });
-
-  /* polaroids: dealt as a pile, fan out as the section scrolls in */
-  G.fromTo(".pol", { xPercent: (i) => [40, 0, -40][i], rotation: (i) => [9, -2, -9][i], y: 40 },
-    { xPercent: 0, rotation: 0, y: 0, ease: "none", scrollTrigger: { trigger: ".pol-stack", start: "top 90%", end: "center 55%", scrub: .6 } });
 
   /* passport stamps thump down one after another */
   G.from(".stamp", { scale: 2.4, opacity: 0, rotation: -35, duration: .75, ease: "back.out(2.2)", stagger: .2,

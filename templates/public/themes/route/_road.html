@@ -1,14 +1,16 @@
-{% comment %}The drawn road. Put inside <div id="journey">; route.js builds it from the .road-gap[data-stop] markers that follow.{% endcomment %}
+{% comment %}The drawn road. Put inside <div id="journey">; route.js builds it from the .road-gap[data-stop] markers that follow.
+Layers: sand shoulder, asphalt, a lighter stroke under a narrower asphalt (leaves two edge lines), yellow centre dashes.{% endcomment %}
 <svg class="road-svg" aria-hidden="true">
     <defs><mask class="rd-mask" id="roadMask" maskUnits="userSpaceOnUse"><path class="rd-maskpath" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"/></mask></defs>
     <path class="rd-plan" fill="none" stroke="#c9b993" stroke-width="2" stroke-dasharray="1 9" stroke-linecap="round"/>
     <g mask="url(#roadMask)">
         <path class="rd-shoulder" fill="none" stroke="#e8d9b8" stroke-linecap="round" stroke-linejoin="round"/>
         <path class="rd-asphalt" fill="none" stroke="#2c302a" stroke-linecap="round" stroke-linejoin="round"/>
-        <path class="rd-center" fill="none" stroke="#f2c14e" stroke-width="1.6" stroke-dasharray="9 13" stroke-linecap="round"/>
+        <path class="rd-edge" fill="none" stroke="#fffaf0" stroke-opacity=".55" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="rd-inner" fill="none" stroke="#2c302a" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="rd-center" fill="none" stroke="#f2c14e" stroke-width="1.6" stroke-dasharray="10 12" stroke-linecap="round"/>
     </g>
 </svg>
 <div class="road-pins" aria-hidden="true"></div>
-<div class="road-car" aria-hidden="true">
-    <svg viewBox="0 0 40 22" width="38" height="22"><rect x="1" y="2" width="38" height="18" rx="7" fill="#d9692f"/><rect x="23" y="4.5" width="8" height="13" rx="3" fill="#fde9c9" opacity=".95"/><rect x="7" y="5" width="7" height="12" rx="2.5" fill="#fde9c9" opacity=".6"/><rect x="35.5" y="3.5" width="3" height="4" rx="1" fill="#fff7cc"/><rect x="35.5" y="14.5" width="3" height="4" rx="1" fill="#fff7cc"/></svg>
-</div>
+<div class="road-puffs" aria-hidden="true"></div>
+<div class="road-car" aria-hidden="true">{% include "public/themes/route/_car.html" with car_id="roadCar" %}</div>

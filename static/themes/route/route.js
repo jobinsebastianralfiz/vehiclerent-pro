@@ -1,19 +1,61 @@
-/* Kerala Route · inner pages. The drawn road (same engine as the home page), plus the page props:
+/* Kerala Route · every page. The drawn road down the page, the header road a car drives along, plus the page props:
    tickets flip like boarding passes, stamps thump down, polaroids fan out, the departures board flaps.
    Everything renders complete without GSAP or with reduced motion; motion only adds on top. */
 (() => {
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ═══════ the road: built from .road-gap[data-stop] markers inside #journey ═══════ */
+  /* ═══════ shared by both roads: the layered strokes, and a car (kicking up dust) that rides a path ═══════ */
+  function layers(svg) {
+    const q = s => svg.querySelector(s);
+    return { svg, plan: q(".rd-plan"), shoulder: q(".rd-shoulder"), asphalt: q(".rd-asphalt"), edge: q(".rd-edge"), inner: q(".rd-inner"),
+             center: q(".rd-center"), maskPath: q(".rd-maskpath"), mask: q("mask") };
+  }
+  function shape(R, d, W, H, sw) {
+    R.svg.setAttribute("width", W); R.svg.setAttribute("height", H); R.svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    [["x", -200], ["y", -200], ["width", W + 400], ["height", H + 400]].forEach(([k, v]) => R.mask.setAttribute(k, v));
+    [R.plan, R.shoulder, R.asphalt, R.edge, R.inner, R.center, R.maskPath].forEach(p => p.setAttribute("d", d));
+    R.shoulder.setAttribute("stroke-width", sw + 8); R.asphalt.setAttribute("stroke-width", sw);
+    R.edge.setAttribute("stroke-width", sw - 3); R.inner.setAttribute("stroke-width", sw - 5);
+    R.maskPath.setAttribute("stroke-width", sw + 14);
+    return R.asphalt.getTotalLength();
+  }
+  /* the car is drawn at full size; carScale shrinks it to the road on smaller screens */
+  const carScale = W => (W >= 1024 ? .9 : W >= 768 ? .72 : .52);
+  function rider(host, path, keepVisible) {
+    const car = host.querySelector(".road-car"), puffHost = host.querySelector(".road-puffs");
+    const puffs = Array.from({ length: 7 }, () => { const s = document.createElement("span"); s.className = "road-puff"; puffHost.appendChild(s); return s; });
+    let last = null, idle = 0, sc = 1;
+    const settle = () => puffs.forEach(p => { p.style.opacity = 0; });
+    return {
+      scale(v) { sc = v; },
+      place(l, L) {
+        if (l <= 1 && !keepVisible) { car.classList.remove("on"); settle(); last = l; return; }
+        l = Math.max(0, Math.min(L, l));
+        const p = path.getPointAtLength(l), a = path.getPointAtLength(Math.min(L, l + 4)), b = path.getPointAtLength(Math.max(0, l - 4));
+        car.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${Math.atan2(a.y - b.y, a.x - b.x) * 180 / Math.PI}deg) scale(${sc})`;
+        car.classList.add("on");
+        /* dust only while moving: thicker the faster it goes, gone a moment after it stops */
+        const speed = last == null ? 0 : Math.min(1, Math.abs(l - last) / 3);
+        last = l;
+        puffs.forEach((pf, k) => {
+          const q = path.getPointAtLength(Math.max(0, l - (30 + k * 10) * sc)), s = (12 + k * 6) * sc;
+          pf.style.width = pf.style.height = s + "px";
+          pf.style.transform = `translate(${q.x - s / 2}px, ${q.y - s / 2}px)`;
+          pf.style.opacity = (l > 30 * sc ? speed * .8 * (1 - k / 7) : 0).toFixed(3);
+        });
+        clearTimeout(idle); idle = setTimeout(settle, 160);
+      },
+    };
+  }
+
+  /* ═══════ the long road: built from .road-gap[data-stop] markers inside #journey, drawn by scroll ═══════ */
   const J = document.getElementById("journey");
   let Road = null;
   if (J && J.querySelector(".road-svg")) Road = (() => {
-    const svg = J.querySelector(".road-svg");
-    const q = s => svg.querySelector(s);
-    const plan = q(".rd-plan"), shoulder = q(".rd-shoulder"), asphalt = q(".rd-asphalt"), center = q(".rd-center"), maskPath = q(".rd-maskpath"), mask = q("mask");
-    const car = J.querySelector(".road-car"), pinsHost = J.querySelector(".road-pins");
+    const R = layers(J.querySelector(".road-svg")), ride = rider(J, R.asphalt), pinsHost = J.querySelector(".road-pins");
     const stops = [...J.querySelectorAll("[data-stop]")];
     let L = 0, ys = [], N = 0, top = 0, pinLen = [], cur = 0, animated = false;
+    /* stops are numbered in page order, so hidden sections never leave a gap in the count */
     let n = 0;
     const pins = stops.map(s => {
       const end = s.hasAttribute("data-stop-end");
@@ -24,6 +66,7 @@
       p.appendChild(lbl); pinsHost.appendChild(p);
       return p;
     });
+    /* path y only ever increases, so binary-search the sampled table */
     function lenAtY(y) {
       if (!N) return 0;
       if (y <= ys[0]) return 0;
@@ -34,46 +77,43 @@
     }
     function render(l) {
       cur = l;
-      maskPath.style.strokeDashoffset = L - l;
-      if (l <= 1) car.classList.remove("on");
-      else {
-        const p = asphalt.getPointAtLength(l), a2 = asphalt.getPointAtLength(Math.min(L, l + 3)), b = asphalt.getPointAtLength(Math.max(0, l - 3));
-        car.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${Math.atan2(a2.y - b.y, a2.x - b.x) * 180 / Math.PI}deg)`;
-        car.classList.add("on");
-      }
+      R.maskPath.style.strokeDashoffset = L - Math.min(L, l > 1 ? l + 24 : 0);
+      ride.place(l, L);
       pins.forEach((p, i) => p.classList.toggle("on", l >= pinLen[i] - 2));
     }
+    /* The road enters from off the left edge, then zig-zags: at each stop an S-bend carries it across the page
+       (the stop's pin sits at the middle of the bend) and it runs straight down the far gutter to the next one. */
     function build() {
       const W = J.clientWidth, H = J.offsetHeight;
       const lg = W >= 1024, md = W >= 768;
-      const xa = lg ? 52 : md ? 34 : 20, xb = lg ? W - 52 : md ? W - 34 : 34, r = lg ? 82 : md ? 64 : 44;
-      const sw = lg ? 16 : md ? 13 : 9;
+      const xa = lg ? 52 : md ? 34 : 20, xb = lg ? W - 52 : md ? W - 34 : 34, R0 = lg ? 120 : md ? 90 : 54;
+      const sw = lg ? 22 : md ? 17 : 11;
       top = J.getBoundingClientRect().top + scrollY;
-      svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-      ["x", "y"].forEach(k => mask.setAttribute(k, 0)); mask.setAttribute("width", W); mask.setAttribute("height", H);
       let side = 0; const X = () => (side ? xb : xa);
-      let d = `M ${xa} 0`;
+      let d = "";
       const pts = [];
-      stops.forEach(s => {
+      stops.forEach((s, i) => {
         const b = s.getBoundingClientRect(), y = b.top + scrollY - top + b.height / 2;
+        /* keep each bend inside its gap so it never runs under the content around it */
+        const r = Math.max(24, Math.min(R0, b.height / 2 - 6));
         if (s.hasAttribute("data-stop-end")) {
           const x0 = X(), xm = W / 2;
           d += ` L ${x0} ${y - r} C ${x0} ${y} ${x0} ${y} ${xm} ${y}`;
           pts.push([xm, y]); return;
         }
-        const x0 = X(); side ^= 1; const x1 = X();
-        d += ` L ${x0} ${y - r} C ${x0} ${y} ${x1} ${y} ${x1} ${y + r}`;
+        const x0 = i ? X() : -60; side ^= 1; const x1 = X();
+        d += `${i ? " L" : "M"} ${x0} ${y - r} C ${x0} ${y} ${x1} ${y} ${x1} ${y + r}`;
         pts.push([(x0 + x1) / 2, y]);
       });
-      [plan, shoulder, asphalt, center, maskPath].forEach(p => p.setAttribute("d", d));
-      shoulder.setAttribute("stroke-width", sw + 8); asphalt.setAttribute("stroke-width", sw); maskPath.setAttribute("stroke-width", sw + 14);
-      L = asphalt.getTotalLength();
+      if (!d) return;
+      L = shape(R, d, W, H, sw);
+      ride.scale(carScale(W));
       N = Math.max(2, Math.ceil(L / 8)); ys = new Float32Array(N + 1);
-      for (let i = 0; i <= N; i++) ys[i] = asphalt.getPointAtLength(i * L / N).y;
+      for (let i = 0; i <= N; i++) ys[i] = R.asphalt.getPointAtLength(i * L / N).y;
       pts.forEach(([x, y], i) => { pins[i].style.left = x + "px"; pins[i].style.top = y + "px"; });
       pinLen = pts.map(([, y]) => lenAtY(y));
-      if (animated) { maskPath.style.strokeDasharray = `${L} ${L + 40}`; render(Math.min(cur, L)); }
-      else { maskPath.style.strokeDasharray = "none"; pins.forEach(p => p.classList.add("on")); }
+      if (animated) { R.maskPath.style.strokeDasharray = `${L} ${L + 40}`; render(Math.min(cur, L)); }
+      else { R.maskPath.style.strokeDasharray = "none"; pins.forEach(p => p.classList.add("on")); }
     }
     const target = () => lenAtY(scrollY + innerHeight * .58 - top);
     return { build, render, target, setAnimated(v) { animated = v; } };
@@ -84,6 +124,45 @@
     addEventListener("load", () => Road.build());
     let t; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => Road.build(), 150); });
   }
+
+  /* ═══════ header roads: the car drives from the start pin to the destination once the strip is in view ═══════ */
+  document.querySelectorAll("[data-drive]").forEach(host => {
+    const R = layers(host.querySelector(".road-svg")), ride = rider(host, R.asphalt, true);
+    const [pinA, pinB] = host.querySelectorAll(".r-drive-pin");
+    let L = 0, stopAt = 0, t = 0;
+    function render(v) {
+      t = v;
+      const l = v * stopAt, reveal = v >= 1 ? L : Math.min(L, l + 26);
+      R.maskPath.style.strokeDashoffset = L - reveal;
+      ride.place(l, L);
+      host.classList.toggle("arrived", v >= 1);
+    }
+    function build() {
+      const W = host.clientWidth, H = host.offsetHeight;
+      const lg = W >= 1024, md = W >= 640, pad = lg ? 10 : 8, sw = lg ? 18 : md ? 14 : 10;
+      const sx = x => (pad + x / 1000 * (W - 2 * pad)).toFixed(1), y = v => (v / 72 * H).toFixed(1);
+      const d = `M ${sx(0)} ${y(44)} C ${sx(160)} ${y(44)}, ${sx(220)} ${y(20)}, ${sx(380)} ${y(26)} S ${sx(640)} ${y(54)}, ${sx(800)} ${y(40)} S ${sx(940)} ${y(26)}, ${sx(1000)} ${y(32)}`;
+      L = shape(R, d, W, H, sw);
+      R.maskPath.style.strokeDasharray = `${L} ${L + 40}`;
+      const sc = carScale(W) * .9;
+      ride.scale(sc);
+      stopAt = L - 44 * sc;
+      [[pinA, 0], [pinB, L]].forEach(([el, l]) => { const p = R.asphalt.getPointAtLength(l); el.style.left = p.x + "px"; el.style.top = p.y + "px"; });
+      render(t);
+    }
+    build();
+    let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(build, 150); });
+    if (reduce || !("IntersectionObserver" in window)) { render(1); return; }
+    const ease = x => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+    const io = new IntersectionObserver(es => {
+      if (!es[0].isIntersecting) return;
+      io.disconnect();
+      const t0 = performance.now() + 450, dur = 3200;
+      const tick = now => { const k = Math.max(0, Math.min(1, (now - t0) / dur)); render(ease(k)); if (k < 1) requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+    }, { threshold: .4 });
+    io.observe(host);
+  });
 
   /* ═══════ departures board: pad rows to one width, then flap the letters in ═══════ */
   document.querySelectorAll("[data-board]").forEach(host => {
@@ -128,7 +207,7 @@
       Road.setAnimated(true);
       J.classList.add("road-live");
       const proxy = { l: 0 };
-      const go = G.quickTo(proxy, "l", { duration: .6, ease: "power3", onUpdate: () => Road.render(proxy.l) });
+      const go = G.quickTo(proxy, "l", { duration: .9, ease: "power3", onUpdate: () => Road.render(proxy.l) });
       ST.addEventListener("refresh", () => { Road.build(); go(Road.target()); });
       ST.create({ trigger: J, start: "top bottom", end: "bottom top", onUpdate: () => go(Road.target()) });
       Road.build(); Road.render(0);
