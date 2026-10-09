@@ -71,12 +71,27 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# Database — Railway provides DATABASE_URL for PostgreSQL
-DATABASE_URL = os.environ.get("DATABASE_URL")
+# Database — Railway provides DATABASE_URL for PostgreSQL; Namecheap sets a
+# mysql:// URL in .env
+DATABASE_URL = config("DATABASE_URL", default="")
 if DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
+    if DATABASE_URL.startswith("mysql"):
+        # Namecheap shared hosting has no compiler for mysqlclient, so use
+        # PyMySQL as a drop-in MySQLdb.
+        try:
+            import MySQLdb  # noqa: F401
+        except ImportError:
+            import pymysql
+            pymysql.version_info = (2, 2, 1, "final", 0)
+            pymysql.install_as_MySQLdb()
+        DATABASES["default"]["CONN_MAX_AGE"] = 0
+        DATABASES["default"]["OPTIONS"] = {
+            "charset": "utf8mb4",
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+        }
 else:
     DATABASES = {
         "default": {
