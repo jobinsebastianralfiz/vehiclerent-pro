@@ -25,6 +25,7 @@ body { background-image: radial-gradient(60rem 40rem at 90% -10%, rgba(212,236,1
 .b-field:focus { outline: none; border-color: #33450d; box-shadow: 0 0 0 3px rgba(212,236,162,.7); }
 .b-chip { display: inline-flex; align-items: center; gap: .4rem; padding: .6rem 1rem; border-radius: 999px; font-size: .8125rem; font-weight: 700; background: rgba(255,255,255,.75); border: 1px solid rgba(255,255,255,.9); color: #4a4c40; white-space: nowrap; transition: background-color .3s, color .3s, transform .45s var(--spring); }
 .b-chip:hover { transform: translateY(-2px); background: #fff; }
+.b-chip-soft { background: #ebebe3; border-color: #ebebe3; }
 .b-chip.is-on, .peer:checked + .b-chip { background: #1f2e00; color: #fff; border-color: #1f2e00; }
 .peer:focus-visible + .b-chip { outline: 2px solid #33450d; outline-offset: 2px; }
 .no-scrollbar::-webkit-scrollbar { display: none; }

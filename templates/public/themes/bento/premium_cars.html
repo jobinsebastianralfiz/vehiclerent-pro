@@ -125,8 +125,10 @@
             <p class="mt-3 text-white/70 text-lg max-w-xl">Tell us your dates and we'll arrange the right car, the right driver and the right delivery point.</p>
         </div>
         <div class="lg:col-span-5 relative grid sm:grid-cols-2 gap-2">
-            <a href="#collection" class="bg-primary-fixed text-primary rounded-2xl p-5 font-bold flex flex-col gap-6 lift"><span class="material-symbols-outlined">directions_car</span>Browse the collection</a>
-            {% if WHATSAPP_NUMBER %}<a href="{% whatsapp_url 'Hi! I want to book a premium car.' %}" target="_blank" rel="noopener" class="bg-[#25D366] text-white rounded-2xl p-5 font-bold flex flex-col gap-6 lift"><span class="material-symbols-outlined">chat</span>WhatsApp us</a>{% elif BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="bg-white/10 rounded-2xl p-5 font-bold flex flex-col gap-6 lift"><span class="material-symbols-outlined">call</span>{{ BUSINESS_PHONE }}</a>{% endif %}
+            <div class="sm:col-span-2 flex flex-wrap items-center gap-2.5">
+                <a href="#collection" class="inline-flex items-center gap-2 bg-primary-fixed text-primary rounded-full pl-3.5 pr-5 py-2.5 text-sm font-bold"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">directions_car</span>Browse the collection</a>
+                {% include "public/themes/bento/_contact_pills.html" with wa_msg="Hi! I want to book a premium car." %}
+            </div>
         </div>
     </div>
 </section>

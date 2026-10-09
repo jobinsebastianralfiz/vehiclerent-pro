@@ -1,0 +1,24 @@
+{% load vehicle_tags %}{# Dashboard stat card. Args: label value icon tone url color, and either trend+trend_label+series or pct+pct_label #}
+<a href="{% url url %}" class="group relative overflow-hidden bg-white rounded-3xl p-4 sm:p-5 shadow-sm ring-1 ring-black/5 hover:shadow-md hover:-translate-y-0.5 transition-all">
+    <div class="flex items-start gap-3">
+        <span class="w-11 h-11 shrink-0 rounded-2xl grid place-items-center
+            {% if tone == 'sky' %}bg-sky-50 text-sky-600{% elif tone == 'emerald' %}bg-emerald-50 text-emerald-600{% elif tone == 'amber' %}bg-amber-50 text-amber-600{% elif tone == 'violet' %}bg-violet-50 text-violet-600{% elif tone == 'rose' %}bg-rose-50 text-rose-500{% else %}bg-teal-50 text-teal-600{% endif %}">
+            <span class="material-symbols-outlined">{{ icon }}</span>
+        </span>
+        <div class="min-w-0">
+            <p class="text-xs sm:text-sm text-stone-500 font-medium truncate">{{ label }}</p>
+            <p class="text-2xl sm:text-[26px] leading-tight font-extrabold text-stone-900">{{ value }}</p>
+        </div>
+    </div>
+    <div class="mt-3 flex items-end justify-between gap-2 min-h-[40px]">
+        {% if series %}
+        <p class="text-xs font-semibold whitespace-nowrap {% if trend %}text-emerald-600{% else %}text-stone-400{% endif %}"><span class="material-symbols-outlined text-[14px] align-[-2px]">{% if trend %}trending_up{% else %}trending_flat{% endif %}</span> +{{ trend }} {{ trend_label }}</p>
+        <span class="w-[44%] max-w-[110px] opacity-90" title="Last 14 days">{% sparkline series color %}</span>
+        {% else %}
+        <div class="w-full">
+            <p class="text-xs text-stone-500 mb-2">{{ pct }}% {{ pct_label }}</p>
+            <div class="h-2 rounded-full bg-stone-100 overflow-hidden"><span class="block h-full rounded-full" style="width: {{ pct }}%; background: {{ color }}"></span></div>
+        </div>
+        {% endif %}
+    </div>
+</a>

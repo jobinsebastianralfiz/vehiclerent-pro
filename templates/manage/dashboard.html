@@ -1,221 +1,171 @@
 {% extends "manage/base_admin.html" %}
-{% load vehicle_tags %}
+{% load static vehicle_tags %}
 
-{% block page_title %}Dashboard{% endblock %}
+{% block title %}Dashboard - {{ BUSINESS_NAME }}{% endblock %}
 
 {% block content %}
-<!-- Stats Cards -->
-<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6 sm:mb-8">
-    <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-stone-100">
-        <div class="flex items-center gap-3 sm:gap-4">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-blue-50 flex-shrink-0">
-                <span class="material-symbols-outlined text-lg sm:text-xl text-blue-600">directions_car</span>
-            </div>
-            <div>
-                <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-stone-500">Vehicles</p>
-                <p class="text-xl sm:text-2xl font-bold text-stone-900">{{ stats.total_vehicles }}</p>
-            </div>
-        </div>
+<!-- ─── Greeting ─── -->
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
+    <div>
+        <h1 class="text-2xl sm:text-[32px] font-extrabold tracking-tight text-stone-900">Welcome back, {{ request.user.full_name|default:"Admin" }}!</h1>
+        <p class="text-stone-500 sm:text-lg mt-1">Here's what's happening with your fleet today.</p>
     </div>
-    <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-stone-100">
-        <div class="flex items-center gap-3 sm:gap-4">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-green-50 flex-shrink-0">
-                <span class="material-symbols-outlined text-lg sm:text-xl text-green-600">check_circle</span>
-            </div>
-            <div>
-                <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-stone-500">Available</p>
-                <p class="text-xl sm:text-2xl font-bold text-stone-900">{{ stats.available_vehicles }}</p>
-            </div>
-        </div>
-    </div>
-    <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-stone-100">
-        <div class="flex items-center gap-3 sm:gap-4">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-amber-50 flex-shrink-0">
-                <span class="material-symbols-outlined text-lg sm:text-xl text-amber-600">car_rental</span>
-            </div>
-            <div>
-                <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-stone-500">Rented</p>
-                <p class="text-xl sm:text-2xl font-bold text-stone-900">{{ stats.rented_vehicles }}</p>
-            </div>
-        </div>
-    </div>
-    <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-stone-100">
-        <div class="flex items-center gap-3 sm:gap-4">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-purple-50 flex-shrink-0">
-                <span class="material-symbols-outlined text-lg sm:text-xl text-purple-600">group</span>
-            </div>
-            <div>
-                <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-stone-500">Customers</p>
-                <p class="text-xl sm:text-2xl font-bold text-stone-900">{{ stats.total_customers }}</p>
-            </div>
-        </div>
-    </div>
-    <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-stone-100">
-        <div class="flex items-center gap-3 sm:gap-4">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-rose-50 flex-shrink-0">
-                <span class="material-symbols-outlined text-lg sm:text-xl text-rose-600">assignment</span>
-            </div>
-            <div>
-                <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-stone-500">Allocations</p>
-                <p class="text-xl sm:text-2xl font-bold text-stone-900">{{ stats.active_allocations }}</p>
-            </div>
-        </div>
-    </div>
-    <div class="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-stone-100">
-        <div class="flex items-center gap-3 sm:gap-4">
-            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center bg-teal-50 flex-shrink-0">
-                <span class="material-symbols-outlined text-lg sm:text-xl text-teal-600">mail</span>
-            </div>
-            <div>
-                <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-stone-500">Enquiries</p>
-                <p class="text-xl sm:text-2xl font-bold text-stone-900">{{ stats.new_enquiries }}</p>
-            </div>
-        </div>
+    <div class="inline-flex items-center gap-3 self-start sm:self-auto rounded-2xl bg-white px-4 py-3 shadow-sm ring-1 ring-black/5">
+        <span class="material-symbols-outlined text-stone-600">calendar_month</span>
+        <span class="font-semibold text-stone-800">{{ today|date:"l, j F Y" }}</span>
     </div>
 </div>
 
-<!-- Bento Grid: Enquiries + Sidebar -->
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-8">
-    <!-- Recent Enquiries -->
-    <div class="lg:col-span-8">
-        <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-100 overflow-hidden">
-            <div class="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6">
-                <div>
-                    <h3 class="font-bold text-base sm:text-lg">Recent Enquiries</h3>
-                    <p class="text-stone-500 text-xs mt-0.5">Inbound requests from the last 24 hours</p>
-                </div>
-                <a href="{% url 'enquiry_list' %}" class="text-primary text-xs sm:text-sm font-medium hover:underline">View All</a>
-            </div>
+<!-- ─── Stat cards ─── -->
+{% with s=stats %}
+<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-6 sm:mb-8">
+    {% include "manage/includes/dash_stat.html" with label="Vehicles" value=s.total_vehicles icon="directions_car" tone="sky" trend=s.vehicles_this_month trend_label="this month" series=spark.vehicles color="#3b82f6" url="vehicle_manage_list" %}
+    {% include "manage/includes/dash_stat.html" with label="Available" value=s.available_vehicles icon="check_circle" tone="emerald" pct=s.available_pct pct_label="available" color="#22a06b" url="vehicle_manage_list" %}
+    {% include "manage/includes/dash_stat.html" with label="Rented" value=s.rented_vehicles icon="car_rental" tone="amber" pct=s.rented_pct pct_label="of total" color="#f59e0b" url="vehicle_manage_list" %}
+    {% include "manage/includes/dash_stat.html" with label="Customers" value=s.total_customers icon="group" tone="violet" trend=s.customers_this_month trend_label="this month" series=spark.customers color="#8b5cf6" url="customer_list" %}
+    {% include "manage/includes/dash_stat.html" with label="Allocations" value=s.active_allocations icon="event_available" tone="rose" trend=s.allocations_this_month trend_label="this month" series=spark.allocations color="#f43f5e" url="allocation_list" %}
+    {% include "manage/includes/dash_stat.html" with label="Enquiries" value=s.new_enquiries icon="mail" tone="teal" trend=s.enquiries_today trend_label="today" series=spark.enquiries color="#14b8a6" url="enquiry_list" %}
+</div>
+{% endwith %}
 
-            <!-- Mobile cards -->
-            <div class="sm:hidden px-4 pb-4 space-y-2">
-                {% for enq in recent_enquiries %}
-                <a href="{% url 'enquiry_detail' enq.pk %}" class="flex items-center gap-3 p-3 rounded-xl bg-stone-50 active:bg-stone-100">
-                    <div class="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center text-xs font-bold text-stone-600 flex-shrink-0">{{ enq.name|first }}</div>
-                    <div class="flex-1 min-w-0">
-                        <p class="font-medium text-sm truncate">{{ enq.name }}</p>
-                        <p class="text-xs text-stone-500 truncate">{{ enq.vehicle.name|default:"General" }} &middot; {{ enq.created_at|date:"d M, h:i A" }}</p>
-                    </div>
-                    {% status_badge enq.status %}
-                </a>
-                {% empty %}
-                <p class="text-center text-stone-400 text-sm py-8">No recent enquiries</p>
-                {% endfor %}
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-6">
+    <!-- ─── Recent enquiries ─── -->
+    <section class="xl:col-span-8 bg-white rounded-3xl shadow-sm ring-1 ring-black/5 overflow-hidden">
+        <div class="flex items-center justify-between gap-4 px-5 sm:px-6 pt-5 sm:pt-6 pb-4">
+            <div class="flex items-center gap-4">
+                <span class="w-11 h-11 rounded-2xl bg-[#ecf7f0] text-[#145c38] grid place-items-center"><span class="material-symbols-outlined">mail</span></span>
+                <div><h2 class="font-bold text-lg text-stone-900">Recent Enquiries</h2><p class="text-stone-500 text-sm">The latest requests from your website</p></div>
             </div>
-
-            <!-- Desktop table -->
-            <div class="hidden sm:block overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
-                            <th class="text-left px-6 py-3">Customer Name</th>
-                            <th class="text-left px-4 py-3">Requested Vehicle</th>
-                            <th class="text-left px-4 py-3">Status</th>
-                            <th class="text-left px-4 py-3">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for enq in recent_enquiries %}
-                        <tr class="group hover:bg-stone-50 transition-colors border-b border-stone-50">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center text-xs font-bold text-stone-600">{{ enq.name|first }}</div>
-                                    <span class="font-medium text-sm">{{ enq.name }}</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-4 text-sm text-stone-600">{{ enq.vehicle.name|default:"General" }}</td>
-                            <td class="px-4 py-4">{% status_badge enq.status %}</td>
-                            <td class="px-4 py-4 text-sm text-stone-500">{{ enq.created_at|date:"d M, h:i A" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="4" class="px-8 py-12 text-center text-stone-400">No recent enquiries</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <a href="{% url 'enquiry_list' %}" class="inline-flex items-center gap-1.5 whitespace-nowrap text-[#145c38] font-bold text-sm hover:gap-2.5 transition-all">View All <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
         </div>
-    </div>
-
-    <!-- Right Sidebar: Revenue + Quick Actions -->
-    <div class="lg:col-span-4 space-y-4 sm:space-y-8">
-        <div class="bg-stone-900 rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-white">
-            <h3 class="text-xs sm:text-sm font-bold uppercase tracking-widest text-stone-400 mb-3 sm:mb-4">Total Revenue</h3>
-            <p class="text-3xl sm:text-4xl font-bold font-serif">{{ total_revenue|inr }}</p>
-            <p class="text-stone-500 text-xs mt-2">From active & completed allocations</p>
+        <!-- phone: cards -->
+        <div class="sm:hidden px-4 pb-4 space-y-2">
+            {% for enq in recent_enquiries %}
+            <a href="{% url 'enquiry_detail' enq.pk %}" class="flex items-center gap-3 p-3 rounded-2xl bg-stone-50 active:bg-stone-100">
+                <span class="w-10 h-10 shrink-0 rounded-full grid place-items-center font-bold {% cycle 'bg-rose-100 text-rose-600' 'bg-emerald-100 text-emerald-700' 'bg-amber-100 text-amber-700' 'bg-violet-100 text-violet-700' 'bg-teal-100 text-teal-700' %}">{{ enq.name|first|upper }}</span>
+                <div class="flex-1 min-w-0"><p class="font-semibold text-sm truncate">{{ enq.name }}</p><p class="text-xs text-stone-500 truncate">{{ enq.vehicle.name|default:"General" }} · {{ enq.created_at|date:"d M, h:i A" }}</p></div>
+                {% status_badge enq.status %}
+            </a>
+            {% empty %}
+            <p class="text-center text-stone-400 text-sm py-8">No enquiries yet</p>
+            {% endfor %}
         </div>
+        <!-- desktop: table -->
+        <div class="hidden sm:block overflow-x-auto px-3 pb-3">
+            <table class="w-full text-sm">
+                <thead><tr class="text-[11px] font-bold uppercase tracking-wider text-stone-500">
+                    <th class="text-left font-bold px-4 py-3 rounded-l-xl">#</th><th class="text-left font-bold px-3 py-3">Customer</th><th class="text-left font-bold px-3 py-3">Requested vehicle</th><th class="text-left font-bold px-3 py-3">Status</th><th class="text-left font-bold px-3 py-3">Date &amp; time</th><th class="text-right font-bold px-4 py-3 rounded-r-xl">Actions</th>
+                </tr></thead>
+                <tbody>
+                    {% for enq in recent_enquiries %}
+                    <tr class="border-b border-stone-100 last:border-0">
+                        <td class="px-4 py-3.5 text-stone-500">{{ forloop.counter }}</td>
+                        <td class="px-3 py-3.5"><div class="flex items-center gap-3">
+                            <span class="w-9 h-9 shrink-0 rounded-full grid place-items-center font-bold {% cycle 'bg-rose-100 text-rose-600' 'bg-emerald-100 text-emerald-700' 'bg-amber-100 text-amber-700' 'bg-violet-100 text-violet-700' 'bg-teal-100 text-teal-700' %}">{{ enq.name|first|upper }}</span>
+                            <div class="min-w-0"><div class="font-semibold text-stone-900 truncate">{{ enq.name }}</div><div class="text-xs text-stone-500 whitespace-nowrap">{{ enq.phone }}</div></div>
+                        </div></td>
+                        <td class="px-3 py-3.5 text-stone-700">{{ enq.vehicle.name|default:"General" }}</td>
+                        <td class="px-3 py-3.5">{% status_badge enq.status %}</td>
+                        <td class="px-3 py-3.5 text-stone-600 whitespace-nowrap">{{ enq.created_at|date:"d M, h:i A" }}</td>
+                        <td class="px-4 py-3.5"><div class="flex items-center justify-end gap-1.5">
+                            <a href="{% url 'enquiry_detail' enq.pk %}" class="px-4 py-1.5 rounded-lg ring-1 ring-[#145c38]/40 text-[#145c38] font-semibold hover:bg-[#ecf7f0]">View</a>
+                            {% if enq.phone %}<a href="tel:{{ enq.phone }}" class="p-1.5 rounded-lg text-stone-500 hover:bg-stone-100" aria-label="Call {{ enq.name }}"><span class="material-symbols-outlined text-[20px]">call</span></a>{% endif %}
+                        </div></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="px-6 py-12 text-center text-stone-400">No enquiries yet</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
 
-        <div class="bg-white rounded-xl sm:rounded-2xl border border-stone-100 p-4 sm:p-6">
-            <h3 class="font-bold text-sm mb-3 sm:mb-4">Quick Actions</h3>
-            <div class="space-y-1 sm:space-y-2">
-                <a href="{% url 'vehicle_add' %}" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl hover:bg-stone-50 transition-colors text-sm">
-                    <span class="material-symbols-outlined text-primary">add_circle</span> Add Vehicle
+    <!-- ─── Revenue + quick actions ─── -->
+    <div class="xl:col-span-4 flex flex-col gap-4 sm:gap-6">
+        <section class="relative overflow-hidden rounded-3xl text-white min-h-[190px] p-6 shadow-sm" x-data="{ period: 'month' }">
+            <img src="{% static 'themes/img/suv-munnar.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover"/>
+            <span class="absolute inset-0 bg-gradient-to-r from-[#0a2e1d] via-[#0c3a24]/85 to-[#0c3a24]/25"></span>
+            <div class="relative flex items-center justify-between gap-3">
+                <h2 class="flex items-center gap-2 font-bold"><span class="material-symbols-outlined text-[20px]">payments</span>Total Revenue</h2>
+                <select x-model="period" class="bg-black/30 text-white text-xs font-semibold rounded-full border-0 py-1.5 pl-3 pr-8 focus:ring-2 focus:ring-white/40" aria-label="Revenue period">
+                    <option value="month" class="text-stone-900">This month</option>
+                    <option value="all" class="text-stone-900">All time</option>
+                </select>
+            </div>
+            <p class="relative mt-6 text-4xl sm:text-5xl font-extrabold tracking-tight" x-text="period === 'month' ? '{{ revenue.month|inr }}' : '{{ revenue.all|inr }}'">{{ revenue.month|inr }}</p>
+            <p class="relative mt-2 text-sm text-white/75">From active &amp; completed allocations</p>
+        </section>
+
+        <section class="bg-white rounded-3xl shadow-sm ring-1 ring-black/5 p-5 sm:p-6 flex-1">
+            <div class="flex items-center gap-4 mb-5">
+                <span class="w-11 h-11 rounded-2xl bg-[#ecf7f0] text-[#145c38] grid place-items-center"><span class="material-symbols-outlined">bolt</span></span>
+                <div><h2 class="font-bold text-lg text-stone-900">Quick Actions</h2><p class="text-stone-500 text-sm">Common tasks for your business</p></div>
+            </div>
+            <div class="grid grid-cols-3 gap-2.5">
+                <a href="{% url 'vehicle_add' %}" class="group rounded-2xl bg-emerald-50 hover:bg-emerald-100 p-3 text-center transition-colors">
+                    <span class="mx-auto w-10 h-10 rounded-xl bg-white grid place-items-center text-emerald-700 shadow-sm group-hover:-translate-y-0.5 transition-transform"><span class="material-symbols-outlined">directions_car</span></span>
+                    <span class="block mt-2.5 font-bold text-[13px] leading-tight text-stone-900">Add Vehicle</span><span class="hidden 2xl:block text-xs text-stone-500 mt-1">Grow your fleet</span>
                 </a>
-                <a href="{% url 'customer_add' %}" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl hover:bg-stone-50 transition-colors text-sm">
-                    <span class="material-symbols-outlined text-primary">person_add</span> Add Customer
+                <a href="{% url 'customer_add' %}" class="group rounded-2xl bg-sky-50 hover:bg-sky-100 p-3 text-center transition-colors">
+                    <span class="mx-auto w-10 h-10 rounded-xl bg-white grid place-items-center text-sky-700 shadow-sm group-hover:-translate-y-0.5 transition-transform"><span class="material-symbols-outlined">person_add</span></span>
+                    <span class="block mt-2.5 font-bold text-[13px] leading-tight text-stone-900">Add Customer</span><span class="hidden 2xl:block text-xs text-stone-500 mt-1">Register a customer</span>
                 </a>
-                <a href="{% url 'allocation_add' %}" class="flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl hover:bg-stone-50 transition-colors text-sm">
-                    <span class="material-symbols-outlined text-primary">assignment_add</span> New Allocation
+                <a href="{% url 'allocation_add' %}" class="group rounded-2xl bg-amber-50 hover:bg-amber-100 p-3 text-center transition-colors">
+                    <span class="mx-auto w-10 h-10 rounded-xl bg-white grid place-items-center text-amber-700 shadow-sm group-hover:-translate-y-0.5 transition-transform"><span class="material-symbols-outlined">event_available</span></span>
+                    <span class="block mt-2.5 font-bold text-[13px] leading-tight text-stone-900">New Allocation</span><span class="hidden 2xl:block text-xs text-stone-500 mt-1">Assign a booking</span>
                 </a>
             </div>
-        </div>
+        </section>
     </div>
 </div>
 
-<!-- Recent Allocations -->
-<div class="mt-4 sm:mt-8 bg-white rounded-xl sm:rounded-2xl border border-stone-100 overflow-hidden">
-    <div class="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6">
-        <div>
-            <h3 class="font-bold text-base sm:text-lg">Recent Allocations</h3>
-            <p class="text-stone-500 text-xs mt-0.5">Vehicles currently on the road</p>
+<!-- ─── Recent allocations ─── -->
+<section class="mt-4 sm:mt-6 bg-white rounded-3xl shadow-sm ring-1 ring-black/5 overflow-hidden">
+    <div class="flex items-center justify-between gap-4 px-5 sm:px-6 pt-5 sm:pt-6 pb-4">
+        <div class="flex items-center gap-4">
+            <span class="w-11 h-11 rounded-2xl bg-[#ecf7f0] text-[#145c38] grid place-items-center"><span class="material-symbols-outlined">event_available</span></span>
+            <div><h2 class="font-bold text-lg text-stone-900">Recent Allocations</h2><p class="text-stone-500 text-sm">Vehicles booked out to customers</p></div>
         </div>
-        <a href="{% url 'allocation_list' %}" class="text-primary text-xs sm:text-sm font-medium hover:underline">View All</a>
+        <a href="{% url 'allocation_list' %}" class="inline-flex items-center gap-1.5 whitespace-nowrap text-[#145c38] font-bold text-sm hover:gap-2.5 transition-all">View All <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
     </div>
-
-    <!-- Mobile cards -->
     <div class="sm:hidden px-4 pb-4 space-y-2">
-        {% for alloc in recent_allocations %}
-        <a href="{% url 'allocation_detail' alloc.pk %}" class="block p-3 rounded-xl bg-stone-50 active:bg-stone-100">
-            <div class="flex items-center justify-between mb-1.5">
-                <p class="font-medium text-sm">{{ alloc.vehicle.name }}</p>
-                {% status_badge alloc.status %}
-            </div>
-            <p class="text-xs text-stone-500">{{ alloc.customer.full_name }} &middot; {{ alloc.start_date|date:"d M" }} - {{ alloc.end_date|date:"d M" }}</p>
-            <p class="text-sm font-medium mt-1">{{ alloc.total_amount|inr }}</p>
+        {% for a in recent_allocations %}
+        <a href="{% url 'allocation_detail' a.pk %}" class="flex items-center gap-3 p-3 rounded-2xl bg-stone-50">
+            <span class="w-14 h-11 shrink-0 rounded-xl overflow-hidden bg-stone-100 grid place-items-center">{% if a.vehicle.thumbnail %}<img src="{{ a.vehicle.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-stone-400">directions_car</span>{% endif %}</span>
+            <div class="flex-1 min-w-0"><p class="font-semibold text-sm truncate">{{ a.vehicle.name }}</p><p class="text-xs text-stone-500 truncate">{{ a.customer.full_name }} · {{ a.start_date|date:"d M" }} – {{ a.end_date|date:"d M" }}</p></div>
+            {% status_badge a.status %}
         </a>
         {% empty %}
-        <p class="text-center text-stone-400 text-sm py-8">No recent allocations</p>
+        <p class="text-center text-stone-400 text-sm py-8">No allocations yet</p>
         {% endfor %}
     </div>
-
-    <!-- Desktop table -->
-    <div class="hidden sm:block overflow-x-auto">
-        <table class="w-full">
-            <thead>
-                <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
-                    <th class="text-left px-6 py-3">Vehicle</th>
-                    <th class="text-left px-4 py-3">Customer</th>
-                    <th class="text-left px-4 py-3">Duration</th>
-                    <th class="text-left px-4 py-3">Amount</th>
-                    <th class="text-left px-4 py-3">Status</th>
-                </tr>
-            </thead>
+    <div class="hidden sm:block overflow-x-auto px-3 pb-3">
+        <table class="w-full text-sm">
+            <thead><tr class="text-[11px] font-bold uppercase tracking-wider text-stone-500">
+                <th class="text-left font-bold px-4 py-3 rounded-l-xl">#</th><th class="text-left font-bold px-3 py-3">Vehicle</th><th class="text-left font-bold px-3 py-3">Customer</th><th class="text-left font-bold px-3 py-3">Duration</th><th class="text-left font-bold px-3 py-3">Amount</th><th class="text-left font-bold px-3 py-3">Status</th><th class="text-right font-bold px-4 py-3 rounded-r-xl">Actions</th>
+            </tr></thead>
             <tbody>
-                {% for alloc in recent_allocations %}
-                <tr class="group hover:bg-stone-50 transition-colors border-b border-stone-50">
-                    <td class="px-6 py-4">
-                        <div class="font-medium text-sm">{{ alloc.vehicle.name }}</div>
-                        <div class="text-xs text-stone-500">{{ alloc.vehicle.brand }}</div>
-                    </td>
-                    <td class="px-4 py-4 text-sm">{{ alloc.customer.full_name }}</td>
-                    <td class="px-4 py-4 text-sm text-stone-600">{{ alloc.start_date|date:"d M" }} - {{ alloc.end_date|date:"d M" }}</td>
-                    <td class="px-4 py-4 text-sm font-medium">{{ alloc.total_amount|inr }}</td>
-                    <td class="px-4 py-4">{% status_badge alloc.status %}</td>
+                {% for a in recent_allocations %}
+                <tr class="border-b border-stone-100 last:border-0">
+                    <td class="px-4 py-3.5 text-stone-500">{{ forloop.counter }}</td>
+                    <td class="px-3 py-3.5"><div class="flex items-center gap-3">
+                        <span class="w-16 h-11 shrink-0 rounded-xl overflow-hidden bg-stone-100 grid place-items-center">{% if a.vehicle.thumbnail %}<img src="{{ a.vehicle.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-stone-400">directions_car</span>{% endif %}</span>
+                        <div class="min-w-0"><div class="font-semibold text-stone-900 truncate">{{ a.vehicle.name }}</div><div class="text-xs text-stone-500">{{ a.vehicle.registration_number|default:"No reg. number" }}</div></div>
+                    </div></td>
+                    <td class="px-3 py-3.5"><div class="flex items-center gap-3">
+                        <span class="w-9 h-9 shrink-0 rounded-full grid place-items-center font-bold {% cycle 'bg-rose-100 text-rose-600' 'bg-emerald-100 text-emerald-700' 'bg-amber-100 text-amber-700' 'bg-violet-100 text-violet-700' 'bg-teal-100 text-teal-700' %}">{{ a.customer.full_name|first|upper }}</span>
+                        <div class="min-w-0"><div class="font-semibold text-stone-900 truncate">{{ a.customer.full_name }}</div><div class="text-xs text-stone-500 whitespace-nowrap">{{ a.customer.phone }}</div></div>
+                    </div></td>
+                    <td class="px-3 py-3.5 whitespace-nowrap"><div class="font-semibold text-stone-800">{% with d=a.duration_days %}{{ d|default:1 }} day{{ d|default:1|pluralize }}{% endwith %}</div><div class="text-xs text-stone-500">{{ a.start_date|date:"d M" }} – {{ a.end_date|date:"d M" }}</div></td>
+                    <td class="px-3 py-3.5 font-bold text-stone-900">{{ a.total_amount|inr }}</td>
+                    <td class="px-3 py-3.5">{% status_badge a.status %}</td>
+                    <td class="px-4 py-3.5 text-right"><a href="{% url 'allocation_detail' a.pk %}" class="inline-block px-4 py-1.5 rounded-lg ring-1 ring-[#145c38]/40 text-[#145c38] font-semibold hover:bg-[#ecf7f0]">View</a></td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5" class="px-8 py-12 text-center text-stone-400">No recent allocations</td></tr>
+                <tr><td colspan="7" class="px-6 py-12 text-center text-stone-400">No allocations yet. <a href="{% url 'allocation_add' %}" class="text-[#145c38] font-semibold hover:underline">Create the first one</a></td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-</div>
+</section>
 {% endblock %}

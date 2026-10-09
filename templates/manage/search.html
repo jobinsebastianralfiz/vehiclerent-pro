@@ -1,0 +1,56 @@
+{% extends "manage/base_admin.html" %}
+{% load vehicle_tags %}
+
+{% block title %}Search - {{ BUSINESS_NAME }}{% endblock %}
+
+{% block content %}
+<div class="mb-6 sm:mb-8">
+    <h1 class="text-2xl sm:text-[32px] font-extrabold tracking-tight text-stone-900">Search</h1>
+    {% if search_q %}<p class="text-stone-500 mt-1">{{ total }} result{{ total|pluralize }} for “{{ search_q }}”</p>{% else %}<p class="text-stone-500 mt-1">Find vehicles, customers and enquiries.</p>{% endif %}
+</div>
+
+<form method="get" class="md:hidden relative mb-6" role="search">
+    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-stone-400">search</span>
+    <input type="search" name="q" value="{{ search_q }}" autofocus placeholder="Name, phone, car, registration..." class="w-full pl-12 pr-4 py-3 bg-white rounded-full text-sm border-0 ring-1 ring-black/10 focus:ring-2 focus:ring-[#145c38]/40"/>
+</form>
+
+{% if search_q %}
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+    <section class="bg-white rounded-3xl shadow-sm ring-1 ring-black/5 p-5">
+        <h2 class="flex items-center gap-2 font-bold text-stone-900 mb-3"><span class="material-symbols-outlined text-sky-600">directions_car</span>Vehicles <span class="text-stone-400 font-semibold">{{ results.vehicles|length }}</span></h2>
+        <div class="space-y-1">
+            {% for v in results.vehicles %}
+            <a href="{% url 'vehicle_edit' v.pk %}" class="flex items-center gap-3 p-2 rounded-2xl hover:bg-stone-50">
+                <span class="w-14 h-10 shrink-0 rounded-xl overflow-hidden bg-stone-100 grid place-items-center">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-stone-400 text-[20px]">directions_car</span>{% endif %}</span>
+                <div class="flex-1 min-w-0"><div class="font-semibold text-sm truncate">{{ v.brand }} {{ v.name }}</div><div class="text-xs text-stone-500">{{ v.registration_number|default:"No reg. number" }}</div></div>
+                {% status_badge v.status %}
+            </a>
+            {% empty %}<p class="text-sm text-stone-400 py-4">No vehicles match.</p>{% endfor %}
+        </div>
+    </section>
+    <section class="bg-white rounded-3xl shadow-sm ring-1 ring-black/5 p-5">
+        <h2 class="flex items-center gap-2 font-bold text-stone-900 mb-3"><span class="material-symbols-outlined text-violet-600">group</span>Customers <span class="text-stone-400 font-semibold">{{ results.customers|length }}</span></h2>
+        <div class="space-y-1">
+            {% for c in results.customers %}
+            <a href="{% url 'customer_detail' c.pk %}" class="flex items-center gap-3 p-2 rounded-2xl hover:bg-stone-50">
+                <span class="w-10 h-10 shrink-0 rounded-full bg-violet-100 text-violet-700 grid place-items-center font-bold">{{ c.full_name|first|upper }}</span>
+                <div class="flex-1 min-w-0"><div class="font-semibold text-sm truncate">{{ c.full_name }}</div><div class="text-xs text-stone-500">{{ c.phone }}</div></div>
+            </a>
+            {% empty %}<p class="text-sm text-stone-400 py-4">No customers match.</p>{% endfor %}
+        </div>
+    </section>
+    <section class="bg-white rounded-3xl shadow-sm ring-1 ring-black/5 p-5">
+        <h2 class="flex items-center gap-2 font-bold text-stone-900 mb-3"><span class="material-symbols-outlined text-teal-600">mail</span>Enquiries <span class="text-stone-400 font-semibold">{{ results.enquiries|length }}</span></h2>
+        <div class="space-y-1">
+            {% for e in results.enquiries %}
+            <a href="{% url 'enquiry_detail' e.pk %}" class="flex items-center gap-3 p-2 rounded-2xl hover:bg-stone-50">
+                <span class="w-10 h-10 shrink-0 rounded-full bg-teal-100 text-teal-700 grid place-items-center font-bold">{{ e.name|first|upper }}</span>
+                <div class="flex-1 min-w-0"><div class="font-semibold text-sm truncate">{{ e.name }}</div><div class="text-xs text-stone-500 truncate">{{ e.phone }} · {{ e.vehicle.name|default:"General" }} · {{ e.created_at|date:"d M" }}</div></div>
+                {% status_badge e.status %}
+            </a>
+            {% empty %}<p class="text-sm text-stone-400 py-4">No enquiries match.</p>{% endfor %}
+        </div>
+    </section>
+</div>
+{% endif %}
+{% endblock %}

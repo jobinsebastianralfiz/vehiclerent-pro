@@ -2,22 +2,44 @@
 {% load vehicle_tags %}
 
 {% block extra_css %}
+<script>
+    /* Admin only: Tailwind's blue scale becomes the brand green, so every page's
+       bg-blue-600 buttons and blue accents follow the new admin look. */
+    tailwind.config.theme.extend.colors.blue = {
+        50: "#ecf7f0", 100: "#d3eedd", 200: "#a8dcbb", 300: "#74c495", 400: "#3fa56d",
+        500: "#1f8a52", 600: "#145c38", 700: "#0f4a2d", 800: "#0c3a24", 900: "#0a2e1d", 950: "#061c12"
+    };
+</script>
 <style>
-    .admin-sidebar { scrollbar-width: thin; scrollbar-color: #44403c transparent; }
+    body { background: #f6f5ef; }
+    .adm-sidebar { background: radial-gradient(120% 60% at 0% 100%, rgba(126,211,155,.10), transparent 60%), linear-gradient(180deg, #0f3d25 0%, #0b2f1c 55%, #08251a 100%); }
+    .adm-scroll { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.18) transparent; }
+    .adm-nav { display: flex; align-items: center; gap: .9rem; padding: .78rem 1rem; border-radius: .9rem; color: rgba(255,255,255,.78); font-size: .9375rem; font-weight: 500; transition: background-color .2s, color .2s; }
+    .adm-nav .material-symbols-outlined { font-size: 22px; }
+    .adm-nav:hover { background: rgba(255,255,255,.07); color: #fff; }
+    .adm-nav.is-on { background: linear-gradient(90deg, #1f6b41, #1a5c38); color: #fff; font-weight: 600; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 10px 24px -12px rgba(0,0,0,.6); }
+    .adm-nav.is-on .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
+    /* shared polish for the existing admin pages */
+    .adm-main .bg-white.rounded-2xl, .adm-main .bg-white.rounded-xl { box-shadow: 0 1px 2px rgba(16,24,16,.04), 0 12px 32px -20px rgba(16,24,16,.18); border-color: rgba(0,0,0,.05); }
+    .adm-main table thead tr { background: #f7f7f2; }
+    .adm-main table tbody tr:hover { background: #fafaf6; }
+    .adm-main h1 { font-weight: 800; letter-spacing: -.02em; color: #1c1917; }
+    @media (min-width: 640px) { .adm-main h1.text-xl, .adm-main h1.text-2xl { font-size: 28px; line-height: 1.2; } }
+    [x-cloak] { display: none !important; }
 </style>
 {% endblock %}
 
 {% block body %}
 <div x-data="{ sidebarOpen: false }">
     <!-- Mobile sidebar overlay -->
-    <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-stone-900/60 z-40 lg:hidden" x-on:click="sidebarOpen = false"></div>
+    <div x-show="sidebarOpen" x-transition:enter="transition-opacity ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-[#06210f]/60 backdrop-blur-sm z-40 lg:hidden" x-on:click="sidebarOpen = false"></div>
 
     {% include "manage/includes/sidebar.html" %}
 
     <!-- Main Content -->
-    <div class="lg:ml-64 min-h-screen">
+    <div class="adm-main lg:ml-[264px] min-h-screen">
         {% include "manage/includes/header.html" %}
-        <div class="p-4 sm:p-8">
+        <div class="p-4 sm:p-8 max-w-[1500px]">
             {% include "manage/includes/messages.html" %}
             {% block content %}{% endblock %}
         </div>
@@ -25,7 +47,7 @@
 </div>
 
 <!-- New Enquiry Notification Toast -->
-<div x-data="enquiryNotifier()" x-init="init()" x-show="showToast" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0 translate-y-4" class="fixed bottom-6 right-6 z-[100] bg-primary text-white rounded-2xl shadow-2xl px-5 py-4 flex items-center gap-3 max-w-sm cursor-pointer" x-on:click="goToEnquiries()" x-cloak>
+<div x-data="enquiryNotifier()" x-init="init()" x-show="showToast" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0 translate-y-4" class="fixed bottom-6 right-6 z-[100] bg-[#145c38] text-white rounded-2xl shadow-2xl px-5 py-4 flex items-center gap-3 max-w-sm cursor-pointer" x-on:click="goToEnquiries()" x-cloak>
     <div class="bg-white/20 rounded-full p-2 flex-shrink-0">
         <span class="material-symbols-outlined text-xl">mail</span>
     </div>

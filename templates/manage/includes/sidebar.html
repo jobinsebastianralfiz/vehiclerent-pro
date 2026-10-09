@@ -1,63 +1,40 @@
-{% load vehicle_tags %}
-<aside class="fixed left-0 top-0 h-full w-64 bg-stone-950 flex flex-col py-6 border-r border-stone-800 z-50 transform transition-transform duration-300 lg:translate-x-0" x-bind:class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
-    <div class="px-6 mb-8">
-        <h1 class="text-white font-bold tracking-tighter text-xl">Admin Panel</h1>
-        <p class="text-stone-500 text-xs font-medium tracking-widest uppercase mt-1">{{ BUSINESS_NAME }}</p>
+{% load static vehicle_tags %}
+<aside class="adm-sidebar fixed left-0 top-0 h-full w-[264px] flex flex-col z-50 transform transition-transform duration-300 lg:translate-x-0" x-bind:class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
+    <div class="px-5 pt-6 pb-5">
+        <a href="{% url 'dashboard' %}" class="flex items-center gap-3" aria-label="{{ BUSINESS_NAME }} admin">
+            {% if SITE_CONFIG.logo %}
+            <span class="inline-flex items-center rounded-xl bg-white px-3 py-2 shadow-lg shadow-black/20"><img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-8 w-auto"/></span>
+            {% else %}
+            <span class="font-serif font-bold text-xl text-white">{{ BUSINESS_NAME }}</span>
+            {% endif %}
+        </a>
+        <p class="mt-3 text-[10px] font-bold tracking-[.22em] uppercase text-white/50">Admin panel</p>
     </div>
-    <nav class="flex-1 space-y-1 admin-sidebar overflow-y-auto">
-        {% with request.resolver_match.url_name as current_url %}
-        <a class="flex items-center space-x-3 {% if current_url == 'dashboard' %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'dashboard' %}">
-            <span class="material-symbols-outlined">dashboard</span>
-            <span class="font-sans font-medium text-sm">Dashboard</span>
+
+    <nav class="flex-1 px-3 space-y-1 overflow-y-auto adm-scroll" aria-label="Admin">
+        {% with request.resolver_match.url_name as u %}
+        {% for item in ADMIN_NAV %}
+        <a href="{% url item.url %}" class="adm-nav {% if item.match|match_any:u %}is-on{% endif %}"{% if item.match|match_any:u %} aria-current="page"{% endif %}>
+            <span class="material-symbols-outlined">{{ item.icon }}</span>
+            <span class="flex-1">{{ item.label }}</span>
+            {% if item.badge and new_enquiry_count %}<span data-enquiry-badge class="min-w-[22px] text-center text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-[#7ed39b] text-[#0a2e1d]">{{ new_enquiry_count }}</span>{% endif %}
         </a>
-        <a class="flex items-center space-x-3 {% if 'vehicle' in current_url and 'category' not in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'vehicle_manage_list' %}">
-            <span class="material-symbols-outlined">directions_car</span>
-            <span class="font-sans font-medium text-sm">Vehicles</span>
-        </a>
-        <a class="flex items-center space-x-3 {% if 'category' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'category_list' %}">
-            <span class="material-symbols-outlined">category</span>
-            <span class="font-sans font-medium text-sm">Categories</span>
-        </a>
-        <a class="flex items-center space-x-3 {% if 'city' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'city_list' %}">
-            <span class="material-symbols-outlined">location_city</span>
-            <span class="font-sans font-medium text-sm">Cities</span>
-        </a>
-        <a class="flex items-center space-x-3 {% if 'addon' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'addon_list' %}">
-            <span class="material-symbols-outlined">add_circle</span>
-            <span class="font-sans font-medium text-sm">Booking Add-ons</span>
-        </a>
-        <a class="flex items-center space-x-3 {% if 'decoration' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'decoration_list' %}">
-            <span class="material-symbols-outlined">local_florist</span>
-            <span class="font-sans font-medium text-sm">Wedding Decor</span>
-        </a>
-        <a class="flex items-center space-x-3 {% if 'customer' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'customer_list' %}">
-            <span class="material-symbols-outlined">group</span>
-            <span class="font-sans font-medium text-sm">Customers</span>
-        </a>
-        <a class="flex items-center space-x-3 {% if 'allocation' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'allocation_list' %}">
-            <span class="material-symbols-outlined">assignment</span>
-            <span class="font-sans font-medium text-sm">Allocations</span>
-        </a>
-        <a class="flex items-center space-x-3 {% if 'enquiry' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'enquiry_list' %}">
-            <span class="material-symbols-outlined">mail</span>
-            <span class="font-sans font-medium text-sm">Enquiries</span>
-            <span data-enquiry-badge class="bg-primary text-[10px] text-white px-2 py-0.5 rounded-full ml-auto {% if not new_enquiry_count %}hidden{% endif %}">{{ new_enquiry_count|default:"0" }}</span>
-        </a>
-        <div class="mx-2 my-2 border-t border-stone-800"></div>
-        <a class="flex items-center space-x-3 {% if 'site_config' in current_url or 'testimonial' in current_url %}bg-blue-600 text-white{% else %}text-stone-400 hover:text-white hover:bg-stone-800{% endif %} rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'site_config_edit' %}">
-            <span class="material-symbols-outlined">settings</span>
-            <span class="font-sans font-medium text-sm">Settings</span>
-        </a>
+        {% endfor %}
         {% endwith %}
     </nav>
-    <div class="px-2 space-y-1 pt-4 border-t border-stone-800">
-        <div class="flex items-center space-x-3 text-stone-500 px-4 py-3 mx-2">
-            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            <span class="text-xs">All systems online</span>
-        </div>
-        <a class="flex items-center space-x-3 text-stone-400 hover:text-white hover:bg-stone-800 rounded-lg mx-2 px-4 py-3 transition-all" href="{% url 'admin_logout' %}">
-            <span class="material-symbols-outlined">logout</span>
-            <span class="font-sans font-medium text-sm">Logout</span>
+
+    <div class="px-4 pt-4 hidden lg:block [@media(max-height:760px)]:!hidden">
+        <a href="{% url 'home' %}" target="_blank" rel="noopener" class="group relative block overflow-hidden rounded-2xl ring-1 ring-white/15 p-4 min-h-[118px]">
+            <img src="{% static 'manage/login-backwaters.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-45 transition-transform duration-700 group-hover:scale-105"/>
+            <span class="absolute inset-0 bg-gradient-to-t from-[#06210f] via-[#0a2e1d]/70 to-transparent"></span>
+            <span class="relative block font-bold text-white leading-snug">View your<br/>website</span>
+            <span class="relative mt-1 block text-xs text-white/70">See what visitors see.</span>
+            <span class="absolute right-3 bottom-3 w-8 h-8 rounded-full bg-white/90 text-[#0a2e1d] grid place-items-center transition-transform group-hover:translate-x-0.5"><span class="material-symbols-outlined text-[18px]">arrow_outward</span></span>
         </a>
+    </div>
+
+    <div class="px-3 py-4 mt-3 border-t border-white/10 space-y-1">
+        <div class="flex items-center gap-3 px-4 py-2 text-xs text-white/55"><span class="w-2 h-2 rounded-full bg-[#5ee08f] animate-pulse"></span>All systems online</div>
+        <a href="{% url 'admin_logout' %}" class="adm-nav"><span class="material-symbols-outlined">logout</span><span>Logout</span></a>
     </div>
 </aside>

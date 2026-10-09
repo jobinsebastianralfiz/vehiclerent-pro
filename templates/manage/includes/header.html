@@ -1,22 +1,34 @@
-<header class="sticky top-0 w-full z-40 bg-white border-b border-stone-100">
-    <div class="flex items-center justify-between px-4 sm:px-8 py-3 sm:py-4">
-        <div class="flex items-center gap-3 sm:gap-4">
-            <button x-on:click="sidebarOpen = !sidebarOpen" class="lg:hidden">
-                <span class="material-symbols-outlined text-2xl text-stone-600">menu</span>
-            </button>
-            <div>
-                <h2 class="text-stone-900 font-bold text-lg sm:text-xl">{% block page_title %}Dashboard{% endblock %}</h2>
-            </div>
-        </div>
-        <div class="flex items-center gap-3 sm:gap-4">
-            <div class="relative hidden md:block">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-lg">search</span>
-                <input type="text" placeholder="Search across fleet..." class="pl-10 pr-4 py-2 bg-surface-container-low rounded-full text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none w-64 border-0"/>
-            </div>
-            <div class="flex items-center gap-2 sm:gap-3">
-                <span class="text-sm font-medium text-stone-600 hidden sm:inline">{{ request.user.full_name }}</span>
-                <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                    <span class="text-white text-xs font-bold">{{ request.user.full_name|first }}</span>
+<header class="sticky top-0 w-full z-40 bg-[#f6f5ef]/85 backdrop-blur-md border-b border-black/[.04]">
+    <div class="flex items-center gap-3 sm:gap-5 px-4 sm:px-8 py-3 sm:py-4">
+        <button x-on:click="sidebarOpen = !sidebarOpen" class="lg:hidden -ml-1 p-1.5 rounded-xl hover:bg-black/5" aria-label="Open menu">
+            <span class="material-symbols-outlined text-2xl text-stone-700">menu</span>
+        </button>
+
+        <form method="get" action="{% url 'admin_search' %}" class="relative flex-1 max-w-2xl hidden md:block" role="search">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 text-[22px]">search</span>
+            <input type="search" name="q" value="{{ search_q|default:'' }}" placeholder="Search across vehicles, customers, enquiries..." class="w-full pl-12 pr-4 py-3 bg-[#ecebe3] rounded-full text-sm border-0 focus:ring-2 focus:ring-[#145c38]/30 focus:bg-white placeholder:text-stone-500"/>
+        </form>
+
+        <div class="ml-auto flex items-center gap-2 sm:gap-4">
+            <a href="{% url 'admin_search' %}" class="md:hidden p-2 rounded-full hover:bg-black/5" aria-label="Search"><span class="material-symbols-outlined text-stone-700">search</span></a>
+            <a href="{% url 'enquiry_list' %}?status=new" class="relative p-2 rounded-full hover:bg-black/5" aria-label="{{ new_enquiry_count|default:0 }} new enquiries">
+                <span class="material-symbols-outlined text-stone-700">notifications</span>
+                {% if new_enquiry_count %}<span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-[#f6f5ef]"></span>{% endif %}
+            </a>
+            <div class="relative" x-data="{ open: false }" x-on:click.outside="open = false" x-on:keydown.escape="open = false">
+                <button type="button" x-on:click="open = !open" class="flex items-center gap-3 rounded-full pl-1 pr-2 py-1 hover:bg-black/5" :aria-expanded="open" aria-haspopup="menu">
+                    <span class="w-10 h-10 rounded-full bg-[#d3eedd] text-[#145c38] grid place-items-center font-bold">{{ request.user.full_name|default:"A"|first|upper }}</span>
+                    <span class="hidden sm:block text-left leading-tight">
+                        <span class="block font-bold text-sm text-stone-900">{{ request.user.full_name|default:"Admin" }}</span>
+                        <span class="block text-xs text-stone-500">Administrator</span>
+                    </span>
+                    <span class="material-symbols-outlined text-stone-500 hidden sm:block">expand_more</span>
+                </button>
+                <div x-show="open" x-cloak x-transition.origin.top.right class="absolute right-0 mt-2 w-56 rounded-2xl bg-white shadow-xl ring-1 ring-black/5 p-2" role="menu">
+                    <div class="px-3 py-2 text-xs text-stone-500 truncate">{{ request.user.email }}</div>
+                    <a href="{% url 'home' %}" target="_blank" rel="noopener" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-stone-50" role="menuitem"><span class="material-symbols-outlined text-[20px] text-stone-500">open_in_new</span>View website</a>
+                    <a href="{% url 'site_config_edit' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm hover:bg-stone-50" role="menuitem"><span class="material-symbols-outlined text-[20px] text-stone-500">settings</span>Settings</a>
+                    <a href="{% url 'admin_logout' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-700 hover:bg-red-50" role="menuitem"><span class="material-symbols-outlined text-[20px]">logout</span>Logout</a>
                 </div>
             </div>
         </div>
