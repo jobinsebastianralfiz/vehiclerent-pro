@@ -78,12 +78,21 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
 
   .postmark { width: 120px; height: 120px; }
 
+  /* hero slides: cross-fade with a slow Ken Burns push; dots show which one is up */
+  .hero-slides .hs { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s ease; }
+  .hero-slides .hs:first-child, .hero-slides .hs.on { opacity: 1; }
+  .hero-slides.ready .hs:first-child:not(.on) { opacity: 0; }
+  .hero-slides .hs.on { animation: hs-push 7s ease-out both; }
+  @keyframes hs-push { from { scale: 1.08; } to { scale: 1; } }
+  .hs-dots span { width: 8px; height: 8px; border-radius: 999px; background: rgba(255,250,240,.55); transition: width .5s, background .5s; }
+  .hs-dots span.on { width: 26px; background: #e39b3c; }
+
   /* the enquiry include is built for a light card; keep its text dark inside the ivory panel */
   .r-form { color: #1b1c17; }
 
   @media (prefers-reduced-motion: reduce) {
     .motion .pc { opacity: 1 !important; }
-    .route-line path, .route-car, .tag:hover { animation: none !important; }
+    .route-line path, .route-car, .tag:hover, .hero-slides .hs.on { animation: none !important; }
   }
 </style>
 {% endblock %}
@@ -112,12 +121,20 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
     </div>
     <div class="lg:w-[54%] w-full relative pb-16 sm:pb-20">
         <div class="m-hero-media rounded-[2.5rem] h-[420px] sm:h-[560px] lg:h-[640px]" data-intro="2" data-intro-kind="media">
-            {% if config.hero_image %}
+            {% comment %}Hero Background Slides 1-3 from Settings cross-fade here; without any, the single hero image (or the default photo).{% endcomment %}
+            {% if config.hero_bg_1 or config.hero_bg_2 or config.hero_bg_3 %}
+            <div class="hero-slides absolute inset-0" data-hero-slides>
+                {% if config.hero_bg_1 %}<div class="hs"><img src="{{ config.hero_bg_1.url }}" alt="" class="w-full h-full object-cover"/></div>{% endif %}
+                {% if config.hero_bg_2 %}<div class="hs"><img src="{{ config.hero_bg_2.url }}" alt="" class="w-full h-full object-cover" loading="lazy"/></div>{% endif %}
+                {% if config.hero_bg_3 %}<div class="hs"><img src="{{ config.hero_bg_3.url }}" alt="" class="w-full h-full object-cover" loading="lazy"/></div>{% endif %}
+            </div>
+            {% elif config.hero_image %}
             <img src="{{ config.hero_image.url }}" alt="" class="w-full h-full object-cover"/>
             {% else %}
             <img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="An SUV beside a Kerala backwater at sunset" class="w-full h-full object-cover"/>
             {% endif %}
             <div class="absolute inset-0 bg-gradient-to-t from-[#0f2e2c]/50 via-transparent to-transparent"></div>
+            <div class="hs-dots absolute right-6 bottom-6 z-10 flex gap-2" aria-hidden="true"></div>
             {% if starting_price %}
             <div class="absolute top-6 right-6 bg-surface-container-lowest/85 backdrop-blur px-5 py-3 rounded-full flex items-center gap-2 text-sm font-bold text-on-surface"><span class="material-symbols-outlined text-[#d9692f] text-lg">wb_twilight</span>From <span data-slot>{{ starting_price|inr }}</span>/day</div>
             {% endif %}
@@ -460,6 +477,23 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
     rows.forEach((r, i) => run(r, i * 110));
   }), { threshold: .35 });
   io.observe(host);
+})();
+
+/* hero slides: next one every 5.5s, paused while the hero is off screen or the tab is hidden */
+(() => {
+  const host = document.querySelector("[data-hero-slides]");
+  if (!host) return;
+  const slides = [...host.children], dots = host.parentElement.querySelector(".hs-dots");
+  if (slides.length < 2) return;
+  const marks = slides.map(() => dots.appendChild(document.createElement("span")));
+  let i = 0, timer = 0, visible = true;
+  const show = n => { i = n; slides.forEach((s, k) => s.classList.toggle("on", k === n)); marks.forEach((m, k) => m.classList.toggle("on", k === n)); };
+  show(0); host.classList.add("ready");
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const run = () => { clearInterval(timer); if (visible && !document.hidden) timer = setInterval(() => show((i + 1) % slides.length), 5500); };
+  if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; run(); }).observe(host);
+  document.addEventListener("visibilitychange", run);
+  run();
 })();
 
 /* local Kerala time on the board */
