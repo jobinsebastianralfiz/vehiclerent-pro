@@ -133,7 +133,7 @@ decoration packages as postcards, the four steps as stops on the road, and a rea
                 </div>
             </div>
             <form action="{% url 'submit_enquiry' %}" method="post" class="r-form relative bg-surface-container-lowest rounded-3xl p-6 sm:p-8 shadow-2xl min-w-0 space-y-4" data-reveal>
-                {% csrf_token %}
+                {% csrf_token %}{% include "public/includes/_antispam.html" %}
                 <input type="hidden" name="rental_type" value="with_driver"/>
                 <div class="flex items-center justify-between gap-3 mb-2"><span class="label-tiny text-tertiary flex items-center gap-2"><span class="material-symbols-outlined text-[#d9692f] text-lg">favorite</span>Wedding enquiry</span></div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">

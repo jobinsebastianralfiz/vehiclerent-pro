@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import MaxLengthValidator
 from .models import Enquiry
 
 
@@ -29,6 +30,10 @@ class EnquiryPublicForm(forms.ModelForm):
         self.fields["pickup_city"].required = False
         self.fields["drop_city"].required = False
         self.fields["rental_type"].required = False
+        self.fields["name"].max_length = 100
+        self.fields["message"].max_length = 2000
+        self.fields["name"].validators.append(MaxLengthValidator(100))
+        self.fields["message"].validators.append(MaxLengthValidator(2000))
         # Resolve addon choices lazily so admin migrations don't import-fail
         try:
             from vehicles.models import BookingAddon

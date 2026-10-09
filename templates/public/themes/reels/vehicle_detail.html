@@ -94,7 +94,7 @@
         </div>
         {% endif %}
         <form action="{% url 'submit_enquiry' %}" method="post" class="book-form" id="bookForm">
-          {% csrf_token %}
+          {% csrf_token %}{% include "public/includes/_antispam.html" %}
           <input type="hidden" name="vehicle" value="{{ vehicle.id }}"/>
           <input type="hidden" name="source" value="website"/>
           <label class="field"><span>Pickup</span><input type="date" name="preferred_start_date" required/></label>

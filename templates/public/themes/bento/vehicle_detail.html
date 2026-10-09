@@ -111,7 +111,7 @@
             {% endif %}
 
             <form action="{% url 'submit_enquiry' %}" method="post" class="mt-6 space-y-3" id="b-book" data-day="{{ vehicle.price_per_day|default:0|floatformat:0 }}" data-driver="{{ vehicle.with_driver_price_per_day|default:0|floatformat:0 }}">
-                {% csrf_token %}
+                {% csrf_token %}{% include "public/includes/_antispam.html" %}
                 <input type="hidden" name="vehicle" value="{{ vehicle.id }}"/>
                 <input type="hidden" name="source" value="website"/>
                 <input type="hidden" name="message" value="" id="b-msg"/>

@@ -142,7 +142,7 @@
         {% endif %}
 
         <form action="{% url 'submit_enquiry' %}" method="post" class="space-y-4">
-          {% csrf_token %}
+          {% csrf_token %}{% include "public/includes/_antispam.html" %}
           <input type="hidden" name="vehicle" value="{{ vehicle.id }}"/>
           <input type="hidden" name="source" value="website"/>
 

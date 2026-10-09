@@ -124,7 +124,7 @@ then a road down the page through specs, the story, what's on board and similar 
                 <div class="tk-perf"></div>
 
                 <form action="{% url 'submit_enquiry' %}" method="post" class="px-6 sm:px-8 pt-7 pb-6 space-y-4 r-form">
-                    {% csrf_token %}
+                    {% csrf_token %}{% include "public/includes/_antispam.html" %}
                     <input type="hidden" name="vehicle" value="{{ vehicle.id }}"/>
                     <input type="hidden" name="source" value="website"/>
                     {% if vehicle.is_chauffeur_available %}

@@ -107,6 +107,14 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# Cache — file based so rate limits are shared by all Passenger/gunicorn workers
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": BASE_DIR / ".cache",
+    }
+}
+
 # Auth
 AUTH_USER_MODEL = "core.AdminUser"
 AUTHENTICATION_BACKENDS = ["core.backends.EmailBackend"]

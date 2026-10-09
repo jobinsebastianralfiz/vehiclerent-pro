@@ -7,11 +7,13 @@ from django.db import models
 from django.db.models import Count, Min
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
+from django_ratelimit.decorators import ratelimit
 
 from vehicles.models import City, Vehicle, VehicleCategory
 
-from . import chatbot
+from . import antispam, chatbot
 from .forms import AdminLoginForm, SiteConfigForm, TestimonialForm
 from .models import SiteConfig, Testimonial
 from .themes import THEMES, active_theme, themed
@@ -173,13 +175,18 @@ def robots_txt(request):
 
 
 @require_POST
+@ratelimit(key=antispam.client_ip, rate="30/m", block=False)
 def chat_search(request):
     """Public chatbot endpoint. Accepts JSON {"message": "..."} and returns matching cars."""
+    if getattr(request, "limited", False):
+        return JsonResponse({"reply": "You're sending messages very fast. Please wait a minute.", "vehicles": [], "filters_applied": []}, status=429)
+    if len(request.body) > 4096:
+        return HttpResponseBadRequest("Message too long")
     try:
         data = json.loads(request.body.decode("utf-8") or "{}")
     except json.JSONDecodeError:
         return HttpResponseBadRequest("Invalid JSON")
-    message = (data.get("message") or "").strip()
+    message = str(data.get("message") or "").strip()[:300]
     if not message:
         return JsonResponse({"reply": "Please type a question.", "vehicles": [], "filters_applied": []})
     result = chatbot.search(message)
@@ -188,18 +195,25 @@ def chat_search(request):
 
 # ──────────────── Auth Views ────────────────
 
+@ratelimit(key=antispam.client_ip, rate="10/15m", method="POST", block=False)
+@ratelimit(key="post:email", rate="5/15m", method="POST", block=False)
 def admin_login(request):
     if request.user.is_authenticated:
         return redirect("dashboard")
     form = AdminLoginForm()
     error = None
-    if request.method == "POST":
+    if request.method == "POST" and getattr(request, "limited", False):
+        error = "Too many sign-in attempts. Please wait 15 minutes and try again."
+    elif request.method == "POST":
         form = AdminLoginForm(request.POST)
         if form.is_valid():
             user = authenticate(request, username=form.cleaned_data["email"], password=form.cleaned_data["password"])
             if user is not None:
                 login(request, user)
-                return redirect(request.GET.get("next", "/manage/"))
+                nxt = request.GET.get("next", "")
+                if not url_has_allowed_host_and_scheme(nxt, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+                    nxt = "/manage/"
+                return redirect(nxt)
             else:
                 error = "Invalid email or password."
     return render(request, "manage/login.html", {"form": form, "error": error})

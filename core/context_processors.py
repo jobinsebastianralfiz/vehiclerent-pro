@@ -1,6 +1,9 @@
 import json
 
 from django.conf import settings
+from django.utils.functional import SimpleLazyObject
+
+from . import antispam
 
 from .themes import active_theme
 
@@ -18,6 +21,7 @@ def site_settings(request):
         "THEME_TOKENS": json.dumps({"colors": theme["colors"], "display": theme["font_display"], "body": theme["font_body"]}),
         "THEME_PREVIEW": theme["key"] != (config.theme if config else theme["key"]),
         "THEME_NAVBAR": [f"public/themes/{theme['key']}/navbar.html", "public/includes/navbar.html"],
+        "ANTISPAM_TOKEN": SimpleLazyObject(antispam.make_token),
         "THEME_FOOTER": [f"public/themes/{theme['key']}/footer.html", "public/includes/footer.html"],
     }
 

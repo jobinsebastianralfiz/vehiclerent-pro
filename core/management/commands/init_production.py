@@ -1,4 +1,5 @@
 import os
+import secrets
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
@@ -14,8 +15,12 @@ class Command(BaseCommand):
         # Create admin if none exists
         if not User.objects.filter(is_superuser=True).exists():
             email = os.environ.get("ADMIN_EMAIL", "admin@vehiclerentpro.com")
-            password = os.environ.get("ADMIN_PASSWORD", "Admin@2026")
+            password = os.environ.get("ADMIN_PASSWORD")
             name = os.environ.get("ADMIN_NAME", "Admin")
+            if not password:
+                # Never fall back to a fixed password: this repo is public.
+                password = secrets.token_urlsafe(18)
+                self.stdout.write(self.style.WARNING(f"ADMIN_PASSWORD not set; generated one for {email}: {password}"))
             User.objects.create_superuser(email=email, password=password, full_name=name)
             self.stdout.write(self.style.SUCCESS(f"Admin user created: {email}"))
         else:
