@@ -10,6 +10,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
+from django.utils import timezone
+
+from . import catalog
 from .forms import VehicleForm
 from .models import City, Vehicle, VehicleCategory, VehicleImage
 
@@ -62,6 +65,14 @@ class _StepBase(VehicleForm):
         if "available_cities" in self.fields:
             self.fields["available_cities"].widget = forms.CheckboxSelectMultiple()
             self.fields["available_cities"].queryset = City.objects.filter(is_active=True)
+        if "year" in self.fields:
+            this_year = timezone.localdate().year
+            years = list(range(this_year + 1, 1949, -1))
+            current = self.initial.get("year") or (self.instance.year if self.instance else None)
+            if current and current not in years:
+                years.append(current)
+            self.fields["year"].widget = forms.Select(
+                choices=[("", "Choose year")] + [(y, y) for y in years], attrs={"class": _INPUT})
         if "vehicle_type" in self.fields:
             self.fields["vehicle_type"].widget = forms.RadioSelect(choices=Vehicle.VEHICLE_TYPE_CHOICES)
         placeholders = {
@@ -210,4 +221,7 @@ def _wizard(request, vehicle, step):
         "draft_key": f"vw-{vehicle.pk if vehicle else 'new'}-{step}",
         "post_url": reverse("vehicle_wizard", args=[vehicle.pk, step]) if vehicle else reverse("vehicle_add"),
         "images": vehicle.images.order_by("display_order") if (vehicle and step == LAST) else [],
+        "catalog": catalog.as_json() if step == 1 else None,
+        "colors": catalog.COLORS if step == 1 else None,
+        "input_class": _INPUT,
     })
