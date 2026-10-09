@@ -1,4 +1,4 @@
-/* Kerala Route · every page. The drawn road down the page, the header road a car drives along, plus the page props:
+/* Kerala Route · every page. The drawn road down the page, the Kerala scene an SUV drives through, plus the page props:
    tickets flip like boarding passes, stamps thump down, polaroids fan out, the departures board flaps.
    Everything renders complete without GSAP or with reduced motion; motion only adds on top. */
 (() => {
@@ -21,7 +21,7 @@
   }
   /* the car is drawn at full size; carScale shrinks it to the road on smaller screens */
   const carScale = W => (W >= 1024 ? .9 : W >= 768 ? .72 : .52);
-  function rider(host, path, keepVisible) {
+  function rider(host, path) {
     const car = host.querySelector(".road-car"), puffHost = host.querySelector(".road-puffs");
     const puffs = Array.from({ length: 7 }, () => { const s = document.createElement("span"); s.className = "road-puff"; puffHost.appendChild(s); return s; });
     let last = null, idle = 0, sc = 1;
@@ -29,7 +29,7 @@
     return {
       scale(v) { sc = v; },
       place(l, L) {
-        if (l <= 1 && !keepVisible) { car.classList.remove("on"); settle(); last = l; return; }
+        if (l <= 1) { car.classList.remove("on"); settle(); last = l; return; }
         l = Math.max(0, Math.min(L, l));
         const p = path.getPointAtLength(l), a = path.getPointAtLength(Math.min(L, l + 4)), b = path.getPointAtLength(Math.max(0, l - 4));
         car.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${Math.atan2(a.y - b.y, a.x - b.x) * 180 / Math.PI}deg) scale(${sc})`;
@@ -125,43 +125,114 @@
     let t; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(() => Road.build(), 150); });
   }
 
-  /* ═══════ header roads: the car drives from the start pin to the destination once the strip is in view ═══════ */
-  document.querySelectorAll("[data-drive]").forEach(host => {
-    const R = layers(host.querySelector(".road-svg")), ride = rider(host, R.asphalt, true);
-    const [pinA, pinB] = host.querySelectorAll(".r-drive-pin");
-    let L = 0, stopAt = 0, t = 0;
-    function render(v) {
-      t = v;
-      const l = v * stopAt, reveal = v >= 1 ? L : Math.min(L, l + 26);
-      R.maskPath.style.strokeDashoffset = L - reveal;
-      ride.place(l, L);
-      host.classList.toggle("arrived", v >= 1);
-    }
+  /* ═══════ header scene: Kerala from the side (hills, backwater, palms), an SUV driving the road along the front ═══════ */
+  const NS = "http://www.w3.org/2000/svg";
+  const sv = (tag, attrs, parent) => { const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); if (parent) parent.appendChild(el); return el; };
+  document.querySelectorAll("[data-scene]").forEach(host => {
+    let stop = () => {};
     function build() {
-      const W = host.clientWidth, H = host.offsetHeight;
-      const lg = W >= 1024, md = W >= 640, pad = lg ? 10 : 8, sw = lg ? 18 : md ? 14 : 10;
-      const sx = x => (pad + x / 1000 * (W - 2 * pad)).toFixed(1), y = v => (v / 72 * H).toFixed(1);
-      const d = `M ${sx(0)} ${y(44)} C ${sx(160)} ${y(44)}, ${sx(220)} ${y(20)}, ${sx(380)} ${y(26)} S ${sx(640)} ${y(54)}, ${sx(800)} ${y(40)} S ${sx(940)} ${y(26)}, ${sx(1000)} ${y(32)}`;
-      L = shape(R, d, W, H, sw);
-      R.maskPath.style.strokeDasharray = `${L} ${L + 40}`;
-      const sc = carScale(W) * .9;
-      ride.scale(sc);
-      stopAt = L - 44 * sc;
-      [[pinA, 0], [pinB, L]].forEach(([el, l]) => { const p = R.asphalt.getPointAtLength(l); el.style.left = p.x + "px"; el.style.top = p.y + "px"; });
-      render(t);
+      stop();
+      host.textContent = "";
+      const W = host.clientWidth, H = host.clientHeight;
+      if (!W || !H) return;
+      const svg = sv("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, "aria-hidden": "true" }, host);
+      sv("defs", {}, svg).innerHTML = `
+        <linearGradient id="scFar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9d3c9"/><stop offset="1" stop-color="#dfe7dc"/></linearGradient>
+        <linearGradient id="scMid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fae9b"/><stop offset="1" stop-color="#b7cfbf"/></linearGradient>
+        <linearGradient id="scWater" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe3df"/><stop offset="1" stop-color="#e6efe9"/></linearGradient>
+        <linearGradient id="scNear" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3cfa6"/><stop offset="1" stop-color="#f1e6cf"/></linearGradient>
+        <radialGradient id="scSun"><stop offset="0" stop-color="#ffd58a"/><stop offset=".55" stop-color="#f6b45c" stop-opacity=".9"/><stop offset="1" stop-color="#f6b45c" stop-opacity="0"/></radialGradient>
+        <linearGradient id="scBeam" x1="0" x2="1"><stop offset="0" stop-color="#fff1c8" stop-opacity=".7"/><stop offset="1" stop-color="#fff1c8" stop-opacity="0"/></linearGradient>`;
+      const sm = W < 640;
+      /* ground lines are sums of sines, measured from the bottom so the scene scales with its height */
+      const wave = (base, parts) => x => H * base + parts.reduce((y, [a, f, p]) => y + a * H * Math.sin(x * f + p), 0);
+      const far = wave(.40, [[.10, .0042, 1], [.05, .011, 2.2], [.02, .027, .3]]);
+      const mid = wave(.56, [[.07, .0035, 4], [.035, .010, 1.1]]);
+      const waterY = H * .68, near = wave(.80, [[.025, .005, 2.2], [.012, .013, .7]]);
+      const fill = f => { let d = `M0 ${H}`; for (let x = 0; x <= W + 8; x += 8) d += `L${x} ${f(x).toFixed(1)}`; return d + `L${W} ${H}Z`; };
+      const line = (f, o = 0) => { let d = ""; for (let x = -40; x <= W + 40; x += 8) d += (d ? "L" : "M") + `${x} ${(f(x) + o).toFixed(1)}`; return d; };
+      sv("circle", { cx: W * .78, cy: far(W * .78) - H * .02, r: H * .2, fill: "url(#scSun)" }, svg);
+      sv("path", { d: fill(far), fill: "url(#scFar)" }, svg);
+      sv("path", { d: fill(mid), fill: "url(#scMid)" }, svg);
+      sv("rect", { x: 0, y: waterY, width: W, height: H - waterY, fill: "url(#scWater)" }, svg);
+      const shimmer = sv("g", { class: "sc-shimmer" }, svg);
+      for (let i = 0; i < (sm ? 10 : 22); i++) {
+        const x = (i * 137.5) % W, y = waterY + 4 + (i * 7) % (H * .1);
+        sv("path", { d: `M${x.toFixed(0)} ${y.toFixed(1)}h${10 + (i % 4) * 6}`, stroke: "#fffaf0", "stroke-width": 1.4, "stroke-linecap": "round", opacity: .8 }, shimmer).style.animationDelay = (-i * .37).toFixed(2) + "s";
+      }
+      /* coconut palms leaning over the water; fronds sway */
+      const palm = (x, y, h, lean, tone) => {
+        const g = sv("g", { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)})` }, svg);
+        const tx = lean * h * .45;
+        sv("path", { d: `M-2.4 0 C${-1.5 + tx * .2} ${-h * .4} ${tx * .7 - 1.6} ${-h * .8} ${tx - 1.2} ${-h} L${tx + 1.2} ${-h} C${tx * .7 + 1.6} ${-h * .8} ${1.5 + tx * .2} ${-h * .4} 2.4 0Z`, fill: tone }, g);
+        const crown = sv("g", { class: "sc-crown", transform: `translate(${tx} ${-h})` }, g);
+        crown.style.animationDelay = (-x % 5).toFixed(2) + "s";
+        [[-160, 1], [-125, .9], [-80, .75], [-35, .95], [5, 1], [-200, .85], [35, .8]].forEach(([a, k]) => {
+          const r = a * Math.PI / 180, L = h * .5 * k, ex = Math.cos(r) * L, ey = Math.sin(r) * L + L * .5, cx = Math.cos(r) * L * .55, cy = Math.sin(r) * L * .55 - L * .1;
+          const nx = -Math.sin(r) * 3.6, ny = Math.cos(r) * 3.6;
+          sv("path", { d: `M0 0 Q${cx + nx} ${cy + ny} ${ex} ${ey} Q${cx - nx} ${cy - ny} 0 0Z`, fill: tone }, crown);
+        });
+      };
+      const ph = H * .34;
+      [[.06, 1, -.25], [.09, .75, .3], [.31, .85, .2], [.55, .7, -.3], [.58, 1, .25], [.86, .9, -.2], [.92, .7, .35]].forEach(([fx, k, l], i) => {
+        if (sm && i % 2) return;
+        palm(W * fx, waterY + 2, ph * k, l, i % 3 ? "#2f6b5e" : "#134e4a");
+      });
+      sv("path", { d: fill(near), fill: "url(#scNear)" }, svg);
+      /* the road along the near bank */
+      const road = x => near(x) + H * .07, RW = sm ? 11 : 15;
+      sv("path", { d: line(road), fill: "none", stroke: "#2c302a", "stroke-width": RW, "stroke-linecap": "round" }, svg);
+      sv("path", { d: line(road, -RW / 2 + 1.5), fill: "none", stroke: "#fffaf0", "stroke-opacity": .5, "stroke-width": 1 }, svg);
+      sv("path", { d: line(road), fill: "none", stroke: "#f2c14e", "stroke-width": 1.5, "stroke-dasharray": "12 14" }, svg);
+      /* an SUV, side on and facing right; drawn in inches-ish units with the ground at y = 0, then scaled to the road */
+      const car = sv("g", {}, svg), body = sv("g", {}, car), FW = 158, BW = 40, WR = 17;
+      sv("path", { d: "M192 -46L360 -70L360 -16Z", fill: "url(#scBeam)" }, body);
+      const dust = sv("g", { class: "sc-dust" }, body);
+      for (let i = 0; i < 7; i++) sv("circle", { cx: 8 - i * 3, cy: -6 - (i % 3) * 4, r: 5 + (i % 3), fill: "#c9b993" }, dust).style.animationDelay = (-i * .13).toFixed(2) + "s";
+      sv("path", { fill: "#d9692f", d: "M4 -16L3 -64C3 -70 6 -73 12 -73L112 -74C118 -74 121 -72 124 -68L138 -50L180 -46C186 -45 189 -42 190 -38L193 -26C194 -21 193 -17 189 -16L177 -16C176 -28 168 -38 158 -38C148 -38 140 -28 139 -16L59 -16C58 -28 50 -38 40 -38C30 -38 22 -28 21 -16Z" }, body);
+      sv("path", { fill: "#b8521f", d: "M4 -30L190 -30L191 -24L4 -24Z", opacity: .55 }, body);
+      sv("path", { fill: "#203330", d: "M16 -66L60 -66L60 -50L14 -50ZM66 -66L106 -66C110 -66 112 -65 114 -62L124 -50L66 -50Z" }, body);
+      sv("path", { d: "M70 -64L82 -52M20 -64L30 -52", stroke: "#fff", "stroke-opacity": .35, "stroke-width": 2, "stroke-linecap": "round" }, body);
+      sv("path", { d: "M63 -66L63 -20M128 -48L128 -22", stroke: "#b8521f", "stroke-width": 1.4 }, body);
+      sv("rect", { x: 10, y: -78, width: 96, height: 4, rx: 2, fill: "#2c302a" }, body);
+      sv("rect", { x: 84, y: -44, width: 10, height: 3, rx: 1.5, fill: "#7a3510" }, body);
+      sv("rect", { x: 183, y: -42, width: 9, height: 6, rx: 2, fill: "#fff6cc" }, body);
+      sv("rect", { x: 2, y: -60, width: 4, height: 14, rx: 2, fill: "#e5352b" }, body);
+      const wheels = [BW, FW].map(cx => {
+        const w = sv("g", {}, car);
+        sv("circle", { cx, cy: -WR, r: WR, fill: "#1b1c17" }, w);
+        sv("circle", { cx, cy: -WR, r: 9.5, fill: "#b9ab8c" }, w);
+        const spokes = sv("g", {}, w);
+        let d = ""; for (let k = 0; k < 5; k++) { const t = k * Math.PI * 2 / 5; d += `M${cx} ${-WR}L${(cx + 9 * Math.cos(t)).toFixed(1)} ${(-WR + 9 * Math.sin(t)).toFixed(1)}`; }
+        sv("path", { d, stroke: "#4a4a3e", "stroke-width": 2.2, "stroke-linecap": "round" }, spokes);
+        sv("circle", { cx, cy: -WR, r: 3, fill: "#4a4a3e" }, w);
+        return { cx, spokes };
+      });
+      const K = H * (sm ? .0034 : .0036), SPAN = W + 400 * K + 200, SPEED = sm ? 70 : 105;
+      const drive = t => {
+        const dist = t * SPEED, x = -200 * K - 60 + (dist % SPAN), cx = x + 97 * K;
+        const ang = Math.atan2(road(cx + 40) - road(cx - 40), 80) * 180 / Math.PI;
+        car.setAttribute("transform", `translate(${x.toFixed(1)} ${(road(cx) + RW * .3).toFixed(1)}) rotate(${ang.toFixed(2)} ${97 * K} 0) scale(${K.toFixed(4)})`);
+        body.setAttribute("transform", `translate(0 ${(Math.sin(t * 17) * .7 + Math.sin(t * 5.3) * .5).toFixed(2)})`);
+        const spin = (dist / K / WR) * 180 / Math.PI;
+        wheels.forEach(w => w.spokes.setAttribute("transform", `rotate(${(spin % 360).toFixed(1)} ${w.cx} ${-WR})`));
+      };
+      /* parked a little in from the left until it can drive; drives only while the scene is on screen */
+      const T0 = (W * .28 + 200 * K + 60) / SPEED;
+      drive(T0);
+      if (reduce || !("IntersectionObserver" in window)) return;
+      let raf = 0, t0 = null, clock = T0;
+      const tick = now => { if (t0 === null) t0 = now - clock * 1000; clock = (now - t0) / 1000; drive(clock); raf = requestAnimationFrame(tick); };
+      const io = new IntersectionObserver(([e]) => {
+        if (e.isIntersecting && !raf) { t0 = null; raf = requestAnimationFrame(tick); }
+        if (!e.isIntersecting && raf) { cancelAnimationFrame(raf); raf = 0; }
+      });
+      io.observe(host);
+      stop = () => { io.disconnect(); cancelAnimationFrame(raf); };
     }
     build();
-    let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(build, 150); });
-    if (reduce || !("IntersectionObserver" in window)) { render(1); return; }
-    const ease = x => (x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
-    const io = new IntersectionObserver(es => {
-      if (!es[0].isIntersecting) return;
-      io.disconnect();
-      const t0 = performance.now() + 450, dur = 3200;
-      const tick = now => { const k = Math.max(0, Math.min(1, (now - t0) / dur)); render(ease(k)); if (k < 1) requestAnimationFrame(tick); };
-      requestAnimationFrame(tick);
-    }, { threshold: .4 });
-    io.observe(host);
+    let rt, lastW = host.clientWidth;
+    addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (host.clientWidth !== lastW) { lastW = host.clientWidth; build(); } }, 200); });
   });
 
   /* ═══════ departures board: pad rows to one width, then flap the letters in ═══════ */

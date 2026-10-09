@@ -1,19 +1,3 @@
-{% comment %}A short road under a page header. On load the car drives it from the start pin to the destination,
-the road painting itself behind it; route.js sizes the path to the real width so the car never stretches.{% endcomment %}
-<div class="r-drive mt-10 sm:mt-14" data-drive aria-hidden="true">
-    <svg class="road-svg">
-        <defs><mask class="rd-mask" id="driveMask" maskUnits="userSpaceOnUse"><path class="rd-maskpath" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"/></mask></defs>
-        <path class="rd-plan" fill="none" stroke="#c9b993" stroke-width="2" stroke-dasharray="1 9" stroke-linecap="round"/>
-        <g mask="url(#driveMask)">
-            <path class="rd-shoulder" fill="none" stroke="#e8d9b8" stroke-linecap="round" stroke-linejoin="round"/>
-            <path class="rd-asphalt" fill="none" stroke="#2c302a" stroke-linecap="round" stroke-linejoin="round"/>
-            <path class="rd-edge" fill="none" stroke="#fffaf0" stroke-opacity=".55" stroke-linecap="round" stroke-linejoin="round"/>
-            <path class="rd-inner" fill="none" stroke="#2c302a" stroke-linecap="round" stroke-linejoin="round"/>
-            <path class="rd-center" fill="none" stroke="#f2c14e" stroke-width="1.6" stroke-dasharray="10 12" stroke-linecap="round"/>
-        </g>
-    </svg>
-    <span class="r-drive-pin start"></span>
-    <span class="r-drive-pin end"></span>
-    <div class="road-puffs"></div>
-    <div class="road-car">{% include "public/themes/route/_car.html" with car_id="driveCar" %}</div>
-</div>
+{% comment %}A little Kerala scene under a page header, seen from the side: misty hills, a backwater with palms,
+and an SUV driving the road along the front. route.js draws it at the real width, so nothing stretches.{% endcomment %}
+<div class="r-scene mt-8 sm:mt-10" data-scene aria-hidden="true"></div>

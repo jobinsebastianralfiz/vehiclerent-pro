@@ -10,13 +10,18 @@
 .r-trail .r-dot { width: 9px; height: 9px; border-radius: 50%; background: #b9ab8c; flex: none; }
 .r-trail .r-here .r-dot { background: #e39b3c; box-shadow: 0 0 0 5px rgba(227,155,60,.22); }
 .r-trail .r-dash { width: 26px; height: 0; border-top: 2px dashed #d6ccb5; }
-/* the header road the car drives on load (route.js sizes it) */
-.r-drive { position: relative; height: 72px; }
-.r-drive-pin { position: absolute; z-index: 5; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; }
-.r-drive-pin.start { background: #fffaf0; border: 3px solid #134e4a; }
-.r-drive-pin.end { background: #e39b3c; border: 3px solid #fffaf0; box-shadow: 0 0 0 6px rgba(227,155,60,.22); }
-.r-drive.arrived .r-drive-pin.end { animation: r-ping 1.8s ease-out infinite; }
-@keyframes r-ping { 0% { box-shadow: 0 0 0 0 rgba(227,155,60,.5); } 100% { box-shadow: 0 0 0 18px rgba(227,155,60,0); } }
+/* the header scene (route.js draws it); edges fade into the page */
+.r-scene { position: relative; height: 130px; border-radius: 0 0 28px 28px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
+@media (min-width: 640px) { .r-scene { height: 170px; } }
+@media (min-width: 1024px) { .r-scene { height: 200px; } }
+.r-scene svg { display: block; }
+.r-scene .sc-crown { transform-box: fill-box; transform-origin: 50% 0; animation: sc-sway 5s ease-in-out infinite alternate; }
+@keyframes sc-sway { from { rotate: -3deg; } to { rotate: 3deg; } }
+.r-scene .sc-shimmer path { animation: sc-shim 3.2s ease-in-out infinite; }
+@keyframes sc-shim { 0%, 100% { opacity: .15; translate: 0 0; } 50% { opacity: .85; translate: 6px 0; } }
+.r-scene .sc-dust circle { transform-box: fill-box; transform-origin: center; animation: sc-dust .9s linear infinite; }
+@keyframes sc-dust { from { opacity: .7; translate: 0 0; scale: .6; } to { opacity: 0; translate: -26px -8px; scale: 1.6; } }
 
 /* ---------- the road (built by route.js from .road-gap[data-stop]) ---------- */
 #journey { position: relative; }
@@ -127,6 +132,6 @@ a.board-row:hover .cell, a.board-row:focus-visible .cell { background: #24403d; 
 @media (prefers-reduced-motion: reduce) {
   .motion .pc-in { opacity: 1 !important; }
   .motion #journey .road-svg > g, .motion #journey .road-pins { opacity: 1 !important; }
-  .r-drive.arrived .r-drive-pin.end { animation: none; }
+  .r-scene .sc-crown, .r-scene .sc-shimmer path, .r-scene .sc-dust circle { animation: none; }
   .route-line path, .tag:hover { animation: none !important; }
 }
