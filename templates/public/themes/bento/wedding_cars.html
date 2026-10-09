@@ -1,0 +1,170 @@
+{% extends "public/themes/bento/_base.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}Wedding Cars for Rent in Kerala | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Chauffeur-driven decorated wedding cars in Kerala. Classic Honda City to Rolls Royce Ghost. Floral packages, statewide delivery, available 365 days.{% endblock %}
+{% block meta_keywords %}wedding car rental Kerala, marriage cars Kerala, decorated wedding cars, Rolls Royce wedding rental, BMW wedding car, Audi wedding car, vintage wedding car Kerala, bridal car hire, groom car rental, Kochi wedding car, Kottayam wedding car, Trivandrum wedding car{% endblock %}
+{% block og_title %}Wedding Cars in Kerala — Decorated, Chauffeur-Driven{% endblock %}
+{% block og_description %}From classic Verna to Rolls Royce Ghost. Decorated, chauffeur-driven, delivered to your venue. Available 365 days across Kerala.{% endblock %}
+
+{% block content %}
+<!-- ─── Hero bento ─── -->
+<section class="b-hero max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 lg:auto-rows-[150px]" aria-label="Wedding fleet">
+    <div class="tile b-glass p-7 sm:p-10 sm:col-span-2 lg:col-span-6 lg:row-span-3 flex flex-col justify-between gap-8">
+        <div>
+            <span class="inline-flex items-center gap-2 bg-primary-fixed text-primary label-tiny px-3 py-2 rounded-full"><span class="material-symbols-outlined text-[16px]" aria-hidden="true">favorite</span>Wedding fleet · Kerala</span>
+            <h1 class="b-title mt-6 font-extrabold text-[44px] sm:text-6xl lg:text-[68px] leading-[.95] tracking-[-.045em] text-primary" data-no-split>For the day you'll always remember.</h1>
+            <p class="mt-5 text-lg text-on-surface-variant max-w-xl">Chauffeur-driven decorated cars for the bride, groom and family. Decorated to your story and delivered to your venue.</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a href="#plan" class="bg-primary text-on-primary px-7 py-4 rounded-full font-bold flex items-center gap-2 m-shine" data-magnetic>Plan your arrival <span class="material-symbols-outlined">arrow_forward</span></a>
+            {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="bg-white px-7 py-4 rounded-full font-bold flex items-center gap-2 border border-outline-variant/50 hover:border-primary transition-colors"><span class="material-symbols-outlined">call</span> Talk to us</a>{% endif %}
+        </div>
+    </div>
+    <div class="tile sm:col-span-2 lg:col-span-6 lg:row-span-3 min-h-[340px] bg-primary" data-no-parallax>
+        <img src="{% static 'themes/img/wedding-rolls.jpg' %}" alt="" class="b-kb absolute inset-0 w-full h-full object-cover"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/10"></div>
+        <div class="absolute bottom-5 left-5 right-5 text-white"><span class="label-tiny opacity-80">Chauffeur included</span><div class="serif-i text-3xl mt-2">Decorated to your story.</div></div>
+    </div>
+    {% if vehicles %}
+    <div class="tile bg-primary text-on-primary p-6 lg:col-span-3 flex items-center justify-between gap-4 lift">
+        <div><div class="font-extrabold text-5xl tracking-tight leading-none"><span data-bslot>{{ vehicles|length }}</span></div><div class="label-tiny mt-2 opacity-70">Wedding car{{ vehicles|length|pluralize }}</div></div>
+        <span class="material-symbols-outlined text-5xl text-primary-fixed/80" aria-hidden="true">favorite</span>
+    </div>
+    {% endif %}
+    {% if decorations %}
+    <div class="tile bg-primary-fixed text-primary p-6 lg:col-span-3 flex items-center justify-between gap-4 lift">
+        <div><div class="font-extrabold text-5xl tracking-tight leading-none"><span data-bslot>{{ decorations|length }}</span></div><div class="label-tiny mt-2 text-primary/70">Decoration package{{ decorations|length|pluralize }}</div></div>
+        <span class="material-symbols-outlined text-5xl text-primary/60" aria-hidden="true">local_florist</span>
+    </div>
+    {% endif %}
+    <div class="tile min-h-[180px] {% if vehicles and decorations %}lg:col-span-3{% elif vehicles or decorations %}lg:col-span-6{% else %}lg:col-span-9{% endif %}" data-no-parallax><img src="{% static 'themes/img/jasmine-handle.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover object-[50%_70%] transition-transform duration-1000 hover:scale-110"/></div>
+    <div class="tile min-h-[180px] lg:col-span-3" data-no-parallax><img src="{% static 'themes/img/ambassador.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 hover:scale-110"/></div>
+</section>
+
+<!-- ─── Three ways to arrive (tiers with cars) ─── -->
+{% if classic_cars or premium_cars or iconic_cars %}
+<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24">
+    <div class="mb-6"><span class="label-tiny text-primary-container block">Choose your entrance</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Ways to <span class="serif-i">arrive.</span></h2></div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4" data-bpop>
+        {% if classic_cars %}{% include "public/themes/bento/_tier.html" with cars=classic_cars name="Classic" line="Elegant sedans, traditional decor." icon="favorite" tone="glass" %}{% endif %}
+        {% if premium_cars %}{% include "public/themes/bento/_tier.html" with cars=premium_cars name="Premium" line="European luxury for the bridal entrance." icon="diamond" tone="dark" %}{% endif %}
+        {% if iconic_cars %}{% include "public/themes/bento/_tier.html" with cars=iconic_cars name="Iconic" line="Once-in-a-lifetime arrivals." icon="workspace_premium" tone="lime" %}{% endif %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── The fleet ─── -->
+<section id="fleet" class="max-w-screen-xl mx-auto pt-16 lg:pt-24 scroll-mt-28">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div><span class="label-tiny text-primary-container block">The fleet</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Available for <span class="serif-i">your date.</span></h2></div>
+        <a href="{% url 'vehicle_list' %}?wedding=1" class="font-bold text-primary inline-flex items-center gap-2 hover:gap-3 transition-all">Filter in the full fleet <span class="material-symbols-outlined">arrow_forward</span></a>
+    </div>
+    {% if vehicles %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" data-deal>
+        {% for v in vehicles|slice:":12" %}
+        {% include "public/themes/bento/_card.html" with v=v badge="With driver" deco=True big=False %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="tile b-glass p-10 sm:p-16 text-center">
+        <span class="w-20 h-20 mx-auto rounded-3xl bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined text-4xl" aria-hidden="true">favorite</span></span>
+        <h3 class="mt-6 font-extrabold text-3xl tracking-[-.04em] text-primary">Wedding fleet <span class="serif-i">coming soon.</span></h3>
+        <p class="mt-3 text-on-surface-variant">Call us to plan your arrival.</p>
+    </div>
+    {% endif %}
+</section>
+
+<!-- ─── Decoration packages ─── -->
+{% if decorations %}
+<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24">
+    <div class="mb-6"><span class="label-tiny text-primary-container block">Floral &amp; trim</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Decorated to <span class="serif-i">your story.</span></h2></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" data-bpop>
+        {% for pkg in decorations %}
+        <div class="tile b-glass p-3 flex flex-col lift">
+            <div class="relative rounded-[22px] overflow-hidden aspect-square bg-surface-container grid place-items-center" data-no-parallax>
+                {% if pkg.image %}<img src="{{ pkg.image.url }}" alt="{{ pkg.name }}" class="absolute inset-0 w-full h-full object-cover" loading="lazy"/>{% else %}<span class="material-symbols-outlined text-5xl text-outline-variant" aria-hidden="true">local_florist</span>{% endif %}
+                <span class="absolute top-3 right-3 bg-primary text-on-primary rounded-full px-3 py-1.5 text-sm font-extrabold">+{{ pkg.price|inr }}</span>
+            </div>
+            <div class="px-3 pt-4 pb-2 flex-1 flex flex-col">
+                <div class="label-tiny text-outline">Package</div>
+                <h3 class="font-extrabold text-xl tracking-tight text-primary mt-1.5">{{ pkg.name }}</h3>
+                {% if pkg.description %}<p class="text-sm text-on-surface-variant mt-2">{{ pkg.description }}</p>{% endif %}
+                <button type="button" class="b-pkg mt-auto pt-4 self-start font-bold text-sm text-primary inline-flex items-center gap-1.5 hover:gap-2.5 transition-all" data-name="{{ pkg.name }}">Add to my enquiry <span class="material-symbols-outlined text-[18px]" aria-hidden="true">add_circle</span></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── How it works ─── -->
+<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24">
+    <div class="mb-6"><span class="label-tiny text-primary-container block">Simple &amp; stress-free</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Four steps to <span class="serif-i">your arrival.</span></h2></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" data-bpop>
+        <div class="tile b-glass p-6 min-h-[220px] flex flex-col justify-between gap-6"><span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-xl">01</span><div><div class="font-extrabold text-xl text-primary">Tell us your date</div><div class="text-on-surface-variant mt-1">Your wedding date and venue.</div></div></div>
+        <div class="tile b-glass p-6 min-h-[220px] flex flex-col justify-between gap-6"><span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-xl">02</span><div><div class="font-extrabold text-xl text-primary">Choose car &amp; decor</div><div class="text-on-surface-variant mt-1">Pick from the wedding fleet and decoration packages.</div></div></div>
+        <div class="tile b-glass p-6 min-h-[220px] flex flex-col justify-between gap-6"><span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-xl">03</span><div><div class="font-extrabold text-xl text-primary">We confirm</div><div class="text-on-surface-variant mt-1">Our team confirms the car, chauffeur, decoration and price.</div></div></div>
+        <div class="tile bg-primary text-on-primary p-6 min-h-[220px] flex flex-col justify-between gap-6"><span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-xl">04</span><div><div class="font-extrabold text-xl">Arrive in style</div><div class="text-white/70 mt-1">Decorated and chauffeur-driven to your venue.</div></div></div>
+    </div>
+</section>
+
+<!-- ─── Plan your arrival: real enquiry ─── -->
+<section id="plan" class="max-w-screen-xl mx-auto pt-16 lg:pt-24 scroll-mt-28">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+        <div class="tile bg-primary text-on-primary p-7 sm:p-10 lg:col-span-5 flex flex-col justify-between gap-8 min-h-[360px]">
+            <div><span class="label-tiny text-primary-fixed block">Plan your arrival</span><h2 class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em]" data-no-split>Let's plan <span class="serif-i text-primary-fixed">your day.</span></h2><p class="mt-4 text-white/70 text-lg">Send your date and what you need. WhatsApp opens with the details so our wedding team can confirm.</p></div>
+            {% if WHATSAPP_NUMBER or BUSINESS_PHONE %}
+            <div class="grid grid-cols-2 gap-3">
+                {% if WHATSAPP_NUMBER %}<a href="{% whatsapp_url 'Hi! I have a wedding car enquiry.' %}" target="_blank" rel="noopener" class="bg-[#25D366] text-white rounded-2xl p-4 font-bold flex flex-col gap-6 lift"><span class="material-symbols-outlined">chat</span>WhatsApp</a>{% endif %}
+                {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="bg-white/10 rounded-2xl p-4 font-bold flex flex-col gap-6 lift break-all"><span class="material-symbols-outlined">call</span>{{ BUSINESS_PHONE }}</a>{% endif %}
+            </div>
+            {% endif %}
+        </div>
+        <form id="w-form" action="{% url 'submit_enquiry' %}" method="post" class="tile b-glass p-6 sm:p-10 lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-2 content-start">
+            {% csrf_token %}
+            <input type="hidden" name="source" value="website"/>
+            <input type="hidden" name="rental_type" value="with_driver"/>
+            <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Wedding date</span><input type="date" name="preferred_start_date" required class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+            <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Pickup city</span>
+                <select name="pickup_city" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"><option value="">Choose city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
+            <fieldset class="sm:col-span-2 bg-white rounded-2xl px-4 py-3">
+                <legend class="sr-only">Cars required</legend>
+                <span class="label-tiny text-outline block mb-2" aria-hidden="true">Cars required</span>
+                <div class="flex flex-wrap gap-1.5">
+                    <label class="cursor-pointer"><input type="radio" name="w_cars" value="1 car (bridal)" checked class="peer sr-only"><span class="b-chip !bg-surface-container">1 · Bridal</span></label>
+                    <label class="cursor-pointer"><input type="radio" name="w_cars" value="2 cars (bridal + groom)" class="peer sr-only"><span class="b-chip !bg-surface-container">2 · Bridal + groom</span></label>
+                    <label class="cursor-pointer"><input type="radio" name="w_cars" value="3+ cars (family convoy)" class="peer sr-only"><span class="b-chip !bg-surface-container">3+ · Family convoy</span></label>
+                </div>
+            </fieldset>
+            <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Your name</span><input type="text" name="name" required autocomplete="name" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+            <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Phone</span><input type="tel" name="phone" required autocomplete="tel" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+            <label class="sm:col-span-2 bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Venue, car or decoration wishes</span><textarea name="message" rows="3" class="border-0 p-0 font-semibold bg-transparent focus:ring-0 w-full text-sm resize-none" placeholder="Venue, timing, the car you liked, decoration…"></textarea></label>
+            <button type="submit" class="sm:col-span-2 bg-primary text-on-primary rounded-full py-4 font-bold flex items-center justify-center gap-2 m-shine m-btn" data-magnetic>Send wedding enquiry <span class="material-symbols-outlined">favorite</span></button>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block page_js %}
+<script>
+/* wedding enquiry: fold the cars-required choice into the message; decoration buttons add the package name */
+(() => {
+    const f = document.getElementById("w-form"); if (!f) return;
+    const ta = f.querySelector("textarea[name=message]");
+    document.querySelectorAll(".b-pkg").forEach(b => b.addEventListener("click", () => {
+        const line = `Decoration: ${b.dataset.name}`;
+        if (!ta.value.includes(line)) ta.value = (ta.value.trim() ? ta.value.trim() + "\n" : "") + line;
+        b.querySelector(".material-symbols-outlined").textContent = "check_circle";
+        document.getElementById("plan").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    }));
+    f.addEventListener("submit", () => {
+        const cars = f.querySelector("input[name=w_cars]:checked");
+        const head = `Wedding car enquiry: ${cars ? cars.value : "1 car"}.`;
+        if (!ta.value.startsWith("Wedding car enquiry")) ta.value = head + (ta.value.trim() ? "\n" + ta.value.trim() : "");
+    });
+    const today = new Date().toISOString().slice(0, 10);
+    f.preferred_start_date.min = today;
+})();
+</script>
+{% endblock %}

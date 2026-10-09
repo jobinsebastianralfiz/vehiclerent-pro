@@ -1,0 +1,65 @@
+{% extends "public/themes/reels/_base.html" %}
+{% load vehicle_tags %}
+
+{% block title %}Frequently Asked Questions - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Frequently asked questions about {{ BUSINESS_NAME }} vehicle rentals. Find answers about booking, documents, cancellation, deposits, and more.{% endblock %}
+
+{% block structured_data %}
+{{ block.super }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {% for item in faq_items %}
+        {
+            "@type": "Question",
+            "name": "{{ item.q }}",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "{{ item.a }}"
+            }
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endblock %}
+
+{% block page %}
+<header class="phead">
+  <div class="phead-copy">
+    <span class="kicker" data-intro="0"><i></i>Help centre</span>
+    <h1 class="phead-h" data-intro="1" data-intro-kind="split">Questions, <span class="ol">answered.</span></h1>
+    <p class="lede" data-intro="2">Quick answers about booking, documents, deposits and more. Can't find yours? <a href="{% url 'contact' %}" class="ul">Contact us</a>.</p>
+  </div>
+  <div class="phead-count ct t-amber" data-intro="3" data-intro-kind="pop" data-tilt="0.5">
+    <b><span data-slot>{{ faq_items|length }}</span></b><small>Answers</small>
+  </div>
+</header>
+
+<section class="sec sec-tight">
+  <div class="wrap faq" data-deal>
+    {% for item in faq_items %}{% cycle 'orange' 'blue' 'green' 'amber' 'red' 'violet' 'teal' 'silver' as tone silent %}
+    <details class="qa"{% if forloop.first %} open{% endif %}>
+      <summary><span class="qa-n t-{{ tone }}">{{ forloop.counter|stringformat:"02d" }}</span><h2>{{ item.q }}</h2><span class="qa-x" aria-hidden="true"><span class="material-symbols-outlined">add</span></span></summary>
+      <div class="qa-a">{{ item.a|safe }}</div>
+    </details>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="sec" style="padding-top:0">
+  <div class="wrap">
+    <div class="ct ready t-lime">
+      <span class="kicker"><i></i>Still have questions?</span>
+      <h2 class="ready-h">Our team is happy to help.</h2>
+      <p>Reach us on WhatsApp, email or phone.</p>
+      <div class="ctas">
+        <a href="{% url 'contact' %}" class="btn btn-main" data-magnetic><span class="material-symbols-outlined">mail</span>Contact us</a>
+        {% if WHATSAPP_NUMBER %}<a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="btn btn-wa"><span class="material-symbols-outlined">chat</span>WhatsApp us</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

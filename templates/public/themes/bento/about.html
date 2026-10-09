@@ -1,0 +1,120 @@
+{% extends "public/themes/bento/_base.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}{{ config.about_title }} - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Learn about {{ BUSINESS_NAME }}. Our mission, vision, licenses, and the team behind your trusted vehicle rental service.{% endblock %}
+
+{% block content %}
+{% with about_text=config.about_content|striptags license_text=config.license_details|striptags %}
+<!-- ─── Hero bento ─── -->
+<section class="b-hero max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4" aria-label="About us">
+    <div class="tile b-glass p-7 sm:p-10 sm:col-span-2 lg:col-span-7 flex flex-col justify-between gap-8 min-h-[420px]">
+        <div>
+            <span class="inline-flex items-center gap-2 bg-primary-fixed text-primary label-tiny px-3 py-2 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>About {{ BUSINESS_NAME }}</span>
+            <h1 class="b-title mt-6 font-extrabold text-[44px] sm:text-6xl lg:text-[68px] leading-[.95] tracking-[-.045em] text-primary" data-no-split>{{ config.about_title|default:"About Us" }}</h1>
+            {% if config.tagline %}<p class="mt-5 text-xl sm:text-2xl font-semibold text-on-surface-variant">{{ config.tagline }}</p>{% endif %}
+        </div>
+        <div class="b-prose text-lg">
+            {% if about_text.strip %}{{ config.about_content|safe }}{% else %}<p>{{ BUSINESS_NAME }} is a trusted vehicle rental service providing quality cars, SUVs, bikes, and more. We're committed to making transportation accessible, affordable, and reliable for everyone.</p>{% endif %}
+        </div>
+    </div>
+    <div class="tile sm:col-span-2 lg:col-span-5 min-h-[360px] bg-primary" data-no-parallax>
+        {% if config.about_image %}
+        <img src="{{ config.about_image.url }}" alt="About {{ BUSINESS_NAME }}" class="b-kb absolute inset-0 w-full h-full object-cover"/>
+        {% else %}
+        <img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="" class="b-kb absolute inset-0 w-full h-full object-cover"/>
+        {% endif %}
+        <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-transparent"></div>
+        <div class="absolute bottom-5 left-5 right-5 text-white"><span class="label-tiny opacity-80">Self-drive · Chauffeur · Wedding</span><div class="serif-i text-3xl mt-2">Every road across Kerala.</div></div>
+    </div>
+    {% if config.years_in_business %}
+    <div class="tile bg-primary text-on-primary p-6 lg:col-span-4 flex items-center justify-between gap-4 lift">
+        <div><div class="font-extrabold text-6xl tracking-tight leading-none"><span data-bslot>{{ config.years_in_business }}</span><span class="text-primary-fixed">+</span></div><div class="label-tiny mt-2 opacity-70">Year{{ config.years_in_business|pluralize }} on Kerala roads</div></div>
+        <span class="material-symbols-outlined text-5xl text-primary-fixed/80" aria-hidden="true">calendar_month</span>
+    </div>
+    {% endif %}
+    {% if config.total_happy_customers %}
+    <div class="tile bg-primary-fixed text-primary p-6 lg:col-span-4 flex items-center justify-between gap-4 lift">
+        <div><div class="font-extrabold text-6xl tracking-tight leading-none"><span data-bslot>{{ config.total_happy_customers }}</span>+</div><div class="label-tiny mt-2 text-primary/70">Happy customers</div></div>
+        <span class="material-symbols-outlined text-5xl text-primary/60" aria-hidden="true">sentiment_satisfied</span>
+    </div>
+    {% endif %}
+    <a href="{% url 'vehicle_list' %}" class="tile b-glass p-6 {% if config.years_in_business and config.total_happy_customers %}lg:col-span-4{% elif config.years_in_business or config.total_happy_customers %}lg:col-span-8{% else %}sm:col-span-2 lg:col-span-12{% endif %} flex items-center justify-between gap-4 lift group">
+        <div><div class="label-tiny text-outline">Our fleet</div><div class="font-extrabold text-2xl sm:text-3xl text-primary mt-1 tracking-tight">Browse every <span class="serif-i">car.</span></div></div>
+        <span class="w-12 h-12 shrink-0 rounded-full bg-primary text-on-primary grid place-items-center transition-transform duration-500 group-hover:-rotate-45"><span class="material-symbols-outlined">arrow_forward</span></span>
+    </a>
+</section>
+
+<!-- ─── Mission & vision ─── -->
+{% if config.about_mission or config.about_vision %}
+<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4" data-bpop>
+        {% if config.about_mission %}
+        <div class="tile b-glass p-7 sm:p-10 {% if not config.about_vision %}md:col-span-2{% endif %}">
+            <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined text-3xl" aria-hidden="true">flag</span></span>
+            <h2 class="mt-6 font-extrabold text-3xl sm:text-4xl tracking-[-.04em] text-primary" data-no-split>Our <span class="serif-i">mission.</span></h2>
+            <p class="mt-4 text-lg text-on-surface-variant leading-relaxed">{{ config.about_mission }}</p>
+        </div>
+        {% endif %}
+        {% if config.about_vision %}
+        <div class="tile bg-primary text-on-primary p-7 sm:p-10 {% if not config.about_mission %}md:col-span-2{% endif %}">
+            <span class="w-14 h-14 rounded-2xl bg-white/10 text-primary-fixed grid place-items-center"><span class="material-symbols-outlined text-3xl" aria-hidden="true">visibility</span></span>
+            <h2 class="mt-6 font-extrabold text-3xl sm:text-4xl tracking-[-.04em]" data-no-split>Our <span class="serif-i text-primary-fixed">vision.</span></h2>
+            <p class="mt-4 text-lg text-white/75 leading-relaxed">{{ config.about_vision }}</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── Licensed & certified ─── -->
+{% if config.license_number or license_text.strip %}
+<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24">
+    <div class="tile b-glass p-7 sm:p-10 grid lg:grid-cols-12 gap-6 items-start">
+        <div class="lg:col-span-5">
+            <span class="w-14 h-14 rounded-2xl bg-primary text-primary-fixed grid place-items-center"><span class="material-symbols-outlined text-3xl" aria-hidden="true">verified</span></span>
+            <h2 class="mt-6 font-extrabold text-3xl sm:text-4xl tracking-[-.04em] text-primary" data-no-split>Licensed &amp; <span class="serif-i">certified.</span></h2>
+            {% if config.license_number %}<div class="mt-5 inline-flex flex-col bg-white rounded-2xl px-5 py-4"><span class="label-tiny text-outline">Registration no.</span><span class="font-extrabold text-xl text-primary mt-1">{{ config.license_number }}</span></div>{% endif %}
+        </div>
+        {% if license_text.strip %}<div class="lg:col-span-7 b-prose">{{ config.license_details|safe }}</div>{% endif %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── Testimonials ─── -->
+{% if testimonials %}
+<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24">
+    <div class="mb-6"><span class="label-tiny text-primary-container block">What our customers say</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">In their <span class="serif-i">words.</span></h2></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4" data-bpop>
+        {% for t in testimonials %}
+        <figure class="tile {% if forloop.first %}bg-primary text-on-primary{% else %}b-glass{% endif %} p-7 flex flex-col justify-between gap-8 lift">
+            <div>
+                {% if t.rating %}<div class="flex gap-0.5 {% if forloop.first %}text-primary-fixed{% else %}text-primary-container{% endif %}" aria-label="{{ t.rating }} out of 5">{% for i in "12345" %}<span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' {% if forloop.counter <= t.rating %}1{% else %}0{% endif %}" aria-hidden="true">star</span>{% endfor %}</div>{% endif %}
+                <blockquote class="mt-4 text-lg font-semibold leading-relaxed {% if not forloop.first %}text-on-surface{% endif %}">"{{ t.quote }}"</blockquote>
+            </div>
+            <figcaption class="flex items-center gap-3">
+                {% if t.photo %}<img src="{{ t.photo.url }}" alt="" class="w-11 h-11 rounded-full object-cover"/>{% else %}<span class="w-11 h-11 rounded-full {% if forloop.first %}bg-white/15 text-primary-fixed{% else %}bg-primary-fixed text-primary{% endif %} grid place-items-center font-extrabold" aria-hidden="true">{{ t.name|slice:":1"|upper }}</span>{% endif %}
+                <div><div class="font-extrabold">{{ t.name }}</div>{% if t.role %}<div class="label-tiny mt-1 {% if forloop.first %}text-white/60{% else %}text-outline{% endif %}">{{ t.role }}</div>{% endif %}</div>
+            </figcaption>
+        </figure>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── CTA ─── -->
+<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4" data-bpop>
+        <div class="tile bg-primary text-on-primary p-8 sm:p-12 lg:col-span-8 flex flex-col justify-between gap-8 min-h-[260px]">
+            <div class="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-primary-fixed/10 blur-2xl" aria-hidden="true"></div>
+            <h2 class="relative font-extrabold text-4xl sm:text-6xl tracking-[-.04em]" data-no-split>Ready to hit <span class="serif-i text-primary-fixed">the road?</span></h2>
+            <div class="relative flex flex-wrap gap-2">
+                <a href="{% url 'vehicle_list' %}" class="bg-primary-fixed text-primary px-7 py-4 rounded-full font-bold inline-flex items-center gap-2 m-shine" data-magnetic>Browse fleet <span class="material-symbols-outlined">arrow_forward</span></a>
+                <a href="{% url 'contact' %}" class="bg-white/10 hover:bg-white/20 px-7 py-4 rounded-full font-bold transition-colors">Contact us</a>
+            </div>
+        </div>
+        <div class="tile lg:col-span-4 min-h-[260px]" data-no-parallax><img src="{% static 'themes/img/steering.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover"/></div>
+    </div>
+</section>
+{% endwith %}
+{% endblock %}

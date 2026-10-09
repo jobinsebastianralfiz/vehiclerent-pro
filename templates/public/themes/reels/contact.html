@@ -1,0 +1,76 @@
+{% extends "public/themes/reels/_base.html" %}
+{% load vehicle_tags %}
+
+{% block title %}Contact Us - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Get in touch with {{ BUSINESS_NAME }}. Call, email, WhatsApp, or visit us. We're here to help with your vehicle rental needs.{% endblock %}
+
+{% block structured_data %}
+{{ block.super }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "Contact {{ BUSINESS_NAME }}",
+    "description": "Get in touch with {{ BUSINESS_NAME }} for vehicle rental enquiries",
+    "mainEntity": {
+        "@type": "AutoRental",
+        "name": "{{ BUSINESS_NAME }}",
+        "telephone": "{{ BUSINESS_PHONE }}",
+        "email": "{{ BUSINESS_EMAIL }}",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "{{ BUSINESS_ADDRESS }}"
+        }
+    }
+}
+</script>
+{% endblock %}
+
+{% block page %}
+<header class="phead">
+  <div class="phead-copy">
+    <span class="kicker" data-intro="0"><i></i>Get in touch</span>
+    <h1 class="phead-h" data-intro="1" data-intro-kind="split">Let's find <span class="ol">your car.</span></h1>
+    <p class="lede" data-intro="2">A question about the fleet, pricing or anything else? Pick a tile, or send us a message below.</p>
+  </div>
+</header>
+
+<section class="sec sec-tight">
+  <div class="wrap">
+    <div class="contact-grid" data-deal>
+      {% if BUSINESS_PHONE %}
+      <a href="tel:{{ BUSINESS_PHONE }}" class="ct ctile t-orange" data-tilt="0.6">
+        <span class="material-symbols-outlined">call</span>
+        <span><small>Phone</small><b>{{ BUSINESS_PHONE }}</b></span>
+        <span class="go"><span class="material-symbols-outlined">arrow_outward</span></span>
+      </a>
+      {% endif %}
+      {% if WHATSAPP_NUMBER %}
+      <a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="ct ctile t-green" data-tilt="0.6">
+        <span class="material-symbols-outlined">chat</span>
+        <span><small>WhatsApp</small><b>Chat with us</b></span>
+        <span class="go"><span class="material-symbols-outlined">arrow_outward</span></span>
+      </a>
+      {% endif %}
+      {% if BUSINESS_EMAIL %}
+      <a href="mailto:{{ BUSINESS_EMAIL }}" class="ct ctile t-blue" data-tilt="0.6">
+        <span class="material-symbols-outlined">mail</span>
+        <span><small>Email</small><b class="b-email">{{ BUSINESS_EMAIL }}</b></span>
+        <span class="go"><span class="material-symbols-outlined">arrow_outward</span></span>
+      </a>
+      {% endif %}
+      {% if BUSINESS_ADDRESS %}
+      <div class="ct ctile dk t-night" data-tilt="0.6">
+        <span class="material-symbols-outlined">location_on</span>
+        <span><small>Visit us</small><b>{{ BUSINESS_ADDRESS }}</b></span>
+      </div>
+      {% endif %}
+    </div>
+    {% if config.google_maps_embed %}
+    <div class="map-embed" data-reveal>{{ config.google_maps_embed|safe }}</div>
+    {% endif %}
+  </div>
+</section>
+
+{% include "public/themes/reels/_band.html" with kicker="Send us a message" heading="Tell us what you need." text="Fill the form and our team will get back to you" %}
+{% endblock %}

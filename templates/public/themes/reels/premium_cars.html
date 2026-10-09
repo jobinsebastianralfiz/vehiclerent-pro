@@ -1,0 +1,100 @@
+{% extends "public/themes/reels/_base.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}Premium & Luxury Car Rentals in Kerala | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Premium and luxury car rentals in Kerala. BMW, Audi, Mercedes, Mini Cooper, Range Rover and more. Self-drive or with chauffeur. Statewide delivery.{% endblock %}
+{% block meta_keywords %}luxury car rental Kerala, premium car rental, BMW rental Kerala, Audi rental Kerala, Mercedes rental, Mini Cooper rental, Range Rover rental, luxury SUV hire, executive sedan rental, premium car with driver Kerala{% endblock %}
+{% block og_title %}Luxury Car Rentals in Kerala — BMW, Audi, Mercedes & more{% endblock %}
+{% block og_description %}When ordinary won't do. Premium fleet across Kerala — self-drive or with trained chauffeur. Doorstep delivery, transparent pricing.{% endblock %}
+
+{% block page %}
+<!-- ─── Hero (dark showroom) ─── -->
+<section class="phero dk-hero">
+  <div class="phero-copy">
+    <span class="kicker" data-intro="0"><i></i>Premium &amp; luxury fleet</span>
+    <h1 class="phead-h" data-intro="1" data-intro-kind="split">When ordinary <span class="lime">won't do.</span></h1>
+    <p class="lede" data-intro="2">European flagships, executive sedans, statement SUVs. Hand-picked for the trips that deserve more than a transport. Self-drive or with a trained chauffeur.</p>
+    <div class="ctas" data-intro="3">
+      <a href="#fleet" class="btn btn-lime" data-magnetic>View fleet <span class="material-symbols-outlined">arrow_downward</span></a>
+      {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="btn btn-ghost"><span class="material-symbols-outlined">call</span>Talk to us</a>{% endif %}
+    </div>
+    {% if vehicles or cities %}
+    <div class="stats" data-intro="4">
+      {% if vehicles %}<div><b><span data-slot>{{ vehicles|length }}</span></b><small>Premium {{ vehicles|length|pluralize:"car,cars" }}</small></div>{% endif %}
+      {% if cities %}<div><b><span data-slot>{{ cities|length }}</span></b><small>{{ cities|length|pluralize:"City,Cities" }}</small></div>{% endif %}
+      <div><b>24×7</b><small>Support</small></div>
+    </div>
+    {% endif %}
+  </div>
+  {% with lead=featured_vehicles.first|default:vehicles.first %}
+  <div class="stage" data-intro="2" data-intro-kind="pop">
+    <div class="ct hero-tile dk t-night" data-tilt="0.6">
+      <div class="stack">{% if lead and lead.thumbnail %}<img src="{{ lead.thumbnail.url }}" alt="{{ lead.brand }} {{ lead.name }}"/>{% else %}<img src="{% static 'themes/img/rolls-palms.jpg' %}" alt=""/>{% endif %}</div>
+      {% if lead %}<span class="ct-tag"><span><b class="on-dk">{{ lead.brand }} {{ lead.name }}</b></span>{% if lead.primary_price_value %}<span>{{ lead.primary_price_value|inr }} / {{ lead.primary_price_label }}</span>{% endif %}</span>{% endif %}
+    </div>
+  </div>
+  {% endwith %}
+</section>
+
+<section class="px-[var(--gut)] lift" data-reveal>{% include "public/themes/reels/_search.html" with extra_premium=1 %}</section>
+
+<!-- ─── Featured: pinned sideways reel ─── -->
+{% if featured_vehicles %}
+<section class="lux" id="luxury" data-hscroll>
+  <div class="head">
+    <div>
+      <span class="kicker"><i></i>Featured · elite collection</span>
+      <h2 class="h2" style="color:#fff">The <span style="color:var(--lime)">headliners.</span></h2>
+    </div>
+    <div class="count"><span data-hscroll-count>01</span><small>/ {{ featured_vehicles|length|stringformat:"02d" }}</small></div>
+  </div>
+  <div class="m-htrack">
+    {% for v in featured_vehicles %}
+    <a href="{{ v.get_absolute_url }}" class="ct lx dk t-night" data-tilt="0.4">
+      <span class="ph">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">diamond</span></span>{% endif %}</span>
+      <span class="cap"><span><b>{{ v.brand }} {{ v.name }}</b><small>{% if v.primary_price_value %}From {{ v.primary_price_value|inr }} / {{ v.primary_price_label }}{% else %}Price on request{% endif %}</small></span><span class="go"><span class="material-symbols-outlined">arrow_outward</span></span></span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Collection ─── -->
+<section class="sec" id="fleet">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="kicker"><i></i>The collection</span><h2 class="h2">Available for <span class="ol">your dates.</span></h2></div>
+      <div class="chips" id="fleetChips" role="group" aria-label="Filter collection"></div>
+    </div>
+    {% if vehicles %}
+    <div class="cards" id="cards">
+      {% for v in vehicles %}{% cycle 'silver' 'amber' 'blue' 'violet' 'green' 'red' as tone silent %}
+      {% include "public/themes/reels/_card.html" %}
+      {% endfor %}
+    </div>
+    <p class="more"><a href="{% url 'vehicle_list' %}?premium=1" class="btn btn-line">View all in the fleet <span class="material-symbols-outlined">arrow_forward</span></a></p>
+    {% else %}
+    <div class="ct empty t-silver">
+      <span class="material-symbols-outlined">diamond</span>
+      <h2 class="empty-h">Premium fleet coming soon.</h2>
+      <p>No vehicles are tagged as premium yet. Talk to our team to access the full collection.</p>
+      <div class="ctas">{% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="btn btn-main"><span class="material-symbols-outlined">call</span>Call us</a>{% endif %}<a href="{% url 'vehicle_list' %}" class="btn btn-line">Browse all cars</a></div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ─── Why premium ─── -->
+<section class="sec" style="background:var(--paper)">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="kicker"><i></i>Why premium</span><h2 class="h2">More than <span class="ol">transport.</span></h2></div></div>
+    <div class="why-grid why-3" data-deal>
+      <div class="ct why t-amber" data-tilt><span class="n">01</span><div><span class="material-symbols-outlined" style="font-size:30px">workspace_premium</span><b>Hand-picked vehicles</b><p>Each premium car is curated for condition, mileage and presentation.</p></div></div>
+      <div class="ct why t-violet" data-tilt><span class="n">02</span><div><span class="material-symbols-outlined" style="font-size:30px">badge</span><b>Trained chauffeurs</b><p>Optional chauffeur service, briefed on your itinerary.</p></div></div>
+      <div class="ct why dk t-night" data-tilt><span class="n">03</span><div><span class="material-symbols-outlined" style="font-size:30px">local_shipping</span><b>Doorstep delivery</b><p>We deliver and collect from your hotel, residence or airport{% if cities %} across our {{ cities|length }} {{ cities|length|pluralize:"city,cities" }}{% endif %}.</p></div></div>
+    </div>
+  </div>
+</section>
+
+{% include "public/themes/reels/_band.html" with kicker="Ready for the upgrade?" heading="Tell us your dates." text="We'll arrange the right car, the right driver and the right delivery point" %}
+{% endblock %}

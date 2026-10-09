@@ -1,0 +1,19 @@
+{% if page_obj.has_other_pages %}
+<nav class="flex justify-center mt-16" aria-label="Pagination">
+    <div class="flex items-center gap-2 bg-surface-container-lowest rounded-full p-1.5 shadow-lg shadow-black/5 border border-outline-variant/50">
+        {% if page_obj.has_previous %}
+        <a href="?{{ query_string }}&page={{ page_obj.previous_page_number }}" class="flex items-center gap-1 px-4 py-2 rounded-full label-tiny text-on-surface-variant hover:text-[#d9692f]" aria-label="Previous page"><span class="material-symbols-outlined text-lg">west</span><span class="hidden sm:inline">Back</span></a>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <span class="w-10 h-10 grid place-items-center rounded-full bg-tertiary text-on-tertiary font-bold text-sm" aria-current="page">{{ num }}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?{{ query_string }}&page={{ num }}" class="w-10 h-10 grid place-items-center rounded-full text-sm font-bold text-on-surface-variant hover:bg-surface-container">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <a href="?{{ query_string }}&page={{ page_obj.next_page_number }}" class="flex items-center gap-1 px-4 py-2 rounded-full label-tiny text-on-surface-variant hover:text-[#d9692f]" aria-label="Next page"><span class="hidden sm:inline">Onward</span><span class="material-symbols-outlined text-lg">east</span></a>
+        {% endif %}
+    </div>
+</nav>
+{% endif %}

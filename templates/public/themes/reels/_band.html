@@ -1,0 +1,32 @@
+{% load static %}{% comment %}Dark call-to-action band with the enquiry form. Optional: kicker, heading, text.{% endcomment %}
+<section class="sec" id="enquiry" style="padding-top:0">
+  <div class="wrap">
+    <div class="band">
+      <div class="band-run" aria-hidden="true">
+        {% for col in "ab" %}
+        <div class="m-runway-col">
+          {% if col == "a" %}{% for n in "xy" %}
+          <span class="ct t-violet"><span class="ph"><img src="{% static 'themes/img/rolls-palms.jpg' %}" alt=""/></span></span>
+          <span class="ct t-orange"><span class="ph"><img src="{% static 'themes/img/thar-backwater.jpg' %}" alt=""/></span></span>
+          <span class="ct t-amber"><span class="ph"><img src="{% static 'themes/img/ambassador.jpg' %}" alt=""/></span></span>
+          <span class="ct t-blue"><span class="ph"><img src="{% static 'themes/img/suv-munnar.jpg' %}" alt=""/></span></span>
+          {% endfor %}{% else %}{% for n in "xy" %}
+          <span class="ct t-red"><span class="ph"><img src="{% static 'themes/img/mini.jpg' %}" alt=""/></span></span>
+          <span class="ct t-green"><span class="ph"><img src="{% static 'themes/img/procession.jpg' %}" alt=""/></span></span>
+          <span class="ct t-silver"><span class="ph"><img src="{% static 'themes/img/porsche.jpg' %}" alt=""/></span></span>
+          <span class="ct t-teal"><span class="ph"><img src="{% static 'themes/img/rangerover.jpg' %}" alt=""/></span></span>
+          {% endfor %}{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <div>
+        <span class="kicker"><i></i>{{ kicker|default:"Get in touch" }}</span>
+        <h2>{{ heading|default:"Send us an enquiry." }}</h2>
+        <p>{{ text|default:"Fill the form and our team will get back to you" }}{% if WHATSAPP_NUMBER %}, or message us on WhatsApp{% endif %}.</p>
+      </div>
+      <div class="form-card" data-reveal>
+        {% include "public/includes/enquiry_form.html" %}
+      </div>
+    </div>
+  </div>
+</section>

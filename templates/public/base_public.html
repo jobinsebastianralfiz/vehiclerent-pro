@@ -40,13 +40,13 @@
 </div>
 {% endif %}
 
-{% block navbar %}{% include "public/includes/navbar.html" %}{% endblock %}
+{% block navbar %}{% include THEME_NAVBAR %}{% endblock %}
 
 <main id="main-content" role="main" class="{% block main_class %}pt-24{% endblock %}">
     {% block content %}{% endblock %}
 </main>
 
-{% block footer %}{% include "public/includes/footer.html" %}{% endblock %}
+{% block footer %}{% include THEME_FOOTER %}{% endblock %}
 {% include "public/includes/whatsapp_float.html" %}
 {% include "public/includes/cookie_banner.html" %}
 {% endblock %}

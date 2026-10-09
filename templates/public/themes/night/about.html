@@ -1,0 +1,125 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}{{ config.about_title }} - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Learn about {{ BUSINESS_NAME }}. Our mission, vision, licenses, and the team behind your trusted vehicle rental service.{% endblock %}
+
+{% block main_class %}{% endblock %}
+{% block extra_css %}
+{% include "public/themes/night/_styles.html" %}
+<style>
+  .nd-rich p { margin-bottom: 1rem; } .nd-rich a { color: #d4eca2; text-decoration: underline; text-underline-offset: 4px; }
+  .nd-rich ul { list-style: disc; padding-left: 1.25rem; margin-bottom: 1rem; } .nd-rich strong { color: #eef0e4; }
+</style>
+{% endblock %}
+
+{% block content %}
+<article class="nd" aria-label="About Us">
+  {% static 'themes/img/steering.jpg' as hero_img %}
+  {% include "public/themes/night/_page_header.html" with kicker="About us" title=config.about_title|default:"About Us" img=hero_img %}
+
+  <!-- ─── Story ─── -->
+  <section class="px-4 sm:px-12 py-20 lg:py-32 max-w-screen-2xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+    <div class="lg:col-span-6">
+      <span class="label-tiny text-primary-container block">Our story</span>
+      <h2 class="nd-head text-4xl sm:text-5xl mt-4 mb-8 text-on-surface">{{ BUSINESS_NAME }}</h2>
+      {% if config.about_content|striptags|cut:" "|cut:"&nbsp;" %}
+      <div class="nd-rich text-lg text-on-surface-variant leading-relaxed font-light">{{ config.about_content|safe }}</div>
+      {% else %}
+      <p class="text-lg text-on-surface-variant leading-relaxed font-light">{{ BUSINESS_NAME }} is a trusted vehicle rental service providing quality cars, SUVs, bikes, and more. We're committed to making transportation accessible, affordable, and reliable for everyone.</p>
+      {% endif %}
+    </div>
+    <div class="lg:col-span-6">
+      <div class="glow rounded-[2.5rem] overflow-hidden aspect-[4/3]" data-tilt="0.3">
+        {% if config.about_image %}
+        <img src="{{ config.about_image.url }}" alt="About {{ BUSINESS_NAME }}" class="w-full h-full object-cover brightness-90" loading="lazy"/>
+        {% else %}
+        <img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="" class="w-full h-full object-cover brightness-75" loading="lazy"/>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Numbers (only what the business has entered) ─── -->
+  {% if config.years_in_business or config.total_happy_customers %}
+  <section class="py-20 lg:py-28 bg-surface-container-low/60 border-y border-white/5">
+    <div class="px-4 sm:px-12 max-w-screen-2xl mx-auto flex flex-wrap justify-center gap-x-20 gap-y-12 text-center">
+      {% if config.years_in_business %}<div><div class="nd-display text-7xl sm:text-8xl nd-glow-text"><span data-slot>{{ config.years_in_business }}</span>+</div><div class="label-tiny text-on-surface-variant mt-4">Years experience</div></div>{% endif %}
+      {% if config.total_happy_customers %}<div><div class="nd-display text-7xl sm:text-8xl nd-glow-text"><span data-slot>{{ config.total_happy_customers }}</span>+</div><div class="label-tiny text-on-surface-variant mt-4">Happy customers</div></div>{% endif %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ─── Mission & vision ─── -->
+  {% if config.about_mission or config.about_vision %}
+  <section class="px-4 sm:px-12 py-20 lg:py-32 max-w-screen-2xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5" data-deal>
+      {% if config.about_mission %}
+      <div class="glow rounded-[2rem] p-8 sm:p-12" data-tilt="0.4">
+        <span class="material-symbols-outlined text-4xl text-primary mb-6 block" style="text-shadow:0 0 18px rgba(212,236,162,.55)" aria-hidden="true">flag</span>
+        <h2 class="nd-head text-3xl text-on-surface mb-4">Our Mission</h2>
+        <p class="text-on-surface-variant leading-relaxed">{{ config.about_mission }}</p>
+      </div>
+      {% endif %}
+      {% if config.about_vision %}
+      <div class="glow rounded-[2rem] p-8 sm:p-12" data-tilt="0.4">
+        <span class="material-symbols-outlined text-4xl text-primary mb-6 block" style="text-shadow:0 0 18px rgba(212,236,162,.55)" aria-hidden="true">visibility</span>
+        <h2 class="nd-head text-3xl text-on-surface mb-4">Our Vision</h2>
+        <p class="text-on-surface-variant leading-relaxed">{{ config.about_vision }}</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ─── Licence ─── -->
+  {% if config.license_number or config.license_details|striptags|cut:" "|cut:"&nbsp;" %}
+  <section class="px-4 sm:px-12 pb-20 lg:pb-32 max-w-4xl mx-auto">
+    <div class="glow glow-static rounded-[2.5rem] p-8 sm:p-14 text-center">
+      <span class="material-symbols-outlined text-5xl nd-glow-text mb-6 block" aria-hidden="true">verified</span>
+      <h2 class="nd-head text-3xl sm:text-4xl text-on-surface mb-4">Licensed & Certified</h2>
+      {% if config.license_number %}<p class="text-on-surface-variant mb-2">Registration No: <strong class="text-primary">{{ config.license_number }}</strong></p>{% endif %}
+      {% if config.license_details|striptags|cut:" "|cut:"&nbsp;" %}<div class="nd-rich text-on-surface-variant leading-relaxed mt-6 text-left max-w-2xl mx-auto">{{ config.license_details|safe }}</div>{% endif %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ─── Reviews ─── -->
+  {% if testimonials %}
+  <section class="px-4 sm:px-12 py-20 lg:py-32 max-w-screen-2xl mx-auto border-t border-white/5">
+    <div class="text-center mb-14"><span class="label-tiny text-primary-container block">What our customers say</span><h2 class="nd-head text-4xl sm:text-6xl mt-4 text-on-surface">Customer reviews.</h2></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" data-deal>
+      {% for t in testimonials %}
+      <figure class="glow rounded-[2rem] p-8" data-tilt="0.4">
+        <div class="flex items-center gap-1 text-primary mb-5" aria-label="{{ t.rating }} out of 5">
+          {% for i in "12345" %}{% if forloop.counter <= t.rating %}<span aria-hidden="true" style="text-shadow:0 0 10px rgba(212,236,162,.6)">&#9733;</span>{% else %}<span class="text-white/15" aria-hidden="true">&#9733;</span>{% endif %}{% endfor %}
+        </div>
+        <blockquote class="text-on-surface leading-relaxed mb-6 font-light">"{{ t.quote }}"</blockquote>
+        <figcaption class="flex items-center gap-3">
+          {% if t.photo %}<img src="{{ t.photo.url }}" alt="{{ t.name }}" class="w-10 h-10 rounded-full object-cover"/>{% else %}<div class="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 grid place-items-center text-primary font-bold text-sm">{{ t.name|first }}</div>{% endif %}
+          <div><p class="font-bold text-sm text-on-surface">{{ t.name }}</p>{% if t.role %}<p class="text-xs text-on-surface-variant">{{ t.role }}</p>{% endif %}</div>
+        </figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- ─── CTA ─── -->
+  <section class="px-4 sm:px-12 pb-24 lg:pb-32 pt-8 max-w-screen-2xl mx-auto">
+    <div class="relative overflow-hidden rounded-[2.5rem] lg:rounded-[3.5rem] border border-white/5 bg-surface-container-low p-10 sm:p-16 text-center">
+      <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[620px] h-[620px] rounded-full pointer-events-none" style="background:radial-gradient(circle, rgba(212,236,162,.16), transparent 65%)" data-parallax="50" aria-hidden="true"></div>
+      <div class="relative">
+        <h2 class="nd-head text-4xl sm:text-6xl text-on-surface mb-5">Ready to hit the road?</h2>
+        <p class="text-on-surface-variant mb-8">Browse our fleet and find the perfect vehicle for your needs.</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <a href="{% url 'vehicle_list' %}" class="m-shine m-btn bg-primary text-on-primary px-10 py-4 rounded-full font-bold" data-magnetic>Browse Fleet</a>
+          <a href="{% url 'contact' %}" class="m-btn border border-white/15 text-on-surface px-10 py-4 rounded-full font-bold hover:bg-white/5">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</article>
+{% endblock %}
+
+{% block extra_js %}{% include "public/themes/night/_scripts.html" %}{% endblock %}

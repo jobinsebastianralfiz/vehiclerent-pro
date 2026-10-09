@@ -1,0 +1,82 @@
+<style>
+  /* Night Drive inner pages. Colours come from the night theme tokens (core/themes.py); hex here only for light effects. */
+  html, body { overflow-x: clip; }
+  .nd-display { font-family: var(--font-display); font-weight: 700; line-height: .95; letter-spacing: -.04em; }
+  .nd-head { font-family: var(--font-display); font-weight: 700; line-height: 1.08; letter-spacing: -.02em; }
+  .nd option { background: #151910; color: #eef0e4; }
+  .m-progress { background: linear-gradient(90deg, #33450d, #b8cf88, #d4eca2); box-shadow: 0 0 12px rgba(212,236,162,.6); }
+
+  /* page header: a soft headlight glow that follows the cursor */
+  .nd-hero { --bx: 70%; --by: 40%; position: relative; overflow: hidden; background: #080906; border-bottom: 1px solid rgba(212,236,162,.06); }
+  .nd-hero .nd-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(.32) saturate(.6); }
+  .nd-hero .nd-hero-beam { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+    background: radial-gradient(circle at var(--bx) var(--by), rgba(212,236,162,.20), rgba(212,236,162,.05) 22%, transparent 48%); transition: background-position .2s; }
+  .nd-hero .nd-hero-shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(13,15,10,.92) 0%, rgba(13,15,10,.55) 45%, rgba(13,15,10,.2) 100%), linear-gradient(0deg, #0d0f0a 0%, transparent 45%); }
+  .nd-hero .nd-hero-grid { position: absolute; inset: 0; pointer-events: none; opacity: .5;
+    background-image: linear-gradient(rgba(242,241,232,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(242,241,232,.035) 1px, transparent 1px); background-size: 64px 64px;
+    -webkit-mask: radial-gradient(circle at var(--bx) var(--by), #000, transparent 55%); mask: radial-gradient(circle at var(--bx) var(--by), #000, transparent 55%); }
+
+  /* glowing cards: lime edge light that follows the cursor (motion.js sets --gx/--gy) */
+  .glow { position: relative; background: #151910; border: 1px solid rgba(212,236,162,.08); transition: box-shadow .5s, border-color .5s; }
+  .glow::before { content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 6;
+    background: radial-gradient(280px circle at var(--gx, 50%) var(--gy, 0%), rgba(212,236,162,.95), transparent 60%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0; transition: opacity .4s; }
+  .glow:hover::before, .glow:focus-within::before { opacity: 1; }
+  .glow:hover { box-shadow: 0 30px 80px -30px rgba(184,207,136,.35); border-color: rgba(212,236,162,.2); }
+  .glow.m-glare::after { background: radial-gradient(40% 35% at var(--gx, 50%) var(--gy, 0%), rgba(212,236,162,.12), transparent 70%); }
+  .glow-static::before { opacity: .55; }
+  @media (hover: none) { .glow::before { opacity: .35; } }
+
+  .m-tile.ntile { background: #151910; border: 1px solid rgba(212,236,162,.08); color: #eef0e4; }
+  .m-tile.ntile::before { background: #33450d; }
+  .m-tile.ntile .material-symbols-outlined { color: #d4eca2; text-shadow: 0 0 18px rgba(212,236,162,.55); }
+  .m-tile.ntile:hover { box-shadow: 0 24px 50px -24px rgba(184,207,136,.5); }
+
+  /* chips + pills */
+  .nd-chip { border: 1px solid rgba(242,241,232,.1); background: #151910; color: #b4b8a5; transition: color .3s, border-color .3s, box-shadow .3s, background-color .3s; }
+  .nd-chip:hover { color: #eef0e4; border-color: rgba(212,236,162,.35); }
+  .nd-chip.on, .peer:checked + .nd-chip { background: #d4eca2; color: #141f00; border-color: #d4eca2; box-shadow: 0 0 24px -6px rgba(212,236,162,.7); }
+  .peer:focus-visible + .nd-chip { outline: 2px solid #d4eca2; outline-offset: 2px; }
+
+  /* dark form fields */
+  .nd-field { width: 100%; background: #0d0f0a; color: #eef0e4; border: 1px solid rgba(242,241,232,.12); border-radius: 1rem; padding: .8rem 1rem; font-size: .875rem; }
+  .nd-field:focus { outline: none; border-color: #d4eca2; box-shadow: 0 0 0 1px #d4eca2, 0 0 24px -8px rgba(212,236,162,.7); }
+  .nd-field::placeholder { color: rgba(180,184,165,.5); }
+  input[type="date"].nd-field, .nd input[type="date"] { color-scheme: dark; }
+  .nd input[type="checkbox"] { background-color: #0d0f0a; border-color: rgba(242,241,232,.25); color: #b8cf88; }
+
+  /* the shared enquiry form on a dark panel */
+  .nd-enquiry input, .nd-enquiry select, .nd-enquiry textarea { background: #0d0f0a; color: #eef0e4; border-color: rgba(242,241,232,.12); }
+  .nd-enquiry input::placeholder, .nd-enquiry textarea::placeholder { color: rgba(180,184,165,.5); }
+  .nd-enquiry input[type="date"] { color-scheme: dark; }
+  .nd-enquiry label { color: #b4b8a5; }
+
+  /* status dots */
+  .nd-dot { width: .45rem; height: .45rem; border-radius: 9999px; display: inline-block; }
+  .nd-dot.available { background: #d4eca2; box-shadow: 0 0 10px #d4eca2; }
+  .nd-dot.rented { background: #7fb3ff; box-shadow: 0 0 10px #7fb3ff; }
+  .nd-dot.other { background: #f0c26b; box-shadow: 0 0 10px #f0c26b; }
+
+  /* glowing figures */
+  .nd-glow-text { color: #d4eca2; text-shadow: 0 0 24px rgba(212,236,162,.45); }
+  .nd-rule { height: 1px; background: linear-gradient(90deg, transparent, rgba(212,236,162,.35), transparent); }
+
+  /* stacked luxury */
+  .stack-card { position: sticky; transform-origin: 50% 0; }
+
+  /* wedding spotlight */
+  .spot { --sr: 70%; position: relative; overflow: hidden; }
+  .motion .spot { --sr: 0%; }
+  .spot .dim, .spot .lit { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .spot .dim { filter: brightness(.22) saturate(.5); }
+  .spot .lit { -webkit-mask: radial-gradient(circle at 50% 55%, #000 0, #000 calc(var(--sr) * .55), transparent var(--sr)); mask: radial-gradient(circle at 50% 55%, #000 0, #000 calc(var(--sr) * .55), transparent var(--sr)); }
+
+  /* dashboard rings */
+  .ring-fg { stroke-dasharray: 302; stroke-dashoffset: 0; filter: drop-shadow(0 0 6px rgba(212,236,162,.6)); }
+  .motion .ring-fg { stroke-dashoffset: 302; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .motion .spot { --sr: 70%; } .motion .ring-fg { stroke-dashoffset: 0; }
+    .glow, .nd-chip { transition: none; }
+  }
+</style>

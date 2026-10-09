@@ -1,0 +1,86 @@
+{% extends "public/base_public.html" %}
+{% load vehicle_tags %}
+{% comment %}Kerala Route · enquiry received. The confirmation is a boarding pass with the reference as the stub,
+stamped "received". WhatsApp still opens automatically, as in the shared page.{% endcomment %}
+
+{% block title %}Booking received — {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block extra_css %}{% include "public/themes/route/_assets.html" %}{% endblock %}
+
+{% block content %}
+<section class="r-glow min-h-[80vh] px-4 sm:px-12 pt-8 lg:pt-12 pb-20">
+    <div class="max-w-4xl mx-auto">
+        {% include "public/themes/route/_trail.html" with here="Booking received" %}
+
+        <div class="relative bg-surface-container-lowest rounded-[1.75rem] shadow-2xl shadow-black/10 border border-outline-variant/50 grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_220px] overflow-hidden" data-intro="1" data-intro-kind="fade">
+            <!-- main pass -->
+            <div class="min-w-0">
+                <div class="bg-tertiary text-[#fffaf0] px-6 sm:px-10 pt-7 pb-8 relative overflow-hidden">
+                    <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(60% 90% at 100% 0%,rgba(227,155,60,.45),transparent 70%)"></div>
+                    <div class="relative flex items-center justify-between gap-3 label-tiny text-[#f6d9a8]"><span>Boarding pass</span><span>{{ BUSINESS_NAME }}</span></div>
+                    <h1 class="relative font-serif font-bold text-3xl sm:text-5xl leading-tight mt-6">You're all set, {{ enquiry.name|default:"there" }}.</h1>
+                    <p class="relative text-[#fffaf0]/75 mt-4 max-w-lg">We've received your enquiry. Our team will be in touch within the hour. Confirm faster by sending the details on WhatsApp now.</p>
+                </div>
+                <dl class="grid grid-cols-2 gap-x-6 gap-y-5 px-6 sm:px-10 py-8 text-on-surface" data-stamps>
+                    {% if enquiry.vehicle %}<div class="col-span-2"><dt class="label-tiny text-outline">Vehicle</dt><dd class="font-serif font-bold text-xl text-tertiary mt-1">{{ enquiry.vehicle.brand }} {{ enquiry.vehicle.name }}</dd></div>{% endif %}
+                    {% if enquiry.preferred_start_date %}<div class="col-span-2 sm:col-span-1"><dt class="label-tiny text-outline">Dates</dt><dd class="font-serif font-bold text-lg mt-1">{{ enquiry.preferred_start_date|date:"d M Y" }}{% if enquiry.preferred_end_date %} → {{ enquiry.preferred_end_date|date:"d M Y" }}{% endif %}</dd></div>{% endif %}
+                    {% if enquiry.pickup_city %}<div><dt class="label-tiny text-outline">Pickup</dt><dd class="font-serif font-bold text-lg mt-1 capitalize">{{ enquiry.pickup_city }}{% if enquiry.drop_city and enquiry.drop_city != enquiry.pickup_city %} → {{ enquiry.drop_city }}{% endif %}</dd></div>{% endif %}
+                    {% if enquiry.rental_type %}<div><dt class="label-tiny text-outline">Type</dt><dd class="font-serif font-bold text-lg mt-1">{{ enquiry.get_rental_type_display }}</dd></div>{% endif %}
+                    {% if enquiry.requested_addons %}<div class="col-span-2"><dt class="label-tiny text-outline">Add-ons</dt><dd class="font-serif font-bold text-lg mt-1">{{ enquiry.requested_addons|join:", " }}</dd></div>{% endif %}
+                    <div><dt class="label-tiny text-outline">Phone</dt><dd class="font-serif font-bold text-lg mt-1">{{ enquiry.phone }}</dd></div>
+                    <div class="flex justify-end items-end" aria-hidden="true"><div class="stamp sm text-[#d9692f] opacity-80" style="rotate:-14deg"><div><span class="material-symbols-outlined">task_alt</span><b>Received</b></div></div></div>
+                </dl>
+                <div class="px-6 sm:px-10 pb-8">
+                    {% if wa_url %}
+                    <a id="wa-cta" href="{{ wa_url }}" target="_blank" rel="noopener" class="m-shine bg-[#25D366] text-white py-4 px-6 rounded-full font-bold hover:opacity-90 transition-all flex items-center justify-center gap-3 text-base">
+<svg fill="currentColor" height="22" viewBox="0 0 24 24" width="22" aria-hidden="true"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.91L4 20l4.2-1.1a7.93 7.93 0 0 0 3.79.97h.01a7.95 7.95 0 0 0 5.6-13.55zm-5.55 12.22a6.6 6.6 0 0 1-3.36-.92l-.24-.14-2.5.65.67-2.43-.16-.25a6.59 6.59 0 1 1 12.24-3.5 6.58 6.58 0 0 1-6.65 6.59zm3.62-4.93c-.2-.1-1.18-.58-1.36-.65-.18-.07-.32-.1-.45.1-.13.2-.51.65-.63.78-.12.13-.23.15-.43.05-.2-.1-.84-.31-1.6-.99-.59-.53-.99-1.18-1.1-1.38-.12-.2-.01-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.33.06-.13.03-.25-.02-.35-.05-.1-.45-1.08-.62-1.48-.16-.39-.32-.34-.45-.34-.12 0-.25-.02-.39-.02-.13 0-.35.05-.53.25-.18.2-.7.68-.7 1.66 0 .98.72 1.93.82 2.06.1.13 1.41 2.16 3.42 3.03.48.21.85.33 1.14.42.48.15.92.13 1.26.08.39-.06 1.18-.48 1.34-.95.17-.47.17-.86.12-.95-.05-.08-.18-.13-.39-.23z"/></svg>
+
+                        Send on WhatsApp
+                    </a>
+                    <p class="text-xs text-outline mt-3 text-center" id="wa-hint">WhatsApp should open in a new tab. If it doesn't, click the button above.</p>
+            <script>
+                // Auto-open WhatsApp once on page load — best-effort, popup blockers may stop it.
+                (function() {
+                    var url = {{ wa_url|safe|escapejs|stringformat:"'%s'" }};
+                    if (!url) return;
+                    var win = window.open(url, '_blank', 'noopener');
+                    if (!win || win.closed || typeof win.closed === 'undefined') {
+                        // Popup blocked — leave button visible.
+                        var hint = document.getElementById('wa-hint');
+                        if (hint) hint.textContent = 'Tap the button to open WhatsApp.';
+                    }
+                })();
+            </script>
+                    {% else %}
+                    <p class="text-sm text-on-surface-variant">Our team will call you back at <strong>{{ enquiry.phone }}</strong>.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- stub -->
+            <div class="tk-vperf hidden md:flex flex-col justify-between p-7 bg-surface-container-low">
+                <div><span class="label-tiny text-outline">Reference</span><div class="font-serif font-bold text-4xl text-tertiary mt-2">#{{ enquiry.id }}</div></div>
+                <div class="space-y-4">
+                    <div><span class="label-tiny text-outline">Passenger</span><div class="font-bold mt-1 truncate">{{ enquiry.name|default:"—" }}</div></div>
+                    <div><span class="label-tiny text-outline">Status</span><div class="font-bold mt-1 text-[#d9692f]">Received</div></div>
+                </div>
+                <span class="material-symbols-outlined text-[#e39b3c] text-4xl" aria-hidden="true">confirmation_number</span>
+            </div>
+            <div class="md:hidden">
+                <div class="tk-perf"></div>
+                <div class="flex items-center justify-between gap-4 px-6 py-5"><div><span class="label-tiny text-outline">Reference</span><div class="font-serif font-bold text-3xl text-tertiary mt-1">#{{ enquiry.id }}</div></div><span class="material-symbols-outlined text-[#e39b3c] text-4xl" aria-hidden="true">confirmation_number</span></div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-4 mt-8">
+            <p class="text-xs text-outline">A copy of this enquiry has been sent to our team. We'll reach out within an hour during business hours.</p>
+            <div class="flex gap-3">
+                <a href="{% url 'vehicle_list' %}" class="label-tiny text-tertiary border border-tertiary rounded-full px-5 py-3 hover:bg-tertiary hover:text-on-tertiary transition-colors">Browse fleet</a>
+                <a href="{% url 'home' %}" class="label-tiny text-on-surface-variant rounded-full px-5 py-3 hover:text-[#d9692f]">← Home</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}{% include "public/themes/route/_js.html" %}{% endblock %}

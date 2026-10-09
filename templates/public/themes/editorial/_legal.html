@@ -1,0 +1,64 @@
+{% extends "public/base_public.html" %}
+{% comment %}
+Editorial layout for legal pages. Children fill:
+  title, meta_description, legal_title, legal_toc (<li><a href="#id">…</a></li> items), legal_body (sections with matching ids), legal_contact_title, legal_contact_lede
+{% endcomment %}
+
+{% block extra_css %}
+{% include "public/themes/editorial/_styles.html" %}
+<style>
+    .ed-legal section { scroll-margin-top: 7rem; }
+    .ed-legal h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); line-height: 1.2; letter-spacing: -.02em; color: var(--page-fg); margin-bottom: 1rem; }
+    .ed-legal h2 .n { color: #33450d; opacity: .45; margin-right: .5rem; }
+    .ed-toc a { display: flex; gap: .75rem; padding: .55rem 0; color: #75786b; transition: color .3s; }
+    .ed-toc a:hover, .ed-toc a.is-active { color: #33450d; }
+    .ed-toc a.is-active { font-weight: 700; }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 lg:pt-14 pb-10 lg:pb-14">
+    <div class="pb-10 lg:pb-12 border-b border-outline-variant/40">
+        <span class="label-tiny text-primary-container block mb-5" data-intro="0">Legal</span>
+        <h1 class="display-hero text-5xl sm:text-7xl lg:text-[96px] text-primary" data-intro="1" data-intro-kind="split">{% block legal_title %}{% endblock %}</h1>
+        <p class="headline-md text-xl sm:text-2xl text-on-surface-variant font-normal italic mt-6 lg:mt-8" data-intro="2">Last updated {% now "F j, Y" %}</p>
+    </div>
+</header>
+
+<div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pb-20 lg:pb-28 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20">
+    <nav class="lg:col-span-3 hidden lg:block" aria-label="On this page">
+        <div class="sticky top-32">
+            <span class="label-tiny text-outline block mb-4">On this page</span>
+            <ol class="ed-toc text-sm border-l border-outline-variant/40 pl-5">{% block legal_toc %}{% endblock %}</ol>
+        </div>
+    </nav>
+    <article class="ed-legal lg:col-span-8 ed-prose text-lg text-on-surface-variant leading-relaxed font-light space-y-14" data-no-split>
+        {% block legal_body %}{% endblock %}
+        <section class="bg-surface-container-low rounded-[2rem] p-8 sm:p-10 not-prose">
+            <h2>{% block legal_contact_title %}Questions?{% endblock %}</h2>
+            <p class="mb-6">{% block legal_contact_lede %}{% endblock %}</p>
+            <div class="flex flex-wrap gap-3">
+                {% if BUSINESS_EMAIL %}<a href="mailto:{{ BUSINESS_EMAIL }}" class="ed-chip bg-surface-container-lowest !no-underline !text-[#33450d] hover:bg-surface-container-high"><span class="material-symbols-outlined text-lg" aria-hidden="true">mail</span>{{ BUSINESS_EMAIL }}</a>{% endif %}
+                {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="ed-chip bg-surface-container-lowest !no-underline !text-[#33450d] hover:bg-surface-container-high"><span class="material-symbols-outlined text-lg" aria-hidden="true">call</span>{{ BUSINESS_PHONE }}</a>{% endif %}
+            </div>
+        </section>
+    </article>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* highlight the section being read in the table of contents */
+(function () {
+    var links = [].slice.call(document.querySelectorAll(".ed-toc a"));
+    if (!links.length || !("IntersectionObserver" in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+            if (!en.isIntersecting) return;
+            links.forEach(function (a) { a.classList.toggle("is-active", a.getAttribute("href") === "#" + en.target.id); });
+        });
+    }, { rootMargin: "-30% 0px -60% 0px" });
+    links.forEach(function (a) { var s = document.querySelector(a.getAttribute("href")); if (s) io.observe(s); });
+})();
+</script>
+{% endblock %}

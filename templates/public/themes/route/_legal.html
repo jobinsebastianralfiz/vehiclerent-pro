@@ -1,0 +1,65 @@
+{% extends "public/base_public.html" %}
+{% comment %}Kerala Route · legal layout (terms, privacy). Each section is a stop on a dashed route; the contents list
+is built from the section headings and follows you down the page.{% endcomment %}
+
+{% block extra_css %}{% include "public/themes/route/_assets.html" %}{% endblock %}
+
+{% block content %}
+<section class="r-glow">
+    <div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 lg:pt-12 pb-12">
+        <nav aria-label="Breadcrumb" class="mb-8 sm:mb-10" data-intro="0">
+            <ol class="r-trail label-tiny text-on-surface-variant">
+                <li><a href="{% url 'home' %}" class="hover:text-[#d9692f] transition-colors"><span class="r-dot"></span>Home</a></li>
+                <li aria-hidden="true"><span class="r-dash block"></span></li>
+                <li><span class="r-here text-tertiary" aria-current="page"><span class="r-dot"></span>{% block legal_crumb %}{% endblock %}</span></li>
+            </ol>
+        </nav>
+        <span class="label-tiny text-[#d9692f] flex items-center gap-3" data-intro="1"><span class="w-8 h-px bg-[#d9692f]"></span>Legal · the fine print</span>
+        <h1 class="display-hero text-5xl sm:text-7xl lg:text-[84px] text-tertiary mt-5" data-intro="2" data-intro-kind="split">{% block legal_title %}{% endblock %}</h1>
+        <p class="text-on-surface-variant mt-6" data-intro="3">Last updated: {% now "F j, Y" %}</p>
+        {% include "public/themes/route/_strip.html" %}
+    </div>
+</section>
+
+<div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pb-24 grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-10 lg:gap-16 items-start">
+    <aside class="hidden lg:block lg:sticky lg:top-28">
+        <span class="label-tiny text-outline block mb-4">On this page</span>
+        <ol class="r-toc space-y-3 text-sm" id="legalToc"></ol>
+    </aside>
+    <article class="r-legal max-w-3xl text-on-surface-variant leading-relaxed bg-surface-container-lowest rounded-[1.75rem] shadow-xl shadow-black/5 border border-outline-variant/50 p-6 sm:p-12" id="legalBody">
+        {% block legal_body %}{% endblock %}
+        <div class="mt-12 pt-8 border-t border-dashed border-[#d6ccb5] flex flex-wrap gap-3">
+            <a href="{% url 'contact' %}" class="bg-primary-container text-on-primary px-7 py-3.5 rounded-full label-tiny">Questions? Contact us</a>
+            <a href="{% url 'faq' %}" class="border border-tertiary text-tertiary px-7 py-3.5 rounded-full label-tiny hover:bg-tertiary hover:text-on-tertiary transition-colors">Read the FAQ</a>
+        </div>
+    </article>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% include "public/themes/route/_js.html" %}
+<script>
+(() => {
+  const body = document.getElementById("legalBody"), toc = document.getElementById("legalToc");
+  if (!body || !toc) return;
+  const hs = [...body.querySelectorAll("section > h2")];
+  const links = hs.map((h, i) => {
+    h.id = h.id || "s" + (i + 1);
+    const li = document.createElement("li"), a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.className = "flex items-start gap-3 text-on-surface-variant hover:text-[#d9692f] transition-colors";
+    const dot = document.createElement("span"); dot.className = "r-dot mt-1.5 w-2 h-2 rounded-full bg-[#b9ab8c] shrink-0";
+    const t = document.createElement("span"); t.textContent = h.textContent.replace(/^\d+\.\s*/, "");
+    a.append(dot, t); li.appendChild(a); toc.appendChild(li);
+    return a;
+  });
+  if (!("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const i = hs.indexOf(e.target);
+    links.forEach((a, j) => a.classList.toggle("on", j === i));
+  }), { rootMargin: "-20% 0px -70% 0px" });
+  hs.forEach(h => io.observe(h));
+})();
+</script>
+{% endblock %}

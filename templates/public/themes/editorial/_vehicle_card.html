@@ -1,0 +1,37 @@
+{% load vehicle_tags %}
+{% comment %}Editorial vehicle card, same as the home page "New Collection" card. Needs `vehicle`; `surface` overrides the card background class; `wedding` adds the decoration line.{% endcomment %}
+<a href="{{ vehicle.get_absolute_url }}" class="vehicle-card group relative {{ surface|default:'bg-surface-container-lowest' }} p-5 sm:p-6 rounded-[2.5rem] hover:shadow-2xl block" itemscope itemtype="https://schema.org/Product">
+    <div class="relative overflow-hidden rounded-[2rem] h-56 sm:h-64 mb-6 bg-surface-container-high">
+        {% if vehicle.thumbnail %}
+        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }} for rent" class="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy" itemprop="image"/>
+        {% else %}
+        <div class="ed-ph"><span class="material-symbols-outlined text-[64px]" aria-hidden="true">directions_car</span></div>
+        {% endif %}
+        {% if vehicle.primary_price_value %}
+        <div class="absolute top-4 right-4 glass-panel bg-white/60 text-[#1b1c17] px-4 py-2 rounded-full font-bold text-sm">{{ vehicle.primary_price_value|inr }}<span class="font-light">/{{ vehicle.primary_price_label }}</span></div>
+        {% endif %}
+        <div class="absolute top-4 left-4 flex items-center gap-1.5 px-3 py-1.5 bg-white/70 text-[#1b1c17] backdrop-blur-md rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full {% if vehicle.status == 'available' %}bg-emerald-500{% elif vehicle.status == 'rented' %}bg-blue-500{% else %}bg-amber-500{% endif %}" aria-hidden="true"></span>
+            <span class="label-tiny">{{ vehicle.get_status_display }}</span>
+        </div>
+        {% if vehicle.is_premium %}
+        <div class="absolute bottom-4 left-4 bg-primary-container/85 text-on-primary px-4 py-1.5 rounded-full label-tiny">Premium</div>
+        {% elif vehicle.is_wedding_service %}
+        <div class="absolute bottom-4 left-4 bg-primary-container/85 text-on-primary px-4 py-1.5 rounded-full label-tiny">Wedding</div>
+        {% elif vehicle.category %}
+        <div class="absolute bottom-4 left-4 bg-primary-container/85 text-on-primary px-4 py-1.5 rounded-full label-tiny">{{ vehicle.category.name }}</div>
+        {% endif %}
+        {% if vehicle.is_chauffeur_available %}
+        <div class="absolute bottom-4 right-4 w-9 h-9 rounded-full bg-white/70 text-[#1f2e00] backdrop-blur-md grid place-items-center" title="With driver available"><span class="material-symbols-outlined text-lg" aria-hidden="true">badge</span><span class="sr-only">With driver available</span></div>
+        {% endif %}
+    </div>
+    <p class="label-tiny text-outline mb-2" itemprop="brand">{{ vehicle.brand }}</p>
+    <h3 class="headline-md text-2xl mb-5" itemprop="name">{{ vehicle.name }}</h3>
+    <div class="grid grid-cols-3 gap-4 mb-6 pb-6 border-b border-outline-variant/30">
+        {% if vehicle.transmission %}<div><div class="label-tiny opacity-40">Gear</div><div class="font-serif text-base mt-1.5">{{ vehicle.get_transmission_display }}</div></div>{% endif %}
+        {% if vehicle.fuel_type %}<div><div class="label-tiny opacity-40">Fuel</div><div class="font-serif text-base mt-1.5">{{ vehicle.get_fuel_type_display }}</div></div>{% endif %}
+        {% if vehicle.seating_capacity %}<div><div class="label-tiny opacity-40">Seats</div><div class="font-serif text-base mt-1.5">{{ vehicle.seating_capacity }} adult</div></div>{% endif %}
+    </div>
+    {% if wedding %}<p class="text-sm text-on-surface-variant -mt-2 mb-5 flex items-center gap-2"><span class="material-symbols-outlined text-base text-primary-container" aria-hidden="true">local_florist</span>{% if vehicle.wedding_decoration_charge %}+{{ vehicle.wedding_decoration_charge|inr }} basic decoration{% else %}Decoration quoted on request{% endif %}</p>{% endif %}
+    <div class="w-full bg-primary-container text-on-primary py-4 rounded-full font-bold text-center m-shine"><span class="m-flip"><span>Rent Now</span><span>View details →</span></span></div>
+</a>

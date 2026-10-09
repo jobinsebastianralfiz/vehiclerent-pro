@@ -1,0 +1,163 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}Premium & Luxury Car Rentals in Kerala | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Premium and luxury car rentals in Kerala. BMW, Audi, Mercedes, Mini Cooper, Range Rover and more. Self-drive or with chauffeur. Statewide delivery.{% endblock %}
+{% block meta_keywords %}luxury car rental Kerala, premium car rental, BMW rental Kerala, Audi rental Kerala, Mercedes rental, Mini Cooper rental, Range Rover rental, luxury SUV hire, executive sedan rental, premium car with driver Kerala{% endblock %}
+{% block og_title %}Luxury Car Rentals in Kerala — BMW, Audi, Mercedes & more{% endblock %}
+{% block og_description %}When ordinary won't do. Premium fleet across Kerala — self-drive or with trained chauffeur. Doorstep delivery, transparent pricing.{% endblock %}
+
+{% block extra_css %}{% include "public/themes/editorial/_styles.html" %}{% endblock %}
+
+{% block content %}
+<!-- ─── Hero: dark, cinematic ─── -->
+<div class="px-3 sm:px-6 pt-4">
+<section id="ed-prem-hero" class="relative bg-[#141611] text-[#fbfaf1] overflow-hidden rounded-[2.5rem] lg:rounded-[3.5rem] max-w-[1800px] mx-auto">
+    <div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-14 pb-20 lg:pt-20 lg:pb-28 grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        <div class="lg:col-span-6 space-y-8 relative z-10">
+            <span class="label-tiny text-[#b8cf88] block" data-intro="0">Premium & luxury fleet</span>
+            <h1 class="display-hero text-5xl sm:text-7xl lg:text-[96px] text-[#e9e8e0]" data-intro="1" data-intro-kind="split">When ordinary won't do.</h1>
+            <p class="headline-md text-xl sm:text-2xl text-white/60 font-normal italic max-w-xl" data-intro="2">European flagships, executive sedans and statement SUVs. Self-drive, or with a chauffeur.</p>
+            <div class="flex flex-wrap gap-4" data-intro="3">
+                <a href="#fleet" class="bg-[#d4eca2] text-[#1f2e00] px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold inline-flex items-center gap-3 m-shine">View the collection <span class="material-symbols-outlined" aria-hidden="true">arrow_downward</span></a>
+                {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="border border-white/25 px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold inline-flex items-center gap-3 hover:bg-white/10 transition-colors"><span class="material-symbols-outlined" aria-hidden="true">call</span> Talk to us</a>{% endif %}
+            </div>
+            {% if vehicles or cities %}
+            <div class="flex gap-10 sm:gap-14 pt-8 border-t border-white/10" data-intro="4">
+                {% if vehicles %}<div><div class="headline-md text-3xl sm:text-4xl text-[#d4eca2]"><span data-slot>{{ vehicles.count }}</span></div><div class="label-tiny text-white/50 mt-2">Premium car{{ vehicles.count|pluralize }}</div></div>{% endif %}
+                {% if cities %}<div><div class="headline-md text-3xl sm:text-4xl text-[#d4eca2]"><span data-slot>{{ cities.count }}</span></div><div class="label-tiny text-white/50 mt-2">Cit{{ cities.count|pluralize:"y,ies" }} served</div></div>{% endif %}
+            </div>
+            {% endif %}
+        </div>
+        <div class="lg:col-span-6 relative">
+            {% with f=featured_vehicles|first v=vehicles|first %}{% with hero=f|default:v %}
+            <div class="ed-prem-media m-hero-media h-[380px] sm:h-[520px] lg:h-[640px] rounded-[2.5rem] bg-[#22261c]" data-intro="5" data-intro-kind="media">
+                {% if hero and hero.thumbnail %}
+                <img src="{{ hero.thumbnail.url }}" alt="{{ hero.brand }} {{ hero.name }}" class="w-full h-full object-cover"/>
+                {% else %}
+                <img src="{% static 'themes/img/sclass-mist.jpg' %}" alt="" class="w-full h-full object-cover"/>
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            </div>
+            {% if hero %}
+            <a href="{{ hero.get_absolute_url }}" class="absolute bottom-6 left-6 right-6 sm:right-auto glass-panel bg-[#1f2e00]/70 border border-white/10 px-6 py-5 rounded-2xl flex items-center gap-5 m-float" data-intro="6" data-intro-kind="pop">
+                <span><span class="label-tiny text-[#b8cf88] block mb-1.5">{{ hero.brand }}</span><span class="font-serif font-bold text-xl">{{ hero.name }}</span></span>
+                {% if hero.primary_price_value %}<span class="ml-auto pl-5 border-l border-white/15"><span class="font-bold">{{ hero.primary_price_value|inr }}</span><span class="text-white/60 text-sm">/{{ hero.primary_price_label }}</span></span>{% endif %}
+            </a>
+            {% endif %}
+            {% endwith %}{% endwith %}
+        </div>
+    </div>
+</section>
+</div>
+
+<!-- ─── Booking widget ─── -->
+<section class="px-4 sm:px-12 max-w-screen-2xl mx-auto -mt-10 relative z-20" data-reveal>
+    <div class="bg-surface rounded-[2rem] p-4 sm:p-6 shadow-2xl shadow-black/10">
+        {% include "public/includes/booking_widget.html" with cities=cities %}
+    </div>
+</section>
+
+<!-- ─── Featured: pinned sideways scroll ─── -->
+{% if featured_vehicles %}
+<section class="bg-[#141611] text-[#fbfaf1] py-20 lg:py-0 lg:h-screen lg:flex lg:flex-col lg:justify-center overflow-hidden mt-20 lg:mt-28" data-hscroll>
+    <div class="px-4 sm:px-12 mb-10 lg:mb-14 flex items-end gap-6 sm:gap-10 max-w-screen-2xl w-full mx-auto">
+        <div>
+            <span class="label-tiny text-[#b8cf88]">Featured · elite collection</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl text-[#e9e8e0] mt-4">The headliners.</h2>
+        </div>
+        <div class="h-px flex-1 bg-white/10 mb-4 hidden sm:block"></div>
+        <div class="font-serif text-4xl sm:text-5xl text-[#b8cf88] hidden lg:flex items-baseline gap-2"><span data-hscroll-count>01</span><span class="text-white/30 text-2xl">/ {{ featured_vehicles|length|stringformat:"02d" }}</span></div>
+    </div>
+    <div class="m-htrack flex gap-8 lg:gap-10 px-4 sm:px-12 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-px-4 sm:scroll-px-12 lg:snap-none pb-4">
+        {% for vehicle in featured_vehicles %}
+        <a href="{{ vehicle.get_absolute_url }}" class="snap-start min-w-[280px] sm:min-w-[420px] lg:min-w-[34vw] h-[420px] sm:h-[520px] lg:h-[62vh] relative rounded-[3rem] overflow-hidden group block bg-[#22261c]" data-tilt="0.5">
+            {% if vehicle.thumbnail %}
+            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover" loading="lazy"/>
+            {% else %}
+            <div class="ed-ph ed-ph-dark"><span class="material-symbols-outlined text-[80px]" aria-hidden="true">diamond</span></div>
+            {% endif %}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent"></div>
+            <div class="absolute bottom-8 left-8 right-8 flex justify-between items-end gap-4">
+                <div>
+                    <div class="label-tiny text-[#b8cf88] mb-3">{{ vehicle.brand }}</div>
+                    <div class="headline-md text-3xl text-white">{{ vehicle.name }}</div>
+                    {% if vehicle.primary_price_value %}<div class="text-white/70 text-sm mt-3">From <span class="font-bold text-white">{{ vehicle.primary_price_value|inr }}</span> / {{ vehicle.primary_price_label }}</div>{% endif %}
+                </div>
+                <span class="shrink-0 w-12 h-12 rounded-full bg-white/10 border border-white/20 text-white grid place-items-center transition-transform duration-500 group-hover:rotate-45 group-hover:bg-[#d4eca2] group-hover:text-[#1f2e00]"><span class="material-symbols-outlined" aria-hidden="true">arrow_outward</span></span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── The collection ─── -->
+<section id="fleet" class="px-4 sm:px-12 py-20 lg:py-32 max-w-screen-2xl mx-auto scroll-mt-24">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-12 lg:mb-16 gap-6">
+        <div>
+            <span class="label-tiny text-primary-container">The collection</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl mt-4">Available for your dates.</h2>
+        </div>
+        <a href="{% url 'vehicle_list' %}?premium=1" class="inline-flex items-center gap-2 font-bold text-primary-container hover:underline">Filter in the full fleet <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
+    </div>
+    {% if vehicles %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+        {% for vehicle in vehicles %}
+        {% include "public/themes/editorial/_vehicle_card.html" with vehicle=vehicle %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-20 px-6 bg-surface-container-low rounded-[2.5rem]">
+        <span class="material-symbols-outlined text-6xl text-primary-container/40 mb-6 block" aria-hidden="true">diamond</span>
+        <h3 class="headline-lg text-3xl sm:text-4xl mb-4">The collection is being curated.</h3>
+        <p class="headline-md text-xl font-normal italic text-on-surface-variant mb-10">No cars are listed as premium yet. Talk to us about what you need.</p>
+        <div class="flex flex-wrap justify-center gap-4">
+            {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="bg-primary-container text-on-primary px-8 py-4 rounded-full font-bold inline-flex items-center gap-2"><span class="material-symbols-outlined" aria-hidden="true">call</span> Call us</a>{% endif %}
+            <a href="{% url 'vehicle_list' %}" class="border border-outline-variant px-8 py-4 rounded-full font-bold hover:bg-surface-container transition-colors">Browse the fleet</a>
+        </div>
+    </div>
+    {% endif %}
+</section>
+
+<!-- ─── Why premium ─── -->
+<section class="px-4 sm:px-12 py-20 lg:py-32 bg-surface-container-low">
+    <div class="max-w-screen-2xl mx-auto">
+        <div class="flex flex-col items-center text-center mb-12 lg:mb-16">
+            <span class="label-tiny text-primary-container">Why premium</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl mt-4">More than transport.</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8" data-deal>
+            <div class="glass-panel bg-surface-container-lowest/80 ghost-border p-8 sm:p-10 rounded-[2rem]" data-tilt>
+                <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center mb-6"><span class="material-symbols-outlined" aria-hidden="true">workspace_premium</span></span>
+                <h3 class="headline-md text-2xl mb-3">Chosen with care</h3>
+                <p class="text-on-surface-variant leading-relaxed">Each car in the collection is selected for its condition and presentation, so it looks right on the day.</p>
+            </div>
+            <div class="glass-panel bg-surface-container-lowest/80 ghost-border p-8 sm:p-10 rounded-[2rem]" data-tilt>
+                <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center mb-6"><span class="material-symbols-outlined" aria-hidden="true">badge</span></span>
+                <h3 class="headline-md text-2xl mb-3">With a chauffeur</h3>
+                <p class="text-on-surface-variant leading-relaxed">Prefer to sit back? Many premium cars can be booked with a driver who knows your itinerary.</p>
+            </div>
+            <div class="glass-panel bg-surface-container-lowest/80 ghost-border p-8 sm:p-10 rounded-[2rem]" data-tilt>
+                <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center mb-6"><span class="material-symbols-outlined" aria-hidden="true">local_shipping</span></span>
+                <h3 class="headline-md text-2xl mb-3">Delivered to you</h3>
+                <p class="text-on-surface-variant leading-relaxed">We can bring the car to your hotel, home or the airport{% if cities %} in {{ cities.count }} cit{{ cities.count|pluralize:"y,ies" }}{% endif %}. Ask when you book.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% include "public/themes/editorial/_enquiry_band.html" with kicker="Ready for the upgrade" title="Tell us your dates." lede="We'll suggest the right car, the right driver and the right delivery point." %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("motion:ready", function (e) {
+    var G = e.detail.G;
+    if (!document.getElementById("ed-prem-hero")) return;
+    var st = { trigger: "#ed-prem-hero", start: "top top", end: "bottom top", scrub: true };
+    G.to(".ed-prem-media", { scale: .92, ease: "none", scrollTrigger: st });
+    G.to(".ed-prem-media img", { yPercent: 10, ease: "none", scrollTrigger: st });
+});
+</script>
+{% endblock %}

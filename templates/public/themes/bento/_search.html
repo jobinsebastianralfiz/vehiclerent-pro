@@ -1,0 +1,24 @@
+{% comment %}
+Bento booking search: the theme's version of includes/booking_widget.html (same field names, GET to the fleet list).
+Include with cities; it preselects the current request's values. Optional cls= extra classes for the tile.
+{% endcomment %}
+<form action="{% url 'vehicle_list' %}" method="get" class="tile b-glass p-5 sm:p-6 flex flex-col justify-between gap-4 {{ cls }}" aria-label="Search vehicles">
+    <div class="flex items-center justify-between gap-3 flex-wrap">
+        <div class="flex bg-surface-container rounded-full p-1">
+            <label class="cursor-pointer"><input type="radio" name="rental_type" value="self_drive" class="peer sr-only" {% if request.GET.rental_type != "with_driver" %}checked{% endif %}><span class="block px-4 py-2 rounded-full text-sm font-bold peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">Self-drive</span></label>
+            <label class="cursor-pointer"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only" {% if request.GET.rental_type == "with_driver" %}checked{% endif %}><span class="block px-4 py-2 rounded-full text-sm font-bold peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">With driver</span></label>
+        </div>
+        <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-on-surface-variant">
+            <input type="checkbox" name="same_location" value="1" {% if request.GET.same_location or not request.GET %}checked{% endif %} class="rounded border-outline-variant text-primary focus:ring-primary"> Same-location return
+        </label>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2">
+        <label class="bg-white rounded-2xl px-4 py-3 min-w-0"><span class="label-tiny text-outline block mb-1">Pickup</span>
+            <select name="pickup_city" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"><option value="">Any city</option>{% for city in cities %}<option value="{{ city.slug }}" {% if request.GET.pickup_city == city.slug %}selected{% endif %}>{{ city.name }}</option>{% endfor %}</select></label>
+        <label class="bg-white rounded-2xl px-4 py-3 min-w-0"><span class="label-tiny text-outline block mb-1">Drop</span>
+            <select name="drop_city" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"><option value="">Same as pickup</option>{% for city in cities %}<option value="{{ city.slug }}" {% if request.GET.drop_city == city.slug %}selected{% endif %}>{{ city.name }}</option>{% endfor %}</select></label>
+        <label class="bg-white rounded-2xl px-4 py-3 min-w-0"><span class="label-tiny text-outline block mb-1">From</span><input type="date" name="pickup_date" value="{{ request.GET.pickup_date }}" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+        <label class="bg-white rounded-2xl px-4 py-3 min-w-0"><span class="label-tiny text-outline block mb-1">To</span><input type="date" name="return_date" value="{{ request.GET.return_date }}" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+        <button type="submit" class="col-span-2 lg:col-span-1 bg-primary text-on-primary rounded-2xl px-6 py-4 font-bold flex items-center justify-center gap-2 m-shine m-btn" data-magnetic>Search <span class="material-symbols-outlined">search</span></button>
+    </div>
+</form>

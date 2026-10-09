@@ -14,7 +14,7 @@ from vehicles.models import City, Vehicle, VehicleCategory
 from . import chatbot
 from .forms import AdminLoginForm, SiteConfigForm, TestimonialForm
 from .models import SiteConfig, Testimonial
-from .themes import THEMES, active_theme
+from .themes import THEMES, active_theme, themed
 
 
 # ──────────────── Public Views ────────────────
@@ -51,8 +51,7 @@ def home(request):
         for field in [config.hero_bg_1, config.hero_bg_2, config.hero_bg_3]:
             if field:
                 hero_bg_images.append(field.url)
-    theme = active_theme(request, config)
-    return render(request, [f"public/themes/{theme['key']}/home.html", "public/home.html"], {
+    return render(request, themed(request, "home.html"), {
         "config": config,
         "categories": categories,
         "featured_vehicles": featured_vehicles,
@@ -69,18 +68,18 @@ def home(request):
 def about(request):
     config = SiteConfig.load()
     testimonials = Testimonial.objects.filter(is_active=True)[:6]
-    return render(request, "public/about.html", {
+    return render(request, themed(request, "about.html"), {
         "config": config,
         "testimonials": testimonials,
     })
 
 
 def terms(request):
-    return render(request, "public/terms.html")
+    return render(request, themed(request, "terms.html"))
 
 
 def privacy(request):
-    return render(request, "public/privacy.html")
+    return render(request, themed(request, "privacy.html"))
 
 
 def faq(request):
@@ -98,12 +97,12 @@ def faq(request):
         {"q": "What is the security deposit?", "a": "A refundable security deposit may be required depending on the vehicle. The amount is listed on each vehicle's page. The deposit is returned upon satisfactory vehicle return, minus any deductions for damage or fines."},
         {"q": "What are the age requirements?", "a": "Renters must be at least 21 years of age and hold a valid driving license that has been active for at least 1 year."},
     ]
-    return render(request, "public/faq.html", {"faq_items": faq_items})
+    return render(request, themed(request, "faq.html"), {"faq_items": faq_items})
 
 
 def contact(request):
     config = SiteConfig.load()
-    return render(request, "public/contact.html", {"config": config})
+    return render(request, themed(request, "contact.html"), {"config": config})
 
 
 def sitemap_xml(request):

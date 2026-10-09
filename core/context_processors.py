@@ -17,6 +17,8 @@ def site_settings(request):
         "THEME": theme,
         "THEME_TOKENS": json.dumps({"colors": theme["colors"], "display": theme["font_display"], "body": theme["font_body"]}),
         "THEME_PREVIEW": theme["key"] != (config.theme if config else theme["key"]),
+        "THEME_NAVBAR": [f"public/themes/{theme['key']}/navbar.html", "public/includes/navbar.html"],
+        "THEME_FOOTER": [f"public/themes/{theme['key']}/footer.html", "public/includes/footer.html"],
     }
 
     if config:

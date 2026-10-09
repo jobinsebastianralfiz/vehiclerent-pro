@@ -1,0 +1,163 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+{% comment %}Kerala Route · wedding. Polaroids of the day, three ways to arrive, every car as a ticket by tier,
+decoration packages as postcards, the four steps as stops on the road, and a real enquiry form at the end.{% endcomment %}
+
+{% block title %}Wedding Cars for Rent in Kerala | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Chauffeur-driven decorated wedding cars in Kerala. Classic Honda City to Rolls Royce Ghost. Floral packages, statewide delivery, available 365 days.{% endblock %}
+{% block meta_keywords %}wedding car rental Kerala, marriage cars Kerala, decorated wedding cars, Rolls Royce wedding rental, BMW wedding car, Audi wedding car, vintage wedding car Kerala, bridal car hire, groom car rental, Kochi wedding car, Kottayam wedding car, Trivandrum wedding car{% endblock %}
+{% block og_title %}Wedding Cars in Kerala — Decorated, Chauffeur-Driven{% endblock %}
+{% block og_description %}From classic Verna to Rolls Royce Ghost. Decorated, chauffeur-driven, delivered to your venue. Available 365 days across Kerala.{% endblock %}
+
+{% block extra_css %}{% include "public/themes/route/_assets.html" %}{% endblock %}
+
+{% block content %}
+<section class="r-glow">
+    <div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 lg:pt-12 pb-10 lg:pb-16">
+        {% include "public/themes/route/_trail.html" with here="Wedding cars" %}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-16 items-center">
+            <div class="space-y-7">
+                <span class="label-tiny text-[#d9692f] flex items-center gap-3" data-intro="1"><span class="w-8 h-px bg-[#d9692f]"></span>Wedding fleet · Kerala</span>
+                <h1 class="display-hero text-5xl sm:text-7xl lg:text-[88px] text-tertiary" data-intro="2" data-intro-kind="split">For the day you'll always remember.</h1>
+                <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed font-light" data-intro="3">Chauffeur-driven decorated cars for the bride, groom and family. Booked in minutes, delivered with ceremony.</p>
+                <div class="flex flex-wrap gap-4" data-intro="4">
+                    <a href="#plan-wedding" class="bg-primary-container text-on-primary px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold">Plan your arrival <span class="material-symbols-outlined" data-icon="favorite">favorite</span></a>
+                    {% if vehicles %}<a href="#fleet" class="border border-outline-variant px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold hover:bg-surface-container-lowest transition-colors">See the cars <span class="material-symbols-outlined">arrow_downward</span></a>{% endif %}
+                </div>
+                {% if vehicles or decorations %}
+                <div class="flex flex-wrap gap-10 pt-7 border-t border-outline-variant" data-intro="5">
+                    {% if vehicles %}<div><div class="headline-md text-3xl sm:text-4xl text-tertiary"><span data-slot>{{ vehicles.count }}</span></div><div class="label-tiny text-outline mt-2">Wedding car{{ vehicles.count|pluralize }}</div></div>{% endif %}
+                    {% if decorations %}<div><div class="headline-md text-3xl sm:text-4xl text-tertiary"><span data-slot>{{ decorations|length }}</span></div><div class="label-tiny text-outline mt-2">Decoration package{{ decorations|length|pluralize }}</div></div>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="pol-stack relative h-[340px] sm:h-[480px] lg:h-[540px]" data-no-parallax aria-hidden="true" data-intro="3" data-intro-kind="fade">
+                <figure class="pol"><img src="{% static 'themes/img/couple.jpg' %}" alt=""><figcaption>Just married</figcaption></figure>
+                <figure class="pol"><img src="{% static 'themes/img/wedding-rolls.jpg' %}" alt=""><figcaption>The arrival</figcaption></figure>
+                <figure class="pol"><img src="{% static 'themes/img/jasmine-handle.jpg' %}" alt="" style="object-position:50% 70%"><figcaption>Every detail</figcaption></figure>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="journey">
+    {% include "public/themes/route/_road.html" %}
+
+    {% if classic_cars or premium_cars or iconic_cars %}
+    <div class="road-gap sm" data-stop="Choose your entrance"></div>
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="flex flex-col items-center mb-12 text-center">
+            <span class="label-tiny text-[#d9692f]">Choose your entrance</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl mt-4 text-tertiary">Three ways to arrive.</h2>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-7 lg:gap-9" data-deal>
+            {% if classic_cars %}{% with first=classic_cars.0 %}
+            <a href="#tier-classic" class="group block pc !p-3 !pb-6 rotate-[-2deg] hover:rotate-0 transition-transform duration-500 text-[#1b1c17]">
+                <div class="aspect-[4/3] overflow-hidden rounded-[3px] bg-surface-container">{% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">{% else %}<div class="r-photo-empty w-full h-full grid place-items-center"><span class="material-symbols-outlined text-6xl text-[#e39b3c]">favorite</span></div>{% endif %}</div>
+                <div class="px-3 pt-6"><span class="label-tiny text-[#d9692f]">Classic · {{ classic_cars|length }} car{{ classic_cars|length|pluralize }}</span><h3 class="headline-md text-2xl sm:text-3xl mt-3 text-tertiary">Elegant sedans, traditional decor.</h3><p class="text-on-surface-variant mt-3">Kerala floral roof decoration. Perfect for the family convoy.</p></div>
+            </a>
+            {% endwith %}{% endif %}
+            {% if premium_cars %}{% with first=premium_cars.0 %}
+            <a href="#tier-premium" class="group block bg-tertiary text-[#fffaf0] rounded-[1.25rem] p-3 pb-6 shadow-2xl shadow-black/20 rotate-[1deg] hover:rotate-0 transition-transform duration-500">
+                <div class="aspect-[4/3] overflow-hidden rounded-[.8rem] bg-[#163c39]">{% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">{% else %}<div class="w-full h-full grid place-items-center"><span class="material-symbols-outlined text-6xl text-[#e39b3c]/50">diamond</span></div>{% endif %}</div>
+                <div class="px-3 pt-6"><span class="label-tiny text-[#e39b3c]">Premium · {{ premium_cars|length }} car{{ premium_cars|length|pluralize }}</span><h3 class="headline-md text-2xl sm:text-3xl mt-3">European luxury, the bridal entrance.</h3><p class="text-[#fffaf0]/75 mt-3">With white-rose roof pieces. Polished, photographed, remembered.</p></div>
+            </a>
+            {% endwith %}{% endif %}
+            {% if iconic_cars %}{% with first=iconic_cars.0 %}
+            <a href="#tier-iconic" class="group block pc !p-3 !pb-6 rotate-[2deg] hover:rotate-0 transition-transform duration-500 text-[#1b1c17]">
+                <div class="aspect-[4/3] overflow-hidden rounded-[3px] bg-surface-container">{% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy">{% else %}<div class="r-photo-empty w-full h-full grid place-items-center"><span class="material-symbols-outlined text-6xl text-[#e39b3c]">workspace_premium</span></div>{% endif %}</div>
+                <div class="px-3 pt-6"><span class="label-tiny text-[#d9692f]">Iconic · {{ iconic_cars|length }} car{{ iconic_cars|length|pluralize }}</span><h3 class="headline-md text-2xl sm:text-3xl mt-3 text-tertiary">Heirloom-grade arrivals.</h3><p class="text-on-surface-variant mt-3">Once-in-a-lifetime cars. Reserve early.</p></div>
+            </a>
+            {% endwith %}{% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    <div class="road-gap" data-stop="The wedding fleet"></div>
+    <section id="fleet" class="lane max-w-screen-2xl mx-auto scroll-mt-28">
+        <div class="mb-12"><span class="label-tiny text-[#d9692f]">The fleet</span><h2 class="headline-lg text-4xl sm:text-6xl mt-4 text-tertiary">Available for your date.</h2></div>
+        {% if vehicles %}
+        {% include "public/themes/route/_wedding_tier.html" with cars=classic_cars tier_id="tier-classic" kicker="Classic" %}
+        {% include "public/themes/route/_wedding_tier.html" with cars=premium_cars tier_id="tier-premium" kicker="Premium" %}
+        {% include "public/themes/route/_wedding_tier.html" with cars=iconic_cars tier_id="tier-iconic" kicker="Iconic" %}
+        {% include "public/themes/route/_wedding_tier.html" with cars=other_cars tier_id="tier-more" kicker="Also available" %}
+        {% else %}
+        <div class="pc-back text-center px-6 py-16">
+            <div class="stamp sm text-[#d9692f] mx-auto mb-8" style="rotate:-8deg"><div><span class="material-symbols-outlined">favorite</span><b>Soon</b></div></div>
+            <h3 class="headline-md text-3xl text-tertiary mb-3">Wedding fleet coming soon</h3>
+            <p class="text-on-surface-variant max-w-md mx-auto">Tell us your date below and we'll plan your arrival.</p>
+        </div>
+        {% endif %}
+    </section>
+
+    {% if decorations %}
+    <div class="road-gap" data-stop="Floral &amp; trim"></div>
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="flex flex-col items-center mb-12 text-center"><span class="label-tiny text-[#d9692f]">Floral &amp; trim</span><h2 class="headline-lg text-4xl sm:text-6xl mt-4 text-tertiary">Decorated to your story.</h2></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {% for pkg in decorations %}
+            <article class="pc pc-in !pb-6 text-[#1b1c17] {% cycle 'rotate-[-2deg]' 'rotate-[1.5deg]' 'rotate-[-1deg]' 'rotate-[2deg]' %}">
+                {% if pkg.image %}<img src="{{ pkg.image.url }}" alt="{{ pkg.name }}" loading="lazy">{% else %}<div class="r-photo-empty aspect-[4/3] grid place-items-center rounded-[3px]"><span class="material-symbols-outlined text-5xl text-[#e39b3c]">local_florist</span></div>{% endif %}
+                <div class="px-2 pt-5">
+                    <div class="flex items-start justify-between gap-3"><h3 class="font-serif font-bold text-xl text-tertiary">{{ pkg.name }}</h3><span class="font-serif font-bold text-lg text-[#d9692f] shrink-0">+{{ pkg.price|inr }}</span></div>
+                    {% if pkg.description %}<p class="text-sm text-[#4a4a3e] mt-2 leading-relaxed">{{ pkg.description }}</p>{% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <div class="road-gap" data-stop="Four steps"></div>
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="flex flex-col items-center mb-12 text-center"><span class="label-tiny text-[#d9692f]">Simple &amp; stress-free</span><h2 class="headline-lg text-4xl sm:text-6xl mt-4 text-tertiary">Four steps to your arrival.</h2></div>
+        <ol class="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" data-deal>
+            <li class="bg-surface-container-lowest rounded-[1.5rem] p-7 shadow-lg shadow-black/5 border border-outline-variant/50"><span class="w-11 h-11 rounded-full bg-tertiary text-on-tertiary grid place-items-center font-bold">1</span><h3 class="font-serif font-bold text-xl text-tertiary mt-5">Tell us your date</h3><p class="text-sm text-on-surface-variant mt-2">Submit the wedding date and venue.</p></li>
+            <li class="bg-surface-container-lowest rounded-[1.5rem] p-7 shadow-lg shadow-black/5 border border-outline-variant/50"><span class="w-11 h-11 rounded-full bg-[#e39b3c] text-[#0f2e2c] grid place-items-center font-bold">2</span><h3 class="font-serif font-bold text-xl text-tertiary mt-5">Choose car &amp; decor</h3><p class="text-sm text-on-surface-variant mt-2">Pick from our curated fleet.</p></li>
+            <li class="bg-surface-container-lowest rounded-[1.5rem] p-7 shadow-lg shadow-black/5 border border-outline-variant/50"><span class="w-11 h-11 rounded-full bg-[#d9692f] text-white grid place-items-center font-bold">3</span><h3 class="font-serif font-bold text-xl text-tertiary mt-5">We confirm ahead</h3><p class="text-sm text-on-surface-variant mt-2">Driver introduced, decoration finalised.</p></li>
+            <li class="bg-surface-container-lowest rounded-[1.5rem] p-7 shadow-lg shadow-black/5 border border-outline-variant/50"><span class="w-11 h-11 rounded-full bg-primary-container text-on-primary grid place-items-center font-bold">4</span><h3 class="font-serif font-bold text-xl text-tertiary mt-5">We arrive early</h3><p class="text-sm text-on-surface-variant mt-2">Polished, dressed in white, ready.</p></li>
+        </ol>
+    </section>
+
+    <div class="road-gap" data-stop="Plan with us"></div>
+    <section id="plan-wedding" class="lane max-w-screen-2xl mx-auto scroll-mt-28">
+        <div class="relative overflow-hidden rounded-[2.5rem] lg:rounded-[3rem] bg-tertiary text-[#fffaf0] p-6 sm:p-14 lg:p-20 grid lg:grid-cols-2 gap-12 items-center">
+            <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(45% 70% at 100% 100%,rgba(227,155,60,.45),transparent 70%)"></div>
+            <div class="relative min-w-0">
+                <span class="label-tiny text-[#e39b3c] block">Let's plan your arrival</span>
+                <h2 class="headline-lg text-4xl sm:text-6xl mt-4 mb-5">Reserve your date.</h2>
+                <p class="text-[#fffaf0]/75 text-lg max-w-md font-light">Tell us the date and how many cars you need. Our wedding team will plan, customise and confirm, and we'll handle the rest.</p>
+                <div class="flex flex-wrap gap-3 mt-8">
+                    {% if WHATSAPP_NUMBER %}<a href="{% whatsapp_url 'Hi! I would like to enquire about a wedding car.' %}" target="_blank" rel="noopener" class="bg-[#25D366] text-white px-7 py-3.5 rounded-full label-tiny hover:opacity-90">WhatsApp us</a>{% endif %}
+                    {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="border border-[#fffaf0]/40 px-7 py-3.5 rounded-full label-tiny hover:bg-[#fffaf0] hover:text-[#0f2e2c] transition-colors">Call {{ BUSINESS_PHONE }}</a>{% endif %}
+                </div>
+            </div>
+            <form action="{% url 'submit_enquiry' %}" method="post" class="r-form relative bg-surface-container-lowest rounded-3xl p-6 sm:p-8 shadow-2xl min-w-0 space-y-4" data-reveal>
+                {% csrf_token %}
+                <input type="hidden" name="rental_type" value="with_driver"/>
+                <div class="flex items-center justify-between gap-3 mb-2"><span class="label-tiny text-tertiary flex items-center gap-2"><span class="material-symbols-outlined text-[#d9692f] text-lg">favorite</span>Wedding enquiry</span></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="block"><span class="label-tiny text-outline block mb-2">Wedding date</span><input type="date" name="preferred_start_date" required class="r-field"></label>
+                    {% if cities %}<label class="block"><span class="label-tiny text-outline block mb-2">Pickup city</span><select name="pickup_city" class="r-field"><option value="">Choose city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>{% endif %}
+                </div>
+                <label class="block"><span class="label-tiny text-outline block mb-2">Cars required</span>
+                    <select name="message" class="r-field">
+                        <option value="Wedding car enquiry: 1 car (bridal)">1 (bridal)</option>
+                        <option value="Wedding car enquiry: 2 cars (bridal + groom)">2 (bridal + groom)</option>
+                        <option value="Wedding car enquiry: 3 or more cars (family convoy)">3+ (family convoy)</option>
+                    </select>
+                </label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="block"><span class="label-tiny text-outline block mb-2">Your name</span><input type="text" name="name" required autocomplete="name" class="r-field"></label>
+                    <label class="block"><span class="label-tiny text-outline block mb-2">Phone</span><input type="tel" name="phone" required autocomplete="tel" class="r-field" placeholder="+91 "></label>
+                </div>
+                <button type="submit" class="m-shine w-full bg-primary-container text-on-primary py-4 rounded-full label-tiny hover:opacity-90 flex items-center justify-center gap-3">Send wedding enquiry <span class="material-symbols-outlined text-base">arrow_forward</span></button>
+            </form>
+        </div>
+    </section>
+
+    <div class="road-gap sm" data-stop="Just married" data-stop-end></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}{% include "public/themes/route/_js.html" %}{% endblock %}

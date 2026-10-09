@@ -1,0 +1,23 @@
+{% load vehicle_tags %}{% comment %}
+Wedding tier tile. Include with cars (the tier's vehicles), name, line, icon, tone = glass | dark | lime.
+The "from" price is the lowest listed day rate among the tier's cars.
+{% endcomment %}
+{% with first=cars.0 low=cars|dictsort:"price_per_day"|first %}
+<div class="tile p-3 flex flex-col lift {% if tone == 'dark' %}bg-[#141611] text-white{% elif tone == 'lime' %}bg-primary-fixed text-primary{% else %}b-glass{% endif %}">
+    <a href="{{ first.get_absolute_url }}" class="relative rounded-[22px] overflow-hidden aspect-[4/3] grid place-items-center group {% if tone == 'dark' %}bg-white/5{% else %}bg-surface-container{% endif %}" data-no-parallax aria-label="{{ first.brand }} {{ first.name }}">
+        {% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] group-hover:scale-110" loading="lazy"/>{% else %}<span class="material-symbols-outlined text-[72px] {% if tone == 'dark' %}text-white/20{% else %}text-outline-variant{% endif %}" aria-hidden="true">{{ icon }}</span>{% endif %}
+        <span class="absolute top-3 left-3 b-glass rounded-full px-3 py-1.5 label-tiny text-primary flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]" aria-hidden="true">{{ icon }}</span>{{ name }}</span>
+    </a>
+    <div class="px-3 pt-5 pb-3 flex-1 flex flex-col gap-4">
+        <h3 class="font-extrabold text-2xl sm:text-3xl tracking-tight {% if tone == 'glass' %}text-primary{% endif %}">{{ line }}</h3>
+        <ul class="grid gap-1.5" role="list">
+            {% for v in cars|slice:":3" %}
+            <li><a href="{{ v.get_absolute_url }}" class="flex items-center justify-between gap-3 rounded-2xl px-4 py-2.5 text-sm font-bold transition-colors {% if tone == 'dark' %}bg-white/10 hover:bg-white/20{% else %}bg-white/80 hover:bg-white{% endif %}"><span class="truncate">{{ v.brand }} {{ v.name }}</span><span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_outward</span></a></li>
+            {% endfor %}
+        </ul>
+        {% if low and low.price_per_day %}
+        <div class="mt-auto flex items-baseline gap-2"><span class="label-tiny {% if tone == 'dark' %}text-white/60{% else %}text-outline{% endif %}">From</span><span class="font-extrabold text-3xl tracking-tight {% if tone == 'dark' %}text-primary-fixed{% else %}text-primary{% endif %}">{{ low.price_per_day|inr }}</span><span class="text-sm font-semibold {% if tone == 'dark' %}text-white/60{% else %}text-on-surface-variant{% endif %}">/ day</span></div>
+        {% endif %}
+    </div>
+</div>
+{% endwith %}

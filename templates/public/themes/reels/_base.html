@@ -1,0 +1,14 @@
+{% extends "public/base_public.html" %}
+{% load static %}
+{% comment %}Layout for every Showroom Reels inner page: the home page's stylesheet and script plus the inner-page layer.{% endcomment %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'themes/reels/reels.css' %}"/><link rel="stylesheet" href="{% static 'themes/reels/inner.css' %}"/>{% endblock %}
+{% block main_class %}{% endblock %}
+
+{% block content %}
+<div class="rx" data-no-parallax>
+{% block page %}{% endblock %}
+</div>
+{% endblock %}
+
+{% block extra_js %}<script defer src="{% static 'themes/reels/reels.js' %}"></script><script defer src="{% static 'themes/reels/inner.js' %}"></script>{% endblock %}

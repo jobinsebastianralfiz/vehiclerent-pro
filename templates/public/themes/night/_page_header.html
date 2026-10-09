@@ -1,0 +1,23 @@
+{% comment %}
+Night Drive page header. Include with:
+  kicker, title, lede (optional), img (optional url), stat + stat_label (optional), tall (optional, any value)
+{% endcomment %}
+<header class="nd-hero {% if tall %}min-h-[70svh] flex items-end{% endif %}" data-nd-beam data-no-parallax>
+  {% if img %}<img class="nd-hero-img" src="{{ img }}" alt=""/>{% endif %}
+  <div class="nd-hero-grid" aria-hidden="true"></div>
+  <div class="nd-hero-beam" aria-hidden="true"></div>
+  {% if img %}<div class="nd-hero-shade" aria-hidden="true"></div>{% endif %}
+  <div class="relative z-10 w-full px-4 sm:px-12 max-w-screen-2xl mx-auto pt-32 sm:pt-40 pb-14 sm:pb-20 flex flex-col md:flex-row md:items-end md:justify-between gap-10">
+    <div class="max-w-3xl space-y-6">
+      <span class="label-tiny text-primary-container flex items-center gap-3" data-intro="0"><i class="w-8 h-px bg-primary-container inline-block"></i>{{ kicker }}</span>
+      <h1 class="nd-display text-5xl sm:text-7xl lg:text-[96px] text-on-surface break-words" data-intro="1" data-intro-kind="split">{{ title }}</h1>
+      {% if lede %}<p class="text-lg text-on-surface-variant max-w-xl leading-relaxed font-light" data-intro="3">{{ lede }}</p>{% endif %}
+    </div>
+    {% if stat %}
+    <div class="shrink-0 md:text-right" data-intro="4" data-intro-kind="pop">
+      <div class="nd-display text-7xl sm:text-8xl nd-glow-text leading-none"><span data-slot>{{ stat }}</span></div>
+      <div class="label-tiny text-on-surface-variant mt-3">{{ stat_label }}</div>
+    </div>
+    {% endif %}
+  </div>
+</header>

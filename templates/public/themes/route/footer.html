@@ -1,0 +1,68 @@
+{% load vehicle_tags %}
+{% comment %}Kerala Route footer: the end of the road. Teal-deep, a postmark, the same links as the shared footer.{% endcomment %}
+<footer class="relative bg-[#0f2e2c] text-[#f7f0e3] mt-16 sm:mt-24 overflow-hidden" id="contact" role="contentinfo" aria-label="Site footer">
+    <div class="absolute inset-0 pointer-events-none opacity-60" style="background:radial-gradient(40% 60% at 100% 0%,rgba(227,155,60,.35),transparent 70%)"></div>
+    <div class="h-[10px] w-full" style="background:repeating-linear-gradient(90deg,#f2c14e 0 22px,transparent 22px 40px);opacity:.55" aria-hidden="true"></div>
+    <div class="relative px-4 sm:px-12 max-w-screen-2xl mx-auto pt-14 sm:pt-20 pb-10">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr] gap-10 sm:gap-12">
+            <div class="sm:col-span-2 lg:col-span-1">
+                <a href="{% url 'home' %}" class="inline-flex items-center gap-3" aria-label="{{ BUSINESS_NAME }} - Home">
+                    {% if SITE_CONFIG.logo %}<span class="bg-[#fffaf0] rounded-2xl px-3 py-2"><img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-10 sm:h-12"/></span>{% else %}<span class="material-symbols-outlined text-[#e39b3c] text-3xl" style="font-variation-settings:'FILL' 1" aria-hidden="true">signpost</span>{% endif %}
+                    {% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}<span class="font-serif font-bold text-2xl">{{ BUSINESS_NAME }}</span>{% endif %}
+                </a>
+                <p class="text-[#f7f0e3]/70 text-sm leading-relaxed mt-6 max-w-sm">{{ SITE_CONFIG.footer_text|default:"Premium vehicle rental service. Flexible daily, weekly & monthly plans for cars, SUVs, bikes and more." }}</p>
+                {% if SITE_CONFIG.facebook_url or SITE_CONFIG.instagram_url or SITE_CONFIG.youtube_url or SITE_CONFIG.twitter_url %}
+                <div class="flex gap-2 mt-6">
+                    {% if SITE_CONFIG.facebook_url %}<a href="{{ SITE_CONFIG.facebook_url }}" target="_blank" rel="noopener" class="w-10 h-10 rounded-full border border-[#f7f0e3]/20 grid place-items-center hover:bg-[#e39b3c] hover:text-[#0f2e2c] hover:border-[#e39b3c] transition-colors label-tiny" aria-label="Facebook">Fb</a>{% endif %}
+                    {% if SITE_CONFIG.instagram_url %}<a href="{{ SITE_CONFIG.instagram_url }}" target="_blank" rel="noopener" class="w-10 h-10 rounded-full border border-[#f7f0e3]/20 grid place-items-center hover:bg-[#e39b3c] hover:text-[#0f2e2c] hover:border-[#e39b3c] transition-colors label-tiny" aria-label="Instagram">Ig</a>{% endif %}
+                    {% if SITE_CONFIG.youtube_url %}<a href="{{ SITE_CONFIG.youtube_url }}" target="_blank" rel="noopener" class="w-10 h-10 rounded-full border border-[#f7f0e3]/20 grid place-items-center hover:bg-[#e39b3c] hover:text-[#0f2e2c] hover:border-[#e39b3c] transition-colors label-tiny" aria-label="YouTube">Yt</a>{% endif %}
+                    {% if SITE_CONFIG.twitter_url %}<a href="{{ SITE_CONFIG.twitter_url }}" target="_blank" rel="noopener" class="w-10 h-10 rounded-full border border-[#f7f0e3]/20 grid place-items-center hover:bg-[#e39b3c] hover:text-[#0f2e2c] hover:border-[#e39b3c] transition-colors label-tiny" aria-label="X / Twitter">X</a>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <nav aria-label="Fleet">
+                <h2 class="label-tiny text-[#e39b3c] mb-6">Fleet</h2>
+                <ul class="space-y-3.5 text-sm text-[#f7f0e3]/75" role="list">
+                    <li><a class="hover:text-[#e39b3c] transition-colors" href="{% url 'vehicle_list' %}?type=car">Cars</a></li>
+                    <li><a class="hover:text-[#e39b3c] transition-colors" href="{% url 'vehicle_list' %}?type=suv">SUVs</a></li>
+                    <li><a class="hover:text-[#e39b3c] transition-colors" href="{% url 'vehicle_list' %}?type=bike">Bikes</a></li>
+                    <li><a class="hover:text-[#e39b3c] transition-colors" href="{% url 'premium_cars' %}">Premium</a></li>
+                    <li><a class="hover:text-[#e39b3c] transition-colors" href="{% url 'wedding_cars' %}">Wedding cars</a></li>
+                    <li><a class="hover:text-[#e39b3c] transition-colors" href="{% url 'vehicle_list' %}">View all</a></li>
+                </ul>
+            </nav>
+
+            <nav aria-label="Support">
+                <h2 class="label-tiny text-[#e39b3c] mb-6">Support</h2>
+                <ul class="space-y-3.5 text-sm text-[#f7f0e3]/75" role="list">
+                    <li><a class="hover:text-[#e39b3c] transition-colors" href="{% url 'about' %}">About us</a></li>
+                    <li><a class="hover:text-[#e39b3c] transition-colors" href="{% url 'faq' %}">FAQ</a></li>
+                    <li><a class="hover:text-[#e39b3c] transition-colors" href="{% url 'contact' %}">Contact us</a></li>
+                    <li><a class="hover:text-[#e39b3c] transition-colors" href="{% url 'terms' %}">Terms of Service</a></li>
+                    <li><a class="hover:text-[#e39b3c] transition-colors" href="{% url 'privacy' %}">Privacy Policy</a></li>
+                </ul>
+            </nav>
+
+            <div>
+                <h2 class="label-tiny text-[#e39b3c] mb-6">Get in touch</h2>
+                <ul class="space-y-4 text-sm" role="list">
+                    {% if BUSINESS_PHONE %}<li><a href="tel:{{ BUSINESS_PHONE }}" class="flex items-center gap-3 hover:text-[#e39b3c] transition-colors"><span class="material-symbols-outlined text-lg text-[#e39b3c]" aria-hidden="true">call</span>{{ BUSINESS_PHONE }}</a></li>{% endif %}
+                    {% if BUSINESS_EMAIL %}<li><a href="mailto:{{ BUSINESS_EMAIL }}" class="flex items-center gap-3 hover:text-[#e39b3c] transition-colors break-all"><span class="material-symbols-outlined text-lg text-[#e39b3c]" aria-hidden="true">mail</span>{{ BUSINESS_EMAIL }}</a></li>{% endif %}
+                    {% if WHATSAPP_NUMBER %}<li><a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="flex items-center gap-3 hover:text-[#25D366] transition-colors"><span class="material-symbols-outlined text-lg text-[#e39b3c]" aria-hidden="true">chat</span>WhatsApp</a></li>{% endif %}
+                    {% if BUSINESS_ADDRESS %}<li class="flex items-start gap-3 text-[#f7f0e3]/75"><span class="material-symbols-outlined text-lg text-[#e39b3c]" aria-hidden="true">location_on</span><address class="not-italic">{{ BUSINESS_ADDRESS }}</address></li>{% endif %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="mt-14 pt-8 border-t border-dashed border-[#f7f0e3]/15 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <p class="text-xs text-[#f7f0e3]/55 text-center sm:text-left">&copy; {% now "Y" %} {{ BUSINESS_NAME }}. All rights reserved.</p>
+            <div class="flex items-center gap-1.5" role="group" aria-label="Text size">
+                <button type="button" onclick="document.documentElement.style.fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) + 1 + 'px'" aria-label="Increase text size" class="w-8 h-8 rounded-full border border-[#f7f0e3]/20 hover:bg-[#f7f0e3]/10 grid place-items-center text-xs font-bold">A+</button>
+                <button type="button" onclick="document.documentElement.style.fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) - 1 + 'px'" aria-label="Decrease text size" class="w-8 h-8 rounded-full border border-[#f7f0e3]/20 hover:bg-[#f7f0e3]/10 grid place-items-center text-[10px] font-bold">A-</button>
+                <button type="button" onclick="document.documentElement.style.fontSize = ''" aria-label="Reset text size" class="w-8 h-8 rounded-full border border-[#f7f0e3]/20 hover:bg-[#f7f0e3]/10 grid place-items-center"><span class="material-symbols-outlined text-sm" aria-hidden="true">restart_alt</span></button>
+            </div>
+            <svg viewBox="0 0 120 120" class="w-16 h-16 text-[#e39b3c]/60 hidden sm:block" aria-hidden="true"><defs><path id="pmft" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs><circle cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="60" cy="60" r="34" fill="none" stroke="currentColor" stroke-width="1.5"/><text fill="currentColor" font-size="11" font-weight="700" letter-spacing="4"><textPath href="#pmft">KERALA · INDIA · KERALA · INDIA ·</textPath></text><path d="M44 60h32M48 52h24M48 68h24" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+    </div>
+</footer>

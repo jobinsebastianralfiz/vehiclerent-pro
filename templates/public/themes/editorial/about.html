@@ -1,0 +1,159 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}{{ config.about_title }} - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Learn about {{ BUSINESS_NAME }}. Our mission, vision, licenses, and the team behind your trusted vehicle rental service.{% endblock %}
+
+{% block extra_css %}{% include "public/themes/editorial/_styles.html" %}{% endblock %}
+
+{% block content %}
+{% with about_body=config.about_content|striptags|cut:"&nbsp;"|wordcount license_body=config.license_details|striptags|cut:"&nbsp;"|wordcount %}
+<!-- ─── Hero ─── -->
+<section id="ed-about-hero" class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 pb-16 lg:pt-14 lg:pb-28 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+    <div class="lg:w-1/2 space-y-8 w-full">
+        <span class="label-tiny text-primary-container block" data-intro="0">About us</span>
+        <h1 class="display-hero text-5xl sm:text-7xl lg:text-[96px] text-primary" data-intro="1" data-intro-kind="split">{{ config.about_title|default:"About Us" }}</h1>
+        {% if config.tagline %}<p class="headline-md text-xl sm:text-2xl text-on-surface-variant font-normal italic" data-intro="2">{{ config.tagline }}</p>{% endif %}
+        <div class="flex flex-wrap gap-4 sm:gap-6" data-intro="3">
+            <a href="{% url 'vehicle_list' %}" class="bg-primary-container text-on-primary px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold">Browse the fleet <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
+            <a href="{% url 'contact' %}" class="border border-outline-variant px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold hover:bg-surface-container-low transition-colors">Contact us</a>
+        </div>
+    </div>
+    <div class="lg:w-1/2 w-full">
+        <div class="m-hero-media h-[380px] sm:h-[520px] lg:h-[620px] rounded-[3rem] bg-surface-container-high" data-intro="4" data-intro-kind="media">
+            {% if config.about_image %}
+            <img src="{{ config.about_image.url }}" alt="About {{ BUSINESS_NAME }}" class="w-full h-full object-cover"/>
+            {% elif config.hero_image %}
+            <img src="{{ config.hero_image.url }}" alt="" class="w-full h-full object-cover"/>
+            {% else %}
+            <img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="" class="w-full h-full object-cover"/>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- ─── Story ─── -->
+<section class="px-4 sm:px-12 py-16 lg:py-24 max-w-screen-2xl mx-auto grid lg:grid-cols-12 gap-10 lg:gap-20 border-t border-outline-variant/40">
+    <div class="lg:col-span-4">
+        <span class="label-tiny text-primary-container block">Our story</span>
+        <h2 class="headline-lg text-4xl sm:text-5xl mt-4">{{ BUSINESS_NAME }}</h2>
+    </div>
+    <div class="lg:col-span-8 ed-prose text-lg sm:text-xl text-on-surface-variant leading-relaxed font-light" data-reveal>
+        {% if about_body %}
+        {{ config.about_content|safe }}
+        {% else %}
+        <p>{{ BUSINESS_NAME }} rents cars across Kerala, self-drive or with a driver, for a day, a week or a month. Browse the fleet, tell us your dates and we'll take care of the rest.</p>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ─── Numbers (only what the business has filled in) ─── -->
+{% if config.years_in_business or config.total_happy_customers %}
+<section class="py-16 lg:py-24 bg-[#1f2e00] text-white">
+    <div class="px-4 sm:px-12 max-w-screen-2xl mx-auto flex flex-wrap justify-center gap-x-20 gap-y-12 text-center" data-deal>
+        {% if config.years_in_business %}
+        <div><div class="font-serif font-bold text-6xl sm:text-8xl text-[#d4eca2] leading-none"><span data-slot>{{ config.years_in_business }}</span>+</div><div class="label-tiny text-white/60 mt-4">Years on the road</div></div>
+        {% endif %}
+        {% if config.total_happy_customers %}
+        <div><div class="font-serif font-bold text-6xl sm:text-8xl text-[#d4eca2] leading-none"><span data-slot>{{ config.total_happy_customers }}</span>+</div><div class="label-tiny text-white/60 mt-4">Happy customers</div></div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── Mission & vision ─── -->
+{% if config.about_mission or config.about_vision %}
+<section class="px-4 sm:px-12 py-20 lg:py-32 max-w-screen-2xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10" data-deal>
+        {% if config.about_mission %}
+        <article class="bg-surface-container-low rounded-[2.5rem] p-8 sm:p-12" data-tilt>
+            <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center mb-8"><span class="material-symbols-outlined" aria-hidden="true">flag</span></span>
+            <span class="label-tiny text-primary-container block mb-3">Our mission</span>
+            <p class="headline-md text-2xl sm:text-3xl font-normal leading-snug">{{ config.about_mission }}</p>
+        </article>
+        {% endif %}
+        {% if config.about_vision %}
+        <article class="bg-surface-container-low rounded-[2.5rem] p-8 sm:p-12" data-tilt>
+            <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center mb-8"><span class="material-symbols-outlined" aria-hidden="true">visibility</span></span>
+            <span class="label-tiny text-primary-container block mb-3">Our vision</span>
+            <p class="headline-md text-2xl sm:text-3xl font-normal italic leading-snug">{{ config.about_vision }}</p>
+        </article>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── Services marquee ─── -->
+<section class="py-12 lg:py-20" aria-label="Services">
+    <div class="m-marquee" data-marquee style="--dur:45s">
+        <div class="m-marquee-track items-center font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-primary whitespace-nowrap">
+            <span>Self-drive</span><span class="material-symbols-outlined text-primary-fixed-dim text-4xl" aria-hidden="true">asterisk</span>
+            <span class="italic font-normal text-on-surface-variant">Chauffeur driven</span><span class="material-symbols-outlined text-primary-fixed-dim text-4xl" aria-hidden="true">asterisk</span>
+            <span>Wedding cars</span><span class="material-symbols-outlined text-primary-fixed-dim text-4xl" aria-hidden="true">asterisk</span>
+            <span class="italic font-normal text-on-surface-variant">Airport transfers</span><span class="material-symbols-outlined text-primary-fixed-dim text-4xl" aria-hidden="true">asterisk</span>
+            <span>Monthly plans</span><span class="material-symbols-outlined text-primary-fixed-dim text-4xl" aria-hidden="true">asterisk</span>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Licence ─── -->
+{% if config.license_number or license_body %}
+<section class="px-4 sm:px-12 py-20 lg:py-28 bg-surface-container-low">
+    <div class="max-w-4xl mx-auto text-center">
+        <span class="material-symbols-outlined text-5xl text-primary-container mb-6 block" aria-hidden="true">verified</span>
+        <span class="label-tiny text-primary-container block">Registration</span>
+        <h2 class="headline-lg text-4xl sm:text-5xl mt-4 mb-6">Licensed & certified.</h2>
+        {% if config.license_number %}<p class="font-serif text-xl text-on-surface-variant">Registration no. <strong class="text-primary">{{ config.license_number }}</strong></p>{% endif %}
+        {% if license_body %}<div class="ed-prose text-on-surface-variant leading-relaxed mt-8 text-left max-w-2xl mx-auto">{{ config.license_details|safe }}</div>{% endif %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── Testimonials ─── -->
+{% if testimonials %}
+<section class="px-4 sm:px-12 py-24 lg:py-40 max-w-6xl mx-auto text-center">
+    <span class="material-symbols-outlined text-primary-container text-6xl mb-8 block" data-reveal aria-hidden="true">format_quote</span>
+    <p class="headline-lg text-3xl sm:text-5xl italic leading-tight text-primary" data-scrub-text data-no-split>"{{ testimonials.0.quote }}"</p>
+    <div class="mt-10 flex flex-col items-center" data-reveal>
+        <div class="font-bold text-lg">{{ testimonials.0.name }}</div>
+        {% if testimonials.0.role %}<div class="label-tiny opacity-60 mt-2">{{ testimonials.0.role }}</div>{% endif %}
+    </div>
+</section>
+{% if testimonials|length > 1 %}
+<section class="px-4 sm:px-12 pb-20 lg:pb-32 max-w-screen-2xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8" data-deal>
+        {% for t in testimonials|slice:"1:" %}
+        <figure class="bg-surface-container-low rounded-[2rem] p-8 flex flex-col" data-tilt>
+            {% if t.rating %}<div class="flex gap-0.5 text-primary-container mb-5" aria-label="{{ t.rating }} out of 5">{% for i in "12345" %}<span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' {% if forloop.counter <= t.rating %}1{% else %}0{% endif %}" aria-hidden="true">star</span>{% endfor %}</div>{% endif %}
+            <blockquote class="font-serif text-lg italic leading-relaxed text-on-surface flex-1">"{{ t.quote }}"</blockquote>
+            <figcaption class="flex items-center gap-3 mt-6 pt-6 border-t border-outline-variant/40">
+                {% if t.photo %}<img src="{{ t.photo.url }}" alt="" class="w-11 h-11 rounded-full object-cover" loading="lazy"/>{% else %}<span class="w-11 h-11 rounded-full bg-primary-fixed text-primary grid place-items-center font-bold">{{ t.name|first }}</span>{% endif %}
+                <span><span class="font-bold block">{{ t.name }}</span>{% if t.role %}<span class="label-tiny text-outline">{{ t.role }}</span>{% endif %}</span>
+            </figcaption>
+        </figure>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endif %}
+
+<!-- ─── CTA ─── -->
+<section class="px-4 sm:px-12 pb-20 lg:pb-28 max-w-screen-2xl mx-auto">
+    <div class="rounded-[2.5rem] lg:rounded-[3.5rem] bg-surface-container-high p-8 sm:p-14 lg:p-20 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10">
+        <div>
+            <span class="label-tiny text-primary-container block">Ready when you are</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl mt-4">Ready to hit the road?</h2>
+        </div>
+        <div class="flex flex-wrap gap-4">
+            <a href="{% url 'vehicle_list' %}" class="bg-primary-container text-on-primary px-10 py-5 rounded-full font-bold inline-flex items-center gap-3 m-shine">Browse the fleet <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
+            <a href="{% url 'contact' %}" class="border border-outline-variant px-10 py-5 rounded-full font-bold hover:bg-surface-container-low transition-colors">Contact us</a>
+        </div>
+    </div>
+</section>
+
+<!-- ─── Wordmark ─── -->
+<div class="px-4 sm:px-8 max-w-screen-2xl mx-auto overflow-hidden" aria-hidden="true">
+    <div class="font-serif font-bold text-primary leading-none tracking-tighter whitespace-nowrap text-center select-none pt-4" style="font-size: min(13vw, calc(160vw / {{ BUSINESS_NAME|length|default:10 }}))" data-split="chars">{{ BUSINESS_NAME }}</div>
+</div>
+{% endwith %}
+{% endblock %}

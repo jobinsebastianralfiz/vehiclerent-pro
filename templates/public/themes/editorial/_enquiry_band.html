@@ -1,0 +1,22 @@
+{% load static %}
+{% comment %}Dark olive enquiry band from the editorial home page. Include with kicker, title, lede (all optional).{% endcomment %}
+<section id="enquiry" class="px-4 sm:px-12 py-16 lg:py-24 max-w-screen-2xl mx-auto scroll-mt-28">
+    <div class="relative overflow-hidden rounded-[2.5rem] lg:rounded-[3.5rem] bg-[#1f2e00] text-white p-6 sm:p-14 lg:p-20 grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+        <div class="absolute -right-10 -top-10 -bottom-10 w-[55%] hidden md:grid grid-cols-2 gap-4 opacity-25 pointer-events-none" style="rotate:-10deg;-webkit-mask:linear-gradient(to right,transparent,#000 45%);mask:linear-gradient(to right,transparent,#000 45%)" aria-hidden="true">
+            <div class="m-runway-col">{% for i in "12" %}<img src="{% static 'themes/img/rolls-palms.jpg' %}" class="rounded-3xl aspect-[4/5] object-cover" alt=""><img src="{% static 'themes/img/wedding-venue.jpg' %}" class="rounded-3xl aspect-[4/5] object-cover" alt=""><img src="{% static 'themes/img/ambassador.jpg' %}" class="rounded-3xl aspect-[4/5] object-cover" alt="">{% endfor %}</div>
+            <div class="m-runway-col">{% for i in "12" %}<img src="{% static 'themes/img/palms.jpg' %}" class="rounded-3xl aspect-[4/5] object-cover" alt=""><img src="{% static 'themes/img/procession.jpg' %}" class="rounded-3xl aspect-[4/5] object-cover" alt=""><img src="{% static 'themes/img/suv-munnar.jpg' %}" class="rounded-3xl aspect-[4/5] object-cover" alt="">{% endfor %}</div>
+        </div>
+        <div class="relative z-10">
+            <span class="label-tiny text-[#b8cf88] block">{{ kicker|default:"Get in touch" }}</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl mt-4 mb-5">{{ title|default:"Send us an enquiry." }}</h2>
+            <p class="text-white/70 text-lg max-w-md font-light">{{ lede|default:"Tell us your dates and what you need. Our team will get back to you, or message us on WhatsApp for a faster reply." }}</p>
+            <div class="flex flex-wrap gap-x-8 gap-y-3 mt-8">
+                {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="inline-flex items-center gap-2 label-tiny text-white/80 hover:text-white"><span class="material-symbols-outlined text-base" aria-hidden="true">call</span>{{ BUSINESS_PHONE }}</a>{% endif %}
+                {% if BUSINESS_EMAIL %}<a href="mailto:{{ BUSINESS_EMAIL }}" class="inline-flex items-center gap-2 label-tiny text-white/80 hover:text-white normal-case tracking-normal text-sm font-semibold"><span class="material-symbols-outlined text-base" aria-hidden="true">mail</span>{{ BUSINESS_EMAIL }}</a>{% endif %}
+            </div>
+        </div>
+        <div class="ed-form relative z-10 bg-[#ffffff] text-[#1b1c17] rounded-3xl p-6 sm:p-8 shadow-2xl" data-reveal>
+            {% include "public/includes/enquiry_form.html" %}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,21 @@
+{% comment %}Booking search (same fields as the shared booking widget). Keeps the visitor's current choices on the fleet page.{% endcomment %}
+{% firstof current_rental_type request.GET.rental_type "" as rt %}{% firstof current_pickup_city request.GET.pickup_city "" as pc %}
+<form class="search" action="{% url 'vehicle_list' %}" method="get" aria-label="Search cars">
+  {% if extra_premium %}<input type="hidden" name="premium" value="1"/>{% endif %}
+  {% if extra_wedding %}<input type="hidden" name="wedding" value="1"/>{% endif %}
+  <div class="search-top">
+    <div class="chips" role="radiogroup" aria-label="Rental type">
+      <label class="chip"><input type="radio" name="rental_type" value="self_drive" class="sr-only"{% if rt != 'with_driver' %} checked{% endif %}/>Self-drive</label>
+      <label class="chip"><input type="radio" name="rental_type" value="with_driver" class="sr-only"{% if rt == 'with_driver' %} checked{% endif %}/>With driver</label>
+    </div>
+    <label class="same"><input type="checkbox" name="same_location" value="1"{% if request.GET.same_location != '0' %} checked{% endif %}/>Same location</label>
+  </div>
+  <div class="search-grid">
+    <label class="field"><span>Pickup city</span><select name="pickup_city"><option value="">Any city</option>{% for city in cities %}<option value="{{ city.slug }}"{% if pc == city.slug %} selected{% endif %}>{{ city.name }}</option>{% endfor %}</select></label>
+    <label class="field"><span>Drop city</span><select name="drop_city"><option value="">Same as pickup</option>{% for city in cities %}<option value="{{ city.slug }}"{% if request.GET.drop_city == city.slug %} selected{% endif %}>{{ city.name }}</option>{% endfor %}</select></label>
+    <label class="field"><span>Pickup date</span><input type="date" name="pickup_date" value="{{ request.GET.pickup_date }}"/></label>
+    <label class="field"><span>Return date</span><input type="date" name="return_date" value="{{ request.GET.return_date }}"/></label>
+    <button type="submit" class="btn btn-main" data-magnetic>Search cars <span class="material-symbols-outlined">arrow_forward</span></button>
+  </div>
+  <p class="search-note">Free cancellation · No hidden charges · 24×7 customer support</p>
+</form>

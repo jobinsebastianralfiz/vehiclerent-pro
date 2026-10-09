@@ -1,0 +1,35 @@
+<script>
+/* Night Drive inner pages: page-header headlight follows the cursor; dashboard rings fill. */
+document.addEventListener("motion:ready", function (ev) {
+  var G = ev.detail.G;
+  var fine = matchMedia("(pointer: fine)").matches;
+  document.querySelectorAll("[data-nd-beam]").forEach(function (h) {
+    var b = { x: 110, y: 20 };
+    var paint = function () { h.style.setProperty("--bx", b.x + "%"); h.style.setProperty("--by", b.y + "%"); };
+    G.to(b, { x: 70, y: 40, duration: 1.8, delay: .2, ease: "power3.out", onUpdate: paint });
+    if (!fine) return;
+    var qx = G.quickTo(b, "x", { duration: 1.2, ease: "power3", onUpdate: paint });
+    var qy = G.quickTo(b, "y", { duration: 1.2, ease: "power3", onUpdate: paint });
+    h.addEventListener("pointermove", function (e) {
+      var r = h.getBoundingClientRect();
+      qx(((e.clientX - r.left) / r.width) * 100); qy(((e.clientY - r.top) / r.height) * 100);
+    });
+  });
+  G.utils.toArray("[data-nd-rings]").forEach(function (sec) {
+    G.to(sec.querySelectorAll(".ring-fg"), { strokeDashoffset: 0, duration: 1.6, ease: "power3.out", stagger: .15, scrollTrigger: { trigger: sec, start: "clamp(top 70%)", once: true } });
+  });
+  var spot = document.querySelector(".spot");
+  if (spot) {
+    var sp = { r: 0 };
+    G.to(sp, { r: 78, ease: "none", onUpdate: function () { spot.style.setProperty("--sr", sp.r + "%"); },
+      scrollTrigger: { trigger: spot, start: "top 85%", end: "center 45%", scrub: .8 } });
+  }
+  var cards = G.utils.toArray(".stack-card");
+  cards.forEach(function (c, i) {
+    var im = c.querySelector("img");
+    if (im) G.fromTo(im, { scale: 1.2 }, { scale: 1, ease: "none", scrollTrigger: { trigger: c, start: "top bottom", end: "top 20%", scrub: true } });
+    if (i === cards.length - 1) return;
+    G.to(c, { scale: .92, opacity: .45, ease: "none", scrollTrigger: { trigger: cards[i + 1], start: "top bottom", end: "top 20%", scrub: true } });
+  });
+});
+</script>

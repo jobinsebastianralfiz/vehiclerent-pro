@@ -1,8 +1,9 @@
 """Public-site themes. The admin picks one in Site Settings (SiteConfig.theme).
 
-Each theme has its own home page at templates/public/themes/<key>/home.html.
-Every other public page shares one layout and takes the theme's colour tokens
-and fonts, which base.html feeds into the Tailwind config.
+Each theme can override any public page, navbar or footer by putting a
+template of the same name in templates/public/themes/<key>/; pages it does not
+override fall back to templates/public/ and take the theme's colour tokens and
+fonts, which base.html feeds into the Tailwind config.
 """
 
 DEFAULT_THEME = "editorial"
@@ -102,3 +103,10 @@ def active_theme(request, config):
             request.session.pop("theme_preview", None)
         return get_theme(request.session.get("theme_preview") or saved)
     return get_theme(saved)
+
+
+def themed(request, name):
+    """Template candidates for a public page: the active theme's version first, then the shared one."""
+    from .models import SiteConfig
+    key = active_theme(request, SiteConfig.load())["key"]
+    return [f"public/themes/{key}/{name}", f"public/{name}"]

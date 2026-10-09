@@ -1,0 +1,83 @@
+{% extends "public/base_public.html" %}
+{% load vehicle_tags %}
+{% comment %}Kerala Route · FAQ. Each question is a ticket: a teal stub with its number, the answer behind a perforation.{% endcomment %}
+
+{% block title %}Frequently Asked Questions - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Frequently asked questions about {{ BUSINESS_NAME }} vehicle rentals. Find answers about booking, documents, cancellation, deposits, and more.{% endblock %}
+
+{% block structured_data %}
+{{ block.super }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {% for item in faq_items %}
+        {
+            "@type": "Question",
+            "name": "{{ item.q }}",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "{{ item.a }}"
+            }
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endblock %}
+
+{% block extra_css %}{% include "public/themes/route/_assets.html" %}{% endblock %}
+
+{% block content %}
+<section class="r-glow">
+    <div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 lg:pt-12 pb-12">
+        {% include "public/themes/route/_trail.html" with here="FAQ" %}
+        <div class="max-w-3xl">
+            <span class="label-tiny text-[#d9692f] flex items-center gap-3" data-intro="1"><span class="w-8 h-px bg-[#d9692f]"></span>Travel desk</span>
+            <h1 class="display-hero text-5xl sm:text-7xl lg:text-[88px] text-tertiary mt-5" data-intro="2" data-intro-kind="split">Before you set off.</h1>
+            <p class="text-lg text-on-surface-variant max-w-xl leading-relaxed font-light mt-6" data-intro="3">Quick answers to common questions about renting with us. Can't find what you're looking for? <a href="{% url 'contact' %}" class="text-[#d9692f] font-semibold hover:underline">Contact us</a>.</p>
+        </div>
+        {% include "public/themes/route/_strip.html" %}
+    </div>
+</section>
+
+<div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pb-24 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-10 lg:gap-14 items-start">
+    <div class="space-y-4" data-deal>
+        {% for item in faq_items %}
+        <div x-data="{ open: {% if forloop.first %}true{% else %}false{% endif %} }" class="bg-surface-container-lowest rounded-[1.5rem] shadow-lg shadow-black/5 border border-outline-variant/50 overflow-hidden">
+            <h2>
+                <button type="button" x-on:click="open = !open" class="w-full flex items-stretch text-left group" :aria-expanded="open.toString()" aria-controls="faq-{{ forloop.counter }}">
+                    <span class="shrink-0 w-16 sm:w-20 grid place-items-center transition-colors" :class="open ? 'bg-[#d9692f] text-white' : 'bg-tertiary text-[#fffaf0]'"><span class="text-center"><span class="block label-tiny opacity-70">Q</span><span class="block font-serif font-bold text-xl mt-1">{{ forloop.counter|stringformat:"02d" }}</span></span></span>
+                    <span class="flex-1 flex items-center justify-between gap-4 px-5 sm:px-7 py-5 border-l-2 border-dashed border-[#d6ccb5]">
+                        <span class="font-serif font-bold text-lg sm:text-xl text-tertiary group-hover:text-[#d9692f] transition-colors">{{ item.q }}</span>
+                        <span class="material-symbols-outlined text-[#e39b3c] transition-transform duration-300 shrink-0" :class="open ? 'rotate-45' : ''" aria-hidden="true">add</span>
+                    </span>
+                </button>
+            </h2>
+            <div id="faq-{{ forloop.counter }}" x-show="open" {% if not forloop.first %}x-cloak{% endif %} x-transition.opacity.duration.300ms>
+                <div class="tk-perf !mx-6" style="--r-notch: var(--page-bg)"></div>
+                <div class="px-6 sm:px-8 py-6 sm:pl-28 text-on-surface-variant leading-relaxed [&_a]:!text-[#d9692f] [&_a]:font-semibold">{{ item.a|safe }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <aside class="lg:sticky lg:top-28">
+        <div class="pc-back p-7 sm:p-8 rotate-[1deg]">
+            <div class="flex items-start justify-between gap-4">
+                <span class="label-tiny text-[#d9692f]">Still have questions?</span>
+                <svg viewBox="0 0 120 120" class="w-20 h-20 text-[#d9692f]/70 shrink-0" aria-hidden="true"><defs><path id="pmf" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs><circle cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="60" cy="60" r="34" fill="none" stroke="currentColor" stroke-width="1.5"/><text fill="currentColor" font-size="11" font-weight="700" letter-spacing="4"><textPath href="#pmf">KERALA · INDIA · KERALA · INDIA ·</textPath></text><path d="M44 60h32M48 52h24M48 68h24" stroke="currentColor" stroke-width="2"/></svg>
+            </div>
+            <p class="font-serif italic text-2xl leading-snug text-tertiary mt-2">Our team is happy to help. Write to us, call, or send a WhatsApp.</p>
+            <div class="flex flex-col gap-3 mt-7">
+                <a href="{% url 'contact' %}" class="bg-primary-container text-on-primary px-6 py-3.5 rounded-full label-tiny text-center flex items-center justify-center gap-2"><span class="material-symbols-outlined text-base">mail</span>Contact us</a>
+                {% if WHATSAPP_NUMBER %}<a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="bg-[#25D366] text-white px-6 py-3.5 rounded-full label-tiny text-center hover:opacity-90">WhatsApp us</a>{% endif %}
+                {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="border border-tertiary text-tertiary px-6 py-3.5 rounded-full label-tiny text-center hover:bg-tertiary hover:text-on-tertiary transition-colors">Call {{ BUSINESS_PHONE }}</a>{% endif %}
+            </div>
+        </div>
+    </aside>
+</div>
+{% endblock %}
+
+{% block extra_js %}{% include "public/themes/route/_js.html" %}{% endblock %}

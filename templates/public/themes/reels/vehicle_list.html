@@ -1,0 +1,125 @@
+{% extends "public/themes/reels/_base.html" %}
+{% load vehicle_tags %}
+
+{% block title %}{% if current_category and categories %}{% for c in categories %}{% if c.id|stringformat:'d' == current_category %}{{ c.meta_title|default:c.name }} | {{ BUSINESS_NAME }}{% endif %}{% endfor %}{% else %}Our Fleet | Car Rentals in Kerala — {{ BUSINESS_NAME }}{% endif %}{% endblock %}
+{% block meta_description %}{% if current_category and categories %}{% for c in categories %}{% if c.id|stringformat:'d' == current_category %}{{ c.meta_description|default:c.description|default:'Browse our fleet of '|add:c.name|add:' for rent in Kerala. Daily, weekly and monthly plans available.' }}{% endif %}{% endfor %}{% else %}Browse {{ total_count }} cars for rent across Kerala. Self-drive, chauffeur, wedding, premium SUVs and economy. Daily, weekly and monthly plans, doorstep delivery.{% endif %}{% endblock %}
+{% block meta_keywords %}{% if current_category and categories %}{% for c in categories %}{% if c.id|stringformat:'d' == current_category %}{{ c.meta_keywords|default:c.name|add:' rental Kerala, '|add:c.name|add:' for rent, '|add:c.name|add:' hire' }}{% endif %}{% endfor %}{% else %}car rental Kerala, self drive cars, SUV rental, sedan rental, hatchback rental, monthly car hire, Kochi car rental, Trivandrum, Kottayam, Calicut{% endif %}{% endblock %}
+
+{% block page %}
+<!-- ─── Header ─── -->
+<header class="phead">
+  <div class="phead-copy">
+    <span class="kicker" data-intro="0"><i></i>{% if search %}Results for “{{ search }}”{% else %}Our fleet{% endif %}</span>
+    <h1 class="phead-h" data-intro="1" data-intro-kind="split">{% if current_category and categories %}{% for c in categories %}{% if c.id|stringformat:'d' == current_category %}{{ c.name }}{% endif %}{% endfor %}{% else %}The fleet,{% endif %} <span class="ol">on a reel.</span></h1>
+    <p class="lede" data-intro="2">{{ total_count }} vehicle{{ total_count|pluralize }}{% if cities %} across {{ cities|length }} {{ cities|length|pluralize:"city,cities" }}{% endif %}. Pick a tile, check the price, send an enquiry.</p>
+  </div>
+  <div class="phead-count ct t-orange" data-intro="3" data-intro-kind="pop" data-tilt="0.5">
+    <b><span data-slot>{{ total_count }}</span></b>
+    <small>{% if current_category or search or current_type or current_fuel or current_transmission or current_brand or current_pickup_city %}Matching{% else %}In the fleet{% endif %}</small>
+  </div>
+</header>
+
+<!-- ─── Booking search ─── -->
+<section class="px-[var(--gut)]" data-reveal>{% include "public/themes/reels/_search.html" %}</section>
+
+<!-- ─── Category chips ─── -->
+<nav class="cat-strip" aria-label="Categories">
+  <div class="cat-track">
+    <a href="{% url 'vehicle_list' %}" class="chip"{% if not current_category %} aria-pressed="true"{% endif %}><span class="dot t-night"></span>All cars</a>
+    {% for cat in categories %}{% cycle 'orange' 'blue' 'green' 'silver' 'amber' 'red' 'violet' 'teal' as tone silent %}
+    <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="chip"{% if current_category == cat.id|stringformat:'d' %} aria-pressed="true"{% endif %}><span class="dot t-{{ tone }}"></span>{{ cat.name }}</a>
+    {% endfor %}
+  </div>
+</nav>
+
+<section class="sec fleet-sec">
+  <div class="wrap fleet-layout">
+    <!-- ─── Filters ─── -->
+    <aside class="filters" x-data="{ open: false }">
+      <button type="button" class="btn btn-line filters-toggle" @click="open = !open" :aria-expanded="open.toString()" aria-controls="filter-form">
+        <span class="material-symbols-outlined">tune</span><span x-text="open ? 'Hide filters' : 'Filters'">Filters</span>
+      </button>
+      <form id="filter-form" method="get" action="{% url 'vehicle_list' %}" class="filter-card" :class="open ? 'is-open' : ''">
+        {% if current_category %}<input type="hidden" name="category" value="{{ current_category }}"/>{% endif %}
+        {% if current_sort %}<input type="hidden" name="sort" value="{{ current_sort }}"/>{% endif %}
+        {% if current_rental_type %}<input type="hidden" name="rental_type" value="{{ current_rental_type }}"/>{% endif %}
+
+        <label class="field"><span>Refine search</span><input type="text" name="search" value="{{ search }}" placeholder="Brand or model"/></label>
+
+        <fieldset class="fgroup"><legend>Body type</legend>
+          <div class="fchips">
+            {% for val, label in vehicle_types %}<label class="chip"><input type="radio" name="type" value="{{ val }}" class="sr-only" {% if current_type == val %}checked{% endif %} onchange="this.form.submit()"/>{{ label }}</label>{% endfor %}
+          </div>
+        </fieldset>
+
+        <fieldset class="fgroup"><legend>Transmission</legend>
+          <div class="fchips">
+            {% for val, label in transmission_types %}<label class="chip"><input type="radio" name="transmission" value="{{ val }}" class="sr-only" {% if current_transmission == val %}checked{% endif %} onchange="this.form.submit()"/>{{ label }}</label>{% endfor %}
+          </div>
+        </fieldset>
+
+        <fieldset class="fgroup"><legend>Fuel</legend>
+          <div class="fchips">
+            {% for val, label in fuel_types %}<label class="chip"><input type="radio" name="fuel" value="{{ val }}" class="sr-only" {% if current_fuel == val %}checked{% endif %} onchange="this.form.submit()"/>{{ label }}</label>{% endfor %}
+          </div>
+        </fieldset>
+
+        {% if brands %}
+        <label class="field"><span>Brand</span><select name="brand" onchange="this.form.submit()"><option value="">All brands</option>{% for b in brands %}<option value="{{ b }}" {% if current_brand == b %}selected{% endif %}>{{ b }}</option>{% endfor %}</select></label>
+        {% endif %}
+
+        {% if cities %}
+        <label class="field"><span>Pickup city</span><select name="pickup_city" onchange="this.form.submit()"><option value="">Any city</option>{% for city in cities %}<option value="{{ city.slug }}" {% if current_pickup_city == city.slug %}selected{% endif %}>{{ city.name }}</option>{% endfor %}</select></label>
+        {% endif %}
+
+        <fieldset class="fgroup"><legend>Special</legend>
+          <div class="fchecks">
+            <label><input type="checkbox" name="premium" value="1" {% if request.GET.premium == '1' %}checked{% endif %} onchange="this.form.submit()"/>Premium / Luxury</label>
+            <label><input type="checkbox" name="wedding" value="1" {% if request.GET.wedding == '1' %}checked{% endif %} onchange="this.form.submit()"/>Wedding service</label>
+            <label><input type="checkbox" name="featured" value="1" {% if request.GET.featured == '1' %}checked{% endif %} onchange="this.form.submit()"/>Featured only</label>
+          </div>
+        </fieldset>
+
+        <div class="factions">
+          <button type="submit" class="btn btn-main">Apply filters <span class="material-symbols-outlined">arrow_forward</span></button>
+          <a href="{% url 'vehicle_list' %}" class="reset">Reset all</a>
+        </div>
+      </form>
+    </aside>
+
+    <!-- ─── Results ─── -->
+    <div class="results">
+      <div class="results-bar">
+        <span class="kicker"><i></i>Showing {{ page_obj|length }} of {{ total_count }}</span>
+        <form method="get" action="{% url 'vehicle_list' %}" id="sort-form" class="sort">
+          {% for k,v in request.GET.items %}{% if k != 'sort' and k != 'page' %}<input type="hidden" name="{{ k }}" value="{{ v }}"/>{% endif %}{% endfor %}
+          <label class="sort-field"><span>Sort</span>
+            <select name="sort" onchange="this.form.submit()">
+              <option value="-created" {% if current_sort == '-created' %}selected{% endif %}>Newest</option>
+              <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Price: Low to High</option>
+              <option value="-price" {% if current_sort == '-price' %}selected{% endif %}>Price: High to Low</option>
+              <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name: A–Z</option>
+            </select>
+          </label>
+        </form>
+      </div>
+
+      {% if page_obj %}
+      <div class="cards cards-2" id="cards">
+        {% for v in page_obj %}{% cycle 'orange' 'blue' 'green' 'silver' 'amber' 'red' as tone silent %}
+        {% include "public/themes/reels/_card.html" %}
+        {% endfor %}
+      </div>
+      {% include "public/themes/reels/_pagination.html" %}
+      {% else %}
+      <div class="ct empty t-silver">
+        <span class="material-symbols-outlined">search_off</span>
+        <h2 class="empty-h">No cars match that.</h2>
+        <p>Try fewer filters, or tell us what you need and we'll find it.</p>
+        <div class="ctas"><a href="{% url 'vehicle_list' %}" class="btn btn-main">Reset all filters <span class="material-symbols-outlined">arrow_forward</span></a><a href="{% url 'contact' %}" class="btn btn-line">Ask us</a></div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

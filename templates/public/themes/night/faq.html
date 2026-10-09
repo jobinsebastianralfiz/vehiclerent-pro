@@ -1,0 +1,77 @@
+{% extends "public/base_public.html" %}
+{% load vehicle_tags %}
+
+{% block title %}Frequently Asked Questions - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Frequently asked questions about {{ BUSINESS_NAME }} vehicle rentals. Find answers about booking, documents, cancellation, deposits, and more.{% endblock %}
+
+{% block structured_data %}
+{{ block.super }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {% for item in faq_items %}
+        {
+            "@type": "Question",
+            "name": "{{ item.q }}",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "{{ item.a }}"
+            }
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endblock %}
+
+{% block main_class %}{% endblock %}
+{% block extra_css %}
+{% include "public/themes/night/_styles.html" %}
+<style>
+  .nd-faq-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .5s cubic-bezier(.16,1,.3,1); }
+  .nd-faq-body > div { overflow: hidden; }
+  .nd-faq.open .nd-faq-body { grid-template-rows: 1fr; }
+  .nd-faq.open { border-color: rgba(212,236,162,.3); box-shadow: 0 30px 80px -40px rgba(184,207,136,.35); }
+  .nd-faq .nd-faq-icon { transition: transform .5s cubic-bezier(.16,1,.3,1), background-color .3s, color .3s; }
+  .nd-faq.open .nd-faq-icon { transform: rotate(45deg); background: #d4eca2; color: #141f00; }
+  .nd-faq-a a { color: #d4eca2 !important; }
+  @media (prefers-reduced-motion: reduce) { .nd-faq-body, .nd-faq .nd-faq-icon { transition: none; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<article class="nd" aria-label="Frequently Asked Questions">
+  {% include "public/themes/night/_page_header.html" with kicker="Help centre" title="Questions, answered." lede="Quick answers about booking, documents, deposits and more." stat=faq_items|length stat_label="Answers" %}
+
+  <div class="px-4 sm:px-12 py-20 lg:py-28 max-w-screen-2xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+    <aside class="lg:col-span-4 lg:sticky lg:top-28">
+      <span class="label-tiny text-primary-container block">Can't find it?</span>
+      <h2 class="nd-head text-3xl sm:text-4xl mt-4 mb-5 text-on-surface">Ask a real person.</h2>
+      <p class="text-on-surface-variant mb-8 font-light">Our team is happy to help. Reach out on WhatsApp, email or phone.</p>
+      <div class="flex flex-col sm:flex-row lg:flex-col gap-3">
+        <a href="{% url 'contact' %}" class="m-shine m-btn bg-primary text-on-primary px-8 py-4 rounded-full font-bold inline-flex items-center justify-center gap-2"><span class="material-symbols-outlined text-lg" aria-hidden="true">mail</span> Contact Us</a>
+        {% if WHATSAPP_NUMBER %}<a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="m-btn bg-[#25D366] text-[#06210f] px-8 py-4 rounded-full font-bold inline-flex items-center justify-center gap-2 hover:opacity-90"><span class="material-symbols-outlined text-lg" aria-hidden="true">chat</span> WhatsApp Us</a>{% endif %}
+      </div>
+    </aside>
+
+    <div class="lg:col-span-8 space-y-3" role="list" data-deal>
+      {% for item in faq_items %}
+      <div x-data="{ open: {% if forloop.first %}true{% else %}false{% endif %} }" :class="open && 'open'" class="nd-faq glow rounded-3xl {% if forloop.first %}open{% endif %}" role="listitem">
+        <button type="button" @click="open = !open" class="w-full flex items-center gap-4 sm:gap-6 px-5 sm:px-8 py-5 sm:py-6 text-left" aria-controls="nd-faq-{{ forloop.counter }}" :aria-expanded="open.toString()" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}">
+          <span class="font-serif text-primary/70 text-sm shrink-0 w-6">{{ forloop.counter|stringformat:"02d" }}</span>
+          <h3 class="nd-head text-lg sm:text-xl text-on-surface flex-1">{{ item.q }}</h3>
+          <span class="nd-faq-icon w-10 h-10 rounded-full border border-primary/30 text-primary grid place-items-center shrink-0" aria-hidden="true"><span class="material-symbols-outlined">add</span></span>
+        </button>
+        <div id="nd-faq-{{ forloop.counter }}" class="nd-faq-body">
+          <div><div class="nd-faq-a px-5 sm:px-8 pb-6 sm:pl-[5.5rem] text-on-surface-variant leading-relaxed font-light">{{ item.a|safe }}</div></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</article>
+{% endblock %}
+
+{% block extra_js %}{% include "public/themes/night/_scripts.html" %}{% endblock %}

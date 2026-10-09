@@ -1,0 +1,93 @@
+{% extends "public/themes/reels/_base.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}{{ config.about_title }} - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Learn about {{ BUSINESS_NAME }}. Our mission, vision, licenses, and the team behind your trusted vehicle rental service.{% endblock %}
+
+{% block page %}
+{% with about_text=config.about_content|striptags|cut:"&nbsp;" license_text=config.license_details|striptags|cut:"&nbsp;" %}
+<!-- ─── Header ─── -->
+<section class="phero">
+  <div class="phero-copy">
+    <span class="kicker" data-intro="0"><i></i>About us</span>
+    <h1 class="phead-h" data-intro="1" data-intro-kind="split">{{ config.about_title|default:"About Us" }}</h1>
+    <div class="lede rich" data-intro="2">
+      {% if about_text.strip %}{{ config.about_content|safe }}
+      {% else %}<p>{{ BUSINESS_NAME }} is a trusted vehicle rental service providing quality cars, SUVs, bikes, and more. We're committed to making transportation accessible, affordable, and reliable for everyone.</p>{% endif %}
+    </div>
+    <div class="ctas" data-intro="3">
+      <a href="{% url 'vehicle_list' %}" class="btn btn-main" data-magnetic>Browse fleet <span class="material-symbols-outlined">arrow_forward</span></a>
+      <a href="{% url 'contact' %}" class="btn btn-line">Contact us</a>
+    </div>
+    {% if config.years_in_business or config.total_happy_customers %}
+    <div class="stats" data-intro="4">
+      {% if config.years_in_business %}<div><b><span data-slot>{{ config.years_in_business }}</span>+</b><small>Years</small></div>{% endif %}
+      {% if config.total_happy_customers %}<div><b><span data-slot>{{ config.total_happy_customers }}</span>+</b><small>Happy customers</small></div>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+  <div class="stage" data-intro="2" data-intro-kind="pop">
+    <div class="ct hero-tile t-blue" data-tilt="0.6">
+      <div class="stack">{% if config.about_image %}<img src="{{ config.about_image.url }}" alt="About {{ BUSINESS_NAME }}"/>{% elif config.hero_image %}<img src="{{ config.hero_image.url }}" alt=""/>{% else %}<img src="{% static 'themes/img/thar-backwater.jpg' %}" alt=""/>{% endif %}</div>
+      <span class="ct-tag"><span><b>{{ BUSINESS_NAME }}</b></span><span>{{ config.tagline }}</span></span>
+    </div>
+    {% include "public/themes/reels/_orbit.html" %}
+  </div>
+</section>
+
+<div class="ribbon-wrap" aria-hidden="true">
+  <div class="ribbon m-marquee" data-marquee style="--dur:38s">
+    <div class="m-marquee-track"><span>Self-drive</span><i></i><span>Chauffeur driven</span><i></i><span>Wedding cars</span><i></i><span>Airport transfers</span><i></i><span>Monthly plans</span><i></i><span>Outstation</span><i></i></div>
+  </div>
+</div>
+
+<!-- ─── Mission & vision ─── -->
+{% if config.about_mission or config.about_vision %}
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="kicker"><i></i>What drives us</span><h2 class="h2">Mission &amp; <span class="ol">vision.</span></h2></div></div>
+    <div class="mv-grid" data-deal>
+      {% if config.about_mission %}<div class="ct mv t-orange" data-tilt="0.5"><span class="material-symbols-outlined">flag</span><b>Our mission</b><p>{{ config.about_mission }}</p></div>{% endif %}
+      {% if config.about_vision %}<div class="ct mv dk t-night" data-tilt="0.5"><span class="material-symbols-outlined">visibility</span><b>Our vision</b><p>{{ config.about_vision }}</p></div>{% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Licence ─── -->
+{% if config.license_number or license_text.strip %}
+<section class="sec sec-tight">
+  <div class="wrap">
+    <div class="ct license t-green">
+      <span class="material-symbols-outlined">verified</span>
+      <div>
+        <span class="kicker" style="color:var(--ink)"><i></i>Licensed &amp; certified</span>
+        {% if config.license_number %}<p class="license-no">Registration No. <b>{{ config.license_number }}</b></p>{% endif %}
+        {% if license_text.strip %}<div class="rich">{{ config.license_details|safe }}</div>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Reviews ─── -->
+{% if testimonials %}
+<section class="sec" style="background:var(--paper)">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="kicker"><i></i>What customers say</span><h2 class="h2">In their <span class="ol">words.</span></h2></div></div>
+    <div class="reviews" data-deal>
+      {% for t in testimonials %}{% cycle 'green' 'amber' 'blue' 'red' 'violet' 'teal' as tone silent %}
+      <figure class="ct review t-{{ tone }}" data-tilt="0.4">
+        {% if t.rating %}<span class="stars" aria-label="{{ t.rating }} out of 5">{% for i in "12345" %}<span class="material-symbols-outlined{% if forloop.counter <= t.rating %} on{% endif %}" aria-hidden="true">star</span>{% endfor %}</span>{% endif %}
+        <blockquote>“{{ t.quote }}”</blockquote>
+        <figcaption>{% if t.photo %}<img src="{{ t.photo.url }}" alt=""/>{% else %}<span class="ini">{{ t.name|first }}</span>{% endif %}<span><b>{{ t.name }}</b>{% if t.role %}<small>{{ t.role }}</small>{% endif %}</span></figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endwith %}
+
+{% include "public/themes/reels/_band.html" with kicker="Ready to hit the road?" heading="Find your car." text="Browse the fleet, or tell us what you need" %}
+{% endblock %}

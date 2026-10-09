@@ -1,0 +1,147 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+{% comment %}Kerala Route · premium. The scenic route: postcards of the collection, a pinned sideways drive past the
+featured cars at golden hour, then the road through the full collection and why it's worth it.{% endcomment %}
+
+{% block title %}Premium & Luxury Car Rentals in Kerala | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Premium and luxury car rentals in Kerala. BMW, Audi, Mercedes, Mini Cooper, Range Rover and more. Self-drive or with chauffeur. Statewide delivery.{% endblock %}
+{% block meta_keywords %}luxury car rental Kerala, premium car rental, BMW rental Kerala, Audi rental Kerala, Mercedes rental, Mini Cooper rental, Range Rover rental, luxury SUV hire, executive sedan rental, premium car with driver Kerala{% endblock %}
+{% block og_title %}Luxury Car Rentals in Kerala — BMW, Audi, Mercedes & more{% endblock %}
+{% block og_description %}When ordinary won't do. Premium fleet across Kerala — self-drive or with trained chauffeur. Doorstep delivery, transparent pricing.{% endblock %}
+
+{% block extra_css %}{% include "public/themes/route/_assets.html" %}{% endblock %}
+
+{% block content %}
+<section class="r-glow">
+    <div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 lg:pt-12 pb-16 lg:pb-20">
+        {% url 'vehicle_list' as fleet_url %}
+        {% include "public/themes/route/_trail.html" with crumb_label="Fleet" crumb_url=fleet_url here="Premium" %}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-16 items-center">
+            <div class="space-y-7">
+                <span class="label-tiny text-[#d9692f] flex items-center gap-3" data-intro="1"><span class="w-8 h-px bg-[#d9692f]"></span>Elite collection · the scenic route</span>
+                <h1 class="display-hero text-5xl sm:text-7xl lg:text-[88px] text-tertiary" data-intro="2" data-intro-kind="split">When ordinary won't do.</h1>
+                <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed font-light" data-intro="3">European flagships, executive sedans, statement SUVs. Hand-picked for the trips that deserve more than a transport. Self-drive or with a trained chauffeur.</p>
+                <div class="flex flex-wrap gap-4" data-intro="4">
+                    <a href="#fleet" class="bg-primary-container text-on-primary px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold">View the collection <span class="material-symbols-outlined">arrow_downward</span></a>
+                    {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="border border-outline-variant px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold hover:bg-surface-container-lowest transition-colors"><span class="material-symbols-outlined">call</span> Talk to us</a>{% endif %}
+                </div>
+                {% if vehicles or cities %}
+                <div class="flex flex-wrap gap-10 pt-7 border-t border-outline-variant" data-intro="5">
+                    {% if vehicles %}<div><div class="headline-md text-3xl sm:text-4xl text-tertiary"><span data-slot>{{ vehicles.count }}</span></div><div class="label-tiny text-outline mt-2">Premium car{{ vehicles.count|pluralize }}</div></div>{% endif %}
+                    {% if cities %}<div><div class="headline-md text-3xl sm:text-4xl text-tertiary"><span data-slot>{{ cities.count }}</span></div><div class="label-tiny text-outline mt-2">Cit{{ cities.count|pluralize:"y,ies" }}</div></div>{% endif %}
+                </div>
+                {% endif %}
+            </div>
+            <!-- postcards of the collection (decorative) -->
+            <div class="pol-stack relative h-[340px] sm:h-[460px] lg:h-[520px]" data-no-parallax aria-hidden="true" data-intro="3" data-intro-kind="fade">
+                {% if vehicles|length >= 3 %}
+                {% for v in vehicles|slice:":3" %}<figure class="pol">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="">{% else %}<div class="r-photo-empty aspect-square grid place-items-center"><span class="material-symbols-outlined text-6xl text-[#e39b3c]">diamond</span></div>{% endif %}<figcaption>{{ v.brand }} {{ v.name }}</figcaption></figure>{% endfor %}
+                {% else %}
+                <figure class="pol"><img src="{% static 'themes/img/rangerover.jpg' %}" alt=""><figcaption>Hill roads</figcaption></figure>
+                <figure class="pol"><img src="{% static 'themes/img/sclass-mist.jpg' %}" alt=""><figcaption>The arrival</figcaption></figure>
+                <figure class="pol"><img src="{% static 'themes/img/porsche.jpg' %}" alt=""><figcaption>Weekend escape</figcaption></figure>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="px-4 sm:px-12 max-w-screen-2xl mx-auto relative z-20 mb-16 lg:mb-24" data-reveal>
+    {% include "public/themes/route/_itinerary.html" with cities=cities %}
+</section>
+
+{% if featured_vehicles %}
+<!-- ─── Featured: pinned sideways scenic route ─── -->
+<section class="relative z-10 bg-[#0f2e2c] text-[#f7f0e3] py-20 lg:py-0 lg:h-screen lg:flex lg:flex-col lg:justify-center overflow-hidden" data-hscroll>
+    <div class="absolute inset-0 opacity-30 pointer-events-none" style="background:radial-gradient(50% 60% at 90% 0%,rgba(227,155,60,.5),transparent 70%)"></div>
+    <div class="relative px-4 sm:px-12 mb-10 lg:mb-14 flex flex-wrap items-end gap-6 sm:gap-10 max-w-screen-2xl w-full mx-auto">
+        <div>
+            <span class="label-tiny text-[#e39b3c]">Featured · elite collection</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl text-[#fffaf0] mt-4">The viewpoints.</h2>
+        </div>
+        <div class="h-px flex-1 mb-4 hidden sm:block" style="background:repeating-linear-gradient(90deg,#e39b3c 0 10px,transparent 10px 22px)"></div>
+        <div class="font-serif text-4xl sm:text-5xl text-[#e39b3c] hidden lg:flex items-baseline gap-2"><span data-hscroll-count>01</span><span class="text-[#fffaf0]/30 text-2xl">/ {{ featured_vehicles|length|stringformat:"02d" }}</span></div>
+    </div>
+    <div class="m-htrack relative flex gap-8 lg:gap-10 px-4 sm:px-12 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-px-4 sm:scroll-px-12 pb-4">
+        {% for vehicle in featured_vehicles %}
+        <a href="{{ vehicle.get_absolute_url }}" class="snap-start min-w-[280px] sm:min-w-[420px] lg:min-w-[36vw] h-[420px] sm:h-[520px] lg:h-[60vh] relative rounded-[2.5rem] overflow-hidden group block bg-[#163c39]" data-tilt="0.5">
+            {% if vehicle.thumbnail %}<img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover" loading="lazy"/>{% else %}<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[96px] text-[#e39b3c]/40">diamond</span></div>{% endif %}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
+            <span class="absolute top-6 left-6 label-tiny bg-[#fffaf0]/15 border border-[#fffaf0]/20 backdrop-blur px-4 py-2 rounded-full text-[#fffaf0]">Viewpoint {{ forloop.counter|stringformat:"02d" }}</span>
+            <div class="absolute bottom-8 left-8 right-8">
+                <div class="label-tiny text-[#fffaf0]/60">{{ vehicle.brand }}</div>
+                <div class="headline-md text-3xl text-white mt-2">{{ vehicle.name }}</div>
+                <div class="flex items-center justify-between gap-4 mt-4">
+                    <span class="text-[#e39b3c] label-tiny">{% if vehicle.primary_price_value %}{{ vehicle.primary_price_value|inr }} / {{ vehicle.primary_price_label }}{% else %}Rate on enquiry{% endif %}</span>
+                    <span class="material-symbols-outlined text-white transition-transform group-hover:translate-x-1">arrow_forward</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<div id="journey">
+    {% include "public/themes/route/_road.html" %}
+
+    <div class="road-gap sm" data-stop="The collection"></div>
+    <section id="fleet" class="lane max-w-screen-2xl mx-auto scroll-mt-28">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-12 gap-6">
+            <div><span class="label-tiny text-[#d9692f]">The collection</span><h2 class="headline-lg text-4xl sm:text-6xl mt-4 text-tertiary">Available for your dates.</h2></div>
+            <a href="{% url 'vehicle_list' %}?premium=1" class="self-start sm:self-auto border border-tertiary text-tertiary px-6 py-3 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-tertiary hover:text-on-tertiary transition-colors">Filter in fleet <span class="material-symbols-outlined text-lg">arrow_forward</span></a>
+        </div>
+        {% if vehicles %}
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7 lg:gap-9" data-tickets>
+            {% for vehicle in vehicles %}
+            {% if vehicle.is_chauffeur_available %}
+            {% include "public/themes/route/_ticket.html" with vehicle=vehicle n=forloop.counter note="Self-drive or with a trained chauffeur" %}
+            {% else %}
+            {% include "public/themes/route/_ticket.html" with vehicle=vehicle n=forloop.counter %}
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="pc-back text-center px-6 py-16">
+            <div class="stamp sm text-[#d9692f] mx-auto mb-8" style="rotate:-8deg"><div><span class="material-symbols-outlined">diamond</span><b>Soon</b></div></div>
+            <h3 class="headline-md text-3xl text-tertiary mb-3">Premium fleet coming soon</h3>
+            <p class="text-on-surface-variant mb-8 max-w-md mx-auto">No vehicles are tagged as premium yet. Talk to our team to access the full collection.</p>
+            {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="bg-primary-container text-on-primary px-8 py-3.5 rounded-full label-tiny inline-block">Call us</a>{% endif %}
+        </div>
+        {% endif %}
+    </section>
+
+    <div class="road-gap" data-stop="Why premium"></div>
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="flex flex-col items-center mb-14 text-center">
+            <span class="label-tiny text-[#d9692f]">Why premium</span>
+            <h2 class="headline-lg text-4xl sm:text-6xl mt-4 text-tertiary">More than transport.</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 justify-items-center text-center" data-stamps>
+            <div class="max-w-[300px]"><div class="stamp text-tertiary mx-auto" style="rotate:-8deg"><div><span class="material-symbols-outlined">workspace_premium</span><b>Hand<br>picked</b></div></div><h3 class="font-bold text-lg text-tertiary mt-6">Hand-picked vehicles</h3><p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Each premium car is curated for condition, mileage and presentation. We retire vehicles past their prime, so you only ever drive a flagship example.</p></div>
+            <div class="max-w-[300px]"><div class="stamp text-[#d9692f] mx-auto" style="rotate:6deg"><div><span class="material-symbols-outlined">badge</span><b>Chauffeur</b></div></div><h3 class="font-bold text-lg text-tertiary mt-6">Trained chauffeurs</h3><p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Optional chauffeur service with formally trained drivers. Dressed in white, briefed on your itinerary, available 24×7.</p></div>
+            <div class="max-w-[300px]"><div class="stamp text-[#e39b3c] mx-auto" style="rotate:-4deg"><div><span class="material-symbols-outlined">local_shipping</span><b>Doorstep</b></div></div><h3 class="font-bold text-lg text-tertiary mt-6">Doorstep delivery</h3><p class="text-sm text-on-surface-variant mt-2 leading-relaxed">We deliver and collect from your hotel, residence or airport{% if cities %} across {% for c in cities|slice:":3" %}{{ c.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if cities.count > 3 %} and more{% endif %}{% endif %}.</p></div>
+        </div>
+    </section>
+
+    <div class="road-gap" data-stop="Book"></div>
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="relative overflow-hidden rounded-[2.5rem] bg-tertiary text-[#fffaf0] p-8 sm:p-14 lg:p-20 text-center">
+            <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(45% 80% at 50% 120%,rgba(227,155,60,.5),transparent 70%)"></div>
+            <div class="relative">
+                <span class="label-tiny text-[#e39b3c] block">Ready for the upgrade?</span>
+                <h2 class="headline-lg text-4xl sm:text-6xl mt-4 mb-5">Tell us your dates.</h2>
+                <p class="text-[#fffaf0]/75 max-w-2xl mx-auto mb-9">We'll arrange the right car, the right driver, the right delivery point. No deposit until you confirm.</p>
+                <div class="flex flex-wrap gap-4 justify-center">
+                    <a href="#fleet" class="bg-[#e39b3c] text-[#0f2e2c] px-10 py-4 rounded-full label-tiny hover:bg-[#f6d9a8] transition-colors">Browse the collection</a>
+                    {% if WHATSAPP_NUMBER %}<a href="{% whatsapp_url 'Hi! I want to book a premium car.' %}" target="_blank" rel="noopener" class="bg-[#25D366] text-white px-10 py-4 rounded-full label-tiny hover:opacity-90">WhatsApp us</a>{% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="road-gap sm" data-stop="Destination" data-stop-end></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}{% include "public/themes/route/_js.html" %}{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "public/base_public.html" %}
+{% load vehicle_tags %}
+
+{% block title %}Booking received — {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block main_class %}{% endblock %}
+{% block extra_css %}
+{% include "public/themes/night/_styles.html" %}
+<style>
+  .nd-check-ring { stroke-dasharray: 302; stroke-dashoffset: 0; filter: drop-shadow(0 0 8px rgba(212,236,162,.7)); animation: nd-ring 1.4s cubic-bezier(.16,1,.3,1) .2s both; }
+  @keyframes nd-ring { from { stroke-dashoffset: 302; } }
+  .nd-ticket { background: #0d0f0a; border: 1px dashed rgba(212,236,162,.2); }
+  @media (prefers-reduced-motion: reduce) { .nd-check-ring { animation: none; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="nd relative min-h-[100svh] flex items-center justify-center px-4 pt-32 pb-16 overflow-hidden">
+  <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[720px] h-[720px] max-w-[160vw] rounded-full pointer-events-none" style="background:radial-gradient(circle, rgba(212,236,162,.14), transparent 62%)" aria-hidden="true"></div>
+  <div class="relative w-full max-w-2xl">
+    <div class="glow glow-static rounded-[2.5rem] p-7 sm:p-12 text-center shadow-2xl shadow-black/60">
+      <div class="relative w-24 h-24 mx-auto mb-7" data-intro="0" data-intro-kind="pop">
+        <svg viewBox="0 0 110 110" class="absolute inset-0 -rotate-90" aria-hidden="true"><circle cx="55" cy="55" r="48" fill="none" stroke="rgba(242,241,232,.08)" stroke-width="3"/><circle class="nd-check-ring" cx="55" cy="55" r="48" fill="none" stroke="#d4eca2" stroke-width="3" stroke-linecap="round"/></svg>
+        <span class="absolute inset-0 grid place-items-center material-symbols-outlined text-5xl text-primary" style="font-variation-settings:'FILL' 1;text-shadow:0 0 24px rgba(212,236,162,.6)">check_circle</span>
+      </div>
+
+      <span class="label-tiny text-primary-container block mb-4" data-intro="1">Ref #{{ enquiry.id }}</span>
+      <h1 class="nd-display text-4xl sm:text-6xl text-on-surface mb-5" data-intro="2">You're all set, {{ enquiry.name|default:"there" }}.</h1>
+      <p class="text-base sm:text-lg text-on-surface-variant mb-8 max-w-lg mx-auto font-light" data-intro="3">
+        We've received your enquiry. Our team will be in touch shortly. Confirm faster by sending the details on WhatsApp now.
+      </p>
+
+      <dl class="nd-ticket rounded-3xl p-5 sm:p-6 mb-8 text-left space-y-3" data-intro="4">
+        {% if enquiry.vehicle %}
+        <div class="flex justify-between gap-4 pb-3 border-b border-white/10"><dt class="label-tiny text-on-surface-variant">Vehicle</dt><dd class="text-sm font-bold text-right text-on-surface">{{ enquiry.vehicle.brand }} {{ enquiry.vehicle.name }}</dd></div>
+        {% endif %}
+        {% if enquiry.preferred_start_date %}
+        <div class="flex justify-between gap-4"><dt class="label-tiny text-on-surface-variant">Dates</dt><dd class="text-sm font-bold text-right text-on-surface">{{ enquiry.preferred_start_date|date:"d M Y" }}{% if enquiry.preferred_end_date %} → {{ enquiry.preferred_end_date|date:"d M Y" }}{% endif %}</dd></div>
+        {% endif %}
+        {% if enquiry.pickup_city %}
+        <div class="flex justify-between gap-4"><dt class="label-tiny text-on-surface-variant">Pickup</dt><dd class="text-sm font-bold text-right text-on-surface capitalize">{{ enquiry.pickup_city }}{% if enquiry.drop_city and enquiry.drop_city != enquiry.pickup_city %} → {{ enquiry.drop_city }}{% endif %}</dd></div>
+        {% endif %}
+        {% if enquiry.rental_type %}
+        <div class="flex justify-between gap-4"><dt class="label-tiny text-on-surface-variant">Type</dt><dd class="text-sm font-bold text-right text-on-surface">{{ enquiry.get_rental_type_display }}</dd></div>
+        {% endif %}
+        {% if enquiry.requested_addons %}
+        <div class="flex justify-between gap-4"><dt class="label-tiny text-on-surface-variant">Add-ons</dt><dd class="text-sm font-bold text-right text-on-surface">{{ enquiry.requested_addons|join:", " }}</dd></div>
+        {% endif %}
+        <div class="flex justify-between gap-4"><dt class="label-tiny text-on-surface-variant">Phone</dt><dd class="text-sm font-bold text-right text-primary">{{ enquiry.phone }}</dd></div>
+      </dl>
+
+      {% if wa_url %}
+      <a id="wa-cta" href="{{ wa_url }}" target="_blank" rel="noopener" class="m-shine m-btn flex bg-[#25D366] text-[#06210f] py-4 px-6 rounded-full font-bold hover:opacity-90 transition-all items-center justify-center gap-3 text-base shadow-[0_0_40px_-10px_rgba(37,211,102,.7)]">
+        <svg fill="currentColor" height="22" viewBox="0 0 24 24" width="22" aria-hidden="true"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.91L4 20l4.2-1.1a7.93 7.93 0 0 0 3.79.97h.01a7.95 7.95 0 0 0 5.6-13.55zm-5.55 12.22a6.6 6.6 0 0 1-3.36-.92l-.24-.14-2.5.65.67-2.43-.16-.25a6.59 6.59 0 1 1 12.24-3.5 6.58 6.58 0 0 1-6.65 6.59zm3.62-4.93c-.2-.1-1.18-.58-1.36-.65-.18-.07-.32-.1-.45.1-.13.2-.51.65-.63.78-.12.13-.23.15-.43.05-.2-.1-.84-.31-1.6-.99-.59-.53-.99-1.18-1.1-1.38-.12-.2-.01-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.33.06-.13.03-.25-.02-.35-.05-.1-.45-1.08-.62-1.48-.16-.39-.32-.34-.45-.34-.12 0-.25-.02-.39-.02-.13 0-.35.05-.53.25-.18.2-.7.68-.7 1.66 0 .98.72 1.93.82 2.06.1.13 1.41 2.16 3.42 3.03.48.21.85.33 1.14.42.48.15.92.13 1.26.08.39-.06 1.18-.48 1.34-.95.17-.47.17-.86.12-.95-.05-.08-.18-.13-.39-.23z"/></svg>
+        Send on WhatsApp
+      </a>
+      <p class="text-xs text-on-surface-variant mt-3" id="wa-hint">WhatsApp should open in a new tab. If it doesn't, click the button above.</p>
+
+      <script>
+        // Auto-open WhatsApp once on page load — best-effort, popup blockers may stop it.
+        (function() {
+          var url = {{ wa_url|safe|escapejs|stringformat:"'%s'" }};
+          if (!url) return;
+          var win = window.open(url, '_blank', 'noopener');
+          if (!win || win.closed || typeof win.closed === 'undefined') {
+            // Popup blocked — leave button visible.
+            var hint = document.getElementById('wa-hint');
+            if (hint) hint.textContent = 'Tap the button to open WhatsApp.';
+          }
+        })();
+      </script>
+      {% else %}
+      <p class="text-sm text-on-surface-variant">Our team will call you back at <strong class="text-primary">{{ enquiry.phone }}</strong>.</p>
+      {% endif %}
+
+      <div class="mt-8 pt-6 border-t border-white/10 flex flex-wrap justify-center gap-x-8 gap-y-3">
+        <a href="{% url 'home' %}" class="label-tiny text-on-surface-variant hover:text-primary transition-colors">← Back to home</a>
+        <a href="{% url 'vehicle_list' %}" class="label-tiny text-on-surface-variant hover:text-primary transition-colors">Browse the fleet →</a>
+      </div>
+    </div>
+    <p class="text-center text-xs text-on-surface-variant/70 mt-6">A copy of this enquiry has been sent to our team.</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}{% include "public/themes/night/_scripts.html" %}{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "public/themes/bento/_base.html" %}
+{% load vehicle_tags %}
+
+{% block title %}Frequently Asked Questions - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Frequently asked questions about {{ BUSINESS_NAME }} vehicle rentals. Find answers about booking, documents, cancellation, deposits, and more.{% endblock %}
+
+{% block structured_data %}
+{{ block.super }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {% for item in faq_items %}
+        {
+            "@type": "Question",
+            "name": "{{ item.q|escapejs }}",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "{{ item.a|striptags|escapejs }}"
+            }
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- ─── Hero bento ─── -->
+<section class="b-hero max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4" aria-label="Help centre">
+    <div class="tile b-glass p-7 sm:p-10 sm:col-span-2 lg:col-span-8 flex flex-col justify-between gap-6 min-h-[300px]">
+        <span class="self-start inline-flex items-center gap-2 bg-primary-fixed text-primary label-tiny px-3 py-2 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>Help centre</span>
+        <div>
+            <h1 class="b-title font-extrabold text-[44px] sm:text-6xl lg:text-[68px] leading-[.95] tracking-[-.045em] text-primary" data-no-split>Questions, answered.</h1>
+            <p class="mt-5 text-lg text-on-surface-variant max-w-xl">Quick answers about booking, documents, deposits and more. Can't find yours? <a href="{% url 'contact' %}" class="text-primary font-bold underline underline-offset-4">Contact us</a>.</p>
+        </div>
+    </div>
+    <div class="tile bg-primary text-on-primary p-7 lg:col-span-4 flex flex-col justify-between gap-6 min-h-[200px]">
+        <div class="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-primary-fixed/10 blur-2xl" aria-hidden="true"></div>
+        <span class="material-symbols-outlined text-5xl text-primary-fixed/80 relative" aria-hidden="true">quiz</span>
+        <div class="relative"><div class="font-extrabold text-7xl tracking-[-.04em] leading-none"><span data-bslot>{{ faq_items|length }}</span></div><div class="label-tiny mt-3 text-white/70">Common questions</div></div>
+    </div>
+</section>
+
+<section class="max-w-screen-xl mx-auto pt-3 sm:pt-4 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-start">
+    <!-- ─── Questions ─── -->
+    <div class="lg:col-span-8 grid gap-2.5" data-bpop>
+        {% for item in faq_items %}
+        <details class="b-faq tile b-glass transition-colors" {% if forloop.first %}open{% endif %}>
+            <summary class="flex items-center justify-between gap-4 p-5 sm:p-6">
+                <span class="flex items-center gap-4 min-w-0">
+                    <span class="w-10 h-10 shrink-0 rounded-xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-sm" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+                    <h2 class="font-extrabold text-lg sm:text-xl tracking-tight text-primary" data-no-split>{{ item.q }}</h2>
+                </span>
+                <span class="b-faq-ic w-10 h-10 shrink-0 rounded-full bg-white text-primary grid place-items-center" aria-hidden="true"><span class="material-symbols-outlined">add</span></span>
+            </summary>
+            <div class="b-faq-a b-prose px-5 sm:px-6 pb-6 sm:pl-[5.5rem]">{{ item.a|safe }}</div>
+        </details>
+        {% endfor %}
+    </div>
+
+    <!-- ─── Still stuck ─── -->
+    <aside class="lg:col-span-4 lg:sticky lg:top-28 grid gap-3 sm:gap-4">
+        <div class="tile bg-primary-fixed p-7">
+            <h2 class="font-extrabold text-3xl tracking-[-.04em] text-primary" data-no-split>Still have <span class="serif-i">questions?</span></h2>
+            <p class="mt-3 text-primary/75">Our team is happy to help. Reach out on WhatsApp, email or phone.</p>
+            <div class="mt-6 grid gap-2">
+                {% if WHATSAPP_NUMBER %}<a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="bg-[#25D366] text-white rounded-2xl px-5 py-4 font-bold flex items-center gap-3 lift"><span class="material-symbols-outlined" aria-hidden="true">chat</span>WhatsApp us</a>{% endif %}
+                {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="bg-primary text-on-primary rounded-2xl px-5 py-4 font-bold flex items-center gap-3 lift"><span class="material-symbols-outlined" aria-hidden="true">call</span>{{ BUSINESS_PHONE }}</a>{% endif %}
+                <a href="{% url 'contact' %}" class="bg-white rounded-2xl px-5 py-4 font-bold flex items-center gap-3 lift text-primary"><span class="material-symbols-outlined" aria-hidden="true">mail</span>Contact page</a>
+            </div>
+        </div>
+        <a href="{% url 'terms' %}" class="tile b-glass p-6 flex items-center justify-between gap-4 lift group"><span class="flex items-center gap-3 font-extrabold text-primary"><span class="material-symbols-outlined" aria-hidden="true">gavel</span>Rental terms</span><span class="material-symbols-outlined transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span></a>
+    </aside>
+</section>
+{% endblock %}

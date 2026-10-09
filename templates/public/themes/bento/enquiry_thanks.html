@@ -1,0 +1,68 @@
+{% extends "public/themes/bento/_base.html" %}
+{% load vehicle_tags %}
+
+{% block title %}Booking received — {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block content %}
+<section class="b-hero max-w-screen-lg mx-auto grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4" aria-label="Enquiry received">
+    <!-- confirmation -->
+    <div class="tile bg-primary text-on-primary p-7 sm:p-10 lg:col-span-7 flex flex-col justify-between gap-8 min-h-[380px]">
+        <div class="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-primary-fixed/10 blur-2xl" aria-hidden="true"></div>
+        <div class="relative flex items-center justify-between gap-3">
+            <span class="w-16 h-16 rounded-2xl bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined text-4xl" style="font-variation-settings:'FILL' 1" aria-hidden="true">check_circle</span></span>
+            <span class="b-glass !bg-white/10 !border-white/20 rounded-full px-4 py-2 label-tiny text-primary-fixed">Ref #{{ enquiry.id }}</span>
+        </div>
+        <div class="relative">
+            <h1 class="b-title font-extrabold text-4xl sm:text-6xl leading-[.95] tracking-[-.045em]" data-accent="text-primary-fixed" data-no-split>You're all set, {{ enquiry.name|default:"there" }}.</h1>
+            <p class="mt-4 text-lg text-white/75 max-w-lg">We've received your enquiry. Confirm faster by sending the details on WhatsApp now.</p>
+        </div>
+        <div class="relative">
+            {% if wa_url %}
+            <a id="wa-cta" href="{{ wa_url }}" target="_blank" rel="noopener" class="bg-[#25D366] text-white rounded-full py-4 px-6 font-bold flex items-center justify-center gap-3 m-shine" data-magnetic>
+                <svg fill="currentColor" height="22" viewBox="0 0 24 24" width="22" aria-hidden="true"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.91L4 20l4.2-1.1a7.93 7.93 0 0 0 3.79.97h.01a7.95 7.95 0 0 0 5.6-13.55zm-5.55 12.22a6.6 6.6 0 0 1-3.36-.92l-.24-.14-2.5.65.67-2.43-.16-.25a6.59 6.59 0 1 1 12.24-3.5 6.58 6.58 0 0 1-6.65 6.59zm3.62-4.93c-.2-.1-1.18-.58-1.36-.65-.18-.07-.32-.1-.45.1-.13.2-.51.65-.63.78-.12.13-.23.15-.43.05-.2-.1-.84-.31-1.6-.99-.59-.53-.99-1.18-1.1-1.38-.12-.2-.01-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.33.06-.13.03-.25-.02-.35-.05-.1-.45-1.08-.62-1.48-.16-.39-.32-.34-.45-.34-.12 0-.25-.02-.39-.02-.13 0-.35.05-.53.25-.18.2-.7.68-.7 1.66 0 .98.72 1.93.82 2.06.1.13 1.41 2.16 3.42 3.03.48.21.85.33 1.14.42.48.15.92.13 1.26.08.39-.06 1.18-.48 1.34-.95.17-.47.17-.86.12-.95-.05-.08-.18-.13-.39-.23z"/></svg>
+                Send on WhatsApp
+            </a>
+            <p class="text-xs text-white/60 mt-3 text-center" id="wa-hint">WhatsApp should open in a new tab. If it doesn't, tap the button above.</p>
+            <script>
+                /* auto-open WhatsApp once on page load — best-effort, popup blockers may stop it */
+                (function() {
+                    var url = {{ wa_url|safe|escapejs|stringformat:"'%s'" }};
+                    if (!url) return;
+                    var win = window.open(url, '_blank', 'noopener');
+                    if (!win || win.closed || typeof win.closed === 'undefined') {
+                        var hint = document.getElementById('wa-hint');
+                        if (hint) hint.textContent = 'Tap the button to open WhatsApp.';
+                    }
+                })();
+            </script>
+            {% else %}
+            <p class="bg-white/10 rounded-2xl px-5 py-4 text-white/85">Our team will call you back at <strong class="text-white">{{ enquiry.phone }}</strong>.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- summary -->
+    <div class="tile b-glass p-6 sm:p-8 lg:col-span-5 flex flex-col gap-2">
+        <span class="label-tiny text-primary-container block mb-2">Your enquiry</span>
+        {% if enquiry.vehicle %}
+        <a href="{{ enquiry.vehicle.get_absolute_url }}" class="bg-white rounded-2xl p-2 flex items-center gap-3 lift">
+            <span class="w-16 h-14 rounded-xl overflow-hidden bg-surface-container grid place-items-center shrink-0">{% if enquiry.vehicle.thumbnail %}<img src="{{ enquiry.vehicle.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-outline" aria-hidden="true">directions_car</span>{% endif %}</span>
+            <span class="min-w-0"><span class="label-tiny text-outline block">Vehicle</span><span class="font-extrabold text-primary block truncate">{{ enquiry.vehicle.brand }} {{ enquiry.vehicle.name }}</span></span>
+        </a>
+        {% endif %}
+        <dl class="grid gap-2">
+            {% if enquiry.preferred_start_date %}<div class="bg-white rounded-2xl px-4 py-3 flex justify-between gap-4"><dt class="label-tiny text-outline">Dates</dt><dd class="text-sm font-bold text-right">{{ enquiry.preferred_start_date|date:"d M Y" }}{% if enquiry.preferred_end_date %} → {{ enquiry.preferred_end_date|date:"d M Y" }}{% endif %}</dd></div>{% endif %}
+            {% if enquiry.pickup_city %}<div class="bg-white rounded-2xl px-4 py-3 flex justify-between gap-4"><dt class="label-tiny text-outline">Pickup</dt><dd class="text-sm font-bold text-right capitalize">{{ enquiry.pickup_city }}{% if enquiry.drop_city and enquiry.drop_city != enquiry.pickup_city %} → {{ enquiry.drop_city }}{% endif %}</dd></div>{% endif %}
+            {% if enquiry.rental_type %}<div class="bg-white rounded-2xl px-4 py-3 flex justify-between gap-4"><dt class="label-tiny text-outline">Type</dt><dd class="text-sm font-bold text-right">{{ enquiry.get_rental_type_display }}</dd></div>{% endif %}
+            {% if enquiry.requested_addons %}<div class="bg-white rounded-2xl px-4 py-3 flex justify-between gap-4"><dt class="label-tiny text-outline">Add-ons</dt><dd class="text-sm font-bold text-right">{{ enquiry.requested_addons|join:", " }}</dd></div>{% endif %}
+            <div class="bg-white rounded-2xl px-4 py-3 flex justify-between gap-4"><dt class="label-tiny text-outline">Phone</dt><dd class="text-sm font-bold text-right">{{ enquiry.phone }}</dd></div>
+        </dl>
+        <div class="mt-auto pt-4 grid grid-cols-2 gap-2">
+            <a href="{% url 'home' %}" class="bg-white rounded-full py-3 font-bold text-sm text-center text-on-surface-variant hover:text-primary">← Home</a>
+            <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary rounded-full py-3 font-bold text-sm text-center">Browse fleet</a>
+        </div>
+    </div>
+</section>
+<p class="max-w-screen-lg mx-auto text-center text-xs font-semibold text-outline mt-6">A copy of this enquiry has been sent to our team.</p>
+{% endblock %}

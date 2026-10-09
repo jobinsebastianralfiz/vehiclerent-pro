@@ -1,0 +1,59 @@
+{% extends "public/themes/bento/_base.html" %}
+{% comment %}
+Bento layout for legal pages (terms, privacy): a sticky contents tile beside one glass tile per section.
+Children fill legal_title, legal_contact_title and legal_sections (each <section> with an <h2>); the contents list is built from the h2s.
+{% endcomment %}
+
+{% block content %}
+<section class="b-hero max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4" aria-label="{% block legal_label %}Legal{% endblock %}">
+    <div class="tile b-glass p-7 sm:p-10 sm:col-span-2 lg:col-span-8 flex flex-col justify-between gap-6 min-h-[260px]">
+        <span class="self-start inline-flex items-center gap-2 bg-primary-fixed text-primary label-tiny px-3 py-2 rounded-full"><span class="material-symbols-outlined text-[16px]" aria-hidden="true">gavel</span>Legal</span>
+        <h1 class="b-title font-extrabold text-[44px] sm:text-6xl lg:text-[68px] leading-[.95] tracking-[-.045em] text-primary" data-no-split>{% block legal_title %}{% endblock %}</h1>
+    </div>
+    <div class="tile bg-primary text-on-primary p-7 lg:col-span-4 flex flex-col justify-between gap-6 min-h-[180px]">
+        <span class="material-symbols-outlined text-5xl text-primary-fixed/80" aria-hidden="true">event_available</span>
+        <div><div class="label-tiny text-white/60">Last updated</div><div class="font-extrabold text-3xl tracking-tight mt-2">{% now "F j, Y" %}</div></div>
+    </div>
+</section>
+
+<div class="max-w-screen-xl mx-auto pt-3 sm:pt-4 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-start">
+    <aside class="hidden lg:block lg:col-span-4 lg:sticky lg:top-28">
+        <nav class="tile b-glass p-4 b-toc" aria-label="On this page">
+            <div class="label-tiny text-outline px-3 pt-2 pb-3">On this page</div>
+            <ol class="grid gap-1 text-sm font-bold text-on-surface-variant" id="b-toc"></ol>
+        </nav>
+    </aside>
+    <div class="lg:col-span-8 grid gap-3 sm:gap-4" id="b-legal">
+        {% block legal_sections %}{% endblock %}
+        <section class="tile bg-primary-fixed p-6 sm:p-8">
+            <h2 class="font-extrabold text-2xl tracking-tight text-primary" data-no-split>{% block legal_contact_title %}Questions?{% endblock %}</h2>
+            <p class="mt-2 text-primary/75">{% block legal_contact_text %}If you have any questions, please contact us:{% endblock %}</p>
+            <div class="mt-5 flex flex-wrap gap-2">
+                {% if BUSINESS_EMAIL %}<a href="mailto:{{ BUSINESS_EMAIL }}" class="bg-white rounded-full px-5 py-3 font-bold text-sm text-primary flex items-center gap-2 break-all"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">mail</span>{{ BUSINESS_EMAIL }}</a>{% endif %}
+                {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="bg-primary text-on-primary rounded-full px-5 py-3 font-bold text-sm flex items-center gap-2"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">call</span>{{ BUSINESS_PHONE }}</a>{% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+<script>
+/* contents list from the section headings; the current section lights up */
+(() => {
+    const toc = document.getElementById("b-toc"), secs = [...document.querySelectorAll("#b-legal > section[id]")];
+    if (!toc || !secs.length) return;
+    const links = secs.map(s => {
+        const li = document.createElement("li"), a = document.createElement("a");
+        a.href = "#" + s.id; a.textContent = s.querySelector("h2").textContent.trim();
+        a.className = "block rounded-2xl px-3 py-2 hover:bg-white transition-colors";
+        li.appendChild(a); toc.appendChild(li); return a;
+    });
+    if (!("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(es => es.forEach(e => {
+        if (e.isIntersecting) links.forEach((a, i) => a.classList.toggle("is-on", secs[i] === e.target));
+    }), { rootMargin: "-30% 0px -60% 0px" });
+    secs.forEach(s => io.observe(s));
+})();
+</script>
+{% endblock %}

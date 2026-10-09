@@ -1,0 +1,82 @@
+{% extends "public/themes/editorial/_legal.html" %}
+
+{% block title %}Privacy Policy - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Privacy Policy for {{ BUSINESS_NAME }}. Learn how we collect, use, and protect your personal information.{% endblock %}
+
+{% block legal_title %}Privacy Policy{% endblock %}
+{% block legal_toc %}<li><a href="#information-we-collect"><span class="opacity-50">01</span>Information We Collect</a></li><li><a href="#how-we-use"><span class="opacity-50">02</span>How We Use Your Information</a></li><li><a href="#sharing"><span class="opacity-50">03</span>Information Sharing</a></li><li><a href="#security"><span class="opacity-50">04</span>Data Security</a></li><li><a href="#retention"><span class="opacity-50">05</span>Data Retention</a></li><li><a href="#cookies"><span class="opacity-50">06</span>Cookies</a></li><li><a href="#your-rights"><span class="opacity-50">07</span>Your Rights</a></li><li><a href="#children"><span class="opacity-50">08</span>Children's Privacy</a></li><li><a href="#changes"><span class="opacity-50">09</span>Changes to This Policy</a></li>{% endblock %}
+{% block legal_contact_title %}Contact Our Privacy Team{% endblock %}
+{% block legal_contact_lede %}For privacy-related questions or to exercise your rights:{% endblock %}
+
+{% block legal_body %}
+        <section id="information-we-collect">
+            <h2><span class="n">01</span>Information We Collect</h2>
+            <p class="mb-4">We collect information that you provide directly to us when using our services:</p>
+            <ul class="list-disc pl-6 space-y-2">
+                <li><strong>Personal Information:</strong> Name, phone number, email address when you submit an enquiry form or contact us.</li>
+                <li><strong>Identity Documents:</strong> Driving license, government ID (Aadhaar, Passport, etc.) — collected only during the rental process for verification purposes.</li>
+                <li><strong>Rental Information:</strong> Vehicle preferences, rental dates, pickup/drop locations.</li>
+                <li><strong>Communication Data:</strong> Messages sent through our enquiry forms or WhatsApp.</li>
+            </ul>
+        </section>
+
+        <section id="how-we-use">
+            <h2><span class="n">02</span>How We Use Your Information</h2>
+            <ul class="list-disc pl-6 space-y-2">
+                <li>To process and manage vehicle rental enquiries and bookings.</li>
+                <li>To communicate with you about your enquiry, booking, or rental.</li>
+                <li>To verify your identity and eligibility for vehicle rental.</li>
+                <li>To send you important notices about your rental (pickup confirmation, return reminders).</li>
+                <li>To improve our services and website experience.</li>
+                <li>To comply with legal obligations.</li>
+            </ul>
+        </section>
+
+        <section id="sharing">
+            <h2><span class="n">03</span>Information Sharing</h2>
+            <p class="mb-4">We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:</p>
+            <ul class="list-disc pl-6 space-y-2">
+                <li>With law enforcement or government authorities when required by law.</li>
+                <li>With insurance providers in the event of an accident or damage claim.</li>
+                <li>With service providers who assist us in operating our business (e.g., email service), bound by confidentiality agreements.</li>
+            </ul>
+        </section>
+
+        <section id="security">
+            <h2><span class="n">04</span>Data Security</h2>
+            <p>We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. This includes encrypted data transmission (HTTPS), secure server infrastructure, and restricted access to personal data.</p>
+        </section>
+
+        <section id="retention">
+            <h2><span class="n">05</span>Data Retention</h2>
+            <p>We retain your personal information for as long as necessary to fulfill the purposes for which it was collected, including to satisfy legal, accounting, or reporting requirements. Enquiry data is retained for up to 2 years. Rental records are retained for 7 years as required by applicable law.</p>
+        </section>
+
+        <section id="cookies">
+            <h2><span class="n">06</span>Cookies</h2>
+            <p>Our website uses only essential cookies necessary for the site to function (session management, CSRF protection). We do not use tracking cookies, advertising cookies, or third-party analytics that track individual users.</p>
+        </section>
+
+        <section id="your-rights">
+            <h2><span class="n">07</span>Your Rights</h2>
+            <p class="mb-4">You have the right to:</p>
+            <ul class="list-disc pl-6 space-y-2">
+                <li><strong>Access</strong> — Request a copy of the personal information we hold about you.</li>
+                <li><strong>Correction</strong> — Request correction of inaccurate or incomplete information.</li>
+                <li><strong>Deletion</strong> — Request deletion of your personal information, subject to legal retention requirements.</li>
+                <li><strong>Objection</strong> — Object to the processing of your personal information.</li>
+                <li><strong>Portability</strong> — Request transfer of your information in a machine-readable format.</li>
+            </ul>
+            <p class="mt-4">To exercise any of these rights, please contact us using the details below.</p>
+        </section>
+
+        <section id="children">
+            <h2><span class="n">08</span>Children's Privacy</h2>
+            <p>Our services are not directed to individuals under the age of 18. We do not knowingly collect personal information from children.</p>
+        </section>
+
+        <section id="changes">
+            <h2><span class="n">09</span>Changes to This Policy</h2>
+            <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page with an updated revision date.</p>
+        </section>
+{% endblock %}

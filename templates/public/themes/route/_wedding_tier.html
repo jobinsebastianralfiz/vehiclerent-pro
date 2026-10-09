@@ -1,0 +1,15 @@
+{% comment %}One wedding tier's cars as tickets. Params: cars, tier_id, title, kicker.{% endcomment %}
+{% if cars %}
+<div id="{{ tier_id }}" class="scroll-mt-28 mb-14 last:mb-0">
+    <div class="flex items-center gap-4 mb-7"><span class="label-tiny text-[#d9692f]">{{ kicker }}</span><span class="h-px flex-1" style="background:repeating-linear-gradient(90deg,#d6ccb5 0 8px,transparent 8px 16px)"></span><span class="label-tiny text-outline">{{ cars|length }} car{{ cars|length|pluralize }}</span></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7 lg:gap-9" data-tickets>
+        {% for vehicle in cars %}
+        {% if vehicle.wedding_decoration_charge %}
+        {% with dc=vehicle.wedding_decoration_charge|floatformat:0 %}{% with note="+ ₹"|add:dc|add:" basic decoration · chauffeur driven" %}{% include "public/themes/route/_ticket.html" with vehicle=vehicle n=forloop.counter note=note %}{% endwith %}{% endwith %}
+        {% else %}
+        {% include "public/themes/route/_ticket.html" with vehicle=vehicle n=forloop.counter note="Includes basic decoration · chauffeur driven" %}
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

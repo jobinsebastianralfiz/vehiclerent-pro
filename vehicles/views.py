@@ -5,6 +5,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
+from core.themes import themed
+
 from .models import (
     BookingAddon,
     City,
@@ -99,7 +101,7 @@ def vehicle_list(request):
     query_params.pop("page", None)
     query_string = query_params.urlencode()
 
-    return render(request, "public/vehicle_list.html", {
+    return render(request, themed(request, "vehicle_list.html"), {
         "page_obj": page_obj,
         "categories": categories,
         "brands": brands,
@@ -133,7 +135,7 @@ def vehicle_detail(request, slug):
     )
     addons = BookingAddon.objects.filter(is_active=True)
     cities = City.objects.filter(is_active=True)
-    return render(request, "public/vehicle_detail.html", {
+    return render(request, themed(request, "vehicle_detail.html"), {
         "vehicle": vehicle,
         "images": images,
         "related_vehicles": related,
@@ -151,7 +153,7 @@ def premium_cars(request):
         .order_by("-is_featured", "-price_per_day")
     )
     cities = City.objects.filter(is_active=True)
-    return render(request, "public/premium_cars.html", {
+    return render(request, themed(request, "premium_cars.html"), {
         "vehicles": qs,
         "featured_vehicles": qs.filter(is_featured=True)[:3],
         "cities": cities,
@@ -171,7 +173,7 @@ def wedding_cars(request):
     other = qs.exclude(wedding_tier__in=["classic", "premium", "iconic"])[:6]
     decorations = WeddingDecorationPackage.objects.filter(is_active=True)
     cities = City.objects.filter(is_active=True)
-    return render(request, "public/wedding_cars.html", {
+    return render(request, themed(request, "wedding_cars.html"), {
         "vehicles": qs,
         "classic_cars": classic,
         "premium_cars": premium,

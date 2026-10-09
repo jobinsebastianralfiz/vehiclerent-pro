@@ -1,0 +1,260 @@
+{% extends "public/base_public.html" %}
+{% load vehicle_tags %}
+{% comment %}Kerala Route · vehicle. A postcard gallery beside a boarding pass that is also the booking form,
+then a road down the page through specs, the story, what's on board and similar drives.{% endcomment %}
+
+{% block title %}{{ vehicle.meta_title|default:vehicle.brand }} {% if not vehicle.meta_title %}{{ vehicle.name }} for Rent in Kerala{% endif %} | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} ({{ vehicle.get_vehicle_type_display }}) at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}{% if vehicle.seating_capacity %}, {{ vehicle.seating_capacity }} seats{% endif %}. Doorstep delivery, transparent pricing, 24x7 support.{% endif %}{% endblock %}
+{% block meta_keywords %}{% if vehicle.meta_keywords %}{{ vehicle.meta_keywords }}{% else %}{{ vehicle.brand }} rental, {{ vehicle.name }} rent, {{ vehicle.get_vehicle_type_display }} rental Kerala, {{ vehicle.brand }} {{ vehicle.name }} hire, car rental Kerala{% endif %}{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_title %}{{ vehicle.brand }} {{ vehicle.name }} for Rent | {{ BUSINESS_NAME }}{% endblock %}
+{% block og_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}.{% endif %}{% endblock %}
+{% block twitter_title %}{{ vehicle.brand }} {{ vehicle.name }} for Rent{% endblock %}
+{% block twitter_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} at {{ vehicle.price_per_day|inr }}/day in Kerala.{% endif %}{% endblock %}
+{% block og_image %}{% if vehicle.thumbnail %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ vehicle.thumbnail.url }}"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>{% else %}{{ block.super }}{% endif %}{% endblock %}
+{% block twitter_image %}{% if vehicle.thumbnail %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ vehicle.thumbnail.url }}"/>{% else %}{{ block.super }}{% endif %}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "{{ vehicle.brand }} {{ vehicle.name }}",
+    "description": "{{ vehicle.description|truncatewords:50 }}",
+    "brand": { "@type": "Brand", "name": "{{ vehicle.brand }}" },
+    "category": "{{ vehicle.get_vehicle_type_display }}",
+    {% if vehicle.thumbnail %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ vehicle.thumbnail.url }}",{% endif %}
+    "offers": {
+        "@type": "Offer",
+        "priceCurrency": "INR",
+        "price": "{{ vehicle.price_per_day }}",
+        "unitCode": "DAY",
+        "availability": "{% if vehicle.status == 'available' %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
+    }
+}
+</script>
+{% endblock %}
+
+
+{% block extra_css %}{% include "public/themes/route/_assets.html" %}{% endblock %}
+
+{% block content %}
+<section class="r-glow">
+<div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 lg:pt-12 pb-16">
+    {% url 'vehicle_list' as fleet_url %}
+    {% if vehicle.category %}
+    {% with cid=vehicle.category.id|stringformat:"d" %}{% with cat_url=fleet_url|add:"?category="|add:cid %}
+    {% include "public/themes/route/_trail.html" with crumb_label="Fleet" crumb_url=fleet_url crumb2_label=vehicle.category.name crumb2_url=cat_url here=vehicle.name %}
+    {% endwith %}{% endwith %}
+    {% else %}
+    {% include "public/themes/route/_trail.html" with crumb_label="Fleet" crumb_url=fleet_url here=vehicle.name %}
+    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] gap-10 lg:gap-14 items-start">
+        <!-- ─── Gallery: a postcard ─── -->
+        <div x-data="{ active: 0 }" class="min-w-0" data-intro="2" data-intro-kind="fade">
+            <div class="pc !pb-12 sm:!p-4 sm:!pb-14 rotate-[-1.2deg]" data-no-parallax>
+                <div class="relative aspect-[4/3] overflow-hidden rounded-[3px] bg-surface-container">
+                    {% if images %}
+                        {% for img in images %}
+                        <img x-show="active === {{ forloop.counter0 }}" {% if not forloop.first %}x-cloak{% endif %} src="{{ img.image.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}{% if images|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-cover !aspect-auto" x-transition.opacity.duration.500ms/>
+                        {% endfor %}
+                    {% elif vehicle.thumbnail %}
+                        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="absolute inset-0 w-full h-full object-cover !aspect-auto"/>
+                    {% else %}
+                        <div class="r-photo-empty absolute inset-0 flex flex-col items-center justify-center gap-3 text-outline"><span class="material-symbols-outlined text-[110px] text-[#e39b3c]">directions_car</span><span class="label-tiny">Photo coming soon</span></div>
+                    {% endif %}
+                    <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+                        {% if vehicle.is_premium %}<span class="bg-tertiary text-on-tertiary label-tiny px-3 py-2 rounded-full">Premium</span>{% endif %}
+                        {% if vehicle.is_wedding_service %}<span class="bg-[#d9692f] text-white label-tiny px-3 py-2 rounded-full">Wedding</span>{% endif %}
+                    </div>
+                    <div class="absolute top-4 right-4 flex items-center gap-2 bg-[#fffaf0]/90 backdrop-blur px-3 py-2 rounded-full">
+                        <span class="w-2 h-2 rounded-full {% if vehicle.status == 'available' %}bg-emerald-500{% elif vehicle.status == 'rented' %}bg-blue-500{% else %}bg-amber-500{% endif %}"></span>
+                        <span class="label-tiny text-[#1b1c17]">{{ vehicle.get_status_display }}</span>
+                    </div>
+                    {% if images|length > 1 %}
+                    <div class="absolute bottom-4 right-4 bg-[#0f2e2c]/75 text-[#fffaf0] label-tiny px-3 py-2 rounded-full"><span x-text="active + 1">1</span> / {{ images|length }}</div>
+                    {% endif %}
+                </div>
+                <span class="pc-cap !text-lg sm:!text-xl !bottom-3 sm:!bottom-4">Greetings from the {{ vehicle.name }}</span>
+                <span class="pc-stamp !w-8 !h-9 !bottom-2 sm:!bottom-3"><span class="material-symbols-outlined">{% if vehicle.is_wedding_service %}favorite{% else %}directions_car{% endif %}</span></span>
+            </div>
+            {% if images|length > 1 %}
+            <div class="flex gap-3 sm:gap-4 mt-8 overflow-x-auto no-scrollbar pb-3 pt-1 px-1" role="tablist" aria-label="Photos">
+                {% for img in images %}
+                <button type="button" role="tab" x-on:click="active = {{ forloop.counter0 }}" :aria-selected="(active === {{ forloop.counter0 }}).toString()" class="shrink-0 w-24 sm:w-28 bg-[#fffaf0] p-1.5 pb-3 rounded shadow-md transition-all duration-300" :class="active === {{ forloop.counter0 }} ? 'ring-2 ring-[#e39b3c] -translate-y-1 rotate-0' : 'opacity-70 hover:opacity-100 {% cycle "rotate-[-3deg]" "rotate-[2deg]" "rotate-[-1deg]" "rotate-[3deg]" %}'" aria-label="Show photo {{ forloop.counter }}">
+                    <img src="{{ img.image.url }}" alt="" class="w-full aspect-[4/3] object-cover rounded-sm"/>
+                </button>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ─── Boarding pass: fare + booking ─── -->
+        <aside id="book" class="lg:sticky lg:top-28 min-w-0 scroll-mt-28" data-intro="3" data-intro-kind="fade">
+            <div class="bg-surface-container-lowest rounded-[1.75rem] shadow-2xl shadow-black/10 border border-outline-variant/50 overflow-hidden">
+                <div class="bg-tertiary text-[#fffaf0] px-6 sm:px-8 pt-6 pb-7 relative overflow-hidden">
+                    <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(60% 90% at 100% 0%,rgba(227,155,60,.45),transparent 70%)"></div>
+                    <div class="relative flex items-center justify-between gap-3 label-tiny text-[#f6d9a8]"><span>Boarding pass</span><span>{{ vehicle.get_vehicle_type_display }}</span></div>
+                    <p class="relative label-tiny text-[#fffaf0]/60 mt-5">{{ vehicle.brand }}</p>
+                    <h1 class="relative font-serif font-bold text-3xl sm:text-4xl leading-tight mt-2">{{ vehicle.name }}</h1>
+                    {% if vehicle.year %}<p class="relative text-sm text-[#fffaf0]/70 mt-2">{{ vehicle.year }}{% if vehicle.color %} · {{ vehicle.color }}{% endif %}</p>{% endif %}
+                    <div class="relative flex items-baseline gap-2 mt-5">
+                        {% if vehicle.primary_price_value %}
+                        <span class="font-serif font-bold text-4xl text-[#e39b3c]">{{ vehicle.primary_price_value|inr }}</span><span class="label-tiny text-[#fffaf0]/60">/ {{ vehicle.primary_price_label }}</span>
+                        {% else %}
+                        <span class="font-serif font-bold text-3xl text-[#e39b3c]">Rate on enquiry</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- fare table -->
+                <dl class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-4 px-6 sm:px-8 py-6 text-on-surface">
+                    {% if vehicle.price_per_day %}<div><dt class="label-tiny text-outline">Per day</dt><dd class="font-serif font-bold text-lg mt-1">{{ vehicle.price_per_day|inr }}</dd></div>{% endif %}
+                    {% if vehicle.price_per_week %}<div><dt class="label-tiny text-outline">Per week</dt><dd class="font-serif font-bold text-lg mt-1">{{ vehicle.price_per_week|inr }}</dd></div>{% endif %}
+                    {% if vehicle.price_per_month %}<div><dt class="label-tiny text-outline">Per month</dt><dd class="font-serif font-bold text-lg mt-1">{{ vehicle.price_per_month|inr }}</dd></div>{% endif %}
+                    {% if vehicle.is_chauffeur_available and vehicle.with_driver_price_per_day %}<div><dt class="label-tiny text-outline">With driver</dt><dd class="font-serif font-bold text-lg mt-1">{{ vehicle.with_driver_price_per_day|inr }}<span class="text-xs text-outline font-sans font-normal">/day</span></dd></div>{% endif %}
+                    {% if vehicle.included_km_per_day %}<div><dt class="label-tiny text-outline">Free km</dt><dd class="font-serif font-bold text-lg mt-1">{{ vehicle.included_km_per_day }}<span class="text-xs text-outline font-sans font-normal">/day</span></dd></div>{% endif %}
+                    {% if vehicle.per_km_charge %}<div><dt class="label-tiny text-outline">Extra km</dt><dd class="font-serif font-bold text-lg mt-1">₹{{ vehicle.per_km_charge }}</dd></div>{% endif %}
+                    {% if vehicle.security_deposit %}<div><dt class="label-tiny text-outline">Deposit</dt><dd class="font-serif font-bold text-lg mt-1">{{ vehicle.security_deposit|inr }}<span class="block text-[10px] text-outline font-sans font-normal">refundable</span></dd></div>{% endif %}
+                </dl>
+
+                <div class="tk-perf"></div>
+
+                <form action="{% url 'submit_enquiry' %}" method="post" class="px-6 sm:px-8 pt-7 pb-6 space-y-4 r-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="vehicle" value="{{ vehicle.id }}"/>
+                    <input type="hidden" name="source" value="website"/>
+                    {% if vehicle.is_chauffeur_available %}
+                    <div class="flex bg-surface rounded-full p-1" role="radiogroup" aria-label="Rental type">
+                        <label class="flex-1 cursor-pointer"><input type="radio" name="rental_type" value="self_drive" checked class="peer sr-only"><span class="block text-center px-3 py-2.5 rounded-full label-tiny peer-checked:bg-tertiary peer-checked:text-on-tertiary text-on-surface-variant transition-colors">Self-drive</span></label>
+                        <label class="flex-1 cursor-pointer"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only"><span class="block text-center px-3 py-2.5 rounded-full label-tiny peer-checked:bg-tertiary peer-checked:text-on-tertiary text-on-surface-variant transition-colors">With driver</span></label>
+                    </div>
+                    {% endif %}
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="block"><span class="label-tiny text-outline block mb-2">Pickup</span><input type="date" name="preferred_start_date" required class="r-field"></label>
+                        <label class="block"><span class="label-tiny text-outline block mb-2">Return</span><input type="date" name="preferred_end_date" required class="r-field"></label>
+                    </div>
+                    {% if cities %}
+                    <label class="block"><span class="label-tiny text-outline block mb-2">Pickup city</span>
+                        <select name="pickup_city" class="r-field"><option value="">Choose city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select>
+                    </label>
+                    {% endif %}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label class="block"><span class="label-tiny text-outline block mb-2">Passenger name</span><input type="text" name="name" required autocomplete="name" class="r-field"></label>
+                        <label class="block"><span class="label-tiny text-outline block mb-2">Phone</span><input type="tel" name="phone" required autocomplete="tel" class="r-field" placeholder="+91 "></label>
+                    </div>
+                    {% if addons %}
+                    <fieldset>
+                        <legend class="label-tiny text-outline block mb-3">Extras</legend>
+                        <div class="space-y-2">
+                            {% for addon in addons %}
+                            <label class="flex items-center justify-between gap-3 cursor-pointer px-4 py-3 rounded-2xl border border-dashed border-[#d6ccb5] hover:bg-surface transition-colors">
+                                <span class="flex items-center gap-3 min-w-0"><input type="checkbox" name="addons" value="{{ addon.slug }}" class="rounded text-tertiary focus:ring-[#e39b3c]">{% if addon.icon %}<span class="material-symbols-outlined text-[#d9692f] text-lg">{{ addon.icon }}</span>{% endif %}<span class="text-sm truncate">{{ addon.name }}</span></span>
+                                <span class="label-tiny text-outline shrink-0">+{{ addon.price|inr }} {{ addon.get_pricing_unit_display|lower }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+                    {% endif %}
+                    <button type="submit" class="m-shine w-full bg-primary-container text-on-primary py-4 rounded-full label-tiny hover:opacity-90 transition-all flex items-center justify-center gap-3 group" data-magnetic>
+                        Reserve now <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
+                    </button>
+                </form>
+
+                <div class="flex items-center gap-3 px-6 sm:px-8 pb-6">
+                    <a href="{% whatsapp_vehicle_url vehicle %}" target="_blank" rel="noopener" class="flex-1 flex items-center justify-center gap-2 bg-[#25D366] text-white py-3 rounded-full text-sm font-bold hover:opacity-90 transition-opacity"><span class="material-symbols-outlined text-base">chat</span> WhatsApp</a>
+                    {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="flex-1 flex items-center justify-center gap-2 bg-surface-container text-on-surface py-3 rounded-full text-sm font-bold hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-base">call</span> Call</a>{% endif %}
+                </div>
+                <p class="label-tiny text-center text-outline pb-6 px-6">Free cancellation up to 24h · No hidden charges</p>
+            </div>
+        </aside>
+    </div>
+</div>
+</section>
+
+<!-- ═══════════ the road through the details ═══════════ -->
+<div id="journey">
+    {% include "public/themes/route/_road.html" %}
+
+    {% if vehicle.seating_capacity or vehicle.transmission or vehicle.fuel_type or vehicle.engine_cc or vehicle.range_km or vehicle.mileage_kmpl or vehicle.battery_capacity_kwh or vehicle.included_km_per_day %}
+    <div class="road-gap sm" data-stop="The specs"></div>
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="mb-10"><span class="label-tiny text-[#d9692f]">Vehicle details</span><h2 class="headline-lg text-4xl sm:text-5xl mt-4 text-tertiary">The specs.</h2></div>
+        <div class="bg-surface-container-lowest rounded-[1.75rem] shadow-xl shadow-black/5 border border-outline-variant/50 grid grid-cols-2 sm:grid-cols-4 divide-x divide-y divide-dashed divide-[#d6ccb5] overflow-hidden" data-deal>
+            {% if vehicle.seating_capacity %}<div class="p-6 sm:p-8"><div class="label-tiny text-outline">Seats</div><div class="font-serif font-bold text-3xl sm:text-4xl text-tertiary mt-3">{{ vehicle.seating_capacity }}</div></div>{% endif %}
+            {% if vehicle.transmission %}<div class="p-6 sm:p-8"><div class="label-tiny text-outline">Gearbox</div><div class="font-serif font-bold text-2xl sm:text-3xl text-tertiary mt-3">{{ vehicle.get_transmission_display }}</div></div>{% endif %}
+            {% if vehicle.fuel_type %}<div class="p-6 sm:p-8"><div class="label-tiny text-outline">Fuel</div><div class="font-serif font-bold text-2xl sm:text-3xl text-tertiary mt-3">{{ vehicle.get_fuel_type_display }}</div></div>{% endif %}
+            {% if vehicle.engine_cc %}<div class="p-6 sm:p-8"><div class="label-tiny text-outline">Engine</div><div class="font-serif font-bold text-3xl sm:text-4xl text-tertiary mt-3">{{ vehicle.engine_cc }}<span class="text-base text-outline">cc</span></div></div>{% endif %}
+            {% if vehicle.range_km %}<div class="p-6 sm:p-8"><div class="label-tiny text-outline">Range</div><div class="font-serif font-bold text-3xl sm:text-4xl text-tertiary mt-3">{{ vehicle.range_km }}<span class="text-base text-outline">km</span></div></div>{% endif %}
+            {% if vehicle.mileage_kmpl %}<div class="p-6 sm:p-8"><div class="label-tiny text-outline">Mileage</div><div class="font-serif font-bold text-3xl sm:text-4xl text-tertiary mt-3">{{ vehicle.mileage_kmpl }}<span class="text-base text-outline">kmpl</span></div></div>{% endif %}
+            {% if vehicle.battery_capacity_kwh %}<div class="p-6 sm:p-8"><div class="label-tiny text-outline">Battery</div><div class="font-serif font-bold text-3xl sm:text-4xl text-tertiary mt-3">{{ vehicle.battery_capacity_kwh }}<span class="text-base text-outline">kWh</span></div></div>{% endif %}
+            {% if vehicle.included_km_per_day %}<div class="p-6 sm:p-8"><div class="label-tiny text-outline">Free km / day</div><div class="font-serif font-bold text-3xl sm:text-4xl text-tertiary mt-3">{{ vehicle.included_km_per_day }}</div></div>{% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if vehicle.description %}
+    <div class="road-gap" data-stop="The story"></div>
+    <section class="lane max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <div>
+            <span class="label-tiny text-[#d9692f]">About this {{ vehicle.get_vehicle_type_display|lower }}</span>
+            <h2 class="headline-lg text-4xl sm:text-5xl mt-4 mb-6 text-tertiary">Built for Kerala roads.</h2>
+            <p class="text-lg text-on-surface-variant leading-relaxed font-light whitespace-pre-line">{{ vehicle.description }}</p>
+        </div>
+        {% if vehicle.thumbnail %}
+        <div class="pc pc-in max-w-md mx-auto w-full rotate-[3deg]"><img src="{{ vehicle.thumbnail.url }}" alt="" loading="lazy"><span class="pc-cap">{{ vehicle.brand }} {{ vehicle.name }}</span><span class="pc-stamp"><span class="material-symbols-outlined">wb_sunny</span></span></div>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    {% if vehicle.features %}
+    <div class="road-gap" data-stop="On board"></div>
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="mb-10"><span class="label-tiny text-[#d9692f]">What's included</span><h2 class="headline-lg text-4xl sm:text-5xl mt-4 text-tertiary">Every detail considered.</h2></div>
+        <ul class="flex flex-wrap gap-3" data-deal>
+            {% for feature in vehicle.features %}
+            <li class="flex items-center gap-2.5 bg-surface-container-lowest border border-dashed border-[#d6ccb5] rounded-full pl-3 pr-5 py-2.5 text-sm font-semibold text-on-surface"><span class="material-symbols-outlined text-[#e39b3c] text-lg" style="font-variation-settings:'FILL' 1">check_circle</span>{{ feature }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    {% if related_vehicles %}
+    <div class="road-gap" data-stop="Similar drives"></div>
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-12 gap-6">
+            <div><span class="label-tiny text-[#d9692f]">Also consider</span><h2 class="headline-lg text-4xl sm:text-5xl mt-4 text-tertiary">Similar drives.</h2></div>
+            {% if vehicle.category %}<a href="{% url 'vehicle_list' %}?category={{ vehicle.category.id }}" class="self-start sm:self-auto border border-tertiary text-tertiary px-6 py-3 rounded-full font-bold text-sm flex items-center gap-2 hover:bg-tertiary hover:text-on-tertiary transition-colors">All {{ vehicle.category.name }} <span class="material-symbols-outlined text-lg">arrow_forward</span></a>{% endif %}
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7 lg:gap-9" data-tickets>
+            {% for v in related_vehicles|slice:":3" %}
+            {% include "public/themes/route/_ticket.html" with vehicle=v n=forloop.counter %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <div class="road-gap" data-stop="Reserve"></div>
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="relative overflow-hidden rounded-[2.5rem] bg-tertiary text-[#fffaf0] p-8 sm:p-14 lg:p-16 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(45% 80% at 100% 100%,rgba(227,155,60,.45),transparent 70%)"></div>
+            <div class="relative">
+                <span class="label-tiny text-[#e39b3c] block">Ready when you are</span>
+                <h2 class="headline-lg text-4xl sm:text-5xl mt-4">Your {{ vehicle.name }} is waiting.</h2>
+                <p class="text-[#fffaf0]/75 mt-4">{% if vehicle.primary_price_value %}{{ vehicle.primary_price_value|inr }} / {{ vehicle.primary_price_label }} · {% endif %}Free cancellation 24h before pickup</p>
+            </div>
+            <div class="relative flex flex-wrap gap-3">
+                <a href="#book" class="bg-[#e39b3c] text-[#0f2e2c] px-8 py-4 rounded-full label-tiny hover:bg-[#f6d9a8] transition-colors flex items-center gap-2">Reserve now <span class="material-symbols-outlined text-base">north</span></a>
+                <a href="{% whatsapp_vehicle_url vehicle %}" target="_blank" rel="noopener" class="border border-[#fffaf0]/40 px-8 py-4 rounded-full label-tiny hover:bg-[#fffaf0] hover:text-[#0f2e2c] transition-colors">WhatsApp</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="road-gap sm" data-stop="Destination" data-stop-end></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}{% include "public/themes/route/_js.html" %}{% endblock %}

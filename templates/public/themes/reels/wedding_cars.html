@@ -1,0 +1,150 @@
+{% extends "public/themes/reels/_base.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}Wedding Cars for Rent in Kerala | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Chauffeur-driven decorated wedding cars in Kerala. Classic Honda City to Rolls Royce Ghost. Floral packages, statewide delivery, available 365 days.{% endblock %}
+{% block meta_keywords %}wedding car rental Kerala, marriage cars Kerala, decorated wedding cars, Rolls Royce wedding rental, BMW wedding car, Audi wedding car, vintage wedding car Kerala, bridal car hire, groom car rental, Kochi wedding car, Kottayam wedding car, Trivandrum wedding car{% endblock %}
+{% block og_title %}Wedding Cars in Kerala — Decorated, Chauffeur-Driven{% endblock %}
+{% block og_description %}From classic Verna to Rolls Royce Ghost. Decorated, chauffeur-driven, delivered to your venue. Available 365 days across Kerala.{% endblock %}
+
+{% block page %}
+<!-- ─── Hero: the wedding photo reel ─── -->
+<section class="phero wed-hero" id="wedding">
+  <div class="phero-copy">
+    <span class="kicker" data-intro="0"><i></i>Wedding fleet · Kerala</span>
+    <h1 class="phead-h" data-intro="1" data-intro-kind="split">For the day you'll <span class="ol">always remember.</span></h1>
+    <p class="lede" data-intro="2">Chauffeur-driven decorated cars for the bride, groom and family. Booked in minutes, delivered with ceremony.</p>
+    <div class="ctas" data-intro="3">
+      <a href="#plan" class="btn btn-main" data-magnetic>Plan your arrival <span class="material-symbols-outlined">arrow_downward</span></a>
+      {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="btn btn-line"><span class="material-symbols-outlined">call</span>Talk to us</a>{% endif %}
+    </div>
+    {% if vehicles or decorations %}
+    <div class="stats" data-intro="4">
+      {% if vehicles %}<div><b><span data-slot>{{ vehicles|length }}</span></b><small>Wedding {{ vehicles|length|pluralize:"car,cars" }}</small></div>{% endif %}
+      {% if decorations %}<div><b><span data-slot>{{ decorations|length }}</span></b><small>Decor {{ decorations|length|pluralize:"package,packages" }}</small></div>{% endif %}
+      {% if cities %}<div><b><span data-slot>{{ cities|length }}</span></b><small>{{ cities|length|pluralize:"City,Cities" }}</small></div>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+  <div class="stage" data-intro="2" data-intro-kind="pop">
+    <div class="ct wed-tile" id="wedTile" data-tilt="0.5">
+      <div class="wreel"><div class="wreel-strip" id="wreel">
+        <img src="{% static 'themes/img/wedding-rolls.jpg' %}" alt="Vintage car with white floral garlands"/>
+        <img src="{% static 'themes/img/ambassador.jpg' %}" alt="Cream classic car with marigold strands"/>
+        <img src="{% static 'themes/img/wedding-venue.jpg' %}" alt="Classic white car under a marigold canopy"/>
+      </div></div>
+      <div class="wcaps" id="wcaps"><span class="on">01 Classic</span><span>02 Premium</span><span>03 Iconic</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Planner ─── -->
+<section class="px-[var(--gut)]" id="plan" data-reveal>
+  <form class="search" action="{% url 'vehicle_list' %}" method="get" aria-label="Find a wedding car">
+    <input type="hidden" name="wedding" value="1"/>
+    <input type="hidden" name="rental_type" value="with_driver"/>
+    <div class="search-top"><span class="kicker"><i></i>Plan the day</span></div>
+    <div class="search-grid search-3">
+      <label class="field"><span>Wedding date</span><input type="date" name="pickup_date"/></label>
+      <label class="field"><span>Pickup city</span><select name="pickup_city"><option value="">Any city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
+      <button type="submit" class="btn btn-main" data-magnetic>See wedding cars <span class="material-symbols-outlined">arrow_forward</span></button>
+    </div>
+    <p class="search-note">Chauffeur included · Decoration tailored to your day</p>
+  </form>
+</section>
+
+<!-- ─── Three tiers ─── -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="kicker"><i></i>Choose your entrance</span><h2 class="h2">Three ways <span class="ol">to arrive.</span></h2></div>
+      <p class="lede">From elegant sedans for the family convoy to once-in-a-lifetime arrivals.</p>
+    </div>
+    <div class="tier-grid" data-deal>
+      {% with low=classic_cars|dictsort:"price_per_day"|first %}
+      <a href="{% if classic_cars %}#fleet{% else %}#enquiry{% endif %}"{% if classic_cars %} data-tier="Classic"{% endif %} class="ct tier t-amber" data-tilt>
+        <span class="tier-ph">{% if classic_cars and classic_cars.0.thumbnail %}<img src="{{ classic_cars.0.thumbnail.url }}" alt="" loading="lazy"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">favorite</span></span>{% endif %}</span>
+        <span class="tier-n">01</span>
+        <span class="tier-copy"><small>Classic</small><b>Elegant sedans, traditional decor.</b><em>{% if low.price_per_day %}From {{ low.price_per_day|inr }} / day{% elif classic_cars %}{{ classic_cars|length }} car{{ classic_cars|length|pluralize }}{% else %}Enquire{% endif %}</em></span>
+      </a>
+      {% endwith %}
+      {% with low=premium_cars|dictsort:"price_per_day"|first %}
+      <a href="{% if premium_cars %}#fleet{% else %}#enquiry{% endif %}"{% if premium_cars %} data-tier="Premium"{% endif %} class="ct tier dk t-night" data-tilt>
+        <span class="tier-ph">{% if premium_cars and premium_cars.0.thumbnail %}<img src="{{ premium_cars.0.thumbnail.url }}" alt="" loading="lazy"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">diamond</span></span>{% endif %}</span>
+        <span class="tier-n">02</span>
+        <span class="tier-copy"><small>Premium</small><b>European luxury, the bridal entrance.</b><em>{% if low.price_per_day %}From {{ low.price_per_day|inr }} / day{% elif premium_cars %}{{ premium_cars|length }} car{{ premium_cars|length|pluralize }}{% else %}Enquire{% endif %}</em></span>
+      </a>
+      {% endwith %}
+      {% with low=iconic_cars|dictsort:"price_per_day"|first %}
+      <a href="{% if iconic_cars %}#fleet{% else %}#enquiry{% endif %}"{% if iconic_cars %} data-tier="Iconic"{% endif %} class="ct tier t-red" data-tilt>
+        <span class="tier-ph">{% if iconic_cars and iconic_cars.0.thumbnail %}<img src="{{ iconic_cars.0.thumbnail.url }}" alt="" loading="lazy"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">workspace_premium</span></span>{% endif %}</span>
+        <span class="tier-n">03</span>
+        <span class="tier-copy"><small>Iconic</small><b>Heirloom-grade. Reserved months ahead.</b><em>{% if low.price_per_day %}From {{ low.price_per_day|inr }} / day{% elif iconic_cars %}{{ iconic_cars|length }} car{{ iconic_cars|length|pluralize }}{% else %}Enquire{% endif %}</em></span>
+      </a>
+      {% endwith %}
+    </div>
+  </div>
+</section>
+
+<!-- ─── The fleet, by tier ─── -->
+<section class="sec" id="fleet" style="background:var(--paper)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="kicker"><i></i>The fleet</span><h2 class="h2">Available for <span class="ol">your date.</span></h2></div>
+      <div class="chips" id="fleetChips" role="group" aria-label="Filter by tier"></div>
+    </div>
+    {% if vehicles %}
+    <div class="cards cards-4" id="cards">
+      {% for v in classic_cars %}{% include "public/themes/reels/_card.html" with tone="amber" wedding=1 cat="Classic" %}{% endfor %}
+      {% for v in premium_cars %}{% include "public/themes/reels/_card.html" with tone="silver" wedding=1 cat="Premium" %}{% endfor %}
+      {% for v in iconic_cars %}{% include "public/themes/reels/_card.html" with tone="red" wedding=1 cat="Iconic" %}{% endfor %}
+      {% for v in other_cars %}{% include "public/themes/reels/_card.html" with tone="violet" wedding=1 cat="Other" %}{% endfor %}
+    </div>
+    {% else %}
+    <div class="ct empty t-red">
+      <span class="material-symbols-outlined">favorite</span>
+      <h2 class="empty-h">Wedding fleet coming soon.</h2>
+      <p>Call us to plan your arrival.</p>
+      {% if BUSINESS_PHONE %}<div class="ctas"><a href="tel:{{ BUSINESS_PHONE }}" class="btn btn-main"><span class="material-symbols-outlined">call</span>Call us</a></div>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ─── Decoration packages ─── -->
+{% if decorations %}
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="kicker"><i></i>Floral &amp; trim</span><h2 class="h2">Decorated to <span class="ol">your story.</span></h2></div></div>
+    <div class="deco-grid" data-deal>
+      {% for pkg in decorations %}{% cycle 'red' 'amber' 'violet' 'green' 'orange' 'teal' as tone silent %}
+      <article class="deco">
+        <div class="ct t-{{ tone }}" data-tilt="0.6"><span class="ph">{% if pkg.image %}<img src="{{ pkg.image.url }}" alt="{{ pkg.name }}" loading="lazy"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">local_florist</span></span>{% endif %}</span><span class="ct-tag"><span>Package</span><span>{{ forloop.counter|stringformat:"02d" }}</span></span></div>
+        <div class="meta">
+          <span class="name">{{ pkg.name }}</span>
+          {% if pkg.description %}<span class="specs">{{ pkg.description }}</span>{% endif %}
+          <span class="mfoot"><span class="price">+{{ pkg.price|inr }}</span></span>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Four steps ─── -->
+<section class="sec" style="background:var(--paper)">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="kicker"><i></i>Simple &amp; stress-free</span><h2 class="h2">Four steps to <span class="ol">your arrival.</span></h2></div></div>
+    <div class="why-grid" data-deal>
+      <div class="ct why t-orange" data-tilt><span class="n">01</span><div><span class="material-symbols-outlined" style="font-size:30px">calendar_month</span><b>Tell us your date</b><p>Submit the wedding date and venue.</p></div></div>
+      <div class="ct why t-blue" data-tilt><span class="n">02</span><div><span class="material-symbols-outlined" style="font-size:30px">directions_car</span><b>Choose car &amp; decor</b><p>Pick from our curated fleet.</p></div></div>
+      <div class="ct why t-red" data-tilt><span class="n">03</span><div><span class="material-symbols-outlined" style="font-size:30px">local_florist</span><b>We confirm the details</b><p>Driver introduced, decoration finalised.</p></div></div>
+      <div class="ct why dk t-night" data-tilt><span class="n">04</span><div><span class="material-symbols-outlined" style="font-size:30px">celebration</span><b>We arrive early</b><p>Polished and ready before you are.</p></div></div>
+    </div>
+    {% if WHATSAPP_NUMBER %}<p class="more"><a href="{% whatsapp_url 'Hi! I would like to enquire about a wedding car.' %}" target="_blank" rel="noopener" class="btn btn-wa"><span class="material-symbols-outlined">chat</span>Plan it on WhatsApp</a></p>{% endif %}
+  </div>
+</section>
+
+{% include "public/themes/reels/_band.html" with kicker="Let's plan your arrival" heading="Reserve your date." text="Tell us the date and venue, and our wedding team will handle the rest" %}
+{% endblock %}

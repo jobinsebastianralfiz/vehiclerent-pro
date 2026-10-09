@@ -1,0 +1,194 @@
+{% extends "public/themes/reels/_base.html" %}
+{% load vehicle_tags %}
+
+{% block title %}{{ vehicle.meta_title|default:vehicle.brand }} {% if not vehicle.meta_title %}{{ vehicle.name }} for Rent in Kerala{% endif %} | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} ({{ vehicle.get_vehicle_type_display }}) at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}{% if vehicle.seating_capacity %}, {{ vehicle.seating_capacity }} seats{% endif %}. Doorstep delivery, transparent pricing, 24x7 support.{% endif %}{% endblock %}
+{% block meta_keywords %}{% if vehicle.meta_keywords %}{{ vehicle.meta_keywords }}{% else %}{{ vehicle.brand }} rental, {{ vehicle.name }} rent, {{ vehicle.get_vehicle_type_display }} rental Kerala, {{ vehicle.brand }} {{ vehicle.name }} hire, car rental Kerala{% endif %}{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_title %}{{ vehicle.brand }} {{ vehicle.name }} for Rent | {{ BUSINESS_NAME }}{% endblock %}
+{% block og_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}.{% endif %}{% endblock %}
+{% block twitter_title %}{{ vehicle.brand }} {{ vehicle.name }} for Rent{% endblock %}
+{% block twitter_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} at {{ vehicle.price_per_day|inr }}/day in Kerala.{% endif %}{% endblock %}
+{% block og_image %}{% if vehicle.thumbnail %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ vehicle.thumbnail.url }}"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>{% else %}{{ block.super }}{% endif %}{% endblock %}
+{% block twitter_image %}{% if vehicle.thumbnail %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ vehicle.thumbnail.url }}"/>{% else %}{{ block.super }}{% endif %}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "{{ vehicle.brand }} {{ vehicle.name }}",
+    "description": "{{ vehicle.description|truncatewords:50 }}",
+    "brand": { "@type": "Brand", "name": "{{ vehicle.brand }}" },
+    "category": "{{ vehicle.get_vehicle_type_display }}",
+    {% if vehicle.thumbnail %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ vehicle.thumbnail.url }}",{% endif %}
+    "offers": {
+        "@type": "Offer",
+        "priceCurrency": "INR",
+        "price": "{{ vehicle.price_per_day }}",
+        "unitCode": "DAY",
+        "availability": "{% if vehicle.status == 'available' %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
+    }
+}
+</script>
+{% endblock %}
+
+
+{% block page %}
+<!-- ─── Hero: gallery tile + booking ─── -->
+<section class="vd" id="top">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="{% url 'vehicle_list' %}">Fleet</a><span aria-hidden="true">/</span>
+    {% if vehicle.category %}<a href="{% url 'vehicle_list' %}?category={{ vehicle.category.id }}">{{ vehicle.category.name }}</a><span aria-hidden="true">/</span>{% endif %}
+    <span aria-current="page">{{ vehicle.brand }} {{ vehicle.name }}</span>
+  </nav>
+
+  <div class="vd-grid">
+    <div class="vd-stage" data-intro="2" data-intro-kind="pop">
+      <div class="ct hero-tile vd-tile t-{% if vehicle.is_premium %}night dk{% elif vehicle.is_wedding_service %}red{% else %}orange{% endif %}" data-tilt="0.5">
+        <div class="stack" id="vdStack">
+          {% if images %}<img src="{{ images.0.image.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}"/>
+          {% elif vehicle.thumbnail %}<img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}"/>
+          {% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ vehicle.category.icon|default:"directions_car" }}</span></span>{% endif %}
+        </div>
+        {% if vehicle.is_premium %}<span class="pbadge">Premium</span>{% elif vehicle.is_wedding_service %}<span class="pbadge">Wedding</span>{% endif %}
+        <span class="ct-tag"><span><span class="status-dot s-{{ vehicle.status }}"></span>{{ vehicle.get_status_display }}</span>{% if images|length > 1 %}<span id="vdIdx">01 / {{ images|length|stringformat:"02d" }}</span>{% endif %}</span>
+      </div>
+      {% if images|length > 1 %}
+      <div class="thumbs vd-thumbs" id="vdThumbs" role="group" aria-label="Photos">
+        {% for img in images %}{% cycle 'orange' 'blue' 'green' 'silver' 'amber' 'red' as tone silent %}
+        <button type="button" class="th t-{{ tone }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="Photo {{ forloop.counter }}" data-img="{{ img.image.url }}"><img src="{{ img.image.url }}" alt="" loading="lazy"/></button>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="vd-copy">
+      <span class="kicker" data-intro="0"><i></i>{{ vehicle.brand }} · {{ vehicle.get_vehicle_type_display }}</span>
+      <h1 class="vd-h" data-intro="1" data-intro-kind="split">{{ vehicle.name }}</h1>
+      {% if vehicle.year or vehicle.color %}<p class="vd-sub">{% if vehicle.year %}{{ vehicle.year }}{% endif %}{% if vehicle.year and vehicle.color %} · {% endif %}{{ vehicle.color }}</p>{% endif %}
+      {% if vehicle.short_description %}<p class="lede">{{ vehicle.short_description }}</p>{% endif %}
+
+      <div class="plans" data-deal>
+        {% if vehicle.price_per_day %}<div class="plan ct t-orange"><small>Per day</small><b>₹<span data-slot>{{ vehicle.price_per_day|inr|slice:"1:" }}</span></b></div>{% endif %}
+        {% if vehicle.price_per_week %}<div class="plan ct t-blue"><small>Per week</small><b>₹<span data-slot>{{ vehicle.price_per_week|inr|slice:"1:" }}</span></b></div>{% endif %}
+        {% if vehicle.price_per_month %}<div class="plan ct t-green"><small>Per month</small><b>₹<span data-slot>{{ vehicle.price_per_month|inr|slice:"1:" }}</span></b></div>{% endif %}
+        {% if vehicle.is_chauffeur_available and vehicle.with_driver_price_per_day %}<div class="plan ct t-night dk"><small>With driver</small><b>+₹<span data-slot>{{ vehicle.with_driver_price_per_day|inr|slice:"1:" }}</span></b><small>a day</small></div>{% endif %}
+        {% if not vehicle.price_per_day and not vehicle.price_per_week and not vehicle.price_per_month %}<div class="plan ct t-silver"><small>Price</small><b class="b-sm">On request</b></div>{% endif %}
+      </div>
+      <p class="vd-terms">
+        {% if vehicle.included_km_per_day %}<span>{{ vehicle.included_km_per_day }} km/day included</span>{% endif %}
+        {% if vehicle.per_km_charge %}<span>₹{{ vehicle.per_km_charge }}/km extra</span>{% endif %}
+        {% if vehicle.security_deposit %}<span>{{ vehicle.security_deposit|inr }} refundable deposit</span>{% endif %}
+        {% if vehicle.minimum_rental_days > 1 %}<span>Min. {{ vehicle.minimum_rental_days }} days</span>{% endif %}
+      </p>
+
+      <div class="book" id="book">
+        <span class="kicker"><i></i>Reserve this car</span>
+        {% if vehicle.is_chauffeur_available %}
+        <div class="chips book-mode" role="radiogroup" aria-label="Rental type">
+          <label class="chip"><input type="radio" name="rental_type" value="self_drive" form="bookForm" class="sr-only" checked/>Self-drive</label>
+          <label class="chip"><input type="radio" name="rental_type" value="with_driver" form="bookForm" class="sr-only"/>With driver{% if vehicle.with_driver_price_per_day %} +₹{{ vehicle.with_driver_price_per_day }}{% endif %}</label>
+        </div>
+        {% endif %}
+        <form action="{% url 'submit_enquiry' %}" method="post" class="book-form" id="bookForm">
+          {% csrf_token %}
+          <input type="hidden" name="vehicle" value="{{ vehicle.id }}"/>
+          <input type="hidden" name="source" value="website"/>
+          <label class="field"><span>Pickup</span><input type="date" name="preferred_start_date" required/></label>
+          <label class="field"><span>Return</span><input type="date" name="preferred_end_date" required/></label>
+          {% if cities %}<label class="field full"><span>Pickup city</span><select name="pickup_city"><option value="">Choose city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>{% endif %}
+          <label class="field"><span>Your name</span><input type="text" name="name" required autocomplete="name"/></label>
+          <label class="field"><span>Phone</span><input type="tel" name="phone" required autocomplete="tel"/></label>
+          {% if addons %}
+          <fieldset class="addons full"><legend>Extras</legend>
+            {% for addon in addons %}
+            <label class="addon"><input type="checkbox" name="addons" value="{{ addon.slug }}"/><span>{% if addon.icon %}<span class="material-symbols-outlined">{{ addon.icon }}</span>{% endif %}{{ addon.name }}</span><small>+₹{{ addon.price }} {{ addon.get_pricing_unit_display|lower }}</small></label>
+            {% endfor %}
+          </fieldset>
+          {% endif %}
+          <button type="submit" class="btn btn-main full" data-magnetic>Reserve now <span class="material-symbols-outlined">arrow_forward</span></button>
+        </form>
+        <div class="book-alt">
+          <a href="{% whatsapp_vehicle_url vehicle %}" target="_blank" rel="noopener" class="btn btn-wa"><span class="material-symbols-outlined">chat</span>WhatsApp</a>
+          {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="btn btn-line"><span class="material-symbols-outlined">call</span>Call</a>{% endif %}
+        </div>
+        <p class="search-note">Free cancellation up to 24h · No hidden charges</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Spec tiles ─── -->
+{% if vehicle.seating_capacity or vehicle.transmission or vehicle.fuel_type or vehicle.engine_cc or vehicle.range_km or vehicle.mileage_kmpl or vehicle.battery_capacity_kwh or vehicle.included_km_per_day %}
+<section class="sec sec-tight" style="background:var(--paper)">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="kicker"><i></i>Spec sheet</span><h2 class="h2">By the <span class="ol">numbers.</span></h2></div></div>
+    <div class="spec-grid" data-deal>
+      {% if vehicle.seating_capacity %}<div class="ct spec t-orange" data-tilt><b><span data-slot>{{ vehicle.seating_capacity }}</span></b><small>Seats</small></div>{% endif %}
+      {% if vehicle.transmission %}<div class="ct spec t-blue" data-tilt><b class="b-word">{{ vehicle.get_transmission_display }}</b><small>Gearbox</small></div>{% endif %}
+      {% if vehicle.fuel_type %}<div class="ct spec t-green" data-tilt><b class="b-word">{{ vehicle.get_fuel_type_display }}</b><small>Fuel</small></div>{% endif %}
+      {% if vehicle.engine_cc %}<div class="ct spec t-silver" data-tilt><b><span data-slot>{{ vehicle.engine_cc }}</span><i>cc</i></b><small>Engine</small></div>{% endif %}
+      {% if vehicle.range_km %}<div class="ct spec t-teal" data-tilt><b><span data-slot>{{ vehicle.range_km }}</span><i>km</i></b><small>Range</small></div>{% endif %}
+      {% if vehicle.mileage_kmpl %}<div class="ct spec t-amber" data-tilt><b>{{ vehicle.mileage_kmpl }}</b><small>km per litre</small></div>{% endif %}
+      {% if vehicle.battery_capacity_kwh %}<div class="ct spec t-violet" data-tilt><b>{{ vehicle.battery_capacity_kwh }}<i>kWh</i></b><small>Battery</small></div>{% endif %}
+      {% if vehicle.included_km_per_day %}<div class="ct spec dk t-night" data-tilt><b><span data-slot>{{ vehicle.included_km_per_day }}</span></b><small>Free km / day</small></div>{% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── About + features ─── -->
+{% if vehicle.description or vehicle.features %}
+<section class="sec">
+  <div class="wrap vd-about">
+    {% if vehicle.description %}
+    <div>
+      <span class="kicker"><i></i>About this car</span>
+      <h2 class="h2">Built for <span class="ol">Kerala roads.</span></h2>
+      <p class="lede vd-desc">{{ vehicle.description }}</p>
+    </div>
+    {% endif %}
+    {% if vehicle.features %}
+    <div>
+      <span class="kicker"><i></i>What's included</span>
+      <ul class="ticks" data-deal>
+        {% for feature in vehicle.features %}<li><i><span class="material-symbols-outlined">check</span></i>{{ feature }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Related ─── -->
+{% if related_vehicles %}
+<section class="sec" style="background:var(--paper)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="kicker"><i></i>Also consider</span><h2 class="h2">Similar <span class="ol">drives.</span></h2></div>
+      {% if vehicle.category %}<a href="{% url 'vehicle_list' %}?category={{ vehicle.category.id }}" class="btn btn-line">All {{ vehicle.category.name }} <span class="material-symbols-outlined">arrow_forward</span></a>{% endif %}
+    </div>
+    <div class="cards" id="cards">
+      {% for v in related_vehicles %}{% cycle 'blue' 'green' 'amber' 'red' as tone silent %}
+      {% include "public/themes/reels/_card.html" %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Final CTA ─── -->
+<section class="sec">
+  <div class="wrap">
+    <div class="ct ready t-lime">
+      <span class="kicker"><i></i>Ready to drive?</span>
+      <h2 class="ready-h">Reserve the {{ vehicle.name }}.</h2>
+      <p>{% if vehicle.primary_price_value %}{{ vehicle.primary_price_value|inr }} / {{ vehicle.primary_price_label }} · {% endif %}Free cancellation 24h before pickup</p>
+      <a href="#book" class="btn btn-main" data-magnetic>Reserve now <span class="material-symbols-outlined">arrow_upward</span></a>
+    </div>
+  </div>
+</section>
+{% endblock %}

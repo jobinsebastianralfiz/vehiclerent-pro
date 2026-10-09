@@ -1,0 +1,45 @@
+{% comment %}Route-styled booking widget: same fields as public/includes/booking_widget.html (searches the fleet).
+Keeps whatever is already in the query string. Param: cities.{% endcomment %}
+<form action="{% url 'vehicle_list' %}" method="get" class="bg-surface-container-lowest rounded-[2rem] p-5 sm:p-7 shadow-2xl shadow-black/10 border border-outline-variant/50" id="itinerary">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+        <div class="flex items-center gap-3"><span class="material-symbols-outlined text-[#d9692f]">route</span><span class="label-tiny text-tertiary">Your itinerary</span></div>
+        <div class="flex bg-surface rounded-full p-1">
+            <label class="cursor-pointer"><input type="radio" name="rental_type" value="self_drive" class="peer sr-only" {% if request.GET.rental_type != "with_driver" %}checked{% endif %}><span class="block px-4 sm:px-5 py-2 rounded-full label-tiny peer-checked:bg-tertiary peer-checked:text-on-tertiary text-on-surface-variant transition-colors">Self-Drive</span></label>
+            <label class="cursor-pointer"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only" {% if request.GET.rental_type == "with_driver" %}checked{% endif %}><span class="block px-4 sm:px-5 py-2 rounded-full label-tiny peer-checked:bg-tertiary peer-checked:text-on-tertiary text-on-surface-variant transition-colors">With Driver</span></label>
+        </div>
+    </div>
+    <input type="hidden" name="same_location" value="1" id="itSame">
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_128px_1fr_1fr_1fr_auto] gap-3 lg:gap-0 lg:items-center">
+        <label class="block bg-surface/70 lg:bg-transparent rounded-2xl px-4 py-3 lg:py-0 min-w-0">
+            <span class="label-tiny text-outline flex items-center gap-2 mb-1.5"><span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>From</span>
+            <select id="itFrom" name="pickup_city" class="bg-transparent border-none p-0 font-serif text-xl font-bold focus:ring-0 w-full text-on-surface">
+                <option value="">Any city</option>
+                {% for city in cities %}<option value="{{ city.slug }}" {% if request.GET.pickup_city == city.slug %}selected{% endif %}>{{ city.name }}</option>{% endfor %}
+            </select>
+        </label>
+        <div class="route-line relative hidden lg:block h-10 w-[124px]" aria-hidden="true">
+            <svg viewBox="0 0 124 40" class="absolute inset-0"><path d="M6 34 C 40 4, 84 4, 118 34" fill="none" stroke="#e39b3c" stroke-width="2" stroke-linecap="round"/></svg>
+            <span class="material-symbols-outlined text-[20px] text-[#d9692f] absolute left-1/2 top-0 -translate-x-1/2" style="font-variation-settings:'FILL' 1">directions_car</span>
+        </div>
+        <div class="lg:hidden flex items-center gap-3 pl-6 text-outline" aria-hidden="true"><span class="h-8 border-l-2 border-dashed border-[#e39b3c]"></span><span class="material-symbols-outlined text-[#d9692f] text-lg">south</span></div>
+        <label class="block bg-surface/70 lg:bg-transparent rounded-2xl px-4 py-3 lg:py-0 lg:border-r border-outline-variant/60 min-w-0">
+            <span class="label-tiny text-outline flex items-center gap-2 mb-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#d9692f]"></span>To</span>
+            <select id="itTo" name="drop_city" class="bg-transparent border-none p-0 font-serif text-xl font-bold focus:ring-0 w-full text-on-surface">
+                <option value="">Same as pickup</option>
+                {% for city in cities %}<option value="{{ city.slug }}" {% if request.GET.drop_city == city.slug %}selected{% endif %}>{{ city.name }}</option>{% endfor %}
+            </select>
+        </label>
+        <label class="block bg-surface/70 lg:bg-transparent rounded-2xl px-4 lg:px-6 py-3 lg:py-0 lg:border-r border-outline-variant/60"><span class="label-tiny text-outline block mb-1.5">Pickup date</span><input type="date" name="pickup_date" value="{{ request.GET.pickup_date }}" class="bg-transparent border-none p-0 font-bold focus:ring-0 w-full text-on-surface"></label>
+        <label class="block bg-surface/70 lg:bg-transparent rounded-2xl px-4 lg:px-6 py-3 lg:py-0"><span class="label-tiny text-outline block mb-1.5">Return date</span><input type="date" name="return_date" value="{{ request.GET.return_date }}" class="bg-transparent border-none p-0 font-bold focus:ring-0 w-full text-on-surface"></label>
+        <button type="submit" class="m-shine m-btn bg-primary-container text-on-primary py-4 px-9 rounded-full label-tiny flex items-center justify-center gap-3" data-magnetic><span>Search Cars</span><span class="material-symbols-outlined text-base">arrow_forward</span></button>
+    </div>
+    <p class="mt-5 text-sm text-on-surface-variant flex flex-wrap items-center gap-x-6 gap-y-2"><span class="flex items-center gap-2"><span class="material-symbols-outlined text-tertiary text-lg">near_me</span>Route: <b id="itSummary" class="text-tertiary">Any city → Same as pickup</b></span><span class="text-outline">Free cancellation · No hidden charges · 24×7 customer support</span></p>
+    <script>
+    (() => {
+      const f = document.getElementById("itFrom"), t = document.getElementById("itTo"), out = document.getElementById("itSummary"), same = document.getElementById("itSame");
+      const label = s => s.options[s.selectedIndex] ? s.options[s.selectedIndex].text : "";
+      const upd = () => { out.textContent = label(f) + " → " + label(t); same.disabled = !!t.value; };
+      f.addEventListener("change", upd); t.addEventListener("change", upd); upd();
+    })();
+    </script>
+</form>

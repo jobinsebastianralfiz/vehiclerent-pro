@@ -1,0 +1,45 @@
+{% extends "public/base_public.html" %}
+{% load static %}
+{% comment %}
+Layout for the Bento Concierge inner pages. Pages fill {% block content %} with
+bento grids; a section marked .b-hero has its tiles assemble on load, and an
+<h1 class="b-title"> gets its last word set in the serif italic accent
+(data-accent="<class>" picks its colour on dark tiles).
+{% endcomment %}
+
+{% block extra_css %}<link rel="stylesheet" href="{% static 'themes/bento/bento.css' %}"/>{% block page_css %}{% endblock %}{% endblock %}
+{% block main_class %}pt-24 sm:pt-28 px-3 sm:px-6 pb-16{% endblock %}
+
+{% block extra_js %}
+<script>
+/* headline: the last word becomes the serif italic accent (text only, no HTML injection) */
+(() => {
+    document.querySelectorAll(".b-title").forEach(h => {
+        if (h.children.length) return;
+        const words = h.textContent.trim().split(/\s+/); if (words.length < 2) return;
+        const last = words.pop();
+        h.textContent = words.join(" ") + " ";
+        const em = document.createElement("span"); em.className = "serif-i " + (h.dataset.accent || "text-primary-container"); em.textContent = last;
+        h.appendChild(em);
+    });
+})();
+
+/* page hero bento assembles: tiles scale and unclip in a stagger, the headline rolls up, numbers spin */
+document.addEventListener("motion:ready", ({ detail: { G, split, slotTo } }) => {
+    const tiles = G.utils.toArray(".b-hero .tile");
+    if (tiles.length) {
+        const tl = G.timeline({ delay: .1 });
+        tl.fromTo(tiles, { opacity: 0, scale: .9, y: 36, clipPath: "inset(14% 14% 14% 14% round 30px)" },
+            { opacity: 1, scale: 1, y: 0, clipPath: "inset(0% 0% 0% 0% round 30px)", duration: 1.1, ease: "expo.out", stagger: .08, clearProps: "clipPath,transform" });
+        const title = document.querySelector(".b-hero .b-title");
+        if (title) tl.from(split(title), { yPercent: 118, rotation: 5, transformOrigin: "0% 100%", duration: 1.1, stagger: .05, ease: "expo.out" }, .15);
+        document.querySelectorAll(".b-hero [data-bslot]").forEach((s, i) => tl.add(() => slotTo(s, s.textContent.trim(), { from: "0" }), .5 + i * .12));
+        const kb = document.querySelector(".b-hero .b-kb");
+        if (kb) G.to(kb, { yPercent: 8, ease: "none", scrollTrigger: { trigger: ".b-hero", start: "top top", end: "bottom top", scrub: true } });
+    }
+    /* any later grid marked data-bpop pops its tiles in when scrolled to */
+    G.utils.toArray("[data-bpop]").forEach(g => G.from(g.querySelectorAll(":scope > .tile"), { opacity: 0, scale: .92, y: 46, duration: 1.05, ease: "expo.out", stagger: .08, scrollTrigger: { trigger: g, start: "clamp(top 82%)", once: true }, clearProps: "transform" }));
+});
+</script>
+{% block page_js %}{% endblock %}
+{% endblock %}

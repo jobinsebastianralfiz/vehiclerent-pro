@@ -1,0 +1,122 @@
+{% extends "public/base_public.html" %}
+{% load vehicle_tags %}
+{% comment %}Kerala Route · contact. Every way to reach us as a departures board, the enquiry form on an ivory card
+inside the teal panel (as on the home page), and the map as a postcard when one is set in settings.{% endcomment %}
+
+{% block title %}Contact Us - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Get in touch with {{ BUSINESS_NAME }}. Call, email, WhatsApp, or visit us. We're here to help with your vehicle rental needs.{% endblock %}
+
+{% block structured_data %}
+{{ block.super }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "Contact {{ BUSINESS_NAME }}",
+    "description": "Get in touch with {{ BUSINESS_NAME }} for vehicle rental enquiries",
+    "mainEntity": {
+        "@type": "AutoRental",
+        "name": "{{ BUSINESS_NAME }}",
+        "telephone": "{{ BUSINESS_PHONE }}",
+        "email": "{{ BUSINESS_EMAIL }}",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "{{ BUSINESS_ADDRESS }}"
+        }
+    }
+}
+</script>
+{% endblock %}
+
+{% block extra_css %}{% include "public/themes/route/_assets.html" %}{% endblock %}
+
+{% block content %}
+<section class="r-glow">
+    <div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 lg:pt-12 pb-12">
+        {% include "public/themes/route/_trail.html" with here="Contact" %}
+        <div class="max-w-3xl">
+            <span class="label-tiny text-[#d9692f] flex items-center gap-3" data-intro="1"><span class="w-8 h-px bg-[#d9692f]"></span>Get in touch</span>
+            <h1 class="display-hero text-5xl sm:text-7xl lg:text-[88px] text-tertiary mt-5" data-intro="2" data-intro-kind="split">Tell us where you're headed.</h1>
+            <p class="text-lg text-on-surface-variant max-w-xl leading-relaxed font-light mt-6" data-intro="3">Whether you have a question about the fleet, pricing or anything else, our team is ready to help.</p>
+        </div>
+        {% include "public/themes/route/_strip.html" %}
+    </div>
+</section>
+
+<div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pb-24 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] gap-10 lg:gap-14 items-start">
+    <!-- ─── Departures board: every way to reach us ─── -->
+    <div class="min-w-0 space-y-8">
+        <div class="board p-5 sm:p-7" data-board>
+            <div class="flex items-center justify-between gap-3 mb-2">
+                <span class="label-tiny text-[#e39b3c] flex items-center gap-2"><span class="material-symbols-outlined text-lg">departure_board</span>Reach us directly</span>
+                <span class="label-tiny text-[#fffaf0]/60">Kerala <span id="rClock" class="text-[#e39b3c]"></span></span>
+            </div>
+            {% if BUSINESS_PHONE %}
+            <a href="tel:{{ BUSINESS_PHONE }}" class="board-row">
+                <span class="text-[#fffaf0]/40 text-xs font-bold">01</span>
+                <span class="min-w-0"><span class="cells" aria-hidden="true" data-flap="CALL">{% for ch in "CALL" %}<span class="cell">{{ ch }}</span>{% endfor %}</span><span class="block text-[#fffaf0] font-serif text-lg sm:text-xl mt-2 truncate"><span class="sr-only">Phone: </span>{{ BUSINESS_PHONE }}</span></span>
+                <span class="material-symbols-outlined text-[#e39b3c]/80" aria-hidden="true">call</span>
+            </a>
+            {% endif %}
+            {% if WHATSAPP_NUMBER %}
+            <a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="board-row">
+                <span class="text-[#fffaf0]/40 text-xs font-bold">02</span>
+                <span class="min-w-0"><span class="cells" aria-hidden="true" data-flap="WHATSAPP">{% for ch in "WHATSAPP" %}<span class="cell">{{ ch }}</span>{% endfor %}</span><span class="block text-[#fffaf0] font-serif text-lg sm:text-xl mt-2 truncate"><span class="sr-only">WhatsApp: </span>Chat with us</span></span>
+                <svg class="w-5 h-5 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.468l4.573-1.462A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.16 0-4.16-.68-5.804-1.836l-.416-.283-3.103.992.989-3.043-.306-.434A9.965 9.965 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+</svg>
+            </a>
+            {% endif %}
+            {% if BUSINESS_EMAIL %}
+            <a href="mailto:{{ BUSINESS_EMAIL }}" class="board-row">
+                <span class="text-[#fffaf0]/40 text-xs font-bold">03</span>
+                <span class="min-w-0"><span class="cells" aria-hidden="true" data-flap="EMAIL">{% for ch in "EMAIL" %}<span class="cell">{{ ch }}</span>{% endfor %}</span><span class="block text-[#fffaf0] font-serif text-lg sm:text-xl mt-2 break-all"><span class="sr-only">Email: </span>{{ BUSINESS_EMAIL }}</span></span>
+                <span class="material-symbols-outlined text-[#e39b3c]/80" aria-hidden="true">mail</span>
+            </a>
+            {% endif %}
+            {% if BUSINESS_ADDRESS %}
+            <div class="board-row">
+                <span class="text-[#fffaf0]/40 text-xs font-bold">04</span>
+                <span class="min-w-0"><span class="cells" aria-hidden="true" data-flap="VISIT">{% for ch in "VISIT" %}<span class="cell">{{ ch }}</span>{% endfor %}</span><address class="not-italic block text-[#fffaf0] font-serif text-lg sm:text-xl mt-2"><span class="sr-only">Address: </span>{{ BUSINESS_ADDRESS }}</address></span>
+                <span class="material-symbols-outlined text-[#e39b3c]/80" aria-hidden="true">location_on</span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if config.google_maps_embed %}
+        <div class="pc rotate-[-1deg]" data-no-parallax>
+            <div class="aspect-[4/3] overflow-hidden rounded-[3px] bg-surface-container [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0">
+                {% if "<iframe" in config.google_maps_embed %}{{ config.google_maps_embed|safe }}{% else %}<iframe src="{{ config.google_maps_embed }}" title="Map to {{ BUSINESS_NAME }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>{% endif %}
+            </div>
+            <span class="pc-cap">Find us here</span><span class="pc-stamp"><span class="material-symbols-outlined">pin_drop</span></span>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ─── Enquiry ─── -->
+    <section id="enquiry" class="relative overflow-hidden rounded-[2.5rem] bg-tertiary text-[#fffaf0] p-5 sm:p-10 lg:p-12 min-w-0">
+        <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(45% 70% at 100% 100%,rgba(227,155,60,.45),transparent 70%)"></div>
+        <div class="relative px-1 sm:px-0 mb-8">
+            <span class="label-tiny text-[#e39b3c] block">Send us a message</span>
+            <h2 class="headline-lg text-3xl sm:text-5xl mt-4">Plan with us.</h2>
+            <p class="text-[#fffaf0]/75 mt-4 max-w-md font-light">Fill the form and our team will get back to you{% if WHATSAPP_NUMBER %}, or message us on WhatsApp{% endif %}.</p>
+        </div>
+        <div class="r-form relative bg-surface-container-lowest rounded-3xl p-5 sm:p-8 shadow-2xl" data-reveal>
+            {% include "public/includes/enquiry_form.html" %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% include "public/themes/route/_js.html" %}
+<script>
+(() => {
+  const el = document.getElementById("rClock");
+  if (!el) return;
+  const fmt = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Kolkata" });
+  const upd = () => { el.textContent = fmt.format(new Date()); };
+  upd(); setInterval(upd, 30000);
+})();
+</script>
+{% endblock %}

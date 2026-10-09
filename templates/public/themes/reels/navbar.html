@@ -3,14 +3,14 @@
     {% if SITE_CONFIG.logo %}<img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}"/>{% endif %}
     {% if SITE_CONFIG.show_brand_name or not SITE_CONFIG.logo %}{{ BUSINESS_NAME }}{% endif %}
   </a>
-  <div class="links">
-    <a href="{% url 'home' %}" aria-current="page">Home</a>
-    <a href="{% url 'vehicle_list' %}">Fleet</a>
-    <a href="{% url 'premium_cars' %}">Premium</a>
-    <a href="{% url 'wedding_cars' %}">Wedding Cars</a>
-    <a href="{% url 'about' %}">About</a>
-    <a href="{% url 'contact' %}">Contact</a>
-  </div>
+  {% with here=request.resolver_match.url_name %}<div class="links">
+    <a href="{% url 'home' %}"{% if here == 'home' %} aria-current="page"{% endif %}>Home</a>
+    <a href="{% url 'vehicle_list' %}"{% if here == 'vehicle_list' or here == 'vehicle_detail' %} aria-current="page"{% endif %}>Fleet</a>
+    <a href="{% url 'premium_cars' %}"{% if here == 'premium_cars' %} aria-current="page"{% endif %}>Premium</a>
+    <a href="{% url 'wedding_cars' %}"{% if here == 'wedding_cars' %} aria-current="page"{% endif %}>Wedding Cars</a>
+    <a href="{% url 'about' %}"{% if here == 'about' %} aria-current="page"{% endif %}>About</a>
+    <a href="{% url 'contact' %}"{% if here == 'contact' %} aria-current="page"{% endif %}>Contact</a>
+  </div>{% endwith %}
   <div class="nav-right">
     {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="nav-phone">{{ BUSINESS_PHONE }}</a>{% endif %}
     <a href="{% url 'vehicle_list' %}" class="nav-cta" data-magnetic><i></i>Book now</a>

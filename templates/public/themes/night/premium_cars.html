@@ -1,0 +1,149 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+
+{% block title %}Premium & Luxury Car Rentals in Kerala | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Premium and luxury car rentals in Kerala. BMW, Audi, Mercedes, Mini Cooper, Range Rover and more. Self-drive or with chauffeur. Statewide delivery.{% endblock %}
+{% block meta_keywords %}luxury car rental Kerala, premium car rental, BMW rental Kerala, Audi rental Kerala, Mercedes rental, Mini Cooper rental, Range Rover rental, luxury SUV hire, executive sedan rental, premium car with driver Kerala{% endblock %}
+{% block og_title %}Luxury Car Rentals in Kerala — BMW, Audi, Mercedes & more{% endblock %}
+{% block og_description %}When ordinary won't do. Premium fleet across Kerala — self-drive or with trained chauffeur. Doorstep delivery, transparent pricing.{% endblock %}
+
+{% block main_class %}{% endblock %}
+{% block extra_css %}{% include "public/themes/night/_styles.html" %}{% endblock %}
+
+{% block content %}
+<div class="nd">
+{% static 'themes/img/rangerover.jpg' as hero_fallback %}
+{% with hero=featured_vehicles.0 %}
+<header class="nd-hero min-h-[88svh] flex items-end" data-nd-beam data-no-parallax>
+  <img class="nd-hero-img" src="{% if hero and hero.thumbnail %}{{ hero.thumbnail.url }}{% else %}{{ hero_fallback }}{% endif %}" alt=""/>
+  <div class="nd-hero-grid" aria-hidden="true"></div>
+  <div class="nd-hero-beam" aria-hidden="true"></div>
+  <div class="nd-hero-shade" aria-hidden="true"></div>
+  <div class="relative z-10 w-full px-4 sm:px-12 max-w-screen-2xl mx-auto pt-36 pb-16 sm:pb-24">
+    <div class="max-w-4xl space-y-7">
+      <span class="label-tiny text-primary-container flex items-center gap-3" data-intro="0"><i class="w-8 h-px bg-primary-container inline-block"></i>Premium & luxury fleet</span>
+      <h1 class="nd-display text-5xl sm:text-7xl lg:text-[110px] text-on-surface" data-intro="1" data-intro-kind="split">When ordinary won't do.</h1>
+      <p class="text-lg text-on-surface-variant max-w-2xl leading-relaxed font-light" data-intro="3">European flagships, executive sedans, statement SUVs. Hand-picked for the trips that deserve more than a transport. Self-drive or with a trained chauffeur.</p>
+      <div class="flex flex-wrap gap-4" data-intro="4">
+        <a href="#fleet" class="m-shine m-btn bg-primary text-on-primary px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold shadow-[0_0_40px_-8px_rgba(212,236,162,.7)]" data-magnetic>View Fleet <span class="material-symbols-outlined">arrow_downward</span></a>
+        {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="m-btn border border-white/15 text-on-surface px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold hover:bg-white/5 transition-colors"><span class="material-symbols-outlined">call</span> Talk to Us</a>{% endif %}
+      </div>
+      {% if vehicles or cities %}
+      <div class="flex flex-wrap gap-x-12 gap-y-6 pt-8 border-t border-white/10 max-w-xl" data-intro="5">
+        {% if vehicles %}<div><div class="nd-head text-3xl sm:text-4xl text-on-surface"><span data-slot>{{ vehicles.count }}</span></div><div class="label-tiny text-on-surface-variant mt-2">Premium car{{ vehicles.count|pluralize }}</div></div>{% endif %}
+        {% if cities %}<div><div class="nd-head text-3xl sm:text-4xl text-on-surface"><span data-slot>{{ cities.count }}</span></div><div class="label-tiny text-on-surface-variant mt-2">Cit{{ cities.count|pluralize:"y,ies" }}</div></div>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</header>
+{% endwith %}
+
+<!-- ─── Booking ─── -->
+<section class="px-4 sm:px-12 max-w-screen-2xl mx-auto -mt-6 relative z-20" data-reveal>
+  <form action="{% url 'vehicle_list' %}" method="get" class="w-full">
+    <input type="hidden" name="premium" value="1"/>
+    <div class="flex items-center gap-3 mb-4 px-2 flex-wrap">
+      <div class="flex bg-surface-container-low border border-white/5 rounded-full p-1">
+        <label class="cursor-pointer"><input type="radio" name="rental_type" value="self_drive" class="peer sr-only" checked><span class="block px-5 py-2 rounded-full label-tiny peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">Self-Drive</span></label>
+        <label class="cursor-pointer"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only"><span class="block px-5 py-2 rounded-full label-tiny peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">With Driver</span></label>
+      </div>
+    </div>
+    <div class="glow backdrop-blur-xl rounded-3xl lg:rounded-full p-3 sm:p-4 lg:p-2 grid grid-cols-1 sm:grid-cols-2 lg:flex gap-3 lg:gap-0 lg:items-center shadow-2xl shadow-black/60" data-tilt="0.15">
+      <label class="lg:flex-1 lg:min-w-[140px] px-4 lg:px-6 lg:border-r border-white/10 py-2 lg:py-0 block"><span class="label-tiny text-on-surface-variant block mb-1">Pickup city</span>
+        <select name="pickup_city" class="bg-transparent border-none p-0 font-bold text-on-surface focus:ring-0 w-full cursor-pointer"><option value="">Any city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
+      <label class="lg:flex-1 lg:min-w-[140px] px-4 lg:px-6 lg:border-r border-white/10 py-2 lg:py-0 block"><span class="label-tiny text-on-surface-variant block mb-1">Pickup date</span>
+        <input type="date" name="pickup_date" class="bg-transparent border-none p-0 font-bold text-on-surface focus:ring-0 w-full [color-scheme:dark]"></label>
+      <label class="lg:flex-1 lg:min-w-[140px] px-4 lg:px-6 lg:border-r border-white/10 py-2 lg:py-0 block"><span class="label-tiny text-on-surface-variant block mb-1">Return date</span>
+        <input type="date" name="return_date" class="bg-transparent border-none p-0 font-bold text-on-surface focus:ring-0 w-full [color-scheme:dark]"></label>
+      <button type="submit" class="m-shine m-btn bg-primary text-on-primary py-4 px-10 rounded-full label-tiny flex items-center justify-center gap-3 whitespace-nowrap sm:col-span-2 lg:col-auto" data-magnetic><span>Find Premium Cars</span><span class="material-symbols-outlined text-base">arrow_forward</span></button>
+    </div>
+  </form>
+</section>
+
+<!-- ─── Featured: cards stack like cars pulling into a garage ─── -->
+{% if featured_vehicles %}
+<section class="px-4 sm:px-12 pt-24 lg:pt-36 max-w-screen-2xl mx-auto">
+  <div class="mb-12 lg:mb-16"><span class="label-tiny text-primary-container block">Featured · elite collection</span><h2 class="nd-head text-4xl sm:text-6xl mt-4 text-on-surface">The flagships.</h2></div>
+  <div class="space-y-8" data-no-parallax>
+    {% for vehicle in featured_vehicles %}
+    <a href="{{ vehicle.get_absolute_url }}" class="stack-card block h-[62vh] sm:h-[70vh] rounded-[2.5rem] overflow-hidden relative bg-surface-container-low border border-white/5" style="top:calc(14vh + {{ forloop.counter0 }} * 16px)">
+      {% if vehicle.thumbnail %}
+      <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="absolute inset-0 w-full h-full object-cover"/>
+      {% else %}
+      <div class="absolute inset-0 grid place-items-center bg-surface-container"><span class="material-symbols-outlined text-[120px] text-primary/20">diamond</span></div>
+      {% endif %}
+      <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/35 to-transparent"></div>
+      <div class="relative h-full flex flex-col justify-end p-8 sm:p-14 max-w-xl">
+        <span class="font-serif text-primary text-xl">{{ forloop.counter|stringformat:"02d" }}</span>
+        <h3 class="nd-head text-4xl sm:text-6xl text-white mt-3">{{ vehicle.brand }} {{ vehicle.name }}</h3>
+        <p class="label-tiny text-primary-container mt-5">{% if vehicle.category %}{{ vehicle.category.name }}{% else %}Elite collection{% endif %}{% if vehicle.primary_price_value %} · {{ vehicle.primary_price_value|inr }}/{{ vehicle.primary_price_label }}{% endif %}{% if vehicle.is_chauffeur_available %} · With driver{% endif %}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── The collection ─── -->
+<section id="fleet" class="px-4 sm:px-12 py-24 lg:py-36 max-w-screen-2xl mx-auto scroll-mt-24">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-12 lg:mb-16 gap-6">
+    <div><span class="label-tiny text-primary-container block">The collection</span><h2 class="nd-head text-4xl sm:text-6xl mt-4 text-on-surface">Available for your dates.</h2></div>
+    <a href="{% url 'vehicle_list' %}?premium=1" class="text-primary font-bold inline-flex items-center gap-2 hover:gap-3 transition-all">Filter the premium fleet <span class="material-symbols-outlined">arrow_forward</span></a>
+  </div>
+  {% if vehicles %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+    {% for vehicle in vehicles %}
+    {% include "public/themes/night/_vehicle_card.html" with vehicle=vehicle n=forloop.counter %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="glow glow-static rounded-[2.5rem] text-center py-16 sm:py-24 px-6">
+    <span class="material-symbols-outlined text-6xl nd-glow-text mb-4" aria-hidden="true">diamond</span>
+    <h3 class="nd-head text-3xl text-on-surface mb-3">Premium fleet coming soon</h3>
+    <p class="text-on-surface-variant mb-8">No vehicles tagged as premium yet. Talk to our team to access the full collection.</p>
+    {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="m-shine bg-primary text-on-primary px-8 py-3 rounded-full label-tiny inline-block">Call Us</a>{% else %}<a href="{% url 'contact' %}" class="m-shine bg-primary text-on-primary px-8 py-3 rounded-full label-tiny inline-block">Contact Us</a>{% endif %}
+  </div>
+  {% endif %}
+</section>
+
+<!-- ─── Why premium: dashboard rings ─── -->
+<section class="px-4 sm:px-12 py-24 lg:py-32 max-w-screen-2xl mx-auto border-t border-white/5" data-nd-rings>
+  <div class="text-center mb-16"><span class="label-tiny text-primary-container block">Why premium</span><h2 class="nd-head text-4xl sm:text-6xl mt-4 text-on-surface">More than transport.</h2></div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5" data-deal>
+    <div class="glow rounded-3xl p-8 text-center" data-tilt="0.6">
+      <div class="relative w-24 h-24 mx-auto mb-6"><svg viewBox="0 0 110 110" class="absolute inset-0 -rotate-90" aria-hidden="true"><circle cx="55" cy="55" r="48" fill="none" stroke="rgba(242,241,232,.08)" stroke-width="3"/><circle class="ring-fg" cx="55" cy="55" r="48" fill="none" stroke="#d4eca2" stroke-width="3" stroke-linecap="round"/></svg><span class="absolute inset-0 grid place-items-center material-symbols-outlined text-4xl text-primary">workspace_premium</span></div>
+      <h3 class="font-bold text-lg text-on-surface mb-3">Hand-picked vehicles</h3>
+      <p class="text-sm text-on-surface-variant leading-relaxed">Each premium car is curated for condition, mileage and presentation. We retire vehicles past their prime — you only ever drive a flagship example.</p>
+    </div>
+    <div class="glow rounded-3xl p-8 text-center" data-tilt="0.6">
+      <div class="relative w-24 h-24 mx-auto mb-6"><svg viewBox="0 0 110 110" class="absolute inset-0 -rotate-90" aria-hidden="true"><circle cx="55" cy="55" r="48" fill="none" stroke="rgba(242,241,232,.08)" stroke-width="3"/><circle class="ring-fg" cx="55" cy="55" r="48" fill="none" stroke="#d4eca2" stroke-width="3" stroke-linecap="round"/></svg><span class="absolute inset-0 grid place-items-center material-symbols-outlined text-4xl text-primary">badge</span></div>
+      <h3 class="font-bold text-lg text-on-surface mb-3">Trained chauffeurs</h3>
+      <p class="text-sm text-on-surface-variant leading-relaxed">Optional chauffeur service with formally-trained drivers. Dressed in white, briefed on your itinerary, available 24×7.</p>
+    </div>
+    <div class="glow rounded-3xl p-8 text-center" data-tilt="0.6">
+      <div class="relative w-24 h-24 mx-auto mb-6"><svg viewBox="0 0 110 110" class="absolute inset-0 -rotate-90" aria-hidden="true"><circle cx="55" cy="55" r="48" fill="none" stroke="rgba(242,241,232,.08)" stroke-width="3"/><circle class="ring-fg" cx="55" cy="55" r="48" fill="none" stroke="#d4eca2" stroke-width="3" stroke-linecap="round"/></svg><span class="absolute inset-0 grid place-items-center material-symbols-outlined text-4xl text-primary">local_shipping</span></div>
+      <h3 class="font-bold text-lg text-on-surface mb-3">Doorstep delivery</h3>
+      <p class="text-sm text-on-surface-variant leading-relaxed">We deliver and collect from your hotel, residence or airport{% if cities %} across {{ cities.count }} Kerala cit{{ cities.count|pluralize:"y,ies" }}{% else %} across Kerala{% endif %}.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section class="px-4 sm:px-12 pb-24 lg:pb-32 max-w-screen-2xl mx-auto">
+  <div class="relative overflow-hidden rounded-[2.5rem] lg:rounded-[3.5rem] border border-white/5 bg-surface-container-low p-10 sm:p-16 text-center">
+    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[620px] h-[620px] rounded-full pointer-events-none" style="background:radial-gradient(circle, rgba(212,236,162,.16), transparent 65%)" data-parallax="50" aria-hidden="true"></div>
+    <div class="relative">
+      <h2 class="nd-head text-4xl sm:text-6xl text-on-surface mb-5">Ready for the upgrade?</h2>
+      <p class="text-on-surface-variant mb-8 max-w-2xl mx-auto">Tell us your dates — we'll arrange the right car, the right driver, the right delivery point.</p>
+      <div class="flex flex-wrap gap-4 justify-center">
+        <a href="#fleet" class="m-shine m-btn bg-primary text-on-primary px-10 py-4 rounded-full font-bold" data-magnetic>Browse Fleet</a>
+        {% if WHATSAPP_NUMBER %}<a href="{% whatsapp_url 'Hi! I want to book a premium car.' %}" target="_blank" rel="noopener" class="m-btn bg-[#25D366] text-[#06210f] px-10 py-4 rounded-full font-bold hover:opacity-90">WhatsApp Us</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+{% endblock %}
+
+{% block extra_js %}{% include "public/themes/night/_scripts.html" %}{% endblock %}

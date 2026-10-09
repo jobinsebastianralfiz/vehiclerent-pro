@@ -1,0 +1,11 @@
+{% comment %}Breadcrumb as a short route: Home → [crumb] → here, with a road that draws itself underneath.
+Params: here (required), crumb_label/crumb_url, crumb2_label/crumb2_url (optional).{% endcomment %}
+<nav aria-label="Breadcrumb" class="mb-8 sm:mb-10" data-intro="0">
+    <ol class="r-trail label-tiny text-on-surface-variant">
+        <li><a href="{% url 'home' %}" class="hover:text-[#d9692f] transition-colors"><span class="r-dot"></span>Home</a></li>
+        {% if crumb_label %}<li aria-hidden="true"><span class="r-dash block"></span></li><li><a href="{{ crumb_url }}" class="hover:text-[#d9692f] transition-colors"><span class="r-dot"></span>{{ crumb_label }}</a></li>{% endif %}
+        {% if crumb2_label %}<li aria-hidden="true"><span class="r-dash block"></span></li><li><a href="{{ crumb2_url }}" class="hover:text-[#d9692f] transition-colors"><span class="r-dot"></span>{{ crumb2_label }}</a></li>{% endif %}
+        <li aria-hidden="true"><span class="r-dash block"></span></li>
+        <li><span class="r-here text-tertiary" aria-current="page"><span class="r-dot"></span><span class="truncate max-w-[60vw]">{{ here }}</span></span></li>
+    </ol>
+</nav>

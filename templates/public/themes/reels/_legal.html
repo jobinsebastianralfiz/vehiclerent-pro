@@ -1,0 +1,29 @@
+{% extends "public/themes/reels/_base.html" %}
+{% comment %}Terms / privacy layout. Children fill legal_kicker, legal_title, legal_contact_title, legal_contact_text and legal_body (plain <section><h2>…).{% endcomment %}
+
+{% block page %}
+<header class="phead">
+  <div class="phead-copy">
+    <span class="kicker" data-intro="0"><i></i>{% block legal_kicker %}Legal{% endblock %}</span>
+    <h1 class="phead-h" data-intro="1" data-intro-kind="split">{% block legal_title %}{% endblock %}</h1>
+    <p class="lede" data-intro="2">Last updated: {% now "F j, Y" %}</p>
+  </div>
+</header>
+
+<section class="sec sec-tight">
+  <div class="wrap legal-layout">
+    <nav class="legal-toc" aria-label="On this page"><span class="kicker"><i></i>On this page</span><ol id="legalToc"></ol></nav>
+    <div class="legal-body" id="legalBody">
+      {% block legal_body %}{% endblock %}
+      <section class="ct legal-ask t-lime">
+        <h2>{% block legal_contact_title %}Questions?{% endblock %}</h2>
+        <p>{% block legal_contact_text %}{% endblock %}</p>
+        <div class="ctas">
+          {% if BUSINESS_EMAIL %}<a href="mailto:{{ BUSINESS_EMAIL }}" class="btn btn-main"><span class="material-symbols-outlined">mail</span>{{ BUSINESS_EMAIL }}</a>{% endif %}
+          {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="btn btn-line"><span class="material-symbols-outlined">call</span>{{ BUSINESS_PHONE }}</a>{% endif %}
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
+{% endblock %}

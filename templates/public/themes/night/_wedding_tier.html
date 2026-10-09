@@ -1,0 +1,23 @@
+{% load vehicle_tags %}
+{% comment %}One wedding tier overview card. Include with key, name, head, body, icon, cars.{% endcomment %}
+{% with first=cars.0 cheapest=cars|dictsort:"price_per_day"|first %}
+<a href="{% if cars %}#tier-{{ key }}{% else %}#wedding-enquiry{% endif %}" class="glow group block rounded-[2rem] p-5 sm:p-6" data-tilt="0.4">
+  <div class="relative aspect-[4/3] rounded-[1.5rem] overflow-hidden mb-6 bg-surface-container">
+    {% if first and first.thumbnail %}
+    <img src="{{ first.thumbnail.url }}" alt="" class="w-full h-full object-cover brightness-[.8] transition-all duration-[1.2s] group-hover:scale-110 group-hover:brightness-100" loading="lazy"/>
+    {% else %}
+    <div class="w-full h-full grid place-items-center"><span class="material-symbols-outlined text-[80px] text-primary/25">{{ icon }}</span></div>
+    {% endif %}
+    <div class="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent"></div>
+    <span class="absolute bottom-4 left-4 label-tiny text-primary">{% if cars %}{{ cars|length }} car{{ cars|length|pluralize }}{% else %}On request{% endif %}</span>
+  </div>
+  <span class="label-tiny text-primary-container">{{ name }}</span>
+  <h3 class="nd-head text-2xl sm:text-3xl text-on-surface mt-3 mb-4">{{ head }}</h3>
+  <p class="text-on-surface-variant mb-6 font-light">{{ body }}</p>
+  {% if cheapest and cheapest.primary_price_value %}
+  <div class="flex items-baseline gap-2"><span class="label-tiny text-on-surface-variant">From</span><span class="nd-head text-2xl nd-glow-text">{{ cheapest.primary_price_value|inr }}</span><span class="label-tiny text-on-surface-variant">/ {{ cheapest.primary_price_label }}</span></div>
+  {% else %}
+  <span class="text-primary font-bold inline-flex items-center gap-2">Ask for a quote <span class="material-symbols-outlined text-base">arrow_forward</span></span>
+  {% endif %}
+</a>
+{% endwith %}

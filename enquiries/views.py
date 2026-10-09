@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .forms import EnquiryPublicForm, EnquiryUpdateForm
 from .models import Enquiry
+from core.themes import themed
 
 
 # ──────────────── Public Views ────────────────
@@ -54,7 +55,7 @@ def _build_whatsapp_url(enquiry):
 def enquiry_thanks(request, pk):
     """Public thank-you page after enquiry submission. Auto-opens WhatsApp with booking details."""
     enquiry = get_object_or_404(Enquiry, pk=pk)
-    return render(request, "public/enquiry_thanks.html", {
+    return render(request, themed(request, "enquiry_thanks.html"), {
         "enquiry": enquiry,
         "wa_url": _build_whatsapp_url(enquiry),
         "wa_message": enquiry.whatsapp_message(),

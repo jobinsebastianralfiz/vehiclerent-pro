@@ -1,0 +1,209 @@
+{% extends "public/base_public.html" %}
+{% load vehicle_tags %}
+{% comment %}Kerala Route · fleet. A departures hall: itinerary search, luggage-tag categories, a check-in desk of filters,
+a departures board for the result count and sort, and every vehicle as a boarding pass.{% endcomment %}
+
+{% block title %}{% if current_category and categories %}{% for c in categories %}{% if c.id|stringformat:'d' == current_category %}{{ c.meta_title|default:c.name }} | {{ BUSINESS_NAME }}{% endif %}{% endfor %}{% else %}Our Fleet | Car Rentals in Kerala — {{ BUSINESS_NAME }}{% endif %}{% endblock %}
+{% block meta_description %}{% if current_category and categories %}{% for c in categories %}{% if c.id|stringformat:'d' == current_category %}{{ c.meta_description|default:c.description|default:'Browse our fleet of '|add:c.name|add:' for rent in Kerala. Daily, weekly and monthly plans available.' }}{% endif %}{% endfor %}{% else %}Browse {{ total_count }} cars for rent across Kerala. Self-drive, chauffeur, wedding, premium SUVs and economy. Daily, weekly and monthly plans, doorstep delivery.{% endif %}{% endblock %}
+{% block meta_keywords %}{% if current_category and categories %}{% for c in categories %}{% if c.id|stringformat:'d' == current_category %}{{ c.meta_keywords|default:c.name|add:' rental Kerala, '|add:c.name|add:' for rent, '|add:c.name|add:' hire' }}{% endif %}{% endfor %}{% else %}car rental Kerala, self drive cars, SUV rental, sedan rental, hatchback rental, monthly car hire, Kochi car rental, Trivandrum, Kottayam, Calicut{% endif %}{% endblock %}
+
+{% block extra_css %}{% include "public/themes/route/_assets.html" %}{% endblock %}
+
+{% block content %}
+{% with request.GET as g %}
+<header class="r-glow">
+    <div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 lg:pt-12 pb-10">
+        {% include "public/themes/route/_trail.html" with here="Fleet" %}
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+            <div class="max-w-3xl">
+                <span class="label-tiny text-[#d9692f] flex items-center gap-3" data-intro="1"><span class="w-8 h-px bg-[#d9692f]"></span>Departures · {{ BUSINESS_NAME }}</span>
+                <h1 class="display-hero text-5xl sm:text-7xl lg:text-[92px] text-tertiary mt-5" data-intro="2" data-intro-kind="split">{% if current_category %}{% for c in categories %}{% if c.id|stringformat:'d' == current_category %}{{ c.name }}{% endif %}{% endfor %}{% elif search %}“{{ search }}”{% else %}Our Fleet{% endif %}</h1>
+                <p class="text-lg text-on-surface-variant max-w-xl leading-relaxed font-light mt-6" data-intro="3">{% if total_count %}{{ total_count }} vehicle{{ total_count|pluralize }} ready to board{% if cities %}, with pickups across {{ cities.count }} cit{{ cities.count|pluralize:"y,ies" }}{% endif %}. Pick a ticket, we'll handle the road.{% else %}No departures match right now. Try another route below.{% endif %}</p>
+            </div>
+            <div class="flex items-end gap-4" data-intro="4">
+                <div class="stamp sm text-tertiary" style="rotate:-8deg"><div><span class="material-symbols-outlined">confirmation_number</span><b>Boarding</b></div></div>
+                <div class="text-right">
+                    <div class="font-serif font-bold text-7xl sm:text-8xl text-tertiary leading-none"><span data-slot>{{ total_count }}</span></div>
+                    <div class="label-tiny text-outline mt-2">On the board</div>
+                </div>
+            </div>
+        </div>
+        {% include "public/themes/route/_strip.html" %}
+    </div>
+</header>
+
+<div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pb-24">
+    <!-- ─── Itinerary (same fields as the booking widget) ─── -->
+    <section class="relative z-30 mb-12 sm:mb-14" data-reveal>
+        {% include "public/themes/route/_itinerary.html" with cities=cities %}
+    </section>
+
+    <!-- ─── Categories as luggage tags ─── -->
+    {% if categories %}
+    <section class="mb-12 sm:mb-16" aria-label="Categories">
+        <div class="tag-row flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-3 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <a href="{% url 'vehicle_list' %}" class="tag {% if not current_category %}bg-tertiary text-on-tertiary{% else %}bg-surface-container-lowest text-tertiary{% endif %}" {% if not current_category %}aria-current="page"{% endif %}>
+                <span class="hole"></span><span class="material-symbols-outlined">apps</span><span class="label-tiny">All cars</span>
+            </a>
+            {% for cat in categories %}
+            <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="tag {% if current_category == cat.id|stringformat:'d' %}bg-tertiary text-on-tertiary{% else %}{% cycle 'bg-surface-container-lowest text-tertiary' 'bg-[#f6d9a8] text-[#0f2e2c]' 'bg-tertiary-container text-[#0f2e2c]' %}{% endif %}" {% if current_category == cat.id|stringformat:'d' %}aria-current="page"{% endif %}>
+                <span class="hole"></span><span class="material-symbols-outlined">{{ cat.icon|default:"directions_car" }}</span><span class="label-tiny">{{ cat.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+        <!-- ─── Check-in desk: filters ─── -->
+        <aside class="lg:w-[320px] shrink-0" x-data="{ open: false }">
+            <button type="button" @click="open = !open" class="lg:hidden flex items-center gap-2 px-5 py-3 bg-tertiary text-on-tertiary rounded-full label-tiny mb-4" :aria-expanded="open.toString()" aria-controls="filter-form">
+                <span class="material-symbols-outlined text-base">tune</span>
+                <span x-text="open ? 'Hide filters' : 'Show filters'">Filters</span>
+            </button>
+            <div :class="open ? 'block' : 'hidden lg:block'">
+                <form id="filter-form" method="get" action="{% url 'vehicle_list' %}" class="lg:sticky lg:top-28 bg-surface-container-lowest rounded-[1.75rem] shadow-xl shadow-black/5 border border-outline-variant/50 overflow-hidden">
+                    {% if g.rental_type %}<input type="hidden" name="rental_type" value="{{ g.rental_type }}"/>{% endif %}
+                    {% if g.pickup_date %}<input type="hidden" name="pickup_date" value="{{ g.pickup_date }}"/>{% endif %}
+                    {% if g.return_date %}<input type="hidden" name="return_date" value="{{ g.return_date }}"/>{% endif %}
+                    {% if g.drop_city %}<input type="hidden" name="drop_city" value="{{ g.drop_city }}"/>{% endif %}
+                    {% if current_category %}<input type="hidden" name="category" value="{{ current_category }}"/>{% endif %}
+                    <div class="flex items-center justify-between gap-3 px-6 sm:px-7 pt-6 pb-5 bg-surface-container-low">
+                        <div><span class="label-tiny text-[#d9692f] block">Check-in desk</span><span class="font-serif text-2xl font-bold text-tertiary">Refine your trip</span></div>
+                        <span class="material-symbols-outlined text-[#e39b3c] text-3xl">luggage</span>
+                    </div>
+                    <div class="tk-perf" style="--r-notch: var(--page-bg)"></div>
+                    <div class="p-6 sm:p-7 space-y-7">
+                        <label class="block">
+                            <span class="label-tiny text-outline block mb-3">Search</span>
+                            <span class="relative block">
+                                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+                                <input type="text" name="search" value="{{ search }}" placeholder="Brand or model..." class="r-field !pl-10"/>
+                            </span>
+                        </label>
+
+                        {% if vehicle_types %}
+                        <fieldset>
+                            <legend class="label-tiny text-outline block mb-3">Body type</legend>
+                            <div class="grid grid-cols-2 gap-2">
+                                {% for val, label in vehicle_types %}
+                                <label class="cursor-pointer"><input type="radio" name="type" value="{{ val }}" {% if current_type == val %}checked{% endif %} class="peer sr-only" onchange="this.form.submit()"/><span class="r-chip">{{ label }}</span></label>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+                        {% endif %}
+
+                        <fieldset>
+                            <legend class="label-tiny text-outline block mb-3">Transmission</legend>
+                            <div class="flex gap-2 flex-wrap">
+                                {% for val, label in transmission_types %}
+                                <label class="cursor-pointer"><input type="radio" name="transmission" value="{{ val }}" {% if current_transmission == val %}checked{% endif %} class="peer sr-only" onchange="this.form.submit()"/><span class="r-chip">{{ label }}</span></label>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <legend class="label-tiny text-outline block mb-3">Fuel</legend>
+                            <div class="flex gap-2 flex-wrap">
+                                {% for val, label in fuel_types %}
+                                <label class="cursor-pointer"><input type="radio" name="fuel" value="{{ val }}" {% if current_fuel == val %}checked{% endif %} class="peer sr-only" onchange="this.form.submit()"/><span class="r-chip">{{ label }}</span></label>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+
+                        {% if rental_modes %}
+                        <fieldset>
+                            <legend class="label-tiny text-outline block mb-3">Rental plan</legend>
+                            <div class="flex gap-2 flex-wrap">
+                                {% for val, label in rental_modes %}
+                                <label class="cursor-pointer"><input type="radio" name="rental" value="{{ val }}" {% if current_rental == val %}checked{% endif %} class="peer sr-only" onchange="this.form.submit()"/><span class="r-chip">{{ label }}</span></label>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+                        {% endif %}
+
+                        {% if brands %}
+                        <label class="block">
+                            <span class="label-tiny text-outline block mb-3">Brand</span>
+                            <select name="brand" onchange="this.form.submit()" class="r-field">
+                                <option value="">All brands</option>
+                                {% for b in brands %}<option value="{{ b }}" {% if current_brand == b %}selected{% endif %}>{{ b }}</option>{% endfor %}
+                            </select>
+                        </label>
+                        {% endif %}
+
+                        {% if cities %}
+                        <label class="block">
+                            <span class="label-tiny text-outline block mb-3">Pickup city</span>
+                            <select name="pickup_city" onchange="this.form.submit()" class="r-field">
+                                <option value="">Any city</option>
+                                {% for city in cities %}<option value="{{ city.slug }}" {% if current_pickup_city == city.slug %}selected{% endif %}>{{ city.name }}</option>{% endfor %}
+                            </select>
+                        </label>
+                        {% endif %}
+
+                        <fieldset>
+                            <legend class="label-tiny text-outline block mb-3">Special</legend>
+                            <div class="flex flex-col gap-2.5 text-sm">
+                                <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" name="premium" value="1" {% if g.premium == '1' %}checked{% endif %} onchange="this.form.submit()" class="rounded text-tertiary focus:ring-[#e39b3c]"> Premium / Luxury</label>
+                                <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" name="wedding" value="1" {% if g.wedding == '1' %}checked{% endif %} onchange="this.form.submit()" class="rounded text-tertiary focus:ring-[#e39b3c]"> Wedding service</label>
+                                <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" name="featured" value="1" {% if g.featured == '1' %}checked{% endif %} onchange="this.form.submit()" class="rounded text-tertiary focus:ring-[#e39b3c]"> Featured only</label>
+                            </div>
+                        </fieldset>
+
+                        {% if current_sort %}<input type="hidden" name="sort" value="{{ current_sort }}"/>{% endif %}
+                        <div class="pt-5 border-t border-dashed border-[#d6ccb5] flex flex-col gap-3">
+                            <button type="submit" class="bg-primary-container text-on-primary rounded-full py-3.5 label-tiny hover:opacity-90">Apply filters</button>
+                            <a href="{% url 'vehicle_list' %}" class="text-center text-sm text-outline hover:text-[#d9692f] underline underline-offset-4">Reset all</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </aside>
+
+        <!-- ─── Results ─── -->
+        <div class="flex-1 min-w-0">
+            <div class="board px-5 sm:px-7 py-4 mb-8 flex flex-wrap items-center justify-between gap-4" data-board>
+                <div class="flex items-center gap-3 min-w-0">
+                    <span class="material-symbols-outlined text-[#e39b3c]">departure_board</span>
+                    <span class="sr-only">Showing {{ page_obj|length }} of {{ total_count }} vehicles</span>
+                    {% with a=page_obj|length|stringformat:"d" b=total_count|stringformat:"d" %}{% with f=a|add:" OF "|add:b %}<span class="cells" aria-hidden="true" data-flap="{{ f }}">{% for ch in f %}<span class="cell">{% if ch != " " %}{{ ch }}{% endif %}</span>{% endfor %}</span>{% endwith %}{% endwith %}
+                    <span class="label-tiny text-[#fffaf0]/60 hidden sm:inline">vehicles</span>
+                </div>
+                <form method="get" action="{% url 'vehicle_list' %}" class="flex items-center gap-3" id="sort-form">
+                    {% for k, v in g.items %}{% if k != 'sort' and k != 'page' %}<input type="hidden" name="{{ k }}" value="{{ v }}"/>{% endif %}{% endfor %}
+                    <label for="sortSel" class="label-tiny text-[#fffaf0]/60">Sort</label>
+                    <select id="sortSel" name="sort" onchange="this.form.submit()" class="text-sm rounded-full px-4 py-2 focus:ring-1 focus:ring-[#e39b3c]">
+                        <option value="-created" {% if current_sort == '-created' %}selected{% endif %}>Newest</option>
+                        <option value="price" {% if current_sort == 'price' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="-price" {% if current_sort == '-price' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Name: A–Z</option>
+                    </select>
+                </form>
+            </div>
+
+            {% if page_obj %}
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7 lg:gap-8" data-tickets>
+                {% for vehicle in page_obj %}
+                {% include "public/themes/route/_ticket.html" with vehicle=vehicle n=page_obj.start_index|add:forloop.counter0 %}
+                {% endfor %}
+            </div>
+            {% include "public/themes/route/_pagination.html" %}
+            {% else %}
+            <div class="pc-back text-center px-6 py-16 sm:py-24">
+                <div class="stamp sm text-[#d9692f] mx-auto mb-8" style="rotate:-10deg"><div><span class="material-symbols-outlined">wrong_location</span><b>No match</b></div></div>
+                <h2 class="headline-md text-3xl sm:text-4xl text-tertiary mb-3">No departures on this route.</h2>
+                <p class="text-on-surface-variant mb-8 max-w-md mx-auto">Try another city, a different body type, or clear the filters to see the whole fleet.</p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <a href="{% url 'vehicle_list' %}" class="bg-primary-container text-on-primary px-8 py-3.5 rounded-full label-tiny">See all vehicles</a>
+                    {% if WHATSAPP_NUMBER %}<a href="{% whatsapp_url 'Hi! I am looking for a vehicle that is not listed on the website.' %}" target="_blank" rel="noopener" class="border border-tertiary text-tertiary px-8 py-3.5 rounded-full label-tiny hover:bg-tertiary hover:text-on-tertiary transition-colors">Ask us on WhatsApp</a>{% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endwith %}
+{% endblock %}
+
+{% block extra_js %}{% include "public/themes/route/_js.html" %}{% endblock %}

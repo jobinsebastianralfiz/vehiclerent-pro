@@ -1,0 +1,13 @@
+{% load static vehicle_tags %}{# premium hero photo tile body; include with hero=<Vehicle or ""> #}
+        {% if hero and hero.thumbnail %}
+        <img src="{{ hero.thumbnail.url }}" alt="{{ hero.brand }} {{ hero.name }}" class="b-kb absolute inset-0 w-full h-full object-cover"/>
+        {% else %}
+        <img src="{% static 'themes/img/sclass-mist.jpg' %}" alt="" class="b-kb absolute inset-0 w-full h-full object-cover"/>
+        {% endif %}
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/10"></div>
+        {% if hero %}
+        <a href="{{ hero.get_absolute_url }}" class="absolute bottom-5 left-5 right-5 b-glass rounded-2xl p-4 flex items-center justify-between gap-3 group">
+            <span class="min-w-0"><span class="label-tiny text-outline block">{{ hero.brand }}</span><span class="font-extrabold text-xl text-primary block truncate">{{ hero.name }}</span></span>
+            {% if hero.primary_price_value %}<span class="font-extrabold text-primary whitespace-nowrap">{{ hero.primary_price_value|inr }}<span class="text-xs text-on-surface-variant">/{{ hero.primary_price_label }}</span></span>{% endif %}
+        </a>
+        {% endif %}

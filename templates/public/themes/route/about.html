@@ -1,0 +1,134 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+{% comment %}Kerala Route · about. Our story on the sand, then a road past the numbers (only real ones from settings),
+mission and vision written on postcard backs, the licence as a passport stamp, and customer postcards.{% endcomment %}
+
+{% block title %}{{ config.about_title|default:"About Us" }} - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Learn about {{ BUSINESS_NAME }}. Our mission, vision, licenses, and the team behind your trusted vehicle rental service.{% endblock %}
+
+{% block extra_css %}{% include "public/themes/route/_assets.html" %}{% endblock %}
+
+{% block content %}
+<section class="r-glow">
+    <div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 lg:pt-12 pb-16">
+        {% include "public/themes/route/_trail.html" with here="About" %}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+            <div class="space-y-7 min-w-0">
+                <span class="label-tiny text-[#d9692f] flex items-center gap-3" data-intro="1"><span class="w-8 h-px bg-[#d9692f]"></span>Our story</span>
+                <h1 class="display-hero text-5xl sm:text-7xl lg:text-[84px] text-tertiary" data-intro="2" data-intro-kind="split">{{ config.about_title|default:"About Us" }}</h1>
+                {% with plain=config.about_content|striptags|cut:" "|cut:"&nbsp;" %}
+                {% if plain %}
+                <div class="text-lg text-on-surface-variant leading-relaxed font-light space-y-4 [&_a]:text-[#d9692f] [&_a]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_strong]:text-tertiary" data-intro="3">{{ config.about_content|safe }}</div>
+                {% else %}
+                <p class="text-lg text-on-surface-variant leading-relaxed font-light" data-intro="3">{{ BUSINESS_NAME }} is a trusted vehicle rental service providing quality cars, SUVs, bikes and more. We're committed to making transportation accessible, affordable and reliable for everyone.</p>
+                {% endif %}
+                {% endwith %}
+                <div class="flex flex-wrap gap-4" data-intro="4">
+                    <a href="{% url 'vehicle_list' %}" class="bg-primary-container text-on-primary px-8 py-4 rounded-full flex items-center gap-3 font-bold">Explore the fleet <span class="material-symbols-outlined">arrow_forward</span></a>
+                    <a href="{% url 'contact' %}" class="border border-outline-variant px-8 py-4 rounded-full flex items-center gap-3 font-bold hover:bg-surface-container-lowest transition-colors">Contact us</a>
+                </div>
+            </div>
+            {% if config.about_image %}
+            <div class="pc max-w-xl w-full mx-auto rotate-[2deg]" data-intro="3" data-intro-kind="fade" data-no-parallax>
+                <img src="{{ config.about_image.url }}" alt="About {{ BUSINESS_NAME }}">
+                <span class="pc-cap">Greetings from {{ BUSINESS_NAME }}</span><span class="pc-stamp"><span class="material-symbols-outlined">signpost</span></span>
+            </div>
+            {% else %}
+            <div class="pol-stack relative h-[340px] sm:h-[460px] lg:h-[520px]" data-no-parallax aria-hidden="true" data-intro="3" data-intro-kind="fade">
+                <figure class="pol"><img src="{% static 'themes/img/palms.jpg' %}" alt=""><figcaption>Kerala</figcaption></figure>
+                <figure class="pol"><img src="{% static 'themes/img/suv-munnar.jpg' %}" alt=""><figcaption>Hill roads</figcaption></figure>
+                <figure class="pol"><img src="{% static 'themes/img/ambassador.jpg' %}" alt=""><figcaption>Every journey</figcaption></figure>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<div id="journey">
+    {% include "public/themes/route/_road.html" %}
+
+    {% if config.years_in_business or config.total_happy_customers %}
+    <div class="road-gap sm" data-stop="By the numbers"></div>
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="flex flex-wrap justify-center gap-12 sm:gap-20 text-center" data-stamps>
+            {% if config.years_in_business %}<div><div class="stamp big-num text-tertiary mx-auto" style="rotate:-8deg"><div><strong><span data-slot>{{ config.years_in_business }}</span></strong><b>Year{{ config.years_in_business|pluralize }}</b></div></div><p class="font-bold text-tertiary mt-6">On Kerala roads</p></div>{% endif %}
+            {% if config.total_happy_customers %}<div><div class="stamp big-num text-[#d9692f] mx-auto" style="rotate:7deg"><div><strong><span data-slot>{{ config.total_happy_customers }}</span></strong><b>Customers</b></div></div><p class="font-bold text-tertiary mt-6">Happy travellers</p></div>{% endif %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if config.about_mission or config.about_vision %}
+    <div class="road-gap" data-stop="Why we drive"></div>
+    <section class="lane max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+        {% if config.about_mission %}
+        <article class="pc-back pc-in p-8 sm:p-12 rotate-[-1deg]">
+            <div class="flex items-start justify-between gap-4 mb-6"><span class="label-tiny text-[#d9692f]">Our mission</span><span class="w-14 h-16 border-2 border-dashed border-[#e39b3c] rounded grid place-items-center text-[#d9692f]"><span class="material-symbols-outlined">flag</span></span></div>
+            <p class="font-serif italic text-2xl sm:text-3xl leading-snug text-tertiary">{{ config.about_mission }}</p>
+        </article>
+        {% endif %}
+        {% if config.about_vision %}
+        <article class="pc-back pc-in p-8 sm:p-12 rotate-[1deg]">
+            <div class="flex items-start justify-between gap-4 mb-6"><span class="label-tiny text-[#d9692f]">Our vision</span><span class="w-14 h-16 border-2 border-dashed border-[#e39b3c] rounded grid place-items-center text-[#d9692f]"><span class="material-symbols-outlined">visibility</span></span></div>
+            <p class="font-serif italic text-2xl sm:text-3xl leading-snug text-tertiary">{{ config.about_vision }}</p>
+        </article>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    {% with lic=config.license_details|striptags|cut:" "|cut:"&nbsp;" %}
+    {% if config.license_number or lic %}
+    <div class="road-gap" data-stop="Licensed"></div>
+    <section class="lane max-w-5xl mx-auto">
+        <div class="bg-surface-container-lowest rounded-[1.75rem] shadow-xl shadow-black/5 border border-outline-variant/50 p-8 sm:p-12 grid sm:grid-cols-[auto_1fr] gap-8 sm:gap-12 items-center" data-stamps>
+            <div class="stamp text-tertiary mx-auto" style="rotate:-10deg"><div><span class="material-symbols-outlined">verified</span><b>Licensed</b></div></div>
+            <div class="min-w-0">
+                <span class="label-tiny text-[#d9692f]">Licensed &amp; certified</span>
+                <h2 class="headline-md text-3xl text-tertiary mt-3">Papers in order.</h2>
+                {% if config.license_number %}<p class="mt-4 text-on-surface-variant">Registration no. <strong class="font-serif text-xl text-tertiary">{{ config.license_number }}</strong></p>{% endif %}
+                {% if lic %}<div class="mt-4 text-on-surface-variant leading-relaxed space-y-3">{{ config.license_details|safe }}</div>{% endif %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    {% endwith %}
+
+    {% if testimonials %}
+    <div class="road-gap" data-stop="Postcards home"></div>
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="flex flex-col items-center mb-12 text-center"><span class="label-tiny text-[#d9692f]">What our customers say</span><h2 class="headline-lg text-4xl sm:text-6xl mt-4 text-tertiary">Postcards home.</h2></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for t in testimonials %}
+            <figure class="pc-back pc-in p-7 sm:p-8 flex flex-col {% cycle 'rotate-[-1.5deg]' 'rotate-[1deg]' 'rotate-[-.5deg]' %}">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="flex gap-0.5 text-[#e39b3c]" aria-label="{{ t.rating }} out of 5">{% for i in "12345" %}<span class="material-symbols-outlined text-lg" {% if forloop.counter <= t.rating %}style="font-variation-settings:'FILL' 1"{% else %}style="opacity:.35"{% endif %}>star</span>{% endfor %}</div>
+                    <span class="w-14 h-16 border-2 border-dashed border-[#e39b3c] rounded p-1 rotate-3 shrink-0">{% if t.photo %}<img src="{{ t.photo.url }}" alt="" class="w-full h-full object-cover rounded-sm">{% else %}<span class="w-full h-full grid place-items-center font-serif font-bold text-xl text-tertiary">{{ t.name|first }}</span>{% endif %}</span>
+                </div>
+                <blockquote class="font-serif italic text-xl leading-snug text-tertiary mt-4 flex-1">“{{ t.quote }}”</blockquote>
+                <figcaption class="mt-6 pt-4 border-t border-[#d6ccb5]"><span class="label-tiny text-outline">From</span><div class="font-bold mt-1">{{ t.name }}</div>{% if t.role %}<div class="text-sm text-on-surface-variant">{{ t.role }}</div>{% endif %}</figcaption>
+            </figure>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <div class="road-gap" data-stop="Next stop"></div>
+    <section class="lane max-w-screen-2xl mx-auto">
+        <div class="relative overflow-hidden rounded-[2.5rem] bg-tertiary text-[#fffaf0] p-8 sm:p-14 lg:p-20 text-center">
+            <div class="absolute inset-0 pointer-events-none" style="background:radial-gradient(45% 80% at 50% 120%,rgba(227,155,60,.5),transparent 70%)"></div>
+            <div class="relative">
+                <span class="label-tiny text-[#e39b3c] block">Ready to hit the road?</span>
+                <h2 class="headline-lg text-4xl sm:text-6xl mt-4 mb-5">Your next trip starts here.</h2>
+                <p class="text-[#fffaf0]/75 max-w-xl mx-auto mb-9">Browse the fleet and find the right vehicle for the journey.</p>
+                <div class="flex flex-wrap gap-4 justify-center">
+                    <a href="{% url 'vehicle_list' %}" class="bg-[#e39b3c] text-[#0f2e2c] px-10 py-4 rounded-full label-tiny hover:bg-[#f6d9a8] transition-colors">Browse fleet</a>
+                    <a href="{% url 'contact' %}" class="border border-[#fffaf0]/40 px-10 py-4 rounded-full label-tiny hover:bg-[#fffaf0] hover:text-[#0f2e2c] transition-colors">Contact us</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="road-gap sm" data-stop="Destination" data-stop-end></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}{% include "public/themes/route/_js.html" %}{% endblock %}

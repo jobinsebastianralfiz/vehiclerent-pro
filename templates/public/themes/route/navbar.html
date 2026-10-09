@@ -27,7 +27,7 @@
             {% if BUSINESS_PHONE %}
             <a href="tel:{{ BUSINESS_PHONE }}" class="hidden xl:inline label-tiny text-on-surface-variant hover:text-primary-container transition-colors">{{ BUSINESS_PHONE }}</a>
             {% endif %}
-            <a href="#plan" class="m-shine bg-tertiary text-on-tertiary px-6 sm:px-8 py-2.5 sm:py-3 rounded-full label-tiny hover:opacity-90 active:scale-95 transition-all hidden lg:inline-block" data-magnetic>Plan a trip</a>
+            <a href="{% if request.resolver_match.url_name == 'home' %}#plan{% else %}{% url 'vehicle_list' %}#itinerary{% endif %}" class="m-shine bg-tertiary text-on-tertiary px-6 sm:px-8 py-2.5 sm:py-3 rounded-full label-tiny hover:opacity-90 active:scale-95 transition-all hidden lg:inline-block" data-magnetic>Plan a trip</a>
             <button x-data x-on:click="$dispatch('toggle-mobile-menu')" class="lg:hidden p-1" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
                 <span class="material-symbols-outlined text-2xl" aria-hidden="true">menu</span>
             </button>

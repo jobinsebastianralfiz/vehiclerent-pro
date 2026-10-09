@@ -1,0 +1,23 @@
+{% comment %}Night Drive restyle for the shared legal pages (terms, privacy): same wording, dark cinematic layout.{% endcomment %}
+{% include "public/themes/night/_styles.html" %}
+<style>
+  main > article { position: relative; isolation: isolate; padding-left: 1rem; padding-right: 1rem; }
+  @media (min-width: 640px) { main > article { padding-left: 2rem; padding-right: 2rem; } }
+  main > article::before { content: ""; position: absolute; top: -10rem; left: 50%; width: 720px; max-width: 160vw; height: 620px; transform: translateX(-50%); pointer-events: none; z-index: -1;
+    background: radial-gradient(circle, rgba(212,236,162,.13), transparent 62%); }
+  main > article > header { padding-top: 3rem; margin-bottom: 3.5rem; border-bottom: 1px solid rgba(212,236,162,.1); padding-bottom: 2.5rem; }
+  main > article > header > p:first-child { color: #b8cf88; display: flex; align-items: center; gap: .75rem; }
+  main > article > header > p:first-child::before { content: ""; width: 2rem; height: 1px; background: currentColor; }
+  main > article > header h1 { font-family: var(--font-display); font-weight: 700; letter-spacing: -.04em; line-height: .95; font-size: clamp(2.75rem, 8vw, 5.5rem); color: #eef0e4; }
+  main > article .prose-content { counter-reset: nd-sec; }
+  main > article .prose-content > section { background: #151910; border: 1px solid rgba(212,236,162,.08); border-radius: 2rem; padding: 1.75rem 1.5rem; transition: border-color .4s, box-shadow .4s; }
+  @media (min-width: 640px) { main > article .prose-content > section { padding: 2.25rem 2.5rem; } }
+  main > article .prose-content > section:hover { border-color: rgba(212,236,162,.25); box-shadow: 0 30px 80px -40px rgba(184,207,136,.3); }
+  main > article .prose-content > section > h2 { color: #eef0e4; }
+  main > article .prose-content strong { color: #eef0e4; }
+  main > article .prose-content li::marker { color: #d4eca2; }
+  main > article .prose-content a { color: #d4eca2; }
+  main > article .prose-content > section:last-child { background: radial-gradient(120% 140% at 0% 0%, rgba(212,236,162,.1), transparent 60%), #151910; border-color: rgba(212,236,162,.2); }
+  main > article .space-y-12 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+  @media (prefers-reduced-motion: reduce) { main > article .prose-content > section { transition: none; } }
+</style>

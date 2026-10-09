@@ -1,0 +1,268 @@
+{% extends "public/themes/bento/_base.html" %}
+{% load vehicle_tags %}
+
+{% block title %}{{ vehicle.meta_title|default:vehicle.brand }} {% if not vehicle.meta_title %}{{ vehicle.name }} for Rent in Kerala{% endif %} | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} ({{ vehicle.get_vehicle_type_display }}) at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}{% if vehicle.seating_capacity %}, {{ vehicle.seating_capacity }} seats{% endif %}. Doorstep delivery, transparent pricing, 24x7 support.{% endif %}{% endblock %}
+{% block meta_keywords %}{% if vehicle.meta_keywords %}{{ vehicle.meta_keywords }}{% else %}{{ vehicle.brand }} rental, {{ vehicle.name }} rent, {{ vehicle.get_vehicle_type_display }} rental Kerala, {{ vehicle.brand }} {{ vehicle.name }} hire, car rental Kerala{% endif %}{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_title %}{{ vehicle.brand }} {{ vehicle.name }} for Rent | {{ BUSINESS_NAME }}{% endblock %}
+{% block og_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}.{% endif %}{% endblock %}
+{% block twitter_title %}{{ vehicle.brand }} {{ vehicle.name }} for Rent{% endblock %}
+{% block twitter_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} at {{ vehicle.price_per_day|inr }}/day in Kerala.{% endif %}{% endblock %}
+{% block og_image %}{% if vehicle.thumbnail %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ vehicle.thumbnail.url }}"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>{% else %}{{ block.super }}{% endif %}{% endblock %}
+{% block twitter_image %}{% if vehicle.thumbnail %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ vehicle.thumbnail.url }}"/>{% else %}{{ block.super }}{% endif %}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "{{ vehicle.brand|escapejs }} {{ vehicle.name|escapejs }}",
+    "description": "{{ vehicle.description|truncatewords:50|escapejs }}",
+    "brand": { "@type": "Brand", "name": "{{ vehicle.brand|escapejs }}" },
+    "category": "{{ vehicle.get_vehicle_type_display|escapejs }}",
+    {% if vehicle.thumbnail %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ vehicle.thumbnail.url }}",{% endif %}
+    "offers": {
+        "@type": "Offer",
+        "priceCurrency": "INR",
+        "price": "{{ vehicle.price_per_day }}",
+        "unitCode": "DAY",
+        "availability": "{% if vehicle.status == 'available' %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
+    }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- ─── Breadcrumb ─── -->
+<nav class="max-w-screen-xl mx-auto mb-3 sm:mb-4 flex items-center gap-1.5 overflow-x-auto no-scrollbar" aria-label="Breadcrumb">
+    <a href="{% url 'vehicle_list' %}" class="b-chip">Fleet</a>
+    <span class="material-symbols-outlined text-outline text-[18px]" aria-hidden="true">chevron_right</span>
+    {% if vehicle.category %}
+    <a href="{% url 'vehicle_list' %}?category={{ vehicle.category.id }}" class="b-chip">{{ vehicle.category.name }}</a>
+    <span class="material-symbols-outlined text-outline text-[18px]" aria-hidden="true">chevron_right</span>
+    {% endif %}
+    <span class="b-chip is-on" aria-current="page">{{ vehicle.brand }} {{ vehicle.name }}</span>
+</nav>
+
+<!-- ─── Gallery + booking bento ─── -->
+<section class="b-hero max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-start" aria-label="{{ vehicle.brand }} {{ vehicle.name }}">
+    <div class="lg:col-span-7 grid gap-3 sm:gap-4">
+        <!-- gallery -->
+        <div class="tile b-glass p-3" x-data="{ i: 0, n: {% if images %}{{ images|length }}{% else %}1{% endif %} }" data-no-parallax>
+            <div class="relative overflow-hidden rounded-[22px] aspect-[4/3] bg-surface-container grid place-items-center"
+                 x-on:keydown.arrow-right.prevent="i = (i + 1) % n" x-on:keydown.arrow-left.prevent="i = (i - 1 + n) % n">
+                {% if images %}
+                    {% for img in images %}
+                    <img src="{{ img.image.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}{% if images|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500" x-bind:style="{ opacity: i === {{ forloop.counter0 }} ? 1 : 0 }" {% if not forloop.first %}style="opacity:0" loading="lazy"{% endif %}/>
+                    {% endfor %}
+                {% elif vehicle.thumbnail %}
+                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="absolute inset-0 w-full h-full object-cover"/>
+                {% else %}
+                    <span class="material-symbols-outlined text-[120px] text-outline-variant" aria-hidden="true">directions_car</span>
+                {% endif %}
+                <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                    {% if vehicle.is_premium %}<span class="b-glass rounded-full px-3 py-1.5 label-tiny text-primary">Premium</span>{% endif %}
+                    {% if vehicle.is_wedding_service %}<span class="b-glass rounded-full px-3 py-1.5 label-tiny text-primary">Wedding</span>{% endif %}
+                    {% if vehicle.category %}<span class="b-glass rounded-full px-3 py-1.5 label-tiny text-primary">{{ vehicle.category.name }}</span>{% endif %}
+                </div>
+                <span class="absolute top-3 right-3 b-glass rounded-full px-3 py-1.5 label-tiny flex items-center gap-1.5"><span class="w-2 h-2 rounded-full {% if vehicle.status == 'available' %}bg-emerald-500{% elif vehicle.status == 'rented' %}bg-blue-500{% else %}bg-amber-500{% endif %}"></span>{{ vehicle.get_status_display }}</span>
+                {% if images|length > 1 %}
+                <div class="absolute bottom-3 right-3 flex gap-1.5">
+                    <button type="button" x-on:click="i = (i - 1 + n) % n" class="w-11 h-11 rounded-full b-glass grid place-items-center" aria-label="Previous photo"><span class="material-symbols-outlined">arrow_back</span></button>
+                    <button type="button" x-on:click="i = (i + 1) % n" class="w-11 h-11 rounded-full bg-primary text-on-primary grid place-items-center" aria-label="Next photo"><span class="material-symbols-outlined">arrow_forward</span></button>
+                </div>
+                <span class="absolute bottom-4 left-4 b-glass rounded-full px-3 py-1.5 text-xs font-extrabold text-primary" aria-live="polite"><span x-text="i + 1">1</span> / {{ images|length }}</span>
+                {% endif %}
+            </div>
+            {% if images|length > 1 %}
+            <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 mt-2">
+                {% for img in images %}
+                <button type="button" x-on:click="i = {{ forloop.counter0 }}" class="b-thumb aspect-[4/3] rounded-2xl overflow-hidden" x-bind:aria-current="(i === {{ forloop.counter0 }}).toString()" aria-label="Show photo {{ forloop.counter }}">
+                    <img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover" loading="lazy"/>
+                </button>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- rates bento -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+            {% if vehicle.price_per_day %}<div class="tile bg-primary text-on-primary p-5 sm:p-6"><div class="label-tiny text-primary-fixed">Per day</div><div class="font-extrabold text-3xl sm:text-4xl tracking-tight mt-3">{{ vehicle.price_per_day|inr }}</div></div>{% endif %}
+            {% if vehicle.price_per_week %}<div class="tile b-glass p-5 sm:p-6"><div class="label-tiny text-outline">Per week</div><div class="font-extrabold text-3xl sm:text-4xl tracking-tight mt-3 text-primary">{{ vehicle.price_per_week|inr }}</div></div>{% endif %}
+            {% if vehicle.price_per_month %}<div class="tile bg-primary-fixed p-5 sm:p-6"><div class="label-tiny text-primary/70">Per month</div><div class="font-extrabold text-3xl sm:text-4xl tracking-tight mt-3 text-primary">{{ vehicle.price_per_month|inr }}</div></div>{% endif %}
+            {% if vehicle.is_chauffeur_available and vehicle.with_driver_price_per_day %}<div class="tile b-glass p-5 sm:p-6"><div class="label-tiny text-outline">With driver</div><div class="font-extrabold text-2xl sm:text-3xl tracking-tight mt-3 text-primary">+{{ vehicle.with_driver_price_per_day|inr }}<span class="text-sm font-semibold text-on-surface-variant">/day</span></div></div>{% endif %}
+            {% if vehicle.security_deposit %}<div class="tile b-glass p-5 sm:p-6"><div class="label-tiny text-outline">Refundable deposit</div><div class="font-extrabold text-2xl sm:text-3xl tracking-tight mt-3 text-primary">{{ vehicle.security_deposit|inr }}</div></div>{% endif %}
+            {% if vehicle.included_km_per_day %}<div class="tile b-glass p-5 sm:p-6"><div class="label-tiny text-outline">Included</div><div class="font-extrabold text-2xl sm:text-3xl tracking-tight mt-3 text-primary">{{ vehicle.included_km_per_day }}<span class="text-sm font-semibold text-on-surface-variant"> km/day</span></div>{% if vehicle.per_km_charge %}<div class="text-xs font-bold text-on-surface-variant mt-1">₹{{ vehicle.per_km_charge }}/km after</div>{% endif %}</div>{% endif %}
+            {% if vehicle.minimum_rental_days and vehicle.minimum_rental_days > 1 %}<div class="tile b-glass p-5 sm:p-6"><div class="label-tiny text-outline">Minimum</div><div class="font-extrabold text-2xl sm:text-3xl tracking-tight mt-3 text-primary">{{ vehicle.minimum_rental_days }}<span class="text-sm font-semibold text-on-surface-variant"> days</span></div></div>{% endif %}
+        </div>
+    </div>
+
+    <!-- booking tile -->
+    <aside id="reserve" class="lg:col-span-5 lg:sticky lg:top-28 scroll-mt-28">
+        <div class="tile b-glass p-6 sm:p-8">
+            <span class="label-tiny text-primary-container block">{{ vehicle.brand }} · {{ vehicle.get_vehicle_type_display }}</span>
+            <h1 class="b-title mt-3 font-extrabold text-4xl sm:text-5xl leading-[.95] tracking-[-.045em] text-primary" data-no-split>{{ vehicle.name }}</h1>
+            {% if vehicle.year or vehicle.color %}<p class="mt-2 text-sm font-semibold text-on-surface-variant">{{ vehicle.year|default:"" }}{% if vehicle.year and vehicle.color %} · {% endif %}{{ vehicle.color }}</p>{% endif %}
+            {% if vehicle.primary_price_value %}
+            <div class="mt-5 flex items-baseline gap-2"><span class="font-extrabold text-5xl tracking-[-.04em] text-primary"><span data-bslot>{{ vehicle.primary_price_value|inr }}</span></span><span class="font-semibold text-on-surface-variant">/ {{ vehicle.primary_price_label }}</span></div>
+            {% endif %}
+
+            <form action="{% url 'submit_enquiry' %}" method="post" class="mt-6 space-y-3" id="b-book" data-day="{{ vehicle.price_per_day|default:0|floatformat:0 }}" data-driver="{{ vehicle.with_driver_price_per_day|default:0|floatformat:0 }}">
+                {% csrf_token %}
+                <input type="hidden" name="vehicle" value="{{ vehicle.id }}"/>
+                <input type="hidden" name="source" value="website"/>
+                <input type="hidden" name="message" value="" id="b-msg"/>
+
+                {% if vehicle.is_chauffeur_available %}
+                <div class="flex bg-surface-container rounded-full p-1" role="radiogroup" aria-label="Rental type">
+                    <label class="flex-1 cursor-pointer"><input type="radio" name="rental_type" value="self_drive" checked class="peer sr-only"><span class="block text-center px-3 py-2.5 rounded-full text-sm font-bold peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">Self-drive</span></label>
+                    <label class="flex-1 cursor-pointer"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only"><span class="block text-center px-3 py-2.5 rounded-full text-sm font-bold peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">With driver{% if vehicle.with_driver_price_per_day %} +{{ vehicle.with_driver_price_per_day|inr }}{% endif %}</span></label>
+                </div>
+                {% else %}
+                <input type="hidden" name="rental_type" value="self_drive"/>
+                {% endif %}
+
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="bg-white rounded-2xl px-4 py-3 min-w-0"><span class="label-tiny text-outline block mb-1">Pickup</span><input type="date" name="preferred_start_date" required class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+                    <label class="bg-white rounded-2xl px-4 py-3 min-w-0"><span class="label-tiny text-outline block mb-1">Return</span><input type="date" name="preferred_end_date" required class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+                </div>
+                {% if cities %}
+                <label class="block bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Pickup city</span>
+                    <select name="pickup_city" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"><option value="">Choose city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
+                {% endif %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Your name</span><input type="text" name="name" required autocomplete="name" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+                    <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Phone</span><input type="tel" name="phone" required autocomplete="tel" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+                </div>
+
+                {% if addons %}
+                <fieldset>
+                    <legend class="label-tiny text-outline mb-2 mt-2">Extras</legend>
+                    <div class="grid gap-1.5">
+                        {% for addon in addons %}
+                        <label class="flex items-center justify-between gap-3 cursor-pointer bg-white/70 hover:bg-white rounded-2xl px-4 py-3 transition-colors">
+                            <span class="flex items-center gap-3 min-w-0"><input type="checkbox" name="addons" value="{{ addon.slug }}" class="rounded text-primary focus:ring-primary">{% if addon.icon %}<span class="material-symbols-outlined text-[18px] text-primary" aria-hidden="true">{{ addon.icon }}</span>{% endif %}<span class="text-sm font-semibold truncate">{{ addon.name }}</span></span>
+                            <span class="text-xs font-bold text-outline whitespace-nowrap">+₹{{ addon.price }} {{ addon.get_pricing_unit_display|lower }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+                {% endif %}
+
+                <!-- live estimate from the chosen dates (day rate only, extras excluded) -->
+                <div id="b-est" class="hidden rounded-2xl bg-primary text-on-primary px-5 py-4" aria-live="polite">
+                    <div class="flex items-center justify-between gap-3"><span class="label-tiny text-primary-fixed">Estimate</span><span class="text-xs font-semibold text-white/60" id="b-est-break"></span></div>
+                    <div class="font-extrabold text-3xl tracking-tight mt-1" id="b-est-total"></div>
+                    <p class="text-xs text-white/60 mt-1">At the listed day rate, extras not included. Our team confirms the final price.</p>
+                </div>
+
+                <button type="submit" class="w-full bg-primary text-on-primary rounded-full py-4 font-bold flex items-center justify-center gap-2 m-shine m-btn group">Reserve now <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span></button>
+            </form>
+
+            <div class="grid grid-cols-2 gap-2 mt-3">
+                <a href="{% whatsapp_vehicle_url vehicle %}" target="_blank" rel="noopener" class="bg-[#25D366] text-white rounded-2xl p-4 font-bold flex flex-col gap-4 lift"><span class="material-symbols-outlined">chat</span>WhatsApp</a>
+                {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="bg-white rounded-2xl p-4 font-bold flex flex-col gap-4 lift text-primary"><span class="material-symbols-outlined">call</span>Call us</a>{% endif %}
+            </div>
+        </div>
+    </aside>
+</section>
+
+<!-- ─── Specs bento ─── -->
+{% if vehicle.seating_capacity or vehicle.transmission or vehicle.fuel_type or vehicle.engine_cc or vehicle.range_km or vehicle.mileage_kmpl or vehicle.battery_capacity_kwh %}
+<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24" aria-labelledby="specs-h">
+    <div class="mb-6"><span class="label-tiny text-primary-container block">Specifications</span><h2 id="specs-h" class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em] text-primary">The <span class="serif-i">details.</span></h2></div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4" data-bpop>
+        {% if vehicle.seating_capacity %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">airline_seat_recline_normal</span><div class="font-extrabold text-3xl text-primary mt-4">{{ vehicle.seating_capacity }}</div><div class="label-tiny text-outline mt-1">Seats</div></div>{% endif %}
+        {% if vehicle.transmission %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">settings</span><div class="font-extrabold text-2xl text-primary mt-4">{{ vehicle.get_transmission_display }}</div><div class="label-tiny text-outline mt-1">Gearbox</div></div>{% endif %}
+        {% if vehicle.fuel_type %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">{% if vehicle.is_ev_or_hybrid %}bolt{% else %}local_gas_station{% endif %}</span><div class="font-extrabold text-2xl text-primary mt-4">{{ vehicle.get_fuel_type_display }}</div><div class="label-tiny text-outline mt-1">Fuel</div></div>{% endif %}
+        {% if vehicle.engine_cc %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">speed</span><div class="font-extrabold text-3xl text-primary mt-4">{{ vehicle.engine_cc }}<span class="text-base">cc</span></div><div class="label-tiny text-outline mt-1">Engine</div></div>{% endif %}
+        {% if vehicle.mileage_kmpl %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">eco</span><div class="font-extrabold text-3xl text-primary mt-4">{{ vehicle.mileage_kmpl }}</div><div class="label-tiny text-outline mt-1">km per litre</div></div>{% endif %}
+        {% if vehicle.range_km %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">route</span><div class="font-extrabold text-3xl text-primary mt-4">{{ vehicle.range_km }}<span class="text-base">km</span></div><div class="label-tiny text-outline mt-1">Range</div></div>{% endif %}
+        {% if vehicle.battery_capacity_kwh %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">battery_charging_full</span><div class="font-extrabold text-3xl text-primary mt-4">{{ vehicle.battery_capacity_kwh }}<span class="text-base">kWh</span></div><div class="label-tiny text-outline mt-1">Battery</div></div>{% endif %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── About + features bento ─── -->
+{% if vehicle.description or vehicle.features or vehicle.short_description %}
+<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4" data-bpop>
+    {% if vehicle.description or vehicle.short_description %}
+    <div class="tile b-glass p-7 sm:p-10 {% if vehicle.features %}lg:col-span-7{% else %}lg:col-span-12{% endif %}">
+        <span class="label-tiny text-primary-container block">About this car</span>
+        <h2 class="mt-3 font-extrabold text-3xl sm:text-4xl tracking-[-.04em] text-primary" data-no-split>{{ vehicle.short_description|default:"Built for Kerala roads." }}</h2>
+        {% if vehicle.description %}<p class="mt-5 text-on-surface-variant text-lg leading-relaxed whitespace-pre-line">{{ vehicle.description }}</p>{% endif %}
+    </div>
+    {% endif %}
+    {% if vehicle.features %}
+    <div class="tile bg-primary text-on-primary p-7 sm:p-10 {% if vehicle.description or vehicle.short_description %}lg:col-span-5{% else %}lg:col-span-12{% endif %}">
+        <span class="label-tiny text-primary-fixed block">What's included</span>
+        <ul class="mt-6 grid gap-2" role="list">
+            {% for feature in vehicle.features %}
+            <li class="flex items-center gap-3 bg-white/10 rounded-2xl px-4 py-3 font-semibold"><span class="material-symbols-outlined text-primary-fixed" aria-hidden="true">check_circle</span>{{ feature }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</section>
+{% endif %}
+
+<!-- ─── Related ─── -->
+{% if related_vehicles %}
+<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+        <div><span class="label-tiny text-primary-container block">Also consider</span><h2 class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em] text-primary">Similar <span class="serif-i">drives.</span></h2></div>
+        {% if vehicle.category %}<a href="{% url 'vehicle_list' %}?category={{ vehicle.category.id }}" class="font-bold text-primary inline-flex items-center gap-2 hover:gap-3 transition-all">All {{ vehicle.category.name }} <span class="material-symbols-outlined">arrow_forward</span></a>{% endif %}
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" data-deal>
+        {% for v in related_vehicles %}{% include "public/themes/bento/_card.html" with v=v big=False %}{% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── Final CTA ─── -->
+<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24">
+    <div class="tile bg-primary text-on-primary p-8 sm:p-14 grid lg:grid-cols-12 gap-6 items-center">
+        <div class="absolute -right-24 -bottom-24 w-80 h-80 rounded-full bg-primary-fixed/10 blur-2xl" aria-hidden="true"></div>
+        <div class="lg:col-span-8 relative">
+            <h2 class="font-extrabold text-4xl sm:text-6xl tracking-[-.04em]" data-no-split>Ready to <span class="serif-i text-primary-fixed">drive?</span></h2>
+            {% if vehicle.primary_price_value %}<p class="mt-3 text-white/70 text-lg">{{ vehicle.brand }} {{ vehicle.name }} · {{ vehicle.primary_price_value|inr }} / {{ vehicle.primary_price_label }}</p>{% endif %}
+        </div>
+        <div class="lg:col-span-4 relative flex flex-wrap lg:justify-end gap-2">
+            <a href="#reserve" class="bg-primary-fixed text-primary rounded-full px-7 py-4 font-bold inline-flex items-center gap-2 m-shine" data-magnetic>Reserve this car <span class="material-symbols-outlined">arrow_upward</span></a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block page_js %}
+<script>
+/* live estimate: whole days between the chosen dates x the listed day rate (+ driver rate when chosen) */
+(() => {
+    const f = document.getElementById("b-book"); if (!f) return;
+    const day = +f.dataset.day || 0, driver = +f.dataset.driver || 0;
+    const box = document.getElementById("b-est"), $t = document.getElementById("b-est-total"), $b = document.getElementById("b-est-break"), msg = document.getElementById("b-msg");
+    const inr = n => "₹" + Math.round(n).toLocaleString("en-IN");
+    function update() {
+        const a = f.preferred_start_date.value, b = f.preferred_end_date.value;
+        const withDriver = f.querySelector("input[name=rental_type]:checked")?.value === "with_driver";
+        const rate = day + (withDriver ? driver : 0);
+        if (!a || !b || !day) { box.classList.add("hidden"); msg.value = ""; return; }
+        const days = Math.round((new Date(b) - new Date(a)) / 864e5);
+        if (days < 1) { box.classList.add("hidden"); msg.value = ""; return; }
+        const word = days === 1 ? "day" : "days";
+        $b.textContent = `${inr(rate)} × ${days} ${word}`;
+        $t.textContent = inr(rate * days);
+        box.classList.remove("hidden");
+        msg.value = `Estimate at the listed rate: ${inr(rate)} x ${days} ${word} = ${inr(rate * days)}${withDriver ? " (with driver)" : ""}.`;
+    }
+    /* return date can't be before pickup */
+    f.preferred_start_date.addEventListener("change", () => { f.preferred_end_date.min = f.preferred_start_date.value; update(); });
+    const today = new Date().toISOString().slice(0, 10);
+    f.preferred_start_date.min = today; f.preferred_end_date.min = today;
+    f.addEventListener("change", update);
+})();
+</script>
+{% endblock %}

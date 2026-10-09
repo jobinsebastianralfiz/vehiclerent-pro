@@ -1,0 +1,10 @@
+{% if page_obj.has_other_pages %}
+<nav class="pager" aria-label="Pagination">
+  {% if page_obj.has_previous %}<a href="?{{ query_string }}&page={{ page_obj.previous_page_number }}" class="chip" rel="prev"><span class="material-symbols-outlined">arrow_back</span>Prev</a>{% endif %}
+  {% for num in page_obj.paginator.page_range %}
+    {% if page_obj.number == num %}<span class="chip" aria-pressed="true" aria-current="page">{{ num|stringformat:"02d" }}</span>
+    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}<a href="?{{ query_string }}&page={{ num }}" class="chip">{{ num|stringformat:"02d" }}</a>{% endif %}
+  {% endfor %}
+  {% if page_obj.has_next %}<a href="?{{ query_string }}&page={{ page_obj.next_page_number }}" class="chip" rel="next">Next<span class="material-symbols-outlined">arrow_forward</span></a>{% endif %}
+</nav>
+{% endif %}

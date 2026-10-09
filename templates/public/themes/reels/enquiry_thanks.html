@@ -1,0 +1,53 @@
+{% extends "public/themes/reels/_base.html" %}
+{% load vehicle_tags %}
+
+{% block title %}Booking received — {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block page %}
+<section class="thanks">
+  <div class="ct ticket t-green" data-intro="0" data-intro-kind="pop">
+    <span class="ticket-ok"><span class="material-symbols-outlined">check</span></span>
+    <span class="kicker" style="color:var(--ink)"><i></i>Ref #<span data-slot>{{ enquiry.id }}</span></span>
+    <h1 class="ticket-h" data-intro="1" data-intro-kind="split">You're all set, {{ enquiry.name|default:"there" }}.</h1>
+    <p class="ticket-p">We've received your enquiry and our team will be in touch soon. Confirm faster by sending the details on WhatsApp now.</p>
+
+    <dl class="summary">
+      {% if enquiry.vehicle %}<div><dt>Vehicle</dt><dd>{{ enquiry.vehicle.brand }} {{ enquiry.vehicle.name }}</dd></div>{% endif %}
+      {% if enquiry.preferred_start_date %}<div><dt>Dates</dt><dd>{{ enquiry.preferred_start_date|date:"d M Y" }}{% if enquiry.preferred_end_date %} → {{ enquiry.preferred_end_date|date:"d M Y" }}{% endif %}</dd></div>{% endif %}
+      {% if enquiry.pickup_city %}<div><dt>Pickup</dt><dd class="cap">{{ enquiry.pickup_city }}{% if enquiry.drop_city and enquiry.drop_city != enquiry.pickup_city %} → {{ enquiry.drop_city }}{% endif %}</dd></div>{% endif %}
+      {% if enquiry.rental_type %}<div><dt>Type</dt><dd>{{ enquiry.get_rental_type_display }}</dd></div>{% endif %}
+      {% if enquiry.requested_addons %}<div><dt>Add-ons</dt><dd>{{ enquiry.requested_addons|join:", " }}</dd></div>{% endif %}
+      <div><dt>Phone</dt><dd>{{ enquiry.phone }}</dd></div>
+    </dl>
+
+    {% if wa_url %}
+    <a id="wa-cta" href="{{ wa_url }}" target="_blank" rel="noopener" class="btn btn-wa btn-block" data-magnetic>
+      <svg fill="currentColor" height="22" viewBox="0 0 24 24" width="22" aria-hidden="true"><path d="M17.6 6.32A7.85 7.85 0 0 0 12.05 4a7.94 7.94 0 0 0-6.88 11.91L4 20l4.2-1.1a7.93 7.93 0 0 0 3.79.97h.01a7.95 7.95 0 0 0 5.6-13.55zm-5.55 12.22a6.6 6.6 0 0 1-3.36-.92l-.24-.14-2.5.65.67-2.43-.16-.25a6.59 6.59 0 1 1 12.24-3.5 6.58 6.58 0 0 1-6.65 6.59zm3.62-4.93c-.2-.1-1.18-.58-1.36-.65-.18-.07-.32-.1-.45.1-.13.2-.51.65-.63.78-.12.13-.23.15-.43.05-.2-.1-.84-.31-1.6-.99-.59-.53-.99-1.18-1.1-1.38-.12-.2-.01-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.33.06-.13.03-.25-.02-.35-.05-.1-.45-1.08-.62-1.48-.16-.39-.32-.34-.45-.34-.12 0-.25-.02-.39-.02-.13 0-.35.05-.53.25-.18.2-.7.68-.7 1.66 0 .98.72 1.93.82 2.06.1.13 1.41 2.16 3.42 3.03.48.21.85.33 1.14.42.48.15.92.13 1.26.08.39-.06 1.18-.48 1.34-.95.17-.47.17-.86.12-.95-.05-.08-.18-.13-.39-.23z"/></svg>
+      Send on WhatsApp
+    </a>
+    <p class="search-note" id="wa-hint">WhatsApp should open in a new tab. If it doesn't, tap the button above.</p>
+            <script>
+                // Auto-open WhatsApp once on page load — best-effort, popup blockers may stop it.
+                (function() {
+                    var url = {{ wa_url|safe|escapejs|stringformat:"'%s'" }};
+                    if (!url) return;
+                    var win = window.open(url, '_blank', 'noopener');
+                    if (!win || win.closed || typeof win.closed === 'undefined') {
+                        // Popup blocked — leave button visible.
+                        var hint = document.getElementById('wa-hint');
+                        if (hint) hint.textContent = 'Tap the button to open WhatsApp.';
+                    }
+                })();
+            </script>
+    {% else %}
+    <p class="ticket-p">Our team will call you back at <b>{{ enquiry.phone }}</b>.</p>
+    {% endif %}
+  </div>
+  <div class="ctas thanks-links">
+    <a href="{% url 'home' %}" class="btn btn-line"><span class="material-symbols-outlined">arrow_back</span>Back to home</a>
+    <a href="{% url 'vehicle_list' %}" class="btn btn-line">Browse the fleet</a>
+  </div>
+  <p class="search-note" style="text-align:center">A copy of this enquiry has been sent to our team.</p>
+</section>
+{% endblock %}

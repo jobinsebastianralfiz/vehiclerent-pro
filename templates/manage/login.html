@@ -1,36 +1,107 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Admin Login - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_robots %}noindex, nofollow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-shell { --lg-green: #0f3a22; --lg-green-2: #174d2e; --lg-gold: #e9c46a; --lg-cream: #fbf8f0; }
+    .login-photo { background-image: url("{% static 'manage/login-backwaters.jpg' %}"); background-size: cover; background-position: center 40%; }
+    .login-photo::after {
+        content: ""; position: absolute; inset: 0;
+        background: linear-gradient(100deg, rgba(10, 42, 24, .94) 0%, rgba(13, 52, 30, .82) 38%, rgba(15, 58, 34, .35) 70%, rgba(15, 58, 34, .1) 100%),
+                    linear-gradient(0deg, rgba(10, 42, 24, .55) 0%, transparent 45%);
+    }
+    .login-field { transition: border-color .2s, box-shadow .2s; }
+    .login-field:focus-within { border-color: var(--lg-green-2); box-shadow: 0 0 0 4px rgba(23, 77, 46, .12); }
+    .login-field input { border: 0; box-shadow: none !important; background: transparent; }
+    .login-field input:focus { outline: none; }
+    @media (prefers-reduced-motion: no-preference) {
+        .login-rise { animation: loginRise .7s cubic-bezier(.2, .7, .2, 1) both; }
+        .login-rise-2 { animation-delay: .12s; }
+        .login-rise-3 { animation-delay: .24s; }
+        @keyframes loginRise { from { opacity: 0; transform: translateY(14px); } }
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-<div class="min-h-screen flex items-center justify-center bg-surface px-4">
-    <div class="w-full max-w-md">
-        <div class="text-center mb-10">
-            <h1 class="text-3xl font-serif font-bold text-on-surface mb-2">{{ BUSINESS_NAME }}</h1>
-            <p class="text-on-surface-variant text-sm">Sign in to your admin panel</p>
+<div class="login-shell min-h-screen flex flex-col lg:flex-row bg-[var(--lg-cream)]">
+
+    <!-- ─── Photo panel ─── -->
+    <section class="login-photo relative overflow-hidden text-white lg:w-[57%] min-h-[300px] sm:min-h-[360px] lg:min-h-screen">
+        <div class="relative z-10 h-full flex flex-col px-6 sm:px-12 lg:px-16 py-6 sm:py-10 lg:py-14">
+            <a href="{% url 'home' %}" class="self-start inline-flex items-center rounded-2xl bg-white/90 backdrop-blur px-4 py-2.5 shadow-lg shadow-black/20" aria-label="{{ BUSINESS_NAME }} home">
+                {% if SITE_CONFIG.logo %}
+                <img src="{{ SITE_CONFIG.logo.url }}" alt="{{ BUSINESS_NAME }}" class="h-9 sm:h-12 w-auto"/>
+                {% else %}
+                <span class="font-serif font-bold text-xl sm:text-2xl text-[var(--lg-green)]">{{ BUSINESS_NAME }}</span>
+                {% endif %}
+            </a>
+
+            <div class="mt-auto lg:my-auto max-w-xl pt-10 lg:pt-0 login-rise">
+                <span class="block w-16 sm:w-20 h-[3px] rounded-full bg-[var(--lg-gold)] mb-5 sm:mb-8"></span>
+                <h1 class="font-serif font-bold leading-[1.02] text-4xl sm:text-6xl xl:text-7xl tracking-tight">Welcome <span class="text-[var(--lg-gold)]">back</span></h1>
+                <p class="mt-3 sm:mt-5 text-base sm:text-xl text-white/90 leading-relaxed max-w-md">Manage your fleet, bookings and guests in one place.</p>
+
+                <ul class="hidden sm:flex mt-10 lg:mt-14 items-start divide-x divide-white/25">
+                    <li class="pr-8 text-center">
+                        <span class="mx-auto grid place-items-center w-14 h-14 rounded-full bg-white/10 ring-1 ring-white/20 backdrop-blur"><span class="material-symbols-outlined text-[26px]" aria-hidden="true">calendar_month</span></span>
+                        <span class="block mt-3 text-[11px] font-bold tracking-[.14em] uppercase leading-snug">Manage<br/>bookings</span>
+                    </li>
+                    <li class="px-8 text-center">
+                        <span class="mx-auto grid place-items-center w-14 h-14 rounded-full bg-white/10 ring-1 ring-white/20 backdrop-blur"><span class="material-symbols-outlined text-[26px]" aria-hidden="true">groups</span></span>
+                        <span class="block mt-3 text-[11px] font-bold tracking-[.14em] uppercase leading-snug">Manage<br/>guests</span>
+                    </li>
+                    <li class="pl-8 text-center">
+                        <span class="mx-auto grid place-items-center w-14 h-14 rounded-full bg-white/10 ring-1 ring-white/20 backdrop-blur"><span class="material-symbols-outlined text-[26px]" aria-hidden="true">bar_chart</span></span>
+                        <span class="block mt-3 text-[11px] font-bold tracking-[.14em] uppercase leading-snug">Track<br/>business</span>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="bg-white rounded-2xl p-8 shadow-sm border border-outline-variant/10">
+    </section>
+
+    <!-- ─── Sign-in panel ─── -->
+    <section class="relative flex-1 flex items-center justify-center px-4 sm:px-10 py-10 sm:py-16 lg:py-0">
+        <div class="w-full max-w-[520px] bg-white rounded-[28px] shadow-[0_30px_80px_-30px_rgba(15,58,34,.25)] ring-1 ring-black/[.04] p-7 sm:p-12 -mt-16 sm:-mt-24 lg:mt-0 relative login-rise login-rise-2">
+            <h2 class="font-serif font-bold text-3xl sm:text-[40px] leading-tight text-[#1b1c17]">Admin sign in</h2>
+            <p class="mt-1.5 text-stone-500 text-base sm:text-lg">Sign in to your dashboard</p>
+
             {% if error %}
-            <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 text-red-800 mb-6 text-sm">
-                <span class="material-symbols-outlined text-lg">error</span>
+            <div class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-red-50 text-red-800 mt-6 text-sm" role="alert">
+                <span class="material-symbols-outlined text-lg" aria-hidden="true">error</span>
                 {{ error }}
             </div>
             {% endif %}
-            <form method="post">
+
+            <form method="post" class="mt-8 space-y-6" x-data="{ show: false }">
                 {% csrf_token %}
-                <div class="space-y-5">
-                    <div>
-                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Email Address</label>
-                        <input type="email" name="email" required autofocus value="{{ form.email.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary py-3 px-4" placeholder="admin@example.com"/>
+                <div>
+                    <label for="login-email" class="block text-xs font-bold tracking-[.12em] uppercase text-stone-600 mb-2.5">Email address</label>
+                    <div class="login-field flex items-center gap-3 rounded-2xl border border-stone-200 bg-white px-4 sm:px-5">
+                        <span class="material-symbols-outlined text-stone-500 text-[22px]" aria-hidden="true">mail</span>
+                        <input id="login-email" type="email" name="email" required autofocus autocomplete="username" value="{{ form.email.value|default:'' }}" placeholder="admin@example.com" class="w-full py-4 text-base text-[#1b1c17] placeholder:text-stone-400"/>
                     </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Password</label>
-                        <input type="password" name="password" required class="w-full border-stone-200 rounded-lg text-sm focus:border-primary focus:ring-1 focus:ring-primary py-3 px-4" placeholder="Enter your password"/>
-                    </div>
-                    <button type="submit" class="w-full bg-primary text-on-primary py-3 rounded-full font-bold hover:bg-primary-container transition-colors">Sign In</button>
                 </div>
+                <div>
+                    <label for="login-password" class="block text-xs font-bold tracking-[.12em] uppercase text-stone-600 mb-2.5">Password</label>
+                    <div class="login-field flex items-center gap-3 rounded-2xl border border-stone-200 bg-white px-4 sm:px-5">
+                        <span class="material-symbols-outlined text-stone-500 text-[22px]" aria-hidden="true">lock</span>
+                        <input id="login-password" :type="show ? 'text' : 'password'" type="password" name="password" required autocomplete="current-password" placeholder="Enter your password" class="w-full py-4 text-base text-[#1b1c17] placeholder:text-stone-400"/>
+                        <button type="button" @click="show = !show" class="text-stone-500 hover:text-[var(--lg-green)] p-1 -mr-1 rounded-full" :aria-label="show ? 'Hide password' : 'Show password'" aria-label="Show password">
+                            <span class="material-symbols-outlined text-[22px]" x-text="show ? 'visibility' : 'visibility_off'" aria-hidden="true">visibility_off</span>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="group w-full flex items-center justify-center gap-3 rounded-full bg-[var(--lg-green)] hover:bg-[var(--lg-green-2)] text-white font-bold text-lg py-4 sm:py-[18px] mt-2 transition-colors">
+                    Sign In
+                    <span class="material-symbols-outlined text-[22px] transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+                </button>
             </form>
         </div>
-    </div>
+        <p class="absolute bottom-5 inset-x-0 text-center text-xs text-stone-400 hidden lg:block">&copy; {% now "Y" %} {{ BUSINESS_NAME }}</p>
+    </section>
 </div>
 {% endblock %}

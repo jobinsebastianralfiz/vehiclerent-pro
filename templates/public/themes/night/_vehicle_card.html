@@ -1,0 +1,37 @@
+{% load vehicle_tags %}
+{% comment %}Night Drive vehicle card. Include with vehicle=<Vehicle>, optional n=<index>, wedding=1 for the decoration note.{% endcomment %}
+<a href="{{ vehicle.get_absolute_url }}" class="vehicle-card glow group block rounded-[2rem] p-4 sm:p-5">
+  <div class="relative overflow-hidden rounded-[1.5rem] h-56 sm:h-60 mb-6 bg-surface-container">
+    {% if vehicle.thumbnail %}
+    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover brightness-[.85] transition-all duration-[1.2s] ease-out group-hover:scale-110 group-hover:brightness-100" loading="lazy"/>
+    {% else %}
+    <div class="w-full h-full grid place-items-center"><span class="material-symbols-outlined text-[64px] text-primary/30">{% if vehicle.is_wedding_service %}favorite{% elif vehicle.is_premium %}diamond{% else %}directions_car{% endif %}</span></div>
+    {% endif %}
+    <div class="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent"></div>
+    <div class="absolute top-4 left-4 flex items-center gap-2 bg-surface/70 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full">
+      <span class="nd-dot {% if vehicle.status == 'available' %}available{% elif vehicle.status == 'rented' %}rented{% else %}other{% endif %}"></span>
+      <span class="label-tiny text-on-surface">{{ vehicle.get_status_display }}</span>
+    </div>
+    {% if vehicle.primary_price_value %}<div class="absolute top-4 right-4 bg-surface/70 backdrop-blur-md border border-primary/20 px-4 py-2 rounded-full font-bold text-sm text-primary">{{ vehicle.primary_price_value|inr }}<span class="font-light text-on-surface-variant">/{{ vehicle.primary_price_label }}</span></div>{% endif %}
+    {% if n %}<div class="absolute bottom-4 left-4 font-serif text-primary/80 text-sm">{{ n|stringformat:"02d" }}</div>{% endif %}
+  </div>
+  <div class="px-2">
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <p class="label-tiny text-on-surface-variant mb-2 truncate">{{ vehicle.brand }}{% if vehicle.category %} · {{ vehicle.category.name }}{% endif %}</p>
+        <h3 class="nd-head text-2xl text-on-surface mb-5">{{ vehicle.name }}</h3>
+      </div>
+      {% if vehicle.is_chauffeur_available %}<span class="material-symbols-outlined text-primary shrink-0" title="With driver available" aria-label="With driver available">badge</span>{% endif %}
+    </div>
+    <div class="flex flex-wrap gap-2 mb-6 text-xs text-on-surface-variant">
+      {% if vehicle.transmission %}<span class="border border-white/10 rounded-full px-3 py-1.5">{{ vehicle.get_transmission_display }}</span>{% endif %}
+      {% if vehicle.fuel_type %}<span class="border border-white/10 rounded-full px-3 py-1.5">{{ vehicle.get_fuel_type_display }}</span>{% endif %}
+      {% if vehicle.seating_capacity %}<span class="border border-white/10 rounded-full px-3 py-1.5">{{ vehicle.seating_capacity }} seats</span>{% endif %}
+      {% if vehicle.is_premium %}<span class="border border-primary/30 text-primary rounded-full px-3 py-1.5">Premium</span>{% endif %}
+      {% if vehicle.is_wedding_service %}<span class="border border-primary/30 text-primary rounded-full px-3 py-1.5">Wedding</span>{% endif %}
+      {% if vehicle.rental_mode == "monthly" %}<span class="border border-primary/30 text-primary rounded-full px-3 py-1.5">Monthly only</span>{% elif vehicle.rental_mode == "weekly" %}<span class="border border-primary/30 text-primary rounded-full px-3 py-1.5">Weekly min</span>{% endif %}
+    </div>
+    {% if wedding %}<p class="text-xs text-on-surface-variant -mt-3 mb-5">{% if vehicle.wedding_decoration_charge %}+ {{ vehicle.wedding_decoration_charge|inr }} basic decoration{% else %}Includes basic decoration{% endif %}</p>{% endif %}
+    <div class="w-full border border-primary/30 text-primary py-3.5 rounded-full font-bold text-center transition-colors duration-500 group-hover:bg-primary group-hover:text-on-primary"><span class="m-flip"><span>Rent Now</span><span>View details →</span></span></div>
+  </div>
+</a>

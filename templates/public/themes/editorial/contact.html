@@ -1,0 +1,105 @@
+{% extends "public/base_public.html" %}
+{% load vehicle_tags %}
+
+{% block title %}Contact Us - {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Get in touch with {{ BUSINESS_NAME }}. Call, email, WhatsApp, or visit us. We're here to help with your vehicle rental needs.{% endblock %}
+
+{% block structured_data %}
+{{ block.super }}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "Contact {{ BUSINESS_NAME|escapejs }}",
+    "description": "Get in touch with {{ BUSINESS_NAME|escapejs }} for vehicle rental enquiries",
+    "mainEntity": {
+        "@type": "AutoRental",
+        "name": "{{ BUSINESS_NAME|escapejs }}",
+        "telephone": "{{ BUSINESS_PHONE|escapejs }}",
+        "email": "{{ BUSINESS_EMAIL|escapejs }}",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "{{ BUSINESS_ADDRESS|escapejs }}"
+        }
+    }
+}
+</script>
+{% endblock %}
+
+{% block extra_css %}{% include "public/themes/editorial/_styles.html" %}{% endblock %}
+
+{% block content %}
+{% include "public/themes/editorial/_page_header.html" with kicker="Get in touch" title="Let's talk." lede="A question about the fleet, a price, or a plan for the weekend. We're happy to help." %}
+
+<div class="px-4 sm:px-12 max-w-screen-2xl mx-auto pb-16 lg:pb-24 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+    <!-- ─── Ways to reach us ─── -->
+    <section class="lg:col-span-5" aria-labelledby="ed-reach">
+        <h2 id="ed-reach" class="label-tiny text-primary-container mb-6" data-no-split>Reach us directly</h2>
+        <div class="space-y-4" data-deal>
+            {% if BUSINESS_PHONE %}
+            <a href="tel:{{ BUSINESS_PHONE }}" class="m-tile flex items-center gap-5 p-5 sm:p-6 bg-surface-container-low rounded-[1.75rem]">
+                <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center shrink-0"><span class="material-symbols-outlined" aria-hidden="true">call</span></span>
+                <span class="min-w-0"><span class="label-tiny opacity-60 block mb-1.5">Call</span><span class="font-serif font-bold text-xl sm:text-2xl break-words">{{ BUSINESS_PHONE }}</span></span>
+                <span class="material-symbols-outlined ml-auto" aria-hidden="true">arrow_outward</span>
+            </a>
+            {% endif %}
+            {% if WHATSAPP_NUMBER %}
+            <a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="m-tile flex items-center gap-5 p-5 sm:p-6 bg-surface-container-low rounded-[1.75rem]">
+                <span class="w-14 h-14 rounded-2xl bg-[#25D366] text-white grid place-items-center shrink-0"><span class="material-symbols-outlined" aria-hidden="true">chat</span></span>
+                <span class="min-w-0"><span class="label-tiny opacity-60 block mb-1.5">WhatsApp</span><span class="font-serif font-bold text-xl sm:text-2xl">Chat with us</span></span>
+                <span class="material-symbols-outlined ml-auto" aria-hidden="true">arrow_outward</span>
+            </a>
+            {% endif %}
+            {% if BUSINESS_EMAIL %}
+            <a href="mailto:{{ BUSINESS_EMAIL }}" class="m-tile flex items-center gap-5 p-5 sm:p-6 bg-surface-container-low rounded-[1.75rem]">
+                <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center shrink-0"><span class="material-symbols-outlined" aria-hidden="true">mail</span></span>
+                <span class="min-w-0"><span class="label-tiny opacity-60 block mb-1.5">Email</span><span class="font-serif font-bold text-lg sm:text-xl break-all">{{ BUSINESS_EMAIL }}</span></span>
+                <span class="material-symbols-outlined ml-auto" aria-hidden="true">arrow_outward</span>
+            </a>
+            {% endif %}
+            {% if BUSINESS_ADDRESS %}
+            <div class="flex items-center gap-5 p-5 sm:p-6 bg-surface-container-low rounded-[1.75rem]">
+                <span class="w-14 h-14 rounded-2xl bg-primary-fixed text-primary grid place-items-center shrink-0"><span class="material-symbols-outlined" aria-hidden="true">location_on</span></span>
+                <span class="min-w-0"><span class="label-tiny opacity-60 block mb-1.5">Visit</span><span class="font-serif text-lg sm:text-xl">{{ BUSINESS_ADDRESS }}</span></span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% with socials=config.facebook_url|add:config.instagram_url|add:config.youtube_url|add:config.twitter_url %}
+        {% if socials %}
+        <div class="mt-10">
+            <span class="label-tiny text-outline block mb-4">Follow along</span>
+            <div class="flex flex-wrap gap-3">
+                {% if config.instagram_url %}<a href="{{ config.instagram_url }}" target="_blank" rel="noopener" class="ed-chip bg-surface-container-low hover:bg-surface-container-high">Instagram</a>{% endif %}
+                {% if config.facebook_url %}<a href="{{ config.facebook_url }}" target="_blank" rel="noopener" class="ed-chip bg-surface-container-low hover:bg-surface-container-high">Facebook</a>{% endif %}
+                {% if config.youtube_url %}<a href="{{ config.youtube_url }}" target="_blank" rel="noopener" class="ed-chip bg-surface-container-low hover:bg-surface-container-high">YouTube</a>{% endif %}
+                {% if config.twitter_url %}<a href="{{ config.twitter_url }}" target="_blank" rel="noopener" class="ed-chip bg-surface-container-low hover:bg-surface-container-high">X / Twitter</a>{% endif %}
+            </div>
+        </div>
+        {% endif %}
+        {% endwith %}
+    </section>
+
+    <!-- ─── Message form ─── -->
+    <section class="lg:col-span-7" aria-labelledby="ed-msg">
+        <div class="ed-form bg-surface-container-lowest rounded-[2.5rem] p-6 sm:p-10 ghost-border shadow-2xl shadow-black/5" data-reveal>
+            <span class="label-tiny text-primary-container block mb-3">Send a message</span>
+            <h2 id="ed-msg" class="headline-lg text-3xl sm:text-5xl mb-8">We'll write back.</h2>
+            {% include "public/includes/enquiry_form.html" %}
+        </div>
+    </section>
+</div>
+
+{% if config.google_maps_embed %}
+<section class="px-4 sm:px-12 pb-20 lg:pb-28 max-w-screen-2xl mx-auto">
+    <div class="rounded-[2.5rem] overflow-hidden h-[360px] sm:h-[460px] bg-surface-container-high [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0" data-no-parallax>
+        {{ config.google_maps_embed|safe }}
+    </div>
+</section>
+{% endif %}
+
+<!-- ─── Wordmark ─── -->
+<div class="px-4 sm:px-8 max-w-screen-2xl mx-auto overflow-hidden pb-4" aria-hidden="true">
+    <div class="font-serif font-bold text-primary leading-none tracking-tighter whitespace-nowrap text-center select-none pt-4" style="font-size: min(13vw, calc(160vw / {{ BUSINESS_NAME|length|default:10 }}))" data-split="chars">{{ BUSINESS_NAME }}</div>
+</div>
+{% endblock %}
