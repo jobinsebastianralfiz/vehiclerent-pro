@@ -37,7 +37,7 @@ STEPS = [
      "fields": ["short_description", "thumbnail", "description", "features"]},
     {"n": 6, "key": "media", "title": "Media & Settings", "sub": "Images, status & SEO", "icon": "photo_library",
      "heading": "Media & Settings", "lede": "Gallery, visibility, badges and search details",
-     "fields": ["status", "is_featured", "is_premium", "is_wedding_service", "is_chauffeur_available",
+     "fields": ["status", "is_featured", "show_in_hero", "is_premium", "is_wedding_service", "is_chauffeur_available",
                 "wedding_tier", "available_cities", "meta_title", "meta_description", "meta_keywords"]},
 ]
 LAST = len(STEPS)

@@ -153,6 +153,7 @@ class Vehicle(models.Model):
     thumbnail = models.ImageField(upload_to="vehicles/thumbnails/", blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="available")
     is_featured = models.BooleanField(default=False)
+    show_in_hero = models.BooleanField(default=False, help_text="Showcase this vehicle in the home page hero slides (needs a photo)")
     is_premium = models.BooleanField(default=False, help_text="Mark as a premium/luxury vehicle")
     is_wedding_service = models.BooleanField(default=False, help_text="Available for wedding services")
     is_chauffeur_available = models.BooleanField(default=False, help_text="Can be rented with a chauffeur")
@@ -210,6 +211,15 @@ class Vehicle(models.Model):
     @property
     def is_ev_or_hybrid(self):
         return self.fuel_type in ("electric", "hybrid")
+
+    @property
+    def hero_image(self):
+        """The photo for the home page hero: the thumbnail, else the primary (or first) gallery image."""
+        if self.thumbnail:
+            return self.thumbnail
+        imgs = list(self.images.all())
+        img = next((i for i in imgs if i.is_primary), imgs[0] if imgs else None)
+        return img.image if img else None
 
     @property
     def primary_price(self):

@@ -47,6 +47,11 @@ def home(request):
     total_vehicle_count = published.count()
     starting_price = published.aggregate(m=Min("price_per_day"))["m"]
     testimonials = Testimonial.objects.filter(is_active=True)[:6]
+    # Vehicles ticked "Hero slides" in the wizard; only those with a photo can be shown
+    hero_vehicles = [
+        v for v in published.filter(show_in_hero=True).select_related("category").prefetch_related("images").order_by("-is_featured", "name")[:8]
+        if v.hero_image
+    ][:6]
     # Collect hero background images
     hero_bg_images = []
     if config:
@@ -64,6 +69,7 @@ def home(request):
         "starting_price": starting_price,
         "testimonials": testimonials,
         "hero_bg_images": hero_bg_images,
+        "hero_vehicles": hero_vehicles,
     })
 
 
