@@ -1,3 +1,4 @@
+{% load vehicle_tags %}
 {% comment %}Caption on a non-vehicle hero photo: starting price and a link to the fleet.{% endcomment %}
 <span class="absolute top-4 left-4 right-4 flex justify-between items-start gap-3">
     {% if starting_price %}<span class="b-glass rounded-2xl px-4 py-3"><span class="label-tiny block text-on-surface-variant mb-1">Starting at</span><span class="font-extrabold text-2xl text-primary">{{ starting_price|inr }}<span class="text-sm font-semibold text-on-surface-variant"> /day</span></span></span>{% else %}<span></span>{% endif %}

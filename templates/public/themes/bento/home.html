@@ -45,7 +45,6 @@
     .lift:hover { transform: translateY(-6px); box-shadow: 0 36px 60px -36px rgba(31,46,0,.45); }
 
     /* estimator */
-    #estimate:not(:has(.car-chip)) { display: none; }
     .car-chip { transition: background-color .35s, color .35s, border-color .35s, transform .45s var(--spring); }
     .car-chip:hover { transform: translateY(-2px); }
     .car-chip[aria-checked="true"] { background: #1f2e00; color: #fff; border-color: #1f2e00; }
@@ -110,7 +109,6 @@
         </div>
         <div class="flex flex-wrap items-center gap-3">
             <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-7 py-4 rounded-full font-bold flex items-center gap-2">{{ config.hero_cta_text|default:"Browse Fleet" }} <span class="material-symbols-outlined">arrow_forward</span></a>
-            <a href="#estimate" class="bg-white px-7 py-4 rounded-full font-bold flex items-center gap-2 border border-outline-variant/50 hover:border-primary transition-colors">Price a trip <span class="material-symbols-outlined">calculate</span></a>
             {% if config.hero_description %}<p class="w-full text-sm text-on-surface-variant font-medium max-w-xl">{{ config.hero_description }}</p>{% endif %}
         </div>
     </div>
@@ -215,62 +213,6 @@
 </section>
 {% endif %}
 
-<!-- ─── Rental estimator: days x the car's listed day rate (hidden by CSS when no car has a day rate) ─── -->
-<section id="estimate" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
-        <div class="tile b-glass p-6 sm:p-10 lg:col-span-7">
-            <span class="label-tiny text-primary-container block">Rental estimator</span>
-            <h2 class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em] text-primary">Price your trip <span class="serif-i">in seconds.</span></h2>
-            <p class="mt-3 text-on-surface-variant">Pick a car, drag the days. We multiply by the listed day rate, nothing hidden.</p>
-            <div class="mt-8">
-                <div class="label-tiny text-outline mb-3" id="carLabel">Choose a car</div>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" role="radiogroup" aria-labelledby="carLabel" id="carChips">
-                    {% for v in featured_vehicles %}{% if v.price_per_day %}
-                    <button type="button" role="radio" aria-checked="false" class="car-chip text-left bg-white border border-outline-variant/40 rounded-2xl px-4 py-3"
-                        data-id="{{ v.pk }}" data-price="{{ v.price_per_day|floatformat:0 }}" data-name="{{ v.name }}" data-brand="{{ v.brand }}" data-img="{% if v.thumbnail %}{{ v.thumbnail.url }}{% endif %}">
-                        <span class="block font-extrabold text-sm leading-tight">{{ v.name }}</span><span class="chip-price block text-xs font-bold text-outline mt-1">{{ v.price_per_day|inr }}/day</span>
-                    </button>
-                    {% endif %}{% endfor %}
-                    {% for v in premium_vehicles %}{% if v.price_per_day %}
-                    <button type="button" role="radio" aria-checked="false" class="car-chip text-left bg-white border border-outline-variant/40 rounded-2xl px-4 py-3"
-                        data-id="{{ v.pk }}" data-price="{{ v.price_per_day|floatformat:0 }}" data-name="{{ v.name }}" data-brand="{{ v.brand }}" data-img="{% if v.thumbnail %}{{ v.thumbnail.url }}{% endif %}">
-                        <span class="block font-extrabold text-sm leading-tight">{{ v.name }}</span><span class="chip-price block text-xs font-bold text-outline mt-1">{{ v.price_per_day|inr }}/day</span>
-                    </button>
-                    {% endif %}{% endfor %}
-                </div>
-            </div>
-            <div class="mt-8">
-                <div class="flex justify-between items-baseline mb-4"><label for="days" class="label-tiny text-outline">Number of days</label><span class="font-extrabold text-2xl text-primary"><span id="daysOut">3</span> <span class="text-sm text-on-surface-variant font-semibold" id="daysWord">days</span></span></div>
-                <input id="days" type="range" min="1" max="30" value="3" class="days" aria-describedby="estNote"/>
-                <div class="flex justify-between text-xs font-bold text-outline mt-2"><span>1 day</span><span>1 week</span><span>2 weeks</span><span>30 days</span></div>
-            </div>
-        </div>
-        <div class="tile bg-primary text-on-primary p-6 sm:p-10 lg:col-span-5 flex flex-col justify-between gap-8 min-h-[420px]">
-            <div class="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-primary-fixed/10 blur-2xl" aria-hidden="true"></div>
-            <div class="relative">
-                <span class="label-tiny text-primary-fixed">Estimate · final price on confirmation</span>
-                <div class="mt-6 flex items-center gap-4">
-                    <div class="relative w-20 h-20 rounded-2xl overflow-hidden bg-white/10 shrink-0 grid place-items-center" data-no-parallax>
-                        <span class="material-symbols-outlined text-4xl text-primary-fixed/70" id="estIcon" aria-hidden="true">directions_car</span>
-                        <img id="estImg" src="" alt="" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 hidden"/>
-                    </div>
-                    <div class="min-w-0"><div class="label-tiny text-white/60" id="estBrand"></div><div class="font-extrabold text-2xl tracking-tight truncate" id="estName"></div></div>
-                </div>
-            </div>
-            <div class="relative" aria-live="polite">
-                <div class="text-white/60 font-semibold" id="estBreak"></div>
-                <div class="font-extrabold text-6xl sm:text-7xl tracking-[-.04em] leading-none mt-2" id="estTotal"></div>
-                <p id="estNote" class="text-white/60 text-sm mt-4 max-w-xs">Estimate only, at the listed day rate. Our team confirms availability and the final price before you book.</p>
-            </div>
-            <div class="relative grid gap-2">
-                <a href="#enquiry" id="estSend" class="bg-primary-fixed text-primary rounded-full py-4 font-bold flex items-center justify-center gap-2 m-shine m-btn" data-magnetic>Send this as an enquiry <span class="material-symbols-outlined">arrow_forward</span></a>
-                {% if WHATSAPP_NUMBER %}{% whatsapp_url "__MSG__" as wa_tpl %}
-                <a href="{{ wa_tpl }}" id="estWa" data-tpl="{{ wa_tpl }}" target="_blank" rel="noopener" class="rounded-full py-3 font-bold flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 transition-colors text-sm"><span class="material-symbols-outlined text-[18px]">chat</span> Or ask on WhatsApp</a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</section>
 
 <!-- ─── Featured fleet bento ─── -->
 {% if featured_vehicles %}
@@ -555,54 +497,6 @@
     h.appendChild(em);
 })();
 
-/* rental estimator: days x the car's listed day rate, nothing else */
-(() => {
-    const sec = document.getElementById("estimate"), chips = document.getElementById("carChips"), range = document.getElementById("days");
-    if (!sec || !chips || !range) return;
-    /* featured and premium lists can overlap: keep the first chip per vehicle, max 6 */
-    const seen = new Set();
-    [...chips.querySelectorAll(".car-chip")].forEach(b => { if (seen.has(b.dataset.id) || seen.size >= 6) b.remove(); else seen.add(b.dataset.id); });
-    const cars = [...chips.querySelectorAll(".car-chip")];
-    if (!cars.length) { sec.remove(); return; }
-    const $ = id => document.getElementById(id);
-    const inr = n => "₹" + Math.round(n).toLocaleString("en-IN");
-    const est = { car: 0, days: 3 };
-    let slot = null; /* set once the motion layer is ready */
-    function render() {
-        const b = cars[est.car], d = b.dataset, price = +d.price, total = price * est.days, word = est.days === 1 ? "day" : "days";
-        cars.forEach((x, i) => x.setAttribute("aria-checked", i === est.car));
-        $("daysOut").textContent = est.days; $("daysWord").textContent = word;
-        $("estBreak").textContent = `${inr(price)} × ${est.days} ${word}`;
-        $("estBrand").textContent = d.brand; $("estName").textContent = d.name;
-        const img = $("estImg"), icon = $("estIcon");
-        if (d.img) { if (img.getAttribute("src") !== d.img) { img.style.opacity = 0; setTimeout(() => { img.src = d.img; img.style.opacity = 1; }, 180); } img.classList.remove("hidden"); icon.classList.add("hidden"); }
-        else { img.classList.add("hidden"); icon.classList.remove("hidden"); }
-        range.style.setProperty("--p", ((est.days - 1) / 29 * 100) + "%");
-        if (slot) slot($("estTotal"), inr(total), { dur: .7 }); else $("estTotal").textContent = inr(total);
-        const msg = `Hi, I'd like the ${d.brand} ${d.name} for ${est.days} ${word}. Estimate at the listed rate: ${inr(price)} x ${est.days} = ${inr(total)}. Please confirm availability and the final price.`;
-        sec.dataset.msg = msg;
-        const wa = $("estWa"); if (wa) wa.href = wa.dataset.tpl.replace("__MSG__", encodeURIComponent(msg));
-    }
-    chips.addEventListener("click", e => { const b = e.target.closest(".car-chip"); if (!b) return; est.car = cars.indexOf(b); render(); });
-    chips.addEventListener("keydown", e => {
-        if (!["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp"].includes(e.key)) return;
-        e.preventDefault();
-        est.car = (est.car + (e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : -1) + cars.length) % cars.length;
-        render(); cars[est.car].focus();
-    });
-    let t = null;
-    range.addEventListener("input", () => { est.days = +range.value; clearTimeout(t); t = setTimeout(render, 60); $("daysOut").textContent = est.days; range.style.setProperty("--p", ((est.days - 1) / 29 * 100) + "%"); });
-    /* "send as enquiry" prefills the real enquiry form's message */
-    const send = $("estSend");
-    if (send) send.addEventListener("click", () => {
-        const ta = document.querySelector("#enquiry textarea[name=message]");
-        if (ta && !ta.value.trim()) ta.value = sec.dataset.msg || "";
-        setTimeout(() => { const n = document.querySelector("#enquiry input[name=name]"); if (n) n.focus({ preventScroll: true }); }, 600);
-    });
-    render();
-    document.addEventListener("motion:ready", ({ detail }) => { slot = detail.slotTo; });
-})();
-
 /* how it works: the phone swaps screens as each step crosses the middle of the viewport (works without GSAP) */
 (() => {
     const steps = [...document.querySelectorAll("#how .step")], screens = [...document.querySelectorAll("#how .ph-screen")], dots = [...document.querySelectorAll("#how .step-dot")];
@@ -632,7 +526,6 @@ document.addEventListener("motion:ready", ({ detail: { G, split, slotTo } }) => 
 
     G.to(".b-hero .b-slides", { yPercent: 6, ease: "none", scrollTrigger: { trigger: ".b-hero", start: "top top", end: "bottom top", scrub: true } });
     if (document.querySelector("#luxury")) G.from("#luxury .lux > a", { y: 120, opacity: 0, rotation: (i) => (i - 2) * 3, duration: 1.2, ease: "expo.out", stagger: .08, scrollTrigger: { trigger: "#luxury", start: "clamp(top 75%)", once: true } });
-    if (document.querySelector("#estimate")) G.from("#estimate .tile", { y: 60, opacity: 0, duration: 1.1, stagger: .12, scrollTrigger: { trigger: "#estimate", start: "clamp(top 80%)", once: true } });
     ["#wedding", "#enquiry"].forEach(sel => G.from(`${sel} > div > .tile`, { opacity: 0, scale: .9, y: 50, duration: 1.1, ease: "expo.out", stagger: .1, scrollTrigger: { trigger: sel, start: "clamp(top 78%)", once: true }, clearProps: "transform" }));
 });
 </script>
