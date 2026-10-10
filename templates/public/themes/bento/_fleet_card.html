@@ -1,0 +1,25 @@
+{% load vehicle_tags %}
+{% comment %}Fleet page card (mockup 2026-10-10): photo with status and a save heart, name and day rate, specs, View Details / Book Now.{% endcomment %}
+<article class="fc tile bg-white p-3 flex flex-col">
+    <a href="{{ v.get_absolute_url }}" class="relative block rounded-[18px] overflow-hidden aspect-[16/10] bg-surface-container" tabindex="-1" aria-hidden="true">
+        {% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+        {% else %}<span class="absolute inset-0 grid place-items-center text-primary/30"><span class="material-symbols-outlined text-[72px]">{{ v.category.icon|default:"directions_car" }}</span></span>{% endif %}
+        <span class="fc-status s-{{ v.status }}"><i></i>{{ v.get_status_display }}</span>
+    </a>
+    <button type="button" class="fc-heart" x-data="favBtn({{ v.pk }})" x-on:click.prevent="toggle()" :class="on && 'is-on'" :aria-pressed="on.toString()" aria-label="Save {{ v.brand }} {{ v.name }}"><span class="material-symbols-outlined">favorite</span></button>
+    <div class="px-2 pt-4 pb-1 flex-1 flex flex-col">
+        <div class="flex items-start justify-between gap-3">
+            <h3 class="min-w-0"><a href="{{ v.get_absolute_url }}" class="block font-extrabold text-lg leading-tight text-on-surface hover:text-primary line-clamp-2">{{ v.brand }} {{ v.name }}</a></h3>
+            {% if v.primary_price_value %}<div class="text-right shrink-0"><div class="font-extrabold text-xl text-on-surface leading-none">{{ v.primary_price_value|inr }}</div><div class="text-xs text-on-surface-variant mt-1">per {{ v.primary_price_label }}</div></div>{% endif %}
+        </div>
+        <div class="flex flex-wrap gap-x-4 gap-y-1.5 mt-3 text-[13px] text-on-surface-variant">
+            {% if v.seating_capacity %}<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[17px]">person</span>{{ v.seating_capacity }} Seats</span>{% endif %}
+            {% if v.transmission %}<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[17px]">settings</span>{{ v.get_transmission_display }}</span>{% endif %}
+            {% if v.fuel_type %}<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[17px]">{% if v.is_ev_or_hybrid %}ev_station{% else %}local_gas_station{% endif %}</span>{{ v.get_fuel_type_display }}</span>{% endif %}
+        </div>
+        <div class="grid grid-cols-2 gap-2 mt-auto pt-5">
+            <a href="{{ v.get_absolute_url }}" class="fc-btn ghost">View Details</a>
+            <a href="{{ v.get_absolute_url }}#reserve" class="fc-btn">Book Now <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
+        </div>
+    </div>
+</article>

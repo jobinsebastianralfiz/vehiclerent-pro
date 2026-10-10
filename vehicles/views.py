@@ -36,9 +36,14 @@ def vehicle_list(request):
     if search:
         qs = qs.filter(Q(name__icontains=search) | Q(brand__icontains=search) | Q(model__icontains=search))
 
-    vehicle_type = request.GET.get("type")
-    if vehicle_type:
-        qs = qs.filter(vehicle_type=vehicle_type)
+    vehicle_types_sel = [t for t in request.GET.getlist("type") if t]
+    vehicle_type = vehicle_types_sel[0] if len(vehicle_types_sel) == 1 else ""
+    if vehicle_types_sel:
+        qs = qs.filter(vehicle_type__in=vehicle_types_sel)
+
+    seats = request.GET.get("seats", "")
+    if seats.isdigit():
+        qs = qs.filter(seating_capacity__gte=int(seats))
 
     category_id = request.GET.get("category")
     if category_id:
@@ -110,6 +115,9 @@ def vehicle_list(request):
         "rental_modes": Vehicle.RENTAL_MODE_CHOICES,
         "search": search,
         "current_type": vehicle_type,
+        "current_types": vehicle_types_sel,
+        "current_seats": seats,
+        "seat_options": [(2, "2+ seats"), (4, "4+ seats"), (5, "5+ seats"), (7, "7+ seats"), (8, "8+ seats")],
         "current_category": category_id,
         "current_brand": brand,
         "current_fuel": fuel,
