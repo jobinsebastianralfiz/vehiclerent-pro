@@ -1,0 +1,9 @@
+{% comment %}Caption on a non-vehicle hero photo: starting price and a link to the fleet.{% endcomment %}
+<span class="absolute top-4 left-4 right-4 flex justify-between items-start gap-3">
+    {% if starting_price %}<span class="b-glass rounded-2xl px-4 py-3"><span class="label-tiny block text-on-surface-variant mb-1">Starting at</span><span class="font-extrabold text-2xl text-primary">{{ starting_price|inr }}<span class="text-sm font-semibold text-on-surface-variant"> /day</span></span></span>{% else %}<span></span>{% endif %}
+    <a href="{% url 'vehicle_list' %}" class="w-11 h-11 shrink-0 rounded-full b-glass grid place-items-center" aria-label="Browse the fleet"><span class="material-symbols-outlined text-primary">north_east</span></a>
+</span>
+<span class="absolute bottom-5 left-5 right-5 text-white">
+    <span class="label-tiny opacity-80">Self-drive · Chauffeur · Wedding</span>
+    <span class="block serif-i text-3xl mt-2">Every road across Kerala.</span>
+</span>

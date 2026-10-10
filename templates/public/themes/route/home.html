@@ -148,6 +148,42 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
   .rh-faces > * + * { margin-left: -.7rem; }
   .rh-go { width: 2.5rem; height: 2.5rem; border-radius: 999px; background: #fffaf0; color: #134e4a; display: grid; place-items: center; flex: none; }
 
+
+  /* ---------- luxury viewpoint section ---------- */
+  .lx-gold { background: linear-gradient(90deg, #f2c98a, #d9a35a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lx-btn { display: inline-flex; align-items: center; gap: .7rem; padding: 1.05rem 1.9rem; border-radius: 1rem; background: #f2c98a; color: #0f2e2c; font-weight: 700; font-size: 1.0625rem; box-shadow: 0 16px 30px -16px rgba(242,201,138,.7); transition: transform .3s var(--spring), background .3s; }
+  .lx-btn:hover { transform: translateY(-2px); background: #f6d6a4; }
+  .lx-feats { display: grid; gap: 1.25rem; }
+  @media (min-width: 640px) { .lx-feats { grid-template-columns: repeat(3, minmax(0, 1fr)); } .lx-feats > div + div { border-left: 1px solid rgba(255,250,240,.15); padding-left: 1.1rem; } }
+  .lx-feats > div { display: flex; gap: .8rem; align-items: flex-start; }
+  .lx-feats .material-symbols-outlined { color: #e39b3c; font-size: 28px; }
+  .lx-feats b { display: block; color: #fffaf0; font-weight: 700; font-size: .9375rem; }
+  .lx-feats span span, .lx-feats > div > span:last-child { font-size: .8125rem; color: rgba(247,240,227,.65); line-height: 1.45; }
+  .lx-bars { display: flex; gap: .5rem; }
+  .lx-bars span { width: 2rem; height: 3px; border-radius: 3px; background: rgba(255,250,240,.2); transition: background .4s; }
+  .lx-bars span.on { background: #e39b3c; }
+  .lx-stage { position: relative; aspect-ratio: 16 / 12; border-radius: 1.75rem; overflow: hidden; background: #163c39; box-shadow: 0 0 0 1.5px rgba(242,201,138,.65), 0 40px 70px -30px rgba(0,0,0,.6); }
+  @media (max-width: 639px) { .lx-stage { aspect-ratio: 4 / 4.4; border-radius: 1.4rem; } }
+  .lx-card { position: absolute; inset: 0; opacity: 0; transition: opacity .9s ease; pointer-events: none; }
+  .lx-card.on { opacity: 1; pointer-events: auto; }
+  .lx-card img { width: 100%; height: 100%; object-fit: cover; }
+  .lx-card.on img { animation: lx-in 8s ease-out both; }
+  @keyframes lx-in { from { scale: 1.07; } to { scale: 1; } }
+  .lx-pill { position: absolute; top: 1.25rem; left: 1.25rem; display: inline-flex; align-items: center; gap: .5rem; padding: .55rem 1rem; border-radius: 999px; background: rgba(255,250,240,.92); color: #1b1c17; font: 700 12px/1 var(--font-body); letter-spacing: .14em; text-transform: uppercase; }
+  .lx-pill .material-symbols-outlined { font-size: 18px; }
+  .lx-go { position: absolute; right: 1.25rem; bottom: 1.25rem; width: 3.75rem; height: 3.75rem; border-radius: 999px; display: grid; place-items: center; background: #f2c98a; color: #0f2e2c; transition: transform .35s var(--spring); }
+  @media (min-width: 640px) { .lx-go { right: 1.75rem; bottom: 1.75rem; width: 4.25rem; height: 4.25rem; } }
+  .lx-card:hover .lx-go { transform: translateX(4px); }
+  .lx-rail { display: flex; flex-direction: column; gap: .75rem; width: 100%; max-height: 420px; overflow-y: auto; scrollbar-width: none; }
+  .lx-rail::-webkit-scrollbar { display: none; }
+  .lx-th { position: relative; width: 100%; aspect-ratio: 4 / 3; border-radius: .9rem; overflow: hidden; flex: none; background: #163c39; outline: 2px solid transparent; outline-offset: 2px; opacity: .65; transition: opacity .3s, outline-color .3s; display: grid; place-items: center; }
+  .lx-th img { width: 100%; height: 100%; object-fit: cover; }
+  .lx-th:hover { opacity: .9; }
+  .lx-th.on { opacity: 1; outline-color: #e39b3c; }
+  .lx-arrow { width: 3.4rem; height: 3.4rem; border-radius: 999px; border: 1px solid rgba(255,250,240,.35); color: #fffaf0; display: grid; place-items: center; transition: background .3s; }
+  .lx-arrow:hover { background: rgba(255,250,240,.1); }
+  @media (prefers-reduced-motion: reduce) { .lx-card.on img { animation: none; } }
+
   /* the enquiry include is built for a light card; keep its text dark inside the ivory panel */
   .r-form { color: #1b1c17; }
 
@@ -426,31 +462,63 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
     {% if premium_vehicles %}
     <div class="road-gap" data-stop="Scenic route"></div>
 
-    <!-- ─── Luxury: pinned sideways scenic route ─── -->
-    <section id="luxury" class="relative z-10 bg-[#0f2e2c] text-[#f7f0e3] py-20 lg:py-0 lg:h-screen lg:flex lg:flex-col lg:justify-center overflow-hidden" data-hscroll>
-        <div class="absolute inset-0 opacity-30 pointer-events-none" style="background:radial-gradient(50% 60% at 90% 0%,rgba(227,155,60,.5),transparent 70%)"></div>
-        <div class="relative px-4 sm:px-12 mb-10 lg:mb-14 flex flex-wrap items-end gap-6 sm:gap-10 max-w-screen-2xl w-full mx-auto">
+    <!-- ─── Luxury: copy left, a large viewpoint card, a numbered thumbnail rail (mockup 2026-10-10) ─── -->
+    <section id="luxury" class="relative z-10 bg-[#0f2e2c] text-[#f7f0e3] py-20 lg:py-28 overflow-hidden" data-no-parallax data-lux>
+        <div class="absolute inset-0 opacity-30 pointer-events-none" style="background:radial-gradient(50% 60% at 90% 0%,rgba(227,155,60,.45),transparent 70%)"></div>
+        <div class="relative px-4 sm:px-12 max-w-screen-2xl mx-auto grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-12 lg:gap-14 items-center">
             <div>
                 <span class="label-tiny text-[#e39b3c]">Elite collection · the scenic route</span>
-                <h2 class="headline-lg text-4xl sm:text-6xl text-[#fffaf0] mt-4">When ordinary won't do.</h2>
+                <h2 class="headline-lg text-5xl sm:text-6xl lg:text-[clamp(52px,4.6vw,76px)] text-[#fffaf0] mt-5 leading-[1.02]" data-no-split><span class="whitespace-nowrap">When ordinary</span><br/><span class="lx-gold">won't do.</span></h2>
+                <p class="text-lg text-[#f7f0e3]/75 mt-6 max-w-md leading-relaxed">Premium vehicles for exceptional journeys. From business travel to special occasions, explore a fleet that makes every mile memorable.</p>
+                <div class="flex flex-wrap items-center gap-4 mt-8">
+                    <a href="{% url 'premium_cars' %}" class="lx-btn">Explore Premium <span class="material-symbols-outlined">arrow_forward</span></a>
+                    <a href="{% url 'wedding_cars' %}" class="flex items-center gap-3 font-semibold text-[#fffaf0] group"><span class="w-14 h-14 rounded-full border border-[#fffaf0]/40 grid place-items-center group-hover:bg-[#fffaf0]/10 transition-colors"><span class="material-symbols-outlined">favorite</span></span>Wedding cars</a>
+                </div>
+                <div class="lx-feats mt-10 pt-8 border-t border-[#fffaf0]/15">
+                    <div><span class="material-symbols-outlined">diamond</span><span><b>Premium Fleet</b>Well maintained luxury vehicles</span></div>
+                    <div><span class="material-symbols-outlined">verified_user</span><span><b>Safe &amp; Reliable</b>Your safety, our priority</span></div>
+                    <div><span class="material-symbols-outlined">location_on</span><span><b>Scenic Routes</b>Explore Kerala's beautiful destinations</span></div>
+                </div>
+                <div class="lx-bars mt-8" aria-hidden="true">{% for v in premium_vehicles %}<span{% if forloop.first %} class="on"{% endif %}></span>{% endfor %}</div>
             </div>
-            <div class="h-px flex-1 mb-4 hidden sm:block" style="background:repeating-linear-gradient(90deg,#e39b3c 0 10px,transparent 10px 22px)"></div>
-            <div class="font-serif text-4xl sm:text-5xl text-[#e39b3c] hidden lg:flex items-baseline gap-2"><span data-hscroll-count>01</span><span class="text-[#fffaf0]/30 text-2xl">/ {{ premium_vehicles|length|stringformat:"02d" }}</span></div>
-            <a href="{% url 'premium_cars' %}" class="label-tiny text-[#fffaf0] border border-[#fffaf0]/30 hover:bg-[#fffaf0] hover:text-[#0f2e2c] transition-colors px-5 py-3 rounded-full mb-2 flex items-center gap-2">All premium <span class="material-symbols-outlined text-base">arrow_forward</span></a>
-        </div>
-        <div class="m-htrack relative flex gap-8 lg:gap-10 px-4 sm:px-12 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-px-4 sm:scroll-px-12 pb-4">
-            {% for vehicle in premium_vehicles %}
-            <a href="{{ vehicle.get_absolute_url }}" class="snap-start min-w-[290px] sm:min-w-[420px] lg:min-w-[36vw] h-[420px] sm:h-[520px] lg:h-[60vh] relative rounded-[2.5rem] overflow-hidden group block bg-[#163c39]" data-tilt="0.5">
-                {% if vehicle.thumbnail %}
-                <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover" loading="lazy"/>
-                {% else %}
-                <div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[96px] text-[#e39b3c]/40">diamond</span></div>
-                {% endif %}
-                <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
-                <span class="absolute top-6 left-6 label-tiny bg-[#fffaf0]/15 border border-[#fffaf0]/20 backdrop-blur px-4 py-2 rounded-full text-[#fffaf0]">Viewpoint {{ forloop.counter|stringformat:"02d" }}</span>
-                <div class="absolute bottom-8 left-8 right-8"><div class="headline-md text-3xl text-white">{{ vehicle.brand }} {{ vehicle.name }}</div><div class="text-[#e39b3c] label-tiny mt-3">{% if vehicle.primary_price_value %}{{ vehicle.primary_price_value|inr }} / {{ vehicle.primary_price_label }}{% elif vehicle.category %}{{ vehicle.category.name }}{% else %}Elite collection{% endif %}</div></div>
-            </a>
-            {% endfor %}
+
+            <div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_128px] gap-5 lg:gap-6 items-center">
+                <div class="relative">
+                    <div class="h-px bg-[#fffaf0]/15 mb-6 hidden sm:block"></div>
+                    <div class="lx-stage" data-lux-stage>
+                        {% for v in premium_vehicles %}
+                        <a href="{{ v.get_absolute_url }}" class="lx-card{% if forloop.first %} on{% endif %}" aria-label="{{ v.brand }} {{ v.name }}">
+                            {% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}"{% if not forloop.first %} loading="lazy"{% endif %}/>{% else %}<span class="absolute inset-0 grid place-items-center"><span class="material-symbols-outlined text-[96px] text-[#e39b3c]/40">diamond</span></span>{% endif %}
+                            <span class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent"></span>
+                            <span class="lx-pill"><span class="material-symbols-outlined">location_on</span>Viewpoint {{ forloop.counter|stringformat:"02d" }}</span>
+                            <span class="absolute left-6 right-24 bottom-6 sm:left-8 sm:bottom-8">
+                                <span class="block font-serif font-bold text-2xl sm:text-4xl text-white leading-tight">{{ v.brand }} {{ v.name }}</span>
+                                <span class="flex flex-wrap gap-x-6 gap-y-2 mt-3 text-sm sm:text-base text-white/90">
+                                    {% if v.seating_capacity %}<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">group</span>{{ v.seating_capacity }} Seats</span>{% endif %}
+                                    <span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">work</span>{{ v.category.name|default:"Premium" }}</span>
+                                    {% if v.transmission %}<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">settings</span>{{ v.get_transmission_display }}</span>{% endif %}
+                                    {% if v.primary_price_value %}<span class="flex items-center gap-2 text-[#f2c98a]"><span class="material-symbols-outlined text-[20px]">sell</span>{{ v.primary_price_value|inr }}/{{ v.primary_price_label }}</span>{% endif %}
+                                </span>
+                            </span>
+                            <span class="lx-go"><span class="material-symbols-outlined">arrow_forward</span></span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="hidden sm:flex flex-col items-center gap-4">
+                    <div class="font-serif text-5xl text-[#e39b3c] leading-none"><span data-lux-n>01</span><span class="text-2xl text-[#fffaf0]/40"> / {{ premium_vehicles|length|stringformat:"02d" }}</span></div>
+                    <div class="h-px w-full bg-[#fffaf0]/15"></div>
+                    <div class="lx-rail" data-lux-rail>
+                        {% for v in premium_vehicles %}
+                        <button type="button" class="lx-th{% if forloop.first %} on{% endif %}" aria-label="Show {{ v.brand }} {{ v.name }}">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="" loading="lazy"/>{% else %}<span class="material-symbols-outlined text-[#e39b3c]/50">diamond</span>{% endif %}</button>
+                        {% endfor %}
+                    </div>
+                    {% if premium_vehicles|length > 1 %}
+                    <button type="button" class="lx-arrow" data-lux-prev aria-label="Previous vehicle"><span class="material-symbols-outlined">keyboard_arrow_up</span></button>
+                    <button type="button" class="lx-arrow" data-lux-next aria-label="Next vehicle"><span class="material-symbols-outlined">keyboard_arrow_down</span></button>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </section>
     {% endif %}
@@ -610,6 +678,26 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
     rows.forEach((r, i) => run(r, i * 110));
   }), { threshold: .35 });
   io.observe(host);
+})();
+
+/* luxury viewpoints: thumbnails, arrows and a 6s auto-advance (paused on hover or off screen) */
+(() => {
+  const sec = document.querySelector("[data-lux]"); if (!sec) return;
+  const cards = [...sec.querySelectorAll(".lx-card")], thumbs = [...sec.querySelectorAll(".lx-th")], bars = [...sec.querySelectorAll(".lx-bars span")], num = sec.querySelector("[data-lux-n]");
+  if (cards.length < 2) return;
+  let i = 0, timer = 0, visible = false, hover = false;
+  const show = n => { i = (n + cards.length) % cards.length; [cards, thumbs, bars].forEach(list => list.forEach((el, k) => el.classList.toggle("on", k === i)));
+    if (num) num.textContent = String(i + 1).padStart(2, "0"); const t = thumbs[i]; if (t) t.parentElement.scrollTo({ top: t.offsetTop - t.parentElement.offsetTop - 8, behavior: "smooth" }); run(); };
+  const run = () => { clearInterval(timer); if (visible && !hover && !document.hidden && !matchMedia("(prefers-reduced-motion: reduce)").matches) timer = setInterval(() => show(i + 1), 6000); };
+  thumbs.forEach((t, k) => t.addEventListener("click", () => show(k)));
+  sec.querySelector("[data-lux-prev]")?.addEventListener("click", () => show(i - 1));
+  sec.querySelector("[data-lux-next]")?.addEventListener("click", () => show(i + 1));
+  const stage = sec.querySelector("[data-lux-stage]");
+  stage.addEventListener("mouseenter", () => { hover = true; run(); }); stage.addEventListener("mouseleave", () => { hover = false; run(); });
+  let x0 = null; stage.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, { passive: true });
+  stage.addEventListener("touchend", e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) show(i + (dx < 0 ? 1 : -1)); x0 = null; });
+  if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; run(); }).observe(sec); else { visible = true; run(); }
+  document.addEventListener("visibilitychange", run);
 })();
 
 /* hero slides: next one every 5.5s, only once its photo has loaded; paused while the hero is off screen or the tab is hidden */

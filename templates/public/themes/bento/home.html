@@ -19,6 +19,21 @@
     /* hero tiles assemble in; hidden only while the motion layer is armed */
     .motion .b-hero .tile { opacity: 0; }
 
+    /* hero photo tile slides */
+    .b-sl { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s ease; display: block; overflow: hidden; }
+    .b-sl:first-child, .b-sl.on { opacity: 1; }
+    .b-slides.ready .b-sl:first-child:not(.on) { opacity: 0; }
+    .b-slides .b-sl:not(.on) { pointer-events: none; }
+    .b-sl-fill { position: absolute; inset: -8%; width: 116%; height: 116%; object-fit: cover; filter: blur(26px) saturate(1.2) brightness(.8); }
+    .b-sl-car { position: absolute; left: 0; right: 0; top: 50%; translate: 0 -50%; width: 100%; max-height: 72%; object-fit: contain; filter: drop-shadow(0 26px 30px rgba(0,0,0,.45)); }
+    .b-sl.on .b-sl-car { animation: b-sl-in 7s ease-out both; }
+    @keyframes b-sl-in { from { scale: 1.06; } to { scale: 1; } }
+    .b-sl-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .b-sl.on .b-sl-cover { animation: b-kb 20s ease-in-out infinite alternate; transform-origin: 60% 40%; }
+    .b-sl-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.6), rgba(0,0,0,0) 45%, rgba(0,0,0,.12)); }
+    .b-sl-dots span { width: 7px; height: 7px; border-radius: 999px; background: rgba(255,255,255,.55); transition: width .4s, background .4s; }
+    .b-sl-dots span.on { width: 22px; background: #fff; }
+    @media (prefers-reduced-motion: reduce) { .b-sl.on .b-sl-car, .b-sl.on .b-sl-cover { animation: none; } }
     @keyframes b-kb { 0% { transform: scale(1.02) translate(0,0); } 100% { transform: scale(1.14) translate(-2%, -2%); } }
     .b-kb { animation: b-kb 20s ease-in-out infinite alternate; transform-origin: 60% 40%; }
 
@@ -95,26 +110,33 @@
             {% if config.hero_description %}<p class="w-full text-sm text-on-surface-variant font-medium max-w-xl">{{ config.hero_description }}</p>{% endif %}
         </div>
     </div>
-    <!-- photo -->
-    <div class="tile sm:col-span-2 lg:col-span-5 lg:row-span-4 min-h-[380px] bg-primary" data-no-parallax>
-        {% if config.hero_image %}
-        <img src="{{ config.hero_image.url }}" alt="" class="b-kb absolute inset-0 w-full h-full object-cover"/>
-        {% elif hero_bg_images %}
-        <img src="{{ hero_bg_images.0 }}" alt="" class="b-kb absolute inset-0 w-full h-full object-cover"/>
-        {% else %}
-        <img src="{% static 'themes/img/palms.jpg' %}" alt="" class="b-kb absolute inset-0 w-full h-full object-cover"/>
-        {% endif %}
-        <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/10"></div>
-        <div class="absolute top-4 left-4 right-4 flex justify-between items-start gap-3">
-            {% if starting_price %}
-            <span class="b-glass rounded-2xl px-4 py-3"><span class="label-tiny block text-on-surface-variant mb-1">Starting at</span><span class="font-extrabold text-2xl text-primary"><span data-bslot>{{ starting_price|inr }}</span><span class="text-sm font-semibold text-on-surface-variant"> /day</span></span></span>
-            {% else %}<span></span>{% endif %}
-            <a href="{% url 'vehicle_list' %}" class="w-11 h-11 shrink-0 rounded-full b-glass grid place-items-center" aria-label="Browse the fleet"><span class="material-symbols-outlined text-primary">north_east</span></a>
+    <!-- photo: vehicles ticked "Hero slides" rotate here (whole car on a blurred fill of the same photo); with fewer than two,
+         the Settings background slides and hero image join so it still rotates -->
+    <div class="tile sm:col-span-2 lg:col-span-5 lg:row-span-4 min-h-[420px] bg-primary" data-no-parallax>
+        {% with n_v=hero_vehicles|length n_bg=hero_bg_images|length %}
+        <div class="b-slides absolute inset-0" data-b-slides>
+            {% for v in hero_vehicles %}
+            <a href="{% url 'vehicle_detail' v.slug %}" class="b-sl" aria-label="{{ v.brand }} {{ v.name }}">
+                <img src="{{ v.hero_image.url }}" alt="" class="b-sl-fill" aria-hidden="true"/>
+                <img src="{{ v.hero_image.url }}" alt="{{ v.brand }} {{ v.name }}" class="b-sl-car"/>
+                <span class="b-sl-shade"></span>
+                <span class="absolute top-4 left-4 right-4 flex justify-between items-start gap-3">
+                    {% if v.primary_price_value %}<span class="b-glass rounded-2xl px-4 py-3"><span class="label-tiny block text-on-surface-variant mb-1">{{ v.category.name|default:v.get_vehicle_type_display }}</span><span class="font-extrabold text-2xl text-primary">{{ v.primary_price_value|inr }}<span class="text-sm font-semibold text-on-surface-variant"> /{{ v.primary_price_label }}</span></span></span>{% else %}<span></span>{% endif %}
+                    <span class="w-11 h-11 shrink-0 rounded-full b-glass grid place-items-center"><span class="material-symbols-outlined text-primary">north_east</span></span>
+                </span>
+                <span class="absolute bottom-5 left-5 right-5 text-white">
+                    <span class="label-tiny opacity-80">{{ v.brand }}{% if v.fuel_type %} · {{ v.get_fuel_type_display }}{% endif %}{% if v.transmission %} · {{ v.get_transmission_display }}{% endif %}</span>
+                    <span class="block serif-i text-3xl mt-2 leading-tight">{{ v.name }}</span>
+                </span>
+            </a>
+            {% endfor %}
+            {% if n_v < 2 %}
+            {% for url in hero_bg_images %}<div class="b-sl"><img src="{{ url }}" alt="" class="b-sl-cover"/><span class="b-sl-shade"></span>{% include "public/themes/bento/_hero_tile_caption.html" %}</div>{% endfor %}
+            {% if n_v|add:n_bg < 2 %}<div class="b-sl"><img src="{% if config.hero_image %}{{ config.hero_image.url }}{% else %}{% static 'themes/img/palms.jpg' %}{% endif %}" alt="" class="b-sl-cover"/><span class="b-sl-shade"></span>{% include "public/themes/bento/_hero_tile_caption.html" %}</div>{% endif %}
+            {% endif %}
         </div>
-        <div class="absolute bottom-5 left-5 right-5 text-white">
-            <span class="label-tiny opacity-80">Self-drive · Chauffeur · Wedding</span>
-            <div class="serif-i text-3xl mt-2">Every road across Kerala.</div>
-        </div>
+        {% endwith %}
+        <div class="b-sl-dots absolute z-10 right-5 bottom-6 flex gap-1.5" aria-hidden="true"></div>
     </div>
     <!-- fleet count -->
     {% if total_vehicle_count %}
@@ -493,6 +515,24 @@
 
 {% block extra_js %}
 <script>
+/* hero photo tile: next slide every 5.5s once its photo has loaded; paused off screen or in a hidden tab */
+(() => {
+    const host = document.querySelector("[data-b-slides]"); if (!host) return;
+    const slides = [...host.children], dots = host.parentElement.querySelector(".b-sl-dots");
+    if (slides.length < 2) return;
+    const marks = slides.map(() => dots.appendChild(document.createElement("span")));
+    const loaded = s => [...s.querySelectorAll("img")].every(im => im.complete && im.naturalWidth > 0);
+    let i = 0, timer = 0, visible = true;
+    const show = n => { i = n; slides.forEach((s, k) => s.classList.toggle("on", k === n)); marks.forEach((m, k) => m.classList.toggle("on", k === n)); };
+    show(0); host.classList.add("ready");
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const next = () => { for (let k = 1; k < slides.length; k++) { const n = (i + k) % slides.length; if (loaded(slides[n])) return show(n); } };
+    const run = () => { clearInterval(timer); if (visible && !document.hidden) timer = setInterval(next, 5500); };
+    if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; run(); }).observe(host);
+    document.addEventListener("visibilitychange", run);
+    run();
+})();
+
 /* headline: the last word becomes the serif italic accent (text only, no HTML injection) */
 (() => {
     const h = document.querySelector(".b-title"); if (!h || h.querySelector("span")) return; /* a word marked with *asterisks* in Settings wins */
@@ -578,7 +618,7 @@ document.addEventListener("motion:ready", ({ detail: { G, split, slotTo } }) => 
     if (title) tl.from(split(title), { yPercent: 118, rotation: 5, transformOrigin: "0% 100%", duration: 1.2, stagger: .06, ease: "expo.out" }, .2);
     document.querySelectorAll("[data-bslot]").forEach((s, i) => tl.add(() => slotTo(s, s.textContent.trim(), { from: "0" }), .6 + i * .12));
 
-    G.to(".b-hero .b-kb", { yPercent: 8, ease: "none", scrollTrigger: { trigger: ".b-hero", start: "top top", end: "bottom top", scrub: true } });
+    G.to(".b-hero .b-slides", { yPercent: 6, ease: "none", scrollTrigger: { trigger: ".b-hero", start: "top top", end: "bottom top", scrub: true } });
     if (document.querySelector("#luxury")) G.from("#luxury .lux > a", { y: 120, opacity: 0, rotation: (i) => (i - 2) * 3, duration: 1.2, ease: "expo.out", stagger: .08, scrollTrigger: { trigger: "#luxury", start: "clamp(top 75%)", once: true } });
     if (document.querySelector("#estimate")) G.from("#estimate .tile", { y: 60, opacity: 0, duration: 1.1, stagger: .12, scrollTrigger: { trigger: "#estimate", start: "clamp(top 80%)", once: true } });
     ["#wedding", "#enquiry"].forEach(sel => G.from(`${sel} > div > .tile`, { opacity: 0, scale: .9, y: 50, duration: 1.1, ease: "expo.out", stagger: .1, scrollTrigger: { trigger: sel, start: "clamp(top 78%)", once: true }, clearProps: "transform" }));
