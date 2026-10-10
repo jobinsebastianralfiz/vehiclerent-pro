@@ -226,13 +226,14 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
         <span class="rh-plane material-symbols-outlined" aria-hidden="true" data-intro="13" data-intro-kind="fade">flight</span>
         <div class="m-hero-media rh-media" data-intro="2" data-intro-kind="media">
             <span class="rh-photo-size" aria-hidden="true"></span><span class="rh-bar-size" aria-hidden="true"></span>
-            {% comment %}Slides: vehicles ticked "Hero slides" first (photo above, details bar below, linked), then Hero Background
-            Slides 1-3 from Settings. With fewer than two, the single hero image (or the default photo) joins so the hero still rotates.{% endcomment %}
+            {% comment %}Slides: vehicles ticked "Hero slides" (photo above, details bar below, linked). With fewer than two vehicles the
+            Hero Background Slides from Settings join, and with fewer than two slides in all the single hero image (or the default photo)
+            joins too, so the hero always rotates.{% endcomment %}
             {% with n_bg=hero_bg_images|length n_v=hero_vehicles|length %}
             <div class="hero-slides absolute inset-0" data-hero-slides>
                 {% for v in hero_vehicles %}
                 <a href="{% url 'vehicle_detail' v.slug %}" class="hs">
-                    <img class="rh-photo" src="{{ v.hero_image.url }}" alt="{{ v.brand }} {{ v.name }}"{% if not forloop.first %} loading="lazy"{% endif %}/>
+                    <img class="rh-photo" src="{{ v.hero_image.url }}" alt="{{ v.brand }} {{ v.name }}"/>
                     <span class="rh-bar">
                         <span class="min-w-0">
                             <span class="label-tiny text-[#d9692f] block">{{ v.brand }}{% if v.category %} · {{ v.category.name }}{% endif %}</span>
@@ -244,15 +245,15 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
                     </span>
                 </a>
                 {% endfor %}
-                {% for url in hero_bg_images %}
+                {% if n_v < 2 %}{% for url in hero_bg_images %}
                 <a href="{% url 'vehicle_list' %}" class="hs">
-                    <img class="rh-photo" src="{{ url }}" alt=""{% if n_v or not forloop.first %} loading="lazy"{% endif %}/>
+                    <img class="rh-photo" src="{{ url }}" alt=""/>
                     <span class="rh-bar"><span class="min-w-0"><span class="label-tiny text-[#d9692f] block">{{ config.hero_subtitle|default:"Premium vehicle rental" }}</span><span class="block font-serif font-bold text-xl sm:text-[26px] text-tertiary leading-tight mt-1">Explore the fleet</span></span>{% if starting_price %}<span class="text-right shrink-0"><span class="label-tiny text-outline block">From</span><b class="font-serif text-xl sm:text-2xl text-tertiary">{{ starting_price|inr }}</b><span class="text-xs text-outline">/day</span></span>{% endif %}<span class="rh-go-sm" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></span></span>
                 </a>
-                {% endfor %}
+                {% endfor %}{% endif %}
                 {% if n_v|add:n_bg < 2 %}
                 <a href="{% url 'vehicle_list' %}" class="hs">
-                    <img class="rh-photo" src="{% if config.hero_image %}{{ config.hero_image.url }}{% else %}{% static 'themes/img/thar-backwater.jpg' %}{% endif %}" alt=""{% if n_v|add:n_bg %} loading="lazy"{% endif %}/>
+                    <img class="rh-photo" src="{% if config.hero_image %}{{ config.hero_image.url }}{% else %}{% static 'themes/img/thar-backwater.jpg' %}{% endif %}" alt=""/>
                     <span class="rh-bar"><span class="min-w-0"><span class="label-tiny text-[#d9692f] block">{{ config.hero_subtitle|default:"Premium vehicle rental" }}</span><span class="block font-serif font-bold text-xl sm:text-[26px] text-tertiary leading-tight mt-1">Explore the fleet</span></span>{% if starting_price %}<span class="text-right shrink-0"><span class="label-tiny text-outline block">From</span><b class="font-serif text-xl sm:text-2xl text-tertiary">{{ starting_price|inr }}</b><span class="text-xs text-outline">/day</span></span>{% endif %}<span class="rh-go-sm" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></span></span>
                 </a>
                 {% endif %}
@@ -611,18 +612,20 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
   io.observe(host);
 })();
 
-/* hero slides: next one every 5.5s, paused while the hero is off screen or the tab is hidden */
+/* hero slides: next one every 5.5s, only once its photo has loaded; paused while the hero is off screen or the tab is hidden */
 (() => {
   const host = document.querySelector("[data-hero-slides]");
   if (!host) return;
   const slides = [...host.children], dots = host.parentElement.querySelector(".hs-dots");
   if (slides.length < 2) return;
   const marks = slides.map(() => dots.appendChild(document.createElement("span")));
+  const loaded = s => { const im = s.querySelector("img"); return !im || (im.complete && im.naturalWidth > 0); };
   let i = 0, timer = 0, visible = true;
   const show = n => { i = n; slides.forEach((s, k) => s.classList.toggle("on", k === n)); marks.forEach((m, k) => m.classList.toggle("on", k === n)); };
   show(0); host.classList.add("ready");
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const run = () => { clearInterval(timer); if (visible && !document.hidden) timer = setInterval(() => show((i + 1) % slides.length), 5500); };
+  const next = () => { for (let k = 1; k < slides.length; k++) { const n = (i + k) % slides.length; if (loaded(slides[n])) return show(n); } };
+  const run = () => { clearInterval(timer); if (visible && !document.hidden) timer = setInterval(next, 5500); };
   if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; run(); }).observe(host);
   document.addEventListener("visibilitychange", run);
   run();

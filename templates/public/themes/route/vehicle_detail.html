@@ -78,7 +78,6 @@ then a road down the page through specs, the story, what's on board and similar 
                     <div class="absolute bottom-4 right-4 bg-[#0f2e2c]/75 text-[#fffaf0] label-tiny px-3 py-2 rounded-full"><span x-text="active + 1">1</span> / {{ images|length }}</div>
                     {% endif %}
                 </div>
-                <span class="pc-cap !text-lg sm:!text-xl !bottom-3 sm:!bottom-4">Greetings from the {{ vehicle.name }}</span>
                 <span class="pc-stamp !w-8 !h-9 !bottom-2 sm:!bottom-3"><span class="material-symbols-outlined">{% if vehicle.is_wedding_service %}favorite{% else %}directions_car{% endif %}</span></span>
             </div>
             {% if images|length > 1 %}

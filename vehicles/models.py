@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
 
+from core.images import shrink_uploads
+
 from .geo import lookup
 
 
@@ -58,6 +60,7 @@ class VehicleCategory(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
+        shrink_uploads(self, "image")
         super().save(*args, **kwargs)
 
     def vehicle_count(self):
@@ -213,6 +216,7 @@ class Vehicle(models.Model):
             self.slug = slug
         if self.is_draft:
             self.is_published = False  # drafts never show on the public site
+        shrink_uploads(self, "thumbnail")
         super().save(*args, **kwargs)
 
     def build_slug(self):
@@ -284,6 +288,10 @@ class VehicleImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.vehicle.name} (#{self.display_order})"
+
+    def save(self, *args, **kwargs):
+        shrink_uploads(self, "image")
+        super().save(*args, **kwargs)
 
 
 class BookingAddon(models.Model):

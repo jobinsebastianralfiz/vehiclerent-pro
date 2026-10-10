@@ -98,6 +98,8 @@ class SiteConfig(models.Model):
 
     def save(self, *args, **kwargs):
         self.pk = 1
+        from .images import shrink_uploads
+        shrink_uploads(self, "hero_image", "hero_bg_1", "hero_bg_2", "hero_bg_3", "about_image")
         super().save(*args, **kwargs)
 
     @classmethod
