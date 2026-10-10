@@ -17,7 +17,7 @@
 <section id="ed-hero" class="px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 pb-16 lg:pt-14 lg:pb-24 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
     <div class="ed-hero-copy lg:w-1/2 space-y-8 lg:space-y-10 w-full">
         <span class="label-tiny text-primary-container block" data-intro="0">{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</span>
-        <h1 class="display-hero text-5xl sm:text-7xl lg:text-[96px] text-primary" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Rent Your Perfect Vehicle" }}</h1>
+        <h1 class="display-hero text-5xl sm:text-7xl lg:text-[96px] text-primary" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Rent Your Perfect Vehicle"|accent:"italic text-primary-container" }}</h1>
         <p class="headline-md text-2xl sm:text-3xl text-on-surface-variant font-normal italic" data-intro="4">for the <span class="text-primary-container not-italic font-bold" data-cycle="wedding day|weekend escape|airport run|monthly commute|Munnar drive" data-wait="1">wedding day</span></p>
         <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed font-light" data-intro="5">{{ config.hero_description|default:"Explore our premium fleet. Flexible daily, weekly, and monthly rentals with 24/7 roadside support." }}</p>
         <div class="flex flex-wrap gap-4 sm:gap-6" data-intro="6">

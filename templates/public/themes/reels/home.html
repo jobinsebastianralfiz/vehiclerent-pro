@@ -60,7 +60,7 @@
 <section class="hero hero-fallback" id="hero">
   <div class="hero-copy">
     <span class="kicker" data-intro="0"><i></i>{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</span>
-    <h1 class="hero-h" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Rent Your Perfect Vehicle" }}</h1>
+    <h1 class="hero-h" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Rent Your Perfect Vehicle"|accent:"ol" }}</h1>
     {% if starting_price %}<p class="hero-price" data-intro="3"><span>from <b>{{ starting_price|inr }}</b> a day</span></p>{% endif %}
     <p class="sub" data-intro="4">{{ config.hero_description|default:"Explore our premium fleet. Flexible daily, weekly, and monthly rentals with 24/7 roadside support." }}</p>
     <div class="ctas" data-intro="5">

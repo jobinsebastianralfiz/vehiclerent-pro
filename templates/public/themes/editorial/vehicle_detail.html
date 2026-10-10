@@ -69,7 +69,7 @@
     <!-- ─── Gallery + booking ─── -->
     <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] gap-8 lg:gap-12 items-start">
         <div x-data="{ active: 0 }" data-no-parallax>
-            <div class="m-hero-media relative aspect-[4/3] rounded-[2.5rem] bg-surface-container-high mb-4" data-intro="5" data-intro-kind="media">
+            <div class="m-hero-media relative aspect-[16/10] rounded-[2.5rem] bg-surface-container-high mb-4" data-intro="5" data-intro-kind="media">
                 {% if images %}
                     {% for img in images %}
                     <img x-show="active === {{ forloop.counter0 }}" {% if not forloop.first %}x-cloak{% endif %} src="{{ img.image.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}{% if not forloop.first %} — photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-cover" x-transition.opacity.duration.500ms {% if not forloop.first %}loading="lazy"{% endif %}/>

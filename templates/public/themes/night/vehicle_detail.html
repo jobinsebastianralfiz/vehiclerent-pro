@@ -62,7 +62,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,60%)_1fr] gap-8 lg:gap-12 items-start">
     <!-- ─── Gallery ─── -->
     <div x-data="{ activeImage: 0 }" class="min-w-0">
-      <div class="nd-gallery relative aspect-[4/3] overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] mb-4 border border-white/5 shadow-[0_60px_120px_-40px_rgba(0,0,0,.9)]" data-intro="0" data-intro-kind="media">
+      <div class="nd-gallery relative aspect-[16/10] overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] mb-4 border border-white/5 shadow-[0_60px_120px_-40px_rgba(0,0,0,.9)]" data-intro="0" data-intro-kind="media">
         {% if images %}
           {% for img in images %}
           <img x-show="activeImage === {{ forloop.counter0 }}" {% if not forloop.first %}x-cloak{% endif %} src="{{ img.image.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}{% if images|length > 1 %} — photo {{ forloop.counter }}{% endif %}" class="nd-gallery-img absolute inset-0 w-full h-full object-cover" x-transition.opacity.duration.500ms/>

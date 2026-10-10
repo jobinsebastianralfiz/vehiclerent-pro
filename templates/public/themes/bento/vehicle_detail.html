@@ -52,7 +52,7 @@
     <div class="lg:col-span-7 grid gap-3 sm:gap-4">
         <!-- gallery -->
         <div class="tile b-glass p-3" x-data="{ i: 0, n: {% if images %}{{ images|length }}{% else %}1{% endif %} }" data-no-parallax>
-            <div class="relative overflow-hidden rounded-[22px] aspect-[4/3] bg-surface-container grid place-items-center"
+            <div class="relative overflow-hidden rounded-[22px] aspect-[16/10] bg-surface-container grid place-items-center"
                  x-on:keydown.arrow-right.prevent="i = (i + 1) % n" x-on:keydown.arrow-left.prevent="i = (i - 1 + n) % n">
                 {% if images %}
                     {% for img in images %}

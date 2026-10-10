@@ -89,10 +89,10 @@
   <img class="lit" src="{% if config.hero_image %}{{ config.hero_image.url }}{% else %}{{ hero_fallback }}{% endif %}" alt=""/>
   <div class="beam-cone" aria-hidden="true"></div>
   <div class="beam-shade" aria-hidden="true"></div>
-  <div class="relative z-10 w-full px-4 sm:px-12 max-w-screen-2xl mx-auto pt-32 pb-14 lg:py-0">
+  <div class="relative z-10 w-full px-4 sm:px-12 max-w-screen-2xl mx-auto {% if starting_price %}pt-48{% else %}pt-32{% endif %} sm:pt-32 pb-14 lg:py-0">
     <div class="max-w-2xl space-y-7 lg:space-y-9">
       <span class="label-tiny text-primary-container flex items-center gap-3" data-intro="0"><i class="w-8 h-px bg-primary-container inline-block"></i>{{ config.hero_subtitle|default:"Premium vehicle rental · Kerala" }}</span>
-      <h1 class="nd-display text-5xl sm:text-7xl lg:text-[104px] text-on-surface" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Rent Your Perfect Vehicle" }}</h1>
+      <h1 class="nd-display text-5xl sm:text-7xl lg:text-[104px] text-on-surface" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Rent Your Perfect Vehicle"|accent:"text-primary-container" }}</h1>
       <p class="nd-head text-2xl sm:text-3xl text-on-surface-variant font-normal italic" data-intro="4">for the <span class="text-primary not-italic font-bold" data-cycle="night out|wedding day|weekend escape|airport run|monthly commute" data-wait="1.6">night out</span></p>
       <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed font-light" data-intro="5">{{ config.hero_description|default:"Explore our premium fleet. Flexible daily, weekly, and monthly rentals with 24/7 roadside support." }}</p>
       <div class="flex flex-wrap gap-4" data-intro="6">
@@ -109,7 +109,7 @@
     </div>
   </div>
   {% if starting_price %}
-  <div class="absolute z-10 top-28 right-4 sm:right-12 lg:top-auto lg:bottom-14 bg-surface/60 backdrop-blur-md border border-primary/20 rounded-2xl px-5 py-4" data-intro="8" data-intro-kind="pop">
+  <div class="absolute z-10 top-[5.5rem] left-4 sm:left-auto sm:top-28 sm:right-12 lg:top-auto lg:bottom-14 bg-surface/60 backdrop-blur-md border border-primary/20 rounded-2xl px-5 py-4" data-intro="8" data-intro-kind="pop">
     <span class="label-tiny text-on-surface-variant block mb-1">Starting at</span>
     <span class="nd-head text-2xl text-primary">₹<span data-slot>{{ starting_price|inr|slice:"1:" }}</span><span class="text-sm font-light text-on-surface-variant"> / day</span></span>
   </div>
@@ -168,7 +168,7 @@
 {% endif %}
 
 <!-- ─── Drive-by: pinned, the car crosses as you scroll; the dial counts ─── -->
-<section id="driveby" class="relative h-[100svh] overflow-hidden bg-[#080906] flex items-center justify-center" data-no-parallax aria-label="Fleet at a glance">
+<section id="driveby" class="relative overflow-hidden bg-[#080906] flex flex-col sm:flex-row items-center justify-center gap-8 py-24 sm:py-0 sm:h-[100svh]" data-no-parallax aria-label="Fleet at a glance">
   <div class="streaks absolute inset-0 pointer-events-none" aria-hidden="true"></div>
   <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-surface to-transparent pointer-events-none"></div>
   <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-surface to-transparent pointer-events-none"></div>
@@ -176,7 +176,7 @@
     <img src="{% static 'themes/img/sclass-mist.jpg' %}" alt="" class="w-full h-full object-cover"/>
     <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
   </div>
-  <div class="gauge absolute left-4 sm:left-12 top-24 sm:top-auto sm:bottom-14 flex items-center gap-5"
+  <div class="gauge relative self-start mx-5 sm:mx-0 sm:absolute sm:left-12 sm:bottom-14 flex items-center gap-5"
        data-stages='[{% if total_vehicle_count %}{"v":"{{ total_vehicle_count }}","u":"","l":"vehicle{{ total_vehicle_count|pluralize }} in the fleet"}{% endif %}{% if cities %}{% if total_vehicle_count %},{% endif %}{"v":"{{ cities.count }}","u":"","l":"cit{{ cities.count|pluralize:"y,ies" }} across Kerala"}{% endif %}{% if config.years_in_business %}{% if total_vehicle_count or cities %},{% endif %}{"v":"{{ config.years_in_business }}","u":"+","l":"years on the road"}{% endif %}]'>
     <div class="relative w-28 h-28 sm:w-44 sm:h-44 shrink-0">
       <svg viewBox="0 0 200 200" class="absolute inset-0 w-full h-full" aria-hidden="true">
@@ -425,6 +425,17 @@ document.addEventListener("motion:ready", function (ev) {
       roll(label, st.l);
       cur = i;
     };
+    if (matchMedia("(max-width: 639px)").matches) {
+      /* phones: no pin (it left a screen of empty black); the car glides in once and the dial steps through the numbers */
+      G.from(".car-frame", { xPercent: -60, opacity: 0, duration: 1.1, ease: "power3.out", scrollTrigger: { trigger: sec, start: "top 75%", once: true } });
+      G.fromTo(".gauge-arc", { strokeDasharray: "0 503" }, { strokeDasharray: "377 503", duration: 1.4, ease: "power2.out", scrollTrigger: { trigger: sec, start: "top 70%", once: true } });
+      if (STAGES.length) {
+        unit.textContent = STAGES[0].u;
+        label.innerHTML = "<span>" + STAGES[0].l + "</span>";
+        slotTo(num, STAGES[0].v, { from: "0".repeat(STAGES[0].v.length) });
+        if (STAGES.length > 1) setInterval(function () { setStage((cur + 1) % STAGES.length); }, 2600);
+      }
+    } else {
     var tl = G.timeline({ defaults: { ease: "none" }, scrollTrigger: {
       trigger: sec, start: "top top", end: "+=220%", pin: true, scrub: .6, anticipatePin: 1, invalidateOnRefresh: true,
       onUpdate: function (self) {
@@ -444,6 +455,7 @@ document.addEventListener("motion:ready", function (ev) {
       unit.textContent = STAGES[0].u;
       label.innerHTML = "<span>" + STAGES[0].l + "</span>";
       slotTo(num, STAGES[0].v, { from: "0".repeat(STAGES[0].v.length) });
+    }
     }
   }
 

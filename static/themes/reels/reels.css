@@ -315,3 +315,5 @@ img.occ2-ph.cut { object-fit: contain; border-radius: 0; box-shadow: none; -webk
 @media (max-width: 640px) { .occ2-grid { grid-template-columns: 1fr; } .occ2 { min-height: 132px; } img.occ2-ph { height: 104px; } }
 @media (prefers-reduced-motion: reduce) { .occ2:hover img.occ2-ph, .occ2:hover .occ2-go { transform: none; } }
 .occ2.dk { color: #fff; }
+.hero-h .ol { color: var(--olive); }
+@media (max-width: 800px) { .foot-grid > :first-child { grid-column: 1 / -1; } }

@@ -86,7 +86,7 @@
     <div class="tile b-glass p-7 sm:p-10 sm:col-span-2 lg:col-span-7 lg:row-span-3 flex flex-col justify-between gap-8">
         <div>
             <span class="inline-flex items-center gap-2 bg-primary-fixed text-primary label-tiny px-3 py-2 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</span>
-            <h1 class="b-title mt-6 font-extrabold text-[44px] sm:text-6xl lg:text-[72px] leading-[.95] tracking-[-.045em] text-primary" data-no-split>{{ config.hero_title|default:"Rent Your Perfect Vehicle" }}</h1>
+            <h1 class="b-title mt-6 font-extrabold text-[44px] sm:text-6xl lg:text-[72px] leading-[.95] tracking-[-.045em] text-primary" data-no-split>{{ config.hero_title|default:"Rent Your Perfect Vehicle"|accent:"serif-i text-primary-container" }}</h1>
             <p class="mt-5 text-xl sm:text-2xl font-semibold text-on-surface-variant">Ready for the <span class="text-primary bg-primary-fixed/70 px-2 rounded-lg" data-cycle="wedding day|weekend escape|airport run|monthly commute|outstation trip" data-wait="1.4">wedding day</span></p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
@@ -495,7 +495,7 @@
 <script>
 /* headline: the last word becomes the serif italic accent (text only, no HTML injection) */
 (() => {
-    const h = document.querySelector(".b-title"); if (!h) return;
+    const h = document.querySelector(".b-title"); if (!h || h.querySelector("span")) return; /* a word marked with *asterisks* in Settings wins */
     const words = h.textContent.trim().split(/\s+/); if (words.length < 2) return;
     const last = words.pop();
     h.textContent = words.join(" ") + " ";

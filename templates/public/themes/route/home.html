@@ -83,9 +83,7 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
   .hero-slides .hs:first-child, .hero-slides .hs.on { opacity: 1; }
   .hero-slides.ready .hs:first-child:not(.on) { opacity: 0; }
   .hero-slides .hs.on img { animation: hs-push 7s ease-out both; }
-  .hero-slides .hs-cap { transition: transform .4s var(--spring); }
-  .hero-slides .hs-cap:hover { transform: translateY(-2px); }
-  .hero-slides .hs:not(.on) .hs-cap { pointer-events: none; }
+  .hero-slides .hs:not(.on) { pointer-events: none; }
   @keyframes hs-push { from { scale: 1.08; } to { scale: 1; } }
   .hs-dots span { width: 8px; height: 8px; border-radius: 999px; background: rgba(255,250,240,.55); transition: width .5s, background .5s; }
   .hs-dots span.on { width: 26px; background: #e39b3c; }
@@ -116,32 +114,39 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
   .rh-btn:hover { transform: translateY(-2px); }
   .rh-btn-ghost { background: rgba(255,250,240,.7); border: 1px solid rgba(74,74,62,.18); color: #1b1c17; }
   .rh-btn-ghost:hover { background: #fffaf0; }
-  .rh-media-col { padding: 0 0 3.5rem; }
-  @media (min-width: 640px) { .rh-media-col { padding: 0 5.5rem 3.5rem 2.5rem; } }
-  .rh-media { position: relative; z-index: 2; border-radius: 2.25rem; background: #e9dcc4; box-shadow: 0 40px 70px -40px rgba(15,46,44,.75); }
-  .rh-blob { position: absolute; z-index: 1; left: 1.1rem; top: 12%; width: 22%; height: 52%; border-radius: 2rem; background: #1f5a45; rotate: -6deg; }
-  .rh-blob.b2 { left: auto; top: auto; right: 14%; bottom: 2.2rem; width: 34%; height: 18%; border-radius: 1.75rem; rotate: 4deg; background: #2c6a52; }
-  @media (max-width: 639px) { .rh-blob { left: -6px; } .rh-blob.b2 { right: -4px; bottom: 2.6rem; } }
-  .rh-flight { position: absolute; z-index: 3; left: -6px; top: 26%; width: 46px; height: 46%; pointer-events: none; display: none; }
-  .rh-plane { position: absolute; z-index: 3; left: -18px; top: 44%; font-size: 30px; color: #d9692f; rotate: 210deg; display: none; }
+  .rh-media-col { padding: 0; }
+  @media (min-width: 640px) { .rh-media-col { padding: 0 7.25rem 0 2.5rem; } }
+  .rh-media { position: relative; z-index: 2; display: flex; flex-direction: column; border-radius: 2rem; background: #fffaf0; box-shadow: 0 40px 70px -40px rgba(15,46,44,.7), 0 0 0 1px rgba(74,74,62,.08); --bar: 92px; }
+  @media (max-width: 639px) { .rh-media { --bar: 84px; border-radius: 1.5rem; } }
+  .rh-photo-size { display: block; aspect-ratio: 16 / 10; }
+  .rh-bar-size { display: block; height: var(--bar); }
+  .rh-media .hs { display: block; color: inherit; }
+  .rh-photo { position: absolute; left: 0; top: 0; width: 100%; height: calc(100% - var(--bar)); object-fit: cover; object-position: 50% 60%; background: #e9dcc4; }
+  .rh-bar { position: absolute; left: 0; right: 0; bottom: 0; height: var(--bar); display: flex; align-items: center; gap: 1rem; padding: 0 1.1rem 0 1.4rem; background: #fffaf0; }
+  @media (min-width: 640px) { .rh-bar { padding: 0 1.25rem 0 1.75rem; gap: 1.5rem; } }
+  .rh-bar > .min-w-0 { flex: 1; }
+  .rh-go-sm { flex: none; width: 2.6rem; height: 2.6rem; border-radius: 999px; display: grid; place-items: center; background: #134e4a; color: #fffaf0; transition: transform .35s var(--spring); }
+  .rh-go-sm .material-symbols-outlined { font-size: 20px; }
+  .rh-media .hs:hover .rh-go-sm { transform: translateX(4px); }
+  .rh-media .hs-dots { bottom: calc(var(--bar) + 14px); }
+  .rh-flight { position: absolute; z-index: 3; left: -6px; top: 18%; width: 46px; height: 40%; pointer-events: none; display: none; }
+  .rh-plane { position: absolute; z-index: 3; left: -18px; top: 34%; font-size: 30px; color: #d9692f; rotate: 210deg; display: none; }
   @media (min-width: 640px) { .rh-flight, .rh-plane { display: block; } }
-  .rh-cap { position: absolute; z-index: 10; left: 1.25rem; top: 1.25rem; max-width: 72%; padding: 1rem 1.25rem 1.1rem; border-radius: 1.25rem; background: rgba(255,250,240,.94); backdrop-filter: blur(8px); box-shadow: 0 18px 36px -20px rgba(0,0,0,.45); }
-  @media (min-width: 640px) { .rh-cap { left: 1.75rem; top: 1.75rem; padding: 1.15rem 1.6rem 1.25rem; } }
-  .rh-cards { position: absolute; z-index: 4; right: 0; top: 4%; width: 31%; max-width: 205px; display: none; flex-direction: column; gap: .4rem; pointer-events: none; }
+  .rh-cards { position: absolute; z-index: 4; right: 0; top: -1.25rem; width: 132px; display: none; flex-direction: column; gap: .2rem; pointer-events: none; }
   @media (min-width: 640px) { .rh-cards { display: flex; } }
-  .rh-cards .pcw:nth-child(1) { rotate: 8deg; }
-  .rh-cards .pcw:nth-child(2) { rotate: -4deg; margin-left: 10%; }
-  .rh-cards .pcw:nth-child(3) { rotate: 7deg; }
-  .rh-cards .pc { padding: 8px 8px 30px; }
-  .rh-cards .pc .pc-cap { font-size: 14px; left: 12px; right: 10px; bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .rh-trust { position: absolute; z-index: 5; right: 0; bottom: 0; display: flex; align-items: center; gap: .9rem; padding: .7rem .75rem .7rem 1rem; border-radius: 999px; background: #134e4a; color: #fffaf0; font-size: .9375rem; box-shadow: 0 22px 40px -22px rgba(15,46,44,.9); transition: transform .3s var(--spring); }
-  @media (min-width: 640px) { .rh-trust { right: 3.5rem; padding: .85rem .85rem .85rem 1.25rem; font-size: 1rem; } }
+  @media (min-width: 1280px) { .rh-cards { width: 140px; } }
+  .rh-cards .pcw:nth-child(1) { rotate: 7deg; }
+  .rh-cards .pcw:nth-child(2) { rotate: -4deg; margin-left: 14%; }
+  .rh-cards .pcw:nth-child(3) { rotate: 6deg; }
+  .rh-cards .pc { padding: 7px 7px 26px; }
+  .rh-cards .pc .pc-cap { font-size: 13px; left: 10px; right: 8px; bottom: 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rh-trust { position: relative; z-index: 5; margin: 1.25rem 0 0 auto; width: max-content; max-width: 100%; display: flex; align-items: center; gap: .9rem; padding: .6rem .65rem .6rem .9rem; border-radius: 999px; background: #134e4a; color: #fffaf0; font-size: .9375rem; box-shadow: 0 22px 40px -22px rgba(15,46,44,.9); transition: transform .3s var(--spring); }
   .rh-trust:hover { transform: translateY(-3px); }
   .rh-trust b { font-weight: 800; color: #f6d9a8; }
   .rh-faces { display: flex; }
-  .rh-faces > * { width: 2.6rem; height: 2.6rem; border-radius: 999px; border: 2px solid #134e4a; object-fit: cover; background: #f6d9a8; color: #134e4a; display: grid; place-items: center; font-weight: 800; }
+  .rh-faces > * { width: 2.4rem; height: 2.4rem; border-radius: 999px; border: 2px solid #134e4a; object-fit: cover; background: #f6d9a8; color: #134e4a; display: grid; place-items: center; font-weight: 800; }
   .rh-faces > * + * { margin-left: -.7rem; }
-  .rh-go { width: 2.75rem; height: 2.75rem; border-radius: 999px; background: #fffaf0; color: #134e4a; display: grid; place-items: center; flex: none; }
+  .rh-go { width: 2.5rem; height: 2.5rem; border-radius: 999px; background: #fffaf0; color: #134e4a; display: grid; place-items: center; flex: none; }
 
   /* the enquiry include is built for a light card; keep its text dark inside the ivory panel */
   .r-form { color: #1b1c17; }
@@ -199,7 +204,7 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
 </svg>
 <svg class="rh-frond" viewBox="0 0 200 200" aria-hidden="true"><g fill="#2f6b5e"><path d="M200 0Q120 40 60 140Q130 60 200 30Z"/><path d="M200 0Q150 70 130 180Q170 80 200 50Z"/><path d="M200 0Q90 10 10 70Q100 30 200 16Z"/></g><path d="M200 0Q120 40 60 140M200 0Q150 70 130 180M200 0Q90 10 10 70" fill="none" stroke="#fffaf0" stroke-opacity=".35" stroke-width="1.2"/></svg>
 
-<section id="hero" class="r-glow relative px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 pb-40 lg:pt-12 lg:pb-44 flex flex-col lg:flex-row items-center gap-12 lg:gap-14">
+<section id="hero" class="r-glow relative px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 pb-48 lg:pt-12 lg:pb-52 flex flex-col lg:flex-row items-center gap-12 lg:gap-14">
     <div class="hero-copy lg:w-[45%] w-full space-y-7 lg:space-y-8 relative z-10">
         <span class="label-tiny text-[#d9692f] flex items-center gap-3" data-intro="0"><span class="w-8 h-px bg-[#d9692f]"></span>{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</span>
         <h1 class="display-hero rh-title text-tertiary" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Rent Your *Perfect* Vehicle"|accent }}</h1>
@@ -217,36 +222,43 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
     </div>
 
     <div class="lg:w-[55%] w-full relative rh-media-col">
-        <span class="rh-blob" aria-hidden="true"></span>
-        <span class="rh-blob b2" aria-hidden="true"></span>
-        <svg class="rh-flight" viewBox="0 0 80 300" aria-hidden="true"><path d="M70 6C10 70 8 200 66 294" fill="none" stroke="#d9692f" stroke-width="2" stroke-dasharray="7 8" stroke-linecap="round"/></svg>
-        <span class="rh-plane material-symbols-outlined" aria-hidden="true">flight</span>
-        <div class="m-hero-media rh-media h-[440px] sm:h-[560px] lg:h-[620px]" data-intro="2" data-intro-kind="media">
-            {% comment %}Slides: vehicles ticked "Hero slides" (photo + name + details, linked) first, then Hero Background Slides 1-3
-            from Settings. With fewer than two, the single hero image (or the default photo) joins so the hero still rotates.{% endcomment %}
+        <svg class="rh-flight" viewBox="0 0 80 300" aria-hidden="true" data-intro="13" data-intro-kind="fade"><path d="M70 6C10 70 8 200 66 294" fill="none" stroke="#d9692f" stroke-width="2" stroke-dasharray="7 8" stroke-linecap="round"/></svg>
+        <span class="rh-plane material-symbols-outlined" aria-hidden="true" data-intro="13" data-intro-kind="fade">flight</span>
+        <div class="m-hero-media rh-media" data-intro="2" data-intro-kind="media">
+            <span class="rh-photo-size" aria-hidden="true"></span><span class="rh-bar-size" aria-hidden="true"></span>
+            {% comment %}Slides: vehicles ticked "Hero slides" first (photo above, details bar below, linked), then Hero Background
+            Slides 1-3 from Settings. With fewer than two, the single hero image (or the default photo) joins so the hero still rotates.{% endcomment %}
             {% with n_bg=hero_bg_images|length n_v=hero_vehicles|length %}
             <div class="hero-slides absolute inset-0" data-hero-slides>
                 {% for v in hero_vehicles %}
-                <div class="hs">
-                    <img src="{{ v.hero_image.url }}" alt="{{ v.brand }} {{ v.name }}" class="w-full h-full object-cover"{% if not forloop.first %} loading="lazy"{% endif %}/>
-                    <a href="{% url 'vehicle_detail' v.slug %}" class="hs-cap rh-cap">
-                        <span class="label-tiny text-[#d9692f] block">{{ v.brand }}</span>
-                        <span class="block font-serif font-bold text-2xl sm:text-[34px] text-tertiary leading-[1.05] mt-1.5">{{ v.name }}</span>
-                        <span class="block text-sm text-on-surface-variant mt-2">{% if v.category %}{{ v.category.name }}{% else %}{{ v.get_vehicle_type_display }}{% endif %}{% if v.fuel_type %} • {{ v.get_fuel_type_display }}{% endif %}{% if v.transmission %} • {{ v.get_transmission_display }}{% endif %}</span>
-                        {% if v.primary_price_value %}<span class="block text-sm text-on-surface-variant mt-1"><b class="text-on-surface">{{ v.primary_price_value|inr }}</b>/{{ v.primary_price_label }} <span class="material-symbols-outlined text-base align-[-3px] text-[#d9692f]">arrow_forward</span></span>{% endif %}
-                    </a>
-                </div>
+                <a href="{% url 'vehicle_detail' v.slug %}" class="hs">
+                    <img class="rh-photo" src="{{ v.hero_image.url }}" alt="{{ v.brand }} {{ v.name }}"{% if not forloop.first %} loading="lazy"{% endif %}/>
+                    <span class="rh-bar">
+                        <span class="min-w-0">
+                            <span class="label-tiny text-[#d9692f] block">{{ v.brand }}{% if v.category %} · {{ v.category.name }}{% endif %}</span>
+                            <span class="block font-serif font-bold text-xl sm:text-[26px] text-tertiary leading-tight mt-1 truncate">{{ v.name }}</span>
+                            <span class="block text-xs sm:text-sm text-on-surface-variant mt-0.5 truncate">{% if v.fuel_type %}{{ v.get_fuel_type_display }}{% endif %}{% if v.transmission %} • {{ v.get_transmission_display }}{% endif %}{% if v.seating_capacity %} • {{ v.seating_capacity }} seats{% endif %}</span>
+                        </span>
+                        {% if v.primary_price_value %}<span class="text-right shrink-0"><b class="block font-serif text-xl sm:text-2xl text-tertiary">{{ v.primary_price_value|inr }}</b><span class="label-tiny text-outline">per {{ v.primary_price_label }}</span></span>{% endif %}
+                        <span class="rh-go-sm" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></span>
+                    </span>
+                </a>
                 {% endfor %}
                 {% for url in hero_bg_images %}
-                <div class="hs"><img src="{{ url }}" alt="" class="w-full h-full object-cover"{% if n_v or not forloop.first %} loading="lazy"{% endif %}/></div>
+                <a href="{% url 'vehicle_list' %}" class="hs">
+                    <img class="rh-photo" src="{{ url }}" alt=""{% if n_v or not forloop.first %} loading="lazy"{% endif %}/>
+                    <span class="rh-bar"><span class="min-w-0"><span class="label-tiny text-[#d9692f] block">{{ config.hero_subtitle|default:"Premium vehicle rental" }}</span><span class="block font-serif font-bold text-xl sm:text-[26px] text-tertiary leading-tight mt-1">Explore the fleet</span></span>{% if starting_price %}<span class="text-right shrink-0"><span class="label-tiny text-outline block">From</span><b class="font-serif text-xl sm:text-2xl text-tertiary">{{ starting_price|inr }}</b><span class="text-xs text-outline">/day</span></span>{% endif %}<span class="rh-go-sm" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></span></span>
+                </a>
                 {% endfor %}
                 {% if n_v|add:n_bg < 2 %}
-                <div class="hs">{% if config.hero_image %}<img src="{{ config.hero_image.url }}" alt="" class="w-full h-full object-cover"{% if n_v|add:n_bg %} loading="lazy"{% endif %}/>{% else %}<img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="An SUV beside a Kerala backwater at sunset" class="w-full h-full object-cover"{% if n_v|add:n_bg %} loading="lazy"{% endif %}/>{% endif %}</div>
+                <a href="{% url 'vehicle_list' %}" class="hs">
+                    <img class="rh-photo" src="{% if config.hero_image %}{{ config.hero_image.url }}{% else %}{% static 'themes/img/thar-backwater.jpg' %}{% endif %}" alt=""{% if n_v|add:n_bg %} loading="lazy"{% endif %}/>
+                    <span class="rh-bar"><span class="min-w-0"><span class="label-tiny text-[#d9692f] block">{{ config.hero_subtitle|default:"Premium vehicle rental" }}</span><span class="block font-serif font-bold text-xl sm:text-[26px] text-tertiary leading-tight mt-1">Explore the fleet</span></span>{% if starting_price %}<span class="text-right shrink-0"><span class="label-tiny text-outline block">From</span><b class="font-serif text-xl sm:text-2xl text-tertiary">{{ starting_price|inr }}</b><span class="text-xs text-outline">/day</span></span>{% endif %}<span class="rh-go-sm" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></span></span>
+                </a>
                 {% endif %}
             </div>
             {% endwith %}
-            <div class="absolute inset-0 bg-gradient-to-t from-[#0f2e2c]/35 via-transparent to-transparent pointer-events-none"></div>
-            <div class="hs-dots absolute left-6 bottom-6 z-10 flex gap-2" aria-hidden="true"></div>
+            <div class="hs-dots absolute left-5 z-10 flex gap-2" aria-hidden="true"></div>
         </div>
 
         <!-- postcards stacked down the right edge (decorative) -->
@@ -257,7 +269,7 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
         </div>
 
         {% if testimonials or config.total_happy_customers %}
-        <a href="#reviews" class="rh-trust">
+        <a href="#reviews" class="rh-trust" data-intro="15" data-intro-kind="pop">
             {% if testimonials %}<span class="rh-faces">{% for t in testimonials|slice:":3" %}{% if t.photo %}<img src="{{ t.photo.url }}" alt=""/>{% else %}<span>{{ t.name|slice:":1"|upper }}</span>{% endif %}{% endfor %}</span>{% endif %}
             <span class="leading-tight">Trusted by<br/>{% if config.total_happy_customers %}<b>{{ config.total_happy_customers }}+</b> {% endif %}Happy Customers</span>
             <span class="rh-go"><span class="material-symbols-outlined">arrow_forward</span></span>
@@ -636,7 +648,10 @@ document.addEventListener("motion:ready", ({ detail: { G, ST } }) => {
   G.to(".hero-copy", { yPercent: -14, opacity: .25, ease: "none", scrollTrigger: { trigger: "#hero", start: "center top+=40%", end: "bottom top", scrub: true } });
 
   /* tickets flip over like boarding passes being handed out */
-  if (document.querySelector("#tickets .tk"))
+  if (document.querySelector("#tickets .tk") && matchMedia("(max-width: 767px)").matches)
+    G.utils.toArray("#tickets .tk").forEach(tk => G.from(tk, { rotationY: -12, y: 36, transformPerspective: 2400, transformOrigin: "0% 50%", opacity: 0, duration: .9, ease: "power3.out", clearProps: "transform",
+      scrollTrigger: { trigger: tk, start: "top 92%", once: true } }));
+  else if (document.querySelector("#tickets .tk"))
     G.from(".tk", { rotationY: -28, rotation: -2, x: -36, y: 40, transformPerspective: 2400, transformOrigin: "0% 50%", opacity: 0, duration: 1.1, ease: "power3.out", clearProps: "transform", stagger: .12,
       scrollTrigger: { trigger: "#tickets", start: "clamp(top 82%)", once: true } });
 

@@ -52,7 +52,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-[60%_1fr] gap-8 lg:gap-12 items-start">
         <!-- Left: Gallery -->
         <div x-data="{ activeImage: 0 }">
-            <div class="relative aspect-[4/3] overflow-hidden rounded-3xl mb-4 bg-surface-container-high">
+            <div class="relative aspect-[16/10] overflow-hidden rounded-3xl mb-4 bg-surface-container-high">
                 {% if images %}
                     {% for img in images %}
                     <img x-show="activeImage === {{ forloop.counter0 }}" src="{{ img.image.url }}" alt="{{ vehicle.name }}" class="w-full h-full object-cover" x-transition/>

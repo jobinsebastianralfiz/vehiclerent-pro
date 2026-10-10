@@ -288,6 +288,12 @@
     G.utils.toArray("[data-tickets]").forEach(grid => {
       const tks = grid.querySelectorAll(".tk");
       if (!tks.length) return;
+      if (matchMedia("(max-width: 767px)").matches) {
+        /* one column: each ticket flips in as it arrives, gently, so none sits half-turned past the screen edge */
+        tks.forEach(tk => G.from(tk, { rotationY: -12, y: 36, transformPerspective: 2400, transformOrigin: "0% 50%", opacity: 0, duration: .9, ease: "power3.out", clearProps: "transform",
+          scrollTrigger: { trigger: tk, start: "top 92%", once: true } }));
+        return;
+      }
       G.from(tks, { rotationY: -28, rotation: -2, x: -36, y: 40, transformPerspective: 2400, transformOrigin: "0% 50%", opacity: 0, duration: 1.1, ease: "power3.out", clearProps: "transform", stagger: .1,
         scrollTrigger: { trigger: grid, start: "clamp(top 85%)", once: true } });
     });

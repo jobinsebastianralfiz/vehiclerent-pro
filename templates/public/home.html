@@ -8,7 +8,7 @@
 <section class="px-4 sm:px-12 max-w-screen-2xl mx-auto py-8 lg:py-16 flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
     <div class="lg:w-1/2 space-y-8 lg:space-y-12">
         <span class="label-tiny text-primary-container block">{{ config.hero_subtitle|default:"DRIVE IN STYLE · KERALA & BEYOND" }}</span>
-        <h1 class="display-hero text-5xl sm:text-7xl lg:text-[96px] text-primary leading-[0.95]">{{ config.hero_title|default:"Your journey, curated." }}</h1>
+        <h1 class="display-hero text-5xl sm:text-7xl lg:text-[96px] text-primary leading-[0.95]">{{ config.hero_title|default:"Your journey, curated."|accent:"text-secondary" }}</h1>
         <p class="text-body-lg text-lg text-on-surface-variant max-w-lg leading-relaxed">{{ config.hero_description|default:"From wedding-day Rolls Royces to weekend self-drive hatchbacks — one team, every road across Kerala." }}</p>
         <div class="flex flex-wrap gap-4 sm:gap-6">
             <a href="{% url 'vehicle_list' %}" class="bg-primary-container text-on-primary px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold hover:opacity-90 transition-all">

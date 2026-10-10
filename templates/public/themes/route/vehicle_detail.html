@@ -56,7 +56,7 @@ then a road down the page through specs, the story, what's on board and similar 
         <!-- ─── Gallery: a postcard ─── -->
         <div x-data="{ active: 0 }" class="min-w-0" data-intro="2" data-intro-kind="fade">
             <div class="pc !pb-12 sm:!p-4 sm:!pb-14 rotate-[-1.2deg]" data-no-parallax>
-                <div class="relative aspect-[4/3] overflow-hidden rounded-[3px] bg-surface-container">
+                <div class="relative aspect-[16/10] overflow-hidden rounded-[3px] bg-surface-container">
                     {% if images %}
                         {% for img in images %}
                         <img x-show="active === {{ forloop.counter0 }}" {% if not forloop.first %}x-cloak{% endif %} src="{{ img.image.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}{% if images|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-cover !aspect-auto" x-transition.opacity.duration.500ms/>
@@ -85,7 +85,7 @@ then a road down the page through specs, the story, what's on board and similar 
             <div class="flex gap-3 sm:gap-4 mt-8 overflow-x-auto no-scrollbar pb-3 pt-1 px-1" role="tablist" aria-label="Photos">
                 {% for img in images %}
                 <button type="button" role="tab" x-on:click="active = {{ forloop.counter0 }}" :aria-selected="(active === {{ forloop.counter0 }}).toString()" class="shrink-0 w-24 sm:w-28 bg-[#fffaf0] p-1.5 pb-3 rounded shadow-md transition-all duration-300" :class="active === {{ forloop.counter0 }} ? 'ring-2 ring-[#e39b3c] -translate-y-1 rotate-0' : 'opacity-70 hover:opacity-100 {% cycle "rotate-[-3deg]" "rotate-[2deg]" "rotate-[-1deg]" "rotate-[3deg]" %}'" aria-label="Show photo {{ forloop.counter }}">
-                    <img src="{{ img.image.url }}" alt="" class="w-full aspect-[4/3] object-cover rounded-sm"/>
+                    <img src="{{ img.image.url }}" alt="" class="w-full aspect-[16/10] object-cover rounded-sm"/>
                 </button>
                 {% endfor %}
             </div>
