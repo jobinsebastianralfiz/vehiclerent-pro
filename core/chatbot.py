@@ -23,14 +23,24 @@ from vehicles.models import BookingAddon, City, Vehicle, VehicleCategory
 
 BODY_TYPES = {
     "suv": "suv", "jeep": "suv", "crossover": "suv", "off-road": "suv", "offroad": "suv",
-    "sedan": "car", "saloon": "car",
-    "hatchback": "car", "hatch": "car", "compact": "car",
-    "van": "van", "minivan": "van", "muv": "van",
+    "sedan": "sedan", "saloon": "sedan",
+    "hatchback": "hatchback", "hatch": "hatchback", "compact": "hatchback",
+    "muv": "muv", "mpv": "muv", "7 seater": "muv", "7-seater": "muv",
+    "luxury car": "luxury",
+    "van": "van", "minivan": "van",
     "bike": "bike", "motorcycle": "bike", "two-wheeler": "bike", "two wheeler": "bike",
     "scooter": "scooter",
     "truck": "truck", "pickup": "truck",
     "auto": "auto", "rickshaw": "auto",
     "bus": "bus",
+}
+
+# A searched body type also matches older vehicles saved under the broader type
+BODY_MATCHES = {
+    "car": ["car", "hatchback", "sedan", "muv", "luxury"],
+    "sedan": ["sedan", "car"],
+    "hatchback": ["hatchback", "car"],
+    "muv": ["muv", "van", "car"],
 }
 
 FUEL_TYPES = {
@@ -170,7 +180,7 @@ def search(message: str, limit: int = 5) -> dict:
     filters = []
 
     if body:
-        qs = qs.filter(vehicle_type=body)
+        qs = qs.filter(vehicle_type__in=BODY_MATCHES.get(body, [body]))
         filters.append(body.upper())
     if fuel:
         qs = qs.filter(fuel_type=fuel)

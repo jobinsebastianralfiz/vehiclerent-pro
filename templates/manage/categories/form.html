@@ -3,110 +3,110 @@
 {% block page_title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="mb-8">
-    <a href="{% url 'category_list' %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
-        <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Categories
-    </a>
-</div>
+<a href="{% url 'category_list' %}" class="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-[#145c38] mb-4">
+    <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Categories
+</a>
 
-<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
-    <div class="px-8 py-6 border-b border-stone-100">
-        <h2 class="text-xl font-bold">{{ title }}</h2>
-        <p class="text-stone-500 text-xs mt-1">{% if category %}Update category details{% else %}Create a new vehicle category{% endif %}</p>
+<div class="af-card">
+    <div class="af-head">
+        <div>
+            <h1>{{ title }}</h1>
+            <p>{% if category %}Update category details{% else %}Create a new vehicle category{% endif %}</p>
+        </div>
+        <span class="af-note"><span class="material-symbols-outlined">info</span><span>Fields marked with <b class="text-red-600">*</b> are required.</span></span>
     </div>
 
-    <form method="post" class="p-8">
+    <form method="post">
         {% csrf_token %}
         {% if form.errors %}
-        <div class="mb-8 px-4 py-3 rounded-xl bg-red-50 text-red-800 text-sm">{{ form.errors }}</div>
+        <div class="af-errors"><p class="font-semibold mb-1">Please correct the errors below:</p>{{ form.errors }}</div>
         {% endif %}
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
-            <div>
-                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Category Details</p>
-                <p class="text-xs text-stone-400 mt-1">Name, icon, and ordering for this category</p>
+        <div class="af-sec">
+            <div class="af-sec-title">
+                <span class="af-sec-icon"><span class="material-symbols-outlined">category</span></span>
+                <div><h2>Category Details</h2><p>Name, description and ordering for this category.</p></div>
             </div>
-            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="md:col-span-2">
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Category Name *</label>
-                    <input type="text" name="name" value="{{ form.name.value|default:'' }}" required class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. SUVs, Sedans, Bikes"/>
-                </div>
-                <div class="md:col-span-2">
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Description</label>
-                    <textarea name="description" rows="3" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="Brief description of this category...">{{ form.description.value|default:'' }}</textarea>
-                </div>
-                <div class="md:col-span-2" x-data="iconPicker('{{ form.icon.value|default:'' }}')">
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Icon</label>
-                    <input type="hidden" name="icon" x-bind:value="selected"/>
-
-                    <!-- Current selection -->
-                    <div class="flex items-center gap-3 mb-4 p-3 bg-surface-container-low rounded-lg" x-show="selected">
-                        <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center">
-                            <span class="material-symbols-outlined text-2xl text-primary" x-text="selected"></span>
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium" x-text="selected"></p>
-                            <p class="text-xs text-stone-400">Selected icon</p>
-                        </div>
-                    </div>
-
-                    <!-- Search -->
-                    <input type="text" x-model="search" placeholder="Search icons..." class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-2.5 px-4 mb-3"/>
-
-                    <!-- Icon Grid -->
-                    <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 max-h-64 overflow-y-auto p-1">
-                        <template x-for="icon in filtered" :key="icon.name">
-                            <button type="button" x-on:click="selected = icon.name" class="flex flex-col items-center gap-1 p-2.5 rounded-xl border transition-all cursor-pointer" x-bind:class="selected === icon.name ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-stone-100 hover:border-stone-300 hover:bg-stone-50'">
-                                <span class="material-symbols-outlined text-xl" x-bind:class="selected === icon.name ? 'text-primary' : 'text-stone-600'" x-text="icon.name"></span>
-                                <span class="text-[9px] text-stone-400 truncate w-full text-center" x-text="icon.label"></span>
-                            </button>
-                        </template>
-                    </div>
-                    <p class="text-xs text-stone-400 mt-2">Click to select. You can also type a custom <a href="https://fonts.google.com/icons" target="_blank" class="text-primary hover:underline">Material Symbols</a> icon name in the search box and it will be used if no match is found.</p>
+            <div class="af-grid c2">
+                <div>
+                    <label class="af-label" for="f-name">Category Name <span class="req">*</span></label>
+                    <input id="f-name" type="text" name="name" value="{{ form.name.value|default:'' }}" required placeholder="e.g. SUVs, Sedans, Bikes"/>
+                    {% if form.name.errors %}<p class="af-err">{{ form.name.errors|join:" " }}</p>{% endif %}
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Display Order</label>
-                    <input type="number" name="display_order" value="{{ form.display_order.value|default:'0' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
-                    <p class="text-xs text-stone-400 mt-1">Lower numbers appear first</p>
+                    <label class="af-label" for="f-order">Display Order</label>
+                    <input id="f-order" type="number" name="display_order" value="{{ form.display_order.value|default:'0' }}"/>
+                    {% if form.display_order.errors %}<p class="af-err">{{ form.display_order.errors|join:" " }}</p>{% else %}<p class="af-help">Lower numbers appear first.</p>{% endif %}
                 </div>
-                <div class="md:col-span-2">
-                    <label class="flex items-center gap-3 cursor-pointer p-4 bg-surface-container-low rounded-xl">
-                        <input type="checkbox" name="is_active" {% if form.is_active.value %}checked{% endif %} class="rounded border-stone-300 text-primary focus:ring-primary"/>
-                        <div>
-                            <span class="text-sm font-medium">Active</span>
-                            <p class="text-xs text-stone-500">Active categories are visible on the public website</p>
-                        </div>
-                    </label>
+                <div class="span-all">
+                    <label class="af-label" for="f-desc">Description</label>
+                    <textarea id="f-desc" name="description" rows="3" placeholder="Brief description of this category…">{{ form.description.value|default:'' }}</textarea>
+                    {% if form.description.errors %}<p class="af-err">{{ form.description.errors|join:" " }}</p>{% endif %}
+                </div>
+                <label class="af-check span-all">
+                    <input type="checkbox" name="is_active" {% if form.is_active.value %}checked{% endif %}/>
+                    <span><b>Active</b><small>Active categories are visible on the public website.</small></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="af-sec">
+            <div class="af-sec-title">
+                <span class="af-sec-icon"><span class="material-symbols-outlined">interests</span></span>
+                <div><h2>Icon</h2><p>Shown next to the category on the website.</p></div>
+            </div>
+            <div class="af-grid" x-data="iconPicker('{{ form.icon.value|default:'' }}')">
+                <input type="hidden" name="icon" x-bind:value="selected"/>
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-[#f6f5f0]" x-show="selected">
+                    <div class="w-11 h-11 bg-white rounded-xl shadow-sm flex items-center justify-center">
+                        <span class="material-symbols-outlined text-2xl text-[#145c38]" x-text="selected"></span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold" x-text="selected"></p>
+                        <p class="text-xs text-stone-500">Selected icon</p>
+                    </div>
+                </div>
+                <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">search</span></span><input type="text" x-model="search" placeholder="Search icons…"/></div>
+                <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 max-h-64 overflow-y-auto p-1">
+                    <template x-for="icon in filtered" :key="icon.name">
+                        <button type="button" x-on:click="selected = icon.name" class="flex flex-col items-center gap-1 p-2.5 rounded-xl border transition-all cursor-pointer" x-bind:class="selected === icon.name ? 'border-[#145c38] bg-[#f4faf6] ring-1 ring-[#145c38]' : 'border-stone-100 hover:border-stone-300 hover:bg-stone-50'">
+                            <span class="material-symbols-outlined text-xl" x-bind:class="selected === icon.name ? 'text-[#145c38]' : 'text-stone-600'" x-text="icon.name"></span>
+                            <span class="text-[9px] text-stone-400 truncate w-full text-center" x-text="icon.label"></span>
+                        </button>
+                    </template>
+                </div>
+                <p class="af-help !mt-0">Click to select. You can also type a custom <a href="https://fonts.google.com/icons" target="_blank" class="text-[#145c38] hover:underline">Material Symbols</a> icon name in the search box and it will be used if no match is found.</p>
+                {% if form.icon.errors %}<p class="af-err">{{ form.icon.errors|join:" " }}</p>{% endif %}
+            </div>
+        </div>
+
+        <div class="af-sec">
+            <div class="af-sec-title">
+                <span class="af-sec-icon"><span class="material-symbols-outlined">travel_explore</span></span>
+                <div><h2>SEO</h2><p>Search-engine title, description and keywords for the category page.</p></div>
+            </div>
+            <div class="af-grid">
+                <div>
+                    <label class="af-label" for="f-mt">Meta Title</label>
+                    <input id="f-mt" type="text" name="meta_title" value="{{ form.meta_title.value|default:'' }}" maxlength="200" placeholder="e.g. SUVs for Rent in Kerala"/>
+                    {% if form.meta_title.errors %}<p class="af-err">{{ form.meta_title.errors|join:" " }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="af-label" for="f-md">Meta Description</label>
+                    <textarea id="f-md" name="meta_description" rows="2" maxlength="300">{{ form.meta_description.value|default:'' }}</textarea>
+                    {% if form.meta_description.errors %}<p class="af-err">{{ form.meta_description.errors|join:" " }}</p>{% else %}<p class="af-help">150–160 characters works best.</p>{% endif %}
+                </div>
+                <div>
+                    <label class="af-label" for="f-mk">Meta Keywords</label>
+                    <input id="f-mk" type="text" name="meta_keywords" value="{{ form.meta_keywords.value|default:'' }}" maxlength="300" placeholder="suv rental Kerala, jeep rental, off-road car hire"/>
+                    {% if form.meta_keywords.errors %}<p class="af-err">{{ form.meta_keywords.errors|join:" " }}</p>{% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- SEO -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 pt-8 border-t border-stone-100">
-            <div>
-                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">SEO</p>
-                <p class="text-xs text-stone-400 mt-1">Search-engine title, description, keywords for the category landing page.</p>
-            </div>
-            <div class="lg:col-span-2 space-y-6">
-                <div>
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Meta Title</label>
-                    <input type="text" name="meta_title" value="{{ form.meta_title.value|default:'' }}" maxlength="200" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. SUVs for Rent in Kerala"/>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Meta Description</label>
-                    <textarea name="meta_description" rows="2" maxlength="300" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">{{ form.meta_description.value|default:'' }}</textarea>
-                    <p class="text-xs text-stone-400 mt-1">150–160 chars.</p>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Meta Keywords</label>
-                    <input type="text" name="meta_keywords" value="{{ form.meta_keywords.value|default:'' }}" maxlength="300" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="suv rental Kerala, jeep rental, off-road car hire"/>
-                </div>
-            </div>
-        </div>
-
-        <div class="flex justify-end gap-4 pt-8 border-t border-stone-100">
-            <a href="{% url 'category_list' %}" class="px-6 py-3 bg-stone-100 text-stone-700 rounded-full font-medium hover:bg-stone-200 transition-colors">Cancel</a>
-            <button type="submit" class="px-8 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors">Save Category</button>
+        <div class="af-actions">
+            <a href="{% url 'category_list' %}" class="af-btn ghost">Cancel</a>
+            <button type="submit" class="af-btn primary"><span class="material-symbols-outlined">check</span>Save Category</button>
         </div>
     </form>
 </div>

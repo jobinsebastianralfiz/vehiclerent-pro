@@ -3,152 +3,137 @@
 {% block page_title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="mb-8">
-    <a href="{% url 'customer_list' %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
-        <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Customers
-    </a>
-</div>
+<a href="{% url 'customer_list' %}" class="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-[#145c38] mb-4">
+    <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Customers
+</a>
 
-<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
-    <div class="px-8 py-6 border-b border-stone-100">
-        <h2 class="text-xl font-bold">{{ title }}</h2>
-        <p class="text-stone-500 text-xs mt-1">{% if customer %}Update customer information{% else %}Add a new customer to the system{% endif %}</p>
+<div class="af-card">
+    <div class="af-head">
+        <div>
+            <h1>{{ title }}</h1>
+            <p>{% if customer %}Update customer information{% else %}Add a new customer to the system{% endif %}</p>
+        </div>
+        <span class="af-note"><span class="material-symbols-outlined">info</span><span>Fields marked with <b class="text-red-600">*</b> are required.</span></span>
     </div>
 
-    <form method="post" enctype="multipart/form-data" class="p-8">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-
         {% if form.errors %}
-        <div class="mb-8 px-4 py-3 rounded-xl bg-red-50 text-red-800 text-sm">
-            <p class="font-medium mb-2">Please correct the errors below:</p>
-            {{ form.errors }}
-        </div>
+        <div class="af-errors"><p class="font-semibold mb-1">Please correct the errors below:</p>{{ form.errors }}</div>
         {% endif %}
 
-        <!-- Personal Information -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12">
-            <div>
-                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Personal Info</p>
-                <p class="text-xs text-stone-400 mt-1">Basic contact details for the customer</p>
+        <div class="af-sec">
+            <div class="af-sec-title">
+                <span class="af-sec-icon"><span class="material-symbols-outlined">person</span></span>
+                <div><h2>Personal Info</h2><p>Basic contact details for the customer.</p></div>
             </div>
-            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="md:col-span-2">
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Full Name *</label>
-                    <input type="text" name="full_name" value="{{ form.full_name.value|default:'' }}" required class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. Rahul Sharma"/>
+            <div class="af-grid c2">
+                <div class="span-all">
+                    <label class="af-label" for="f-name">Full Name <span class="req">*</span></label>
+                    <input id="f-name" type="text" name="full_name" value="{{ form.full_name.value|default:'' }}" required placeholder="e.g. Rahul Sharma"/>
+                    {% if form.full_name.errors %}<p class="af-err">{{ form.full_name.errors|join:" " }}</p>{% endif %}
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Phone Number *</label>
-                    <input type="tel" name="phone" value="{{ form.phone.value|default:'' }}" required class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="+91 98765 43210"/>
+                    <label class="af-label" for="f-phone">Phone Number <span class="req">*</span></label>
+                    <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">call</span></span><input id="f-phone" type="tel" name="phone" value="{{ form.phone.value|default:'' }}" required placeholder="+91 98765 43210"/></div>
+                    {% if form.phone.errors %}<p class="af-err">{{ form.phone.errors|join:" " }}</p>{% endif %}
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Email</label>
-                    <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="customer@example.com"/>
+                    <label class="af-label" for="f-email">Email</label>
+                    <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">mail</span></span><input id="f-email" type="email" name="email" value="{{ form.email.value|default:'' }}" placeholder="customer@example.com"/></div>
+                    {% if form.email.errors %}<p class="af-err">{{ form.email.errors|join:" " }}</p>{% endif %}
                 </div>
-                <div class="md:col-span-2">
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Address</label>
-                    <textarea name="address" rows="3" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="Full address...">{{ form.address.value|default:'' }}</textarea>
+                <div class="span-all">
+                    <label class="af-label" for="f-address">Address</label>
+                    <textarea id="f-address" name="address" rows="3" placeholder="Full address…">{{ form.address.value|default:'' }}</textarea>
+                    {% if form.address.errors %}<p class="af-err">{{ form.address.errors|join:" " }}</p>{% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Identity Verification -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
-            <div>
-                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">ID Verification</p>
-                <p class="text-xs text-stone-400 mt-1">Government-issued identification documents</p>
+        <div class="af-sec">
+            <div class="af-sec-title">
+                <span class="af-sec-icon"><span class="material-symbols-outlined">badge</span></span>
+                <div><h2>ID Verification</h2><p>Government-issued identification documents.</p></div>
             </div>
-            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="af-grid c2">
                 <div>
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">ID Proof Type</label>
-                    <select name="id_proof_type" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">
+                    <label class="af-label" for="f-idtype">ID Proof Type</label>
+                    <select id="f-idtype" name="id_proof_type">
                         <option value="">Select type</option>
                         <option value="aadhaar" {% if form.id_proof_type.value == 'aadhaar' %}selected{% endif %}>Aadhaar</option>
                         <option value="driving_license" {% if form.id_proof_type.value == 'driving_license' %}selected{% endif %}>Driving License</option>
                         <option value="passport" {% if form.id_proof_type.value == 'passport' %}selected{% endif %}>Passport</option>
                         <option value="voter_id" {% if form.id_proof_type.value == 'voter_id' %}selected{% endif %}>Voter ID</option>
                     </select>
+                    {% if form.id_proof_type.errors %}<p class="af-err">{{ form.id_proof_type.errors|join:" " }}</p>{% endif %}
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">ID Proof Number</label>
-                    <input type="text" name="id_proof_number" value="{{ form.id_proof_number.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. XXXX XXXX 1234"/>
+                    <label class="af-label" for="f-idnum">ID Proof Number</label>
+                    <input id="f-idnum" type="text" name="id_proof_number" value="{{ form.id_proof_number.value|default:'' }}" placeholder="e.g. XXXX XXXX 1234"/>
+                    {% if form.id_proof_number.errors %}<p class="af-err">{{ form.id_proof_number.errors|join:" " }}</p>{% endif %}
                 </div>
-                <div class="md:col-span-2">
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">ID Proof Image</label>
+                <div class="span-all">
+                    <label class="af-label" for="f-idimg">ID Proof Image</label>
                     {% if customer.id_proof_image %}
-                    <div class="mb-2 flex items-center gap-3">
-                        <span class="material-symbols-outlined text-green-600">check_circle</span>
-                        <span class="text-sm text-stone-600">File uploaded</span>
-                        <a href="{{ customer.id_proof_image.url }}" target="_blank" class="text-primary text-sm hover:underline">View</a>
-                    </div>
+                    <p class="mb-2 flex items-center gap-2 text-sm text-stone-600"><span class="material-symbols-outlined text-[18px] text-[#145c38]">check_circle</span>File uploaded · <a href="{{ customer.id_proof_image.url }}" target="_blank" class="text-[#145c38] font-semibold hover:underline">View</a></p>
                     {% endif %}
-                    <input type="file" name="id_proof_image" accept="image/*,.pdf" class="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200"/>
+                    <input id="f-idimg" type="file" name="id_proof_image" accept="image/*,.pdf" class="block w-full text-sm text-stone-600 rounded-xl border border-dashed border-stone-300 p-2 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#ecf7f0] file:text-[#145c38] hover:file:bg-[#d3eedd]"/>
+                    {% if form.id_proof_image.errors %}<p class="af-err">{{ form.id_proof_image.errors|join:" " }}</p>{% else %}<p class="af-help">Photo or PDF.</p>{% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Driving License -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
-            <div>
-                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Driving License</p>
-                <p class="text-xs text-stone-400 mt-1">License details required for vehicle rental</p>
+        <div class="af-sec">
+            <div class="af-sec-title">
+                <span class="af-sec-icon"><span class="material-symbols-outlined">id_card</span></span>
+                <div><h2>Driving License</h2><p>License details required for vehicle rental.</p></div>
             </div>
-            <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="af-grid c2">
                 <div>
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">License Number</label>
-                    <input type="text" name="license_number" value="{{ form.license_number.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. KL-01-2020-0012345"/>
+                    <label class="af-label" for="f-lic">License Number</label>
+                    <input id="f-lic" type="text" name="license_number" value="{{ form.license_number.value|default:'' }}" placeholder="e.g. KL-01-2020-0012345"/>
+                    {% if form.license_number.errors %}<p class="af-err">{{ form.license_number.errors|join:" " }}</p>{% endif %}
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">License Expiry Date</label>
-                    <input type="date" name="license_expiry" value="{{ form.license_expiry.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
+                    <label class="af-label" for="f-licexp">License Expiry Date</label>
+                    <input id="f-licexp" type="date" name="license_expiry" value="{{ form.license_expiry.value|default:'' }}"/>
+                    {% if form.license_expiry.errors %}<p class="af-err">{{ form.license_expiry.errors|join:" " }}</p>{% endif %}
                 </div>
-                <div class="md:col-span-2">
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">License Image</label>
+                <div class="span-all">
+                    <label class="af-label" for="f-licimg">License Image</label>
                     {% if customer.license_image %}
-                    <div class="mb-2 flex items-center gap-3">
-                        <span class="material-symbols-outlined text-green-600">check_circle</span>
-                        <span class="text-sm text-stone-600">File uploaded</span>
-                        <a href="{{ customer.license_image.url }}" target="_blank" class="text-primary text-sm hover:underline">View</a>
-                    </div>
+                    <p class="mb-2 flex items-center gap-2 text-sm text-stone-600"><span class="material-symbols-outlined text-[18px] text-[#145c38]">check_circle</span>File uploaded · <a href="{{ customer.license_image.url }}" target="_blank" class="text-[#145c38] font-semibold hover:underline">View</a></p>
                     {% endif %}
-                    <input type="file" name="license_image" accept="image/*,.pdf" class="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-stone-100 file:text-stone-700 hover:file:bg-stone-200"/>
+                    <input id="f-licimg" type="file" name="license_image" accept="image/*,.pdf" class="block w-full text-sm text-stone-600 rounded-xl border border-dashed border-stone-300 p-2 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#ecf7f0] file:text-[#145c38] hover:file:bg-[#d3eedd]"/>
+                    {% if form.license_image.errors %}<p class="af-err">{{ form.license_image.errors|join:" " }}</p>{% else %}<p class="af-help">Photo or PDF.</p>{% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Admin Settings -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-12 pt-8 border-t border-stone-100">
-            <div>
-                <p class="text-sm font-extrabold uppercase tracking-widest text-primary">Admin Settings</p>
-                <p class="text-xs text-stone-400 mt-1">Internal notes and status flags</p>
+        <div class="af-sec">
+            <div class="af-sec-title">
+                <span class="af-sec-icon"><span class="material-symbols-outlined">admin_panel_settings</span></span>
+                <div><h2>Admin Settings</h2><p>Internal notes and status flags.</p></div>
             </div>
-            <div class="lg:col-span-2 space-y-6">
+            <div class="af-grid">
                 <div>
-                    <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Admin Notes</label>
-                    <textarea name="notes" rows="3" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="Internal notes about this customer...">{{ form.notes.value|default:'' }}</textarea>
+                    <label class="af-label" for="f-notes">Admin Notes</label>
+                    <textarea id="f-notes" name="notes" rows="3" placeholder="Internal notes about this customer…">{{ form.notes.value|default:'' }}</textarea>
                 </div>
-                <div class="flex items-center gap-3 p-4 bg-red-50/50 rounded-xl">
-                    <input type="checkbox" name="is_blacklisted" {% if form.is_blacklisted.value %}checked{% endif %} class="rounded border-red-300 text-red-600 focus:ring-red-500" id="id_blacklisted"/>
-                    <label for="id_blacklisted" class="cursor-pointer">
-                        <span class="text-sm font-medium text-stone-800">Blacklist this customer</span>
-                        <p class="text-xs text-stone-500 mt-0.5">Blacklisted customers cannot be assigned new vehicle allocations</p>
-                    </label>
-                </div>
+                <label class="af-check">
+                    <input type="checkbox" name="is_blacklisted" id="id_blacklisted" {% if form.is_blacklisted.value %}checked{% endif %}/>
+                    <span><b>Blacklist this customer</b><small>Blacklisted customers cannot be assigned new vehicle allocations.</small></span>
+                </label>
             </div>
         </div>
 
-        <!-- Actions -->
-        <div class="flex justify-between items-center pt-8 border-t border-stone-100">
-            <div>
-                {% if customer %}
-                <a href="{% url 'customer_detail' customer.pk %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
-                    <span class="material-symbols-outlined text-lg">visibility</span> View Customer Profile
-                </a>
-                {% endif %}
-            </div>
-            <div class="flex gap-4">
-                <a href="{% url 'customer_list' %}" class="px-6 py-3 bg-stone-100 text-stone-700 rounded-full font-medium hover:bg-stone-200 transition-colors">Cancel</a>
-                <button type="submit" class="px-8 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors">Save Customer</button>
-            </div>
+        <div class="af-actions">
+            {% if customer %}
+            <a href="{% url 'customer_detail' customer.pk %}" class="mr-auto inline-flex items-center gap-1.5 text-sm font-semibold text-stone-500 hover:text-[#145c38]"><span class="material-symbols-outlined text-lg">visibility</span>View Customer Profile</a>
+            {% endif %}
+            <a href="{% url 'customer_list' %}" class="af-btn ghost">Cancel</a>
+            <button type="submit" class="af-btn primary"><span class="material-symbols-outlined">check</span>Save Customer</button>
         </div>
     </form>
 </div>

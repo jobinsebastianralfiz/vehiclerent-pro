@@ -12,6 +12,7 @@ urlpatterns = [
     path("manage/vehicles/add/", wizard.vehicle_add, name="vehicle_add"),
     path("manage/vehicles/<int:pk>/step/<int:step>/", wizard.vehicle_wizard, name="vehicle_wizard"),
     path("manage/vehicles/<int:pk>/edit/", wizard.vehicle_edit, name="vehicle_edit"),
+    path("manage/vehicles/<int:pk>/gallery/", wizard.vehicle_gallery, name="vehicle_gallery"),
     path("manage/vehicles/<int:pk>/delete/", views.vehicle_delete, name="vehicle_delete"),
     path("manage/vehicles/<int:pk>/images/", views.vehicle_images, name="vehicle_images"),
     path("manage/vehicles/<int:pk>/toggle-status/", views.vehicle_toggle_status, name="vehicle_toggle_status"),

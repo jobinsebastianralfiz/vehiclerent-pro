@@ -7,7 +7,9 @@ straight to that record, so leaving half way never loses finished steps.
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 from django.urls import reverse
 
 from django.utils import timezone
@@ -220,8 +222,56 @@ def _wizard(request, vehicle, step):
         "is_edit": bool(vehicle and not vehicle.is_draft),
         "draft_key": f"vw-{vehicle.pk if vehicle else 'new'}-{step}",
         "post_url": reverse("vehicle_wizard", args=[vehicle.pk, step]) if vehicle else reverse("vehicle_add"),
-        "images": vehicle.images.order_by("display_order") if (vehicle and step == LAST) else [],
+        "images": _gallery_json(vehicle) if (vehicle and step == LAST) else [],
         "catalog": catalog.as_json() if step == 1 else None,
         "colors": catalog.COLORS if step == 1 else None,
         "input_class": _INPUT,
     })
+
+
+GALLERY_MAX_BYTES = 10 * 1024 * 1024
+
+
+def _gallery_json(vehicle):
+    return [{"id": i.pk, "url": i.image.url} for i in vehicle.images.order_by("display_order", "pk")]
+
+
+def _sync_primary(vehicle):
+    """The first gallery photo is the primary one."""
+    first = vehicle.images.order_by("display_order", "pk").first()
+    vehicle.images.exclude(pk=first.pk if first else None).filter(is_primary=True).update(is_primary=False)
+    if first and not first.is_primary:
+        VehicleImage.objects.filter(pk=first.pk).update(is_primary=True)
+
+
+@login_required
+@require_POST
+def vehicle_gallery(request, pk):
+    """Step 6 gallery, saved instantly: op=upload (file), op=delete (id) or op=reorder (ids, in order)."""
+    vehicle = get_object_or_404(Vehicle, pk=pk)
+    op = request.POST.get("op")
+    if op == "upload":
+        f = request.FILES.get("file")
+        if not f:
+            return JsonResponse({"error": "No file received."}, status=400)
+        if f.size > GALLERY_MAX_BYTES:
+            return JsonResponse({"error": f"{f.name} is over 10 MB."}, status=400)
+        try:
+            f = forms.ImageField().clean(f)
+        except forms.ValidationError:
+            return JsonResponse({"error": f"{f.name} isn't a photo we can read."}, status=400)
+        last = vehicle.images.order_by("-display_order").first()
+        VehicleImage.objects.create(vehicle=vehicle, image=f, display_order=(last.display_order + 1) if last else 0)
+    elif op == "delete":
+        img = vehicle.images.filter(pk=request.POST.get("id")).first()
+        if img:
+            img.image.delete(save=False)
+            img.delete()
+    elif op == "reorder":
+        ids = [int(x) for x in request.POST.getlist("ids") if x.isdigit()]
+        for n, img_id in enumerate(ids):
+            vehicle.images.filter(pk=img_id).update(display_order=n)
+    else:
+        return JsonResponse({"error": "Unknown action."}, status=400)
+    _sync_primary(vehicle)
+    return JsonResponse({"images": _gallery_json(vehicle)})

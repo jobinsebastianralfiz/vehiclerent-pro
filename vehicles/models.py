@@ -65,15 +65,19 @@ class VehicleCategory(models.Model):
 
 class Vehicle(models.Model):
     VEHICLE_TYPE_CHOICES = [
+        ("hatchback", "Hatchback"),
+        ("sedan", "Sedan"),
+        ("suv", "SUV"),
+        ("muv", "MUV / MPV"),
+        ("luxury", "Luxury"),
         ("car", "Car"),
+        ("tempo", "Tempo"),
+        ("van", "Van"),
+        ("bus", "Bus"),
         ("bike", "Bike"),
         ("scooter", "Scooter"),
-        ("van", "Van"),
-        ("truck", "Truck"),
-        ("bus", "Bus"),
-        ("suv", "SUV"),
-        ("tempo", "Tempo"),
         ("auto", "Auto"),
+        ("truck", "Truck"),
         ("other", "Other"),
     ]
     FUEL_TYPE_CHOICES = [
@@ -139,7 +143,7 @@ class Vehicle(models.Model):
         help_text="Charge per km after the daily included kilometres are exhausted",
     )
     included_km_per_day = models.PositiveIntegerField(
-        default=200, help_text="Free kilometres included in the daily rate",
+        blank=True, null=True, help_text="Free kilometres included in the daily rate (leave empty if none)",
     )
     wedding_decoration_charge = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True,

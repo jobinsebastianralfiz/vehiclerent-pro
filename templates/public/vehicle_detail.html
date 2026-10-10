@@ -101,7 +101,7 @@
                 </div>
 
                 <p class="text-xs text-on-surface-variant mb-6">
-                    {{ vehicle.included_km_per_day }} km included{% if vehicle.per_km_charge %} · ₹{{ vehicle.per_km_charge }}/km extra{% endif %}{% if vehicle.security_deposit %} · {{ vehicle.security_deposit|inr }} refundable deposit{% endif %}
+                    {% if vehicle.included_km_per_day %}{{ vehicle.included_km_per_day }} km included{% endif %}{% if vehicle.per_km_charge %} · ₹{{ vehicle.per_km_charge }}/km extra{% endif %}{% if vehicle.security_deposit %} · {{ vehicle.security_deposit|inr }} refundable deposit{% endif %}
                 </p>
 
                 <!-- Rental type segmented toggle -->

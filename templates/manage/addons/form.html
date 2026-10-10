@@ -3,64 +3,83 @@
 {% block page_title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="mb-8">
-    <a href="{% url 'addon_list' %}" class="text-sm text-stone-500 hover:text-primary flex items-center gap-1">
-        <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Add-ons
-    </a>
-</div>
+<a href="{% url 'addon_list' %}" class="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-[#145c38] mb-4">
+    <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Add-ons
+</a>
 
-<div class="bg-white rounded-2xl border border-stone-100">
-    <div class="px-8 py-6 border-b border-stone-100">
-        <h2 class="text-xl font-bold">{{ title }}</h2>
+<div class="af-card">
+    <div class="af-head">
+        <div>
+            <h1>{{ title }}</h1>
+            <p>Optional extras customers can add to a booking.</p>
+        </div>
+        <span class="af-note"><span class="material-symbols-outlined">info</span><span>Fields marked with <b class="text-red-600">*</b> are required.</span></span>
     </div>
 
-    <form method="post" class="p-8">
+    <form method="post">
         {% csrf_token %}
-        {% if form.errors %}<div class="mb-6 px-4 py-3 rounded-xl bg-red-50 text-red-800 text-sm">{{ form.errors }}</div>{% endif %}
+        {% if form.errors %}
+        <div class="af-errors"><p class="font-semibold mb-1">Please correct the errors below:</p>{{ form.errors }}</div>
+        {% endif %}
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="md:col-span-2">
-                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Add-on Name *</label>
-                <input type="text" name="name" value="{{ form.name.value|default:'' }}" required class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. Baby Seat, GPS Device"/>
+        <div class="af-sec">
+            <div class="af-sec-title">
+                <span class="af-sec-icon"><span class="material-symbols-outlined">add_circle</span></span>
+                <div><h2>Details</h2><p>What the add-on is and how it shows.</p></div>
             </div>
-            <div class="md:col-span-2">
-                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Description</label>
-                <textarea name="description" rows="2" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">{{ form.description.value|default:'' }}</textarea>
+            <div class="af-grid c2">
+                <div class="span-all">
+                    <label class="af-label" for="f-name">Add-on Name <span class="req">*</span></label>
+                    <input id="f-name" type="text" name="name" value="{{ form.name.value|default:'' }}" required placeholder="e.g. Baby Seat, GPS Device"/>
+                    {% if form.name.errors %}<p class="af-err">{{ form.name.errors|join:" " }}</p>{% endif %}
+                </div>
+                <div class="span-all">
+                    <label class="af-label" for="f-desc">Description</label>
+                    <textarea id="f-desc" name="description" rows="2">{{ form.description.value|default:'' }}</textarea>
+                    {% if form.description.errors %}<p class="af-err">{{ form.description.errors|join:" " }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="af-label" for="f-icon">Material Icon Name</label>
+                    <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">{{ form.icon.value|default:'interests' }}</span></span><input id="f-icon" type="text" name="icon" value="{{ form.icon.value|default:'' }}" placeholder="e.g. child_friendly"/></div>
+                    {% if form.icon.errors %}<p class="af-err">{{ form.icon.errors|join:" " }}</p>{% else %}<p class="af-help"><a href="https://fonts.google.com/icons" target="_blank" class="text-[#145c38] font-semibold hover:underline">Browse icons</a></p>{% endif %}
+                </div>
+                <div>
+                    <label class="af-label" for="f-order">Display Order</label>
+                    <input id="f-order" type="number" name="display_order" value="{{ form.display_order.value|default:'0' }}"/>
+                    {% if form.display_order.errors %}<p class="af-err">{{ form.display_order.errors|join:" " }}</p>{% endif %}
+                </div>
             </div>
-            <div>
-                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Material Icon Name</label>
-                <input type="text" name="icon" value="{{ form.icon.value|default:'' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4" placeholder="e.g. child_friendly"/>
-                <p class="text-xs text-stone-400 mt-1"><a href="https://fonts.google.com/icons" target="_blank" class="text-primary hover:underline">Browse icons</a></p>
+        </div>
+
+        <div class="af-sec">
+            <div class="af-sec-title">
+                <span class="af-sec-icon"><span class="material-symbols-outlined">payments</span></span>
+                <div><h2>Pricing &amp; Visibility</h2><p>What it costs and whether it's offered.</p></div>
             </div>
-            <div>
-                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Price (₹) *</label>
-                <input type="number" step="0.01" name="price" value="{{ form.price.value|default:'' }}" required class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Pricing Unit</label>
-                <select name="pricing_unit" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4">
-                    <option value="per_day" {% if form.pricing_unit.value == 'per_day' %}selected{% endif %}>Per Day</option>
-                    <option value="per_trip" {% if form.pricing_unit.value == 'per_trip' %}selected{% endif %}>Per Trip</option>
-                </select>
-            </div>
-            <div>
-                <label class="text-[10px] font-bold text-stone-500 uppercase tracking-wider block mb-2">Display Order</label>
-                <input type="number" name="display_order" value="{{ form.display_order.value|default:'0' }}" class="w-full border-stone-200 rounded-lg text-sm focus:border-blue-500 focus:ring-0 py-3 px-4"/>
-            </div>
-            <div class="md:col-span-2">
-                <label class="flex items-center gap-3 cursor-pointer p-4 bg-stone-50 rounded-xl">
-                    <input type="checkbox" name="is_active" {% if form.is_active.value or not form.instance.pk %}checked{% endif %} class="rounded border-stone-300 text-primary focus:ring-primary"/>
-                    <div>
-                        <span class="text-sm font-medium">Active</span>
-                        <p class="text-xs text-stone-500">Active add-ons appear in booking forms</p>
-                    </div>
+            <div class="af-grid c2">
+                <div>
+                    <label class="af-label" for="f-price">Price <span class="req">*</span></label>
+                    <div class="af-affix"><span>₹</span><input id="f-price" type="number" step="0.01" name="price" value="{{ form.price.value|default:'' }}" required/></div>
+                    {% if form.price.errors %}<p class="af-err">{{ form.price.errors|join:" " }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="af-label" for="f-unit">Pricing Unit</label>
+                    <select id="f-unit" name="pricing_unit">
+                        <option value="per_day" {% if form.pricing_unit.value == 'per_day' %}selected{% endif %}>Per Day</option>
+                        <option value="per_trip" {% if form.pricing_unit.value == 'per_trip' %}selected{% endif %}>Per Trip</option>
+                    </select>
+                    {% if form.pricing_unit.errors %}<p class="af-err">{{ form.pricing_unit.errors|join:" " }}</p>{% endif %}
+                </div>
+                <label class="af-check span-all">
+                    <input type="checkbox" name="is_active" {% if form.is_active.value or not form.instance.pk %}checked{% endif %}/>
+                    <span><b>Active</b><small>Active add-ons appear in booking forms.</small></span>
                 </label>
             </div>
         </div>
 
-        <div class="flex justify-end gap-4 pt-8 mt-8 border-t border-stone-100">
-            <a href="{% url 'addon_list' %}" class="px-6 py-3 bg-stone-100 text-stone-700 rounded-full font-medium hover:bg-stone-200">Cancel</a>
-            <button type="submit" class="px-8 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700">Save Add-on</button>
+        <div class="af-actions">
+            <a href="{% url 'addon_list' %}" class="af-btn ghost">Cancel</a>
+            <button type="submit" class="af-btn primary"><span class="material-symbols-outlined">check</span>Save Add-on</button>
         </div>
     </form>
 </div>

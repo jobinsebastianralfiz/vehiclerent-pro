@@ -142,12 +142,12 @@
         {% elif step == 2 %}
         <fieldset>
             <legend class="block text-sm font-semibold text-stone-700 mb-2">Vehicle type <span class="text-red-500">*</span></legend>
-            <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-10 gap-2">
+            <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-2">
                 {% for r in form.vehicle_type %}
                 <label class="cursor-pointer">
                     <input type="radio" name="{{ r.data.name }}" value="{{ r.data.value }}" class="peer sr-only" {% if r.data.selected %}checked{% endif %}/>
                     <span class="flex flex-col items-center gap-1.5 rounded-2xl ring-1 ring-stone-200 py-3.5 px-1 text-xs font-semibold text-stone-600 transition peer-checked:ring-2 peer-checked:ring-[#145c38] peer-checked:bg-[#ecf7f0] peer-checked:text-[#145c38] hover:bg-stone-50 peer-focus-visible:ring-2 peer-focus-visible:ring-[#145c38]/50">
-                        <span class="material-symbols-outlined text-[26px]">{% if r.data.value == 'car' %}directions_car{% elif r.data.value == 'suv' %}airport_shuttle{% elif r.data.value == 'bike' %}two_wheeler{% elif r.data.value == 'scooter' %}moped{% elif r.data.value == 'van' %}airport_shuttle{% elif r.data.value == 'truck' %}local_shipping{% elif r.data.value == 'bus' %}directions_bus{% elif r.data.value == 'tempo' %}rv_hookup{% elif r.data.value == 'auto' %}electric_rickshaw{% else %}more_horiz{% endif %}</span>
+                        <span class="material-symbols-outlined text-[26px]">{% if r.data.value == 'car' %}directions_car{% elif r.data.value == 'hatchback' %}time_to_leave{% elif r.data.value == 'sedan' %}local_taxi{% elif r.data.value == 'muv' %}family_restroom{% elif r.data.value == 'luxury' %}diamond{% elif r.data.value == 'suv' %}terrain{% elif r.data.value == 'bike' %}two_wheeler{% elif r.data.value == 'scooter' %}moped{% elif r.data.value == 'van' %}airport_shuttle{% elif r.data.value == 'truck' %}local_shipping{% elif r.data.value == 'bus' %}directions_bus{% elif r.data.value == 'tempo' %}rv_hookup{% elif r.data.value == 'auto' %}electric_rickshaw{% else %}more_horiz{% endif %}</span>
                         {{ r.choice_label }}
                     </span>
                 </label>
@@ -161,16 +161,18 @@
         </div>
 
         {% elif step == 3 %}
-        <div class="grid lg:grid-cols-2 gap-6" x-data="{ fuel: '{{ form.fuel_type.value|default:'' }}' }">
-            <div class="grid sm:grid-cols-2 gap-4 sm:gap-5 content-start" x-on:change="if ($event.target.name === 'fuel_type') fuel = $event.target.value">
+        {% comment %}The EV / Hybrid box only shows for electric or hybrid; engine and mileage hide for pure electric.{% endcomment %}
+        {% with fv=form.fuel_type.value|default:'' %}
+        <div class="grid lg:grid-cols-2 gap-6" x-data="{ fuel: '{{ fv }}', get ev() { return ['electric','hybrid'].includes(this.fuel) } }">
+            <div class="grid sm:grid-cols-2 gap-4 sm:gap-5 content-start" :class="ev ? '' : 'lg:col-span-2 lg:grid-cols-4'" x-on:change="if ($event.target.name === 'fuel_type') fuel = $event.target.value">
                 {% include "manage/vehicles/_wf.html" with f=form.fuel_type %}
                 {% include "manage/vehicles/_wf.html" with f=form.transmission %}
-                {% include "manage/vehicles/_wf.html" with f=form.engine_cc post="cc" %}
-                {% include "manage/vehicles/_wf.html" with f=form.mileage_kmpl post="km/L" %}
+                <div x-show="fuel !== 'electric'"{% if fv == 'electric' %} x-cloak{% endif %}>{% include "manage/vehicles/_wf.html" with f=form.engine_cc post="cc" %}</div>
+                <div x-show="fuel !== 'electric'"{% if fv == 'electric' %} x-cloak{% endif %}>{% include "manage/vehicles/_wf.html" with f=form.mileage_kmpl post="km/L" %}</div>
             </div>
-            <div class="rounded-2xl ring-1 transition-colors p-4 sm:p-5" :class="['electric','hybrid'].includes(fuel) ? 'ring-[#145c38]/30 bg-[#f4faf6]' : 'ring-stone-200 bg-stone-50/60'">
-                <p class="font-bold text-[#145c38] flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">bolt</span>EV / Hybrid specifications</p>
-                <p class="text-xs text-stone-500 mb-4" x-text="['electric','hybrid'].includes(fuel) ? 'Fill these in for this electric or hybrid vehicle.' : 'Only needed for electric or hybrid vehicles.'">Only needed for electric or hybrid vehicles.</p>
+            <div x-show="ev" x-transition.opacity{% if fv != 'electric' and fv != 'hybrid' %} x-cloak{% endif %} class="rounded-2xl ring-1 ring-[#145c38]/30 bg-[#f4faf6] p-4 sm:p-5">
+                <p class="font-bold text-[#145c38] flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">bolt</span><span x-text="fuel === 'hybrid' ? 'Hybrid specifications' : 'EV specifications'">EV / Hybrid specifications</span></p>
+                <p class="text-xs text-stone-500 mb-4">Battery, range and charging details.</p>
                 <div class="grid sm:grid-cols-2 gap-4">
                     {% include "manage/vehicles/_wf.html" with f=form.battery_capacity_kwh post="kWh" %}
                     {% include "manage/vehicles/_wf.html" with f=form.range_km post="km" %}
@@ -180,6 +182,7 @@
                 <label class="mt-4 inline-flex items-center gap-2.5 text-sm font-semibold text-stone-700">{{ form.fast_charging }} Fast charging support</label>
             </div>
         </div>
+        {% endwith %}
 
         {% elif step == 4 %}
         <div class="grid sm:grid-cols-2 gap-4 sm:gap-5">
@@ -235,26 +238,48 @@
         {% elif step == 6 %}
         <div class="grid lg:grid-cols-[1fr_360px] gap-6">
             <div class="space-y-6">
-                <div x-data="{ previews: [] }">
-                    <p class="block text-sm font-semibold text-stone-700 mb-2">Gallery images</p>
-                    <label class="block cursor-pointer rounded-2xl border-2 border-dashed border-stone-200 hover:border-[#145c38]/50 p-6 text-center">
-                        <span class="material-symbols-outlined text-4xl text-stone-400">cloud_upload</span>
-                        <span class="block mt-1 text-sm font-semibold text-stone-700">Upload more photos</span>
-                        <span class="block text-xs text-stone-500">PNG or JPG, up to 10 MB each. They're added when you save this step.</span>
-                        <input type="file" name="gallery_images" accept="image/*" multiple class="sr-only" data-no-draft x-on:change="previews = [...$event.target.files].map(f => URL.createObjectURL(f))"/>
-                    </label>
-                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-2.5 mt-3">
-                        {% for img in images %}
-                        <label class="relative block rounded-xl overflow-hidden ring-1 ring-stone-200 aspect-[4/3] group cursor-pointer" title="Tick to remove when you save">
-                            <img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover"/>
-                            <input type="checkbox" name="delete_image" value="{{ img.pk }}" class="peer sr-only" data-no-draft/>
-                            <span class="absolute inset-0 bg-red-900/0 peer-checked:bg-red-900/55 transition-colors"></span>
-                            <span class="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-white/90 text-red-600 grid place-items-center shadow peer-checked:bg-red-600 peer-checked:text-white"><span class="material-symbols-outlined text-[16px]">close</span></span>
-                            <span class="absolute bottom-1.5 left-1.5 hidden peer-checked:block text-[11px] font-bold text-white">Will be removed</span>
-                        </label>
-                        {% endfor %}
-                        <template x-for="p in previews" :key="p"><div class="relative rounded-xl overflow-hidden ring-2 ring-[#145c38]/40 aspect-[4/3]"><img :src="p" alt="" class="w-full h-full object-cover"/><span class="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-full bg-[#145c38] text-white text-[10px] font-bold">New</span></div></template>
+                {{ images|json_script:"gallery-data" }}
+                <div x-data="galleryManager('{% url 'vehicle_gallery' vehicle.pk %}')" x-init="init()">
+                    <div class="flex items-baseline justify-between gap-3 mb-2">
+                        <p class="text-sm font-semibold text-stone-700">Gallery images <span class="text-stone-400 font-normal" x-show="images.length" x-text="'· ' + images.length"></span></p>
+                        <p class="text-xs text-stone-500" x-show="images.length > 1">Drag to reorder · first photo shows first</p>
                     </div>
+                    <label class="block cursor-pointer rounded-2xl border-2 border-dashed p-6 text-center transition-colors"
+                           :class="over ? 'border-[#145c38] bg-[#f4faf6]' : 'border-stone-200 hover:border-[#145c38]/50'"
+                           x-on:dragover.prevent="over = true" x-on:dragleave="over = false" x-on:drop.prevent="over = false; add($event.dataTransfer.files)">
+                        <span class="material-symbols-outlined text-4xl text-stone-400">cloud_upload</span>
+                        <span class="block mt-1 text-sm font-semibold text-stone-700">Add photos</span>
+                        <span class="block text-xs text-stone-500">Click or drop PNG/JPG, up to 10 MB each. They're saved straight away.</span>
+                        <input type="file" accept="image/*" multiple class="sr-only" data-no-draft x-on:change="add($event.target.files); $event.target.value = ''"/>
+                    </label>
+                    <p x-show="error" x-text="error" x-cloak class="mt-2 text-xs font-semibold text-red-600"></p>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-2.5 mt-3" x-ref="grid">
+                        <template x-for="(img, i) in images" :key="img.id">
+                            <div :data-id="img.id" class="relative rounded-xl overflow-hidden ring-1 ring-stone-200 aspect-[4/3] bg-stone-100 cursor-grab active:cursor-grabbing select-none group">
+                                <img :src="img.url" alt="" class="w-full h-full object-cover pointer-events-none" loading="lazy"/>
+                                <span class="absolute top-1.5 left-1.5 min-w-6 h-6 px-1.5 rounded-full bg-black/55 text-white text-[11px] font-bold grid place-items-center" x-text="i === 0 ? 'First' : i + 1"></span>
+                                <div class="absolute top-1.5 right-1.5 flex gap-1" x-show="confirming !== img.id">
+                                    <button type="button" x-show="i > 0" x-on:click="move(i, -1)" class="w-7 h-7 rounded-full bg-white/90 text-stone-700 grid place-items-center shadow sm:opacity-0 group-hover:opacity-100 focus:opacity-100" title="Move earlier" aria-label="Move earlier"><span class="material-symbols-outlined text-[16px]">arrow_back</span></button>
+                                    <button type="button" x-show="i < images.length - 1" x-on:click="move(i, 1)" class="w-7 h-7 rounded-full bg-white/90 text-stone-700 grid place-items-center shadow sm:opacity-0 group-hover:opacity-100 focus:opacity-100" title="Move later" aria-label="Move later"><span class="material-symbols-outlined text-[16px]">arrow_forward</span></button>
+                                    <button type="button" x-on:click="confirming = img.id" class="w-7 h-7 rounded-full bg-white/90 text-red-600 grid place-items-center shadow" title="Delete photo" aria-label="Delete photo"><span class="material-symbols-outlined text-[16px]">delete</span></button>
+                                </div>
+                                <div x-show="confirming === img.id" x-cloak class="absolute inset-0 bg-red-950/70 flex flex-col items-center justify-center gap-2 text-white">
+                                    <p class="text-xs font-bold">Delete this photo?</p>
+                                    <div class="flex gap-1.5">
+                                        <button type="button" x-on:click="remove(img.id)" class="px-3 py-1 rounded-full bg-red-600 text-xs font-bold">Delete</button>
+                                        <button type="button" x-on:click="confirming = null" class="px-3 py-1 rounded-full bg-white/90 text-stone-800 text-xs font-bold">Keep</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <template x-for="p in pending" :key="p.key">
+                            <div class="relative rounded-xl overflow-hidden ring-2 ring-[#145c38]/40 aspect-[4/3]">
+                                <img :src="p.url" alt="" class="w-full h-full object-cover opacity-60"/>
+                                <span class="absolute inset-0 grid place-items-center"><span class="px-2.5 py-1 rounded-full bg-[#145c38] text-white text-[11px] font-bold">Uploading…</span></span>
+                            </div>
+                        </template>
+                    </div>
+                    <p x-show="!images.length && !pending.length" class="mt-2 text-xs text-stone-500">No gallery photos yet.</p>
                 </div>
                 <div>
                     <p class="font-bold text-stone-900 mb-3">SEO details</p>
@@ -429,5 +454,70 @@ function featureChips(initial) {
     form.addEventListener("submit", () => { submitting = true; if (store) store.removeItem(key); });
     window.addEventListener("beforeunload", e => { if (dirty && !submitting) { e.preventDefault(); e.returnValue = ""; } });
 })();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<script>
+// Step 6 gallery: every upload, delete and reorder is saved at once through vehicle_gallery
+function galleryManager(url) {
+    return {
+        images: [], pending: [], over: false, error: "", confirming: null,
+        init() {
+            const data = document.getElementById("gallery-data");
+            this.images = data ? JSON.parse(data.textContent) : [];
+            if (window.Sortable) Sortable.create(this.$refs.grid, {
+                draggable: "[data-id]", animation: 160, filter: "button", preventOnFilter: false,
+                onEnd: e => {
+                    if (e.oldDraggableIndex === e.newDraggableIndex) return;
+                    const imgs = [...this.images];
+                    imgs.splice(e.newDraggableIndex, 0, imgs.splice(e.oldDraggableIndex, 1)[0]);
+                    // Put the node back so Alpine stays in charge of the DOM, then apply the new order
+                    const nodes = [...e.from.querySelectorAll(":scope > [data-id]")].filter(n => n !== e.item);
+                    e.from.insertBefore(e.item, nodes[e.oldDraggableIndex] || nodes[nodes.length - 1]?.nextSibling || null);
+                    this.images = imgs;
+                    this.save();
+                },
+            });
+        },
+        csrf() { return document.querySelector("#wizard [name=csrfmiddlewaretoken]").value; },
+        async send(fields) {
+            const body = new FormData();
+            for (const [k, v] of fields) body.append(k, v);
+            const r = await fetch(url, { method: "POST", body, headers: { "X-CSRFToken": this.csrf() } });
+            const out = await r.json().catch(() => ({ error: "Something went wrong. Try again." }));
+            if (!r.ok || out.error) throw new Error(out.error || "Something went wrong. Try again.");
+            this.images = out.images;
+        },
+        async add(files) {
+            this.error = "";
+            for (const f of [...files]) {
+                if (!f.type.startsWith("image/")) { this.error = `${f.name} isn't a photo.`; continue; }
+                const p = { key: Math.random(), url: URL.createObjectURL(f) };
+                this.pending.push(p);
+                try { await this.send([["op", "upload"], ["file", f]]); }
+                catch (err) { this.error = err.message; }
+                this.pending = this.pending.filter(x => x.key !== p.key);
+                URL.revokeObjectURL(p.url);
+            }
+        },
+        async remove(id) {
+            this.error = ""; this.confirming = null;
+            const keep = this.images;
+            this.images = this.images.filter(i => i.id !== id);
+            try { await this.send([["op", "delete"], ["id", id]]); }
+            catch (err) { this.images = keep; this.error = err.message; }
+        },
+        move(i, d) {
+            const imgs = [...this.images];
+            imgs.splice(i + d, 0, imgs.splice(i, 1)[0]);
+            this.images = imgs;
+            this.save();
+        },
+        async save() {
+            this.error = "";
+            try { await this.send([["op", "reorder"], ...this.images.map(i => ["ids", i.id])]); }
+            catch (err) { this.error = err.message; }
+        },
+    };
+}
 </script>
 {% endblock %}
