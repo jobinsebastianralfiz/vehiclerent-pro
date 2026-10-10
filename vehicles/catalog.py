@@ -7,7 +7,8 @@ new model never blocks the admin. Edit freely.
 CATALOG = [
     ("Cars & SUVs", {
         "Maruti Suzuki": ["Alto K10", "S-Presso", "Celerio", "Wagon R", "Swift", "Dzire", "Baleno", "Ignis", "Fronx",
-                          "Brezza", "Ertiga", "XL6", "Ciaz", "Grand Vitara", "Victoris", "Jimny", "Invicto", "e Vitara", "Eeco"],
+                          "Brezza", "Ertiga", "XL6", "Ciaz", "Grand Vitara", "Victoris", "Jimny", "Invicto", "e Vitara", "Eeco",
+                          "Glanza", "Alto", "Alto 800", "Ritz", "Vitara Brezza", "S-Cross", "Swift Dzire", "Omni", "Gypsy"],
         "Hyundai": ["Grand i10 Nios", "i20", "i20 N Line", "Aura", "Exter", "Venue", "Venue N Line", "Verna", "Creta",
                     "Creta N Line", "Creta Electric", "Alcazar", "Tucson", "Ioniq 5"],
         "Tata": ["Tiago", "Tiago EV", "Tigor", "Tigor EV", "Altroz", "Punch", "Punch EV", "Nexon", "Nexon EV", "Curvv",
