@@ -19,6 +19,41 @@
     /* hero tiles assemble in; hidden only while the motion layer is armed */
     .motion .b-hero .tile { opacity: 0; }
 
+    /* wedding section */
+    .wd { background: linear-gradient(160deg, #123826 0%, #0c2a1c 60%, #0a2418 100%); color: #fff; }
+    .wd-gold { background: linear-gradient(90deg, #f2c98a, #d9a35a); -webkit-background-clip: text; background-clip: text; color: transparent; padding-right: .08em; }
+    .wd-btn { display: inline-flex; align-items: center; gap: .7rem; padding: 1.05rem 1.9rem; border-radius: 1rem; background: #f2c98a; color: #0c2a1c; font-weight: 800; box-shadow: 0 16px 30px -16px rgba(242,201,138,.7); transition: transform .3s, background .3s; }
+    .wd-btn:hover { transform: translateY(-2px); background: #f6d6a4; }
+    .wd-feats { display: grid; gap: 1.1rem; }
+    @media (min-width: 640px) { .wd-feats { grid-template-columns: repeat(3, minmax(0, 1fr)); } .wd-feats > div + div { border-left: 1px solid rgba(255,255,255,.15); padding-left: 1rem; } }
+    .wd-feats > div { display: flex; gap: .7rem; align-items: flex-start; }
+    .wd-feats .material-symbols-outlined { color: #f2c98a; font-size: 26px; }
+    .wd-feats b { display: block; color: #fff; font-weight: 700; font-size: .9375rem; }
+    .wd-feats > div > span:last-child { font-size: .8125rem; color: rgba(255,255,255,.62); line-height: 1.45; }
+    .wd-bars { display: flex; gap: .5rem; }
+    .wd-bars span { width: 2rem; height: 3px; border-radius: 3px; background: rgba(255,255,255,.2); transition: background .4s; }
+    .wd-bars span.on { background: #f2c98a; }
+    .wd-stage { position: relative; aspect-ratio: 16 / 12; border-radius: 1.75rem; overflow: hidden; background: #163c2a; box-shadow: 0 0 0 1.5px rgba(242,201,138,.7), 0 40px 70px -30px rgba(0,0,0,.6); }
+    @media (max-width: 639px) { .wd-stage { aspect-ratio: 4 / 4.4; border-radius: 1.4rem; } }
+    .wd-card { position: absolute; inset: 0; opacity: 0; transition: opacity .9s ease; pointer-events: none; }
+    .wd-card.on { opacity: 1; pointer-events: auto; }
+    .wd-card img { width: 100%; height: 100%; object-fit: cover; }
+    .wd-card.on img { animation: wd-in 8s ease-out both; }
+    @keyframes wd-in { from { scale: 1.07; } to { scale: 1; } }
+    .wd-pill { position: absolute; top: 1.25rem; left: 1.25rem; display: inline-flex; align-items: center; gap: .5rem; padding: .55rem 1rem; border-radius: 999px; background: rgba(255,255,255,.92); color: #1b1c17; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .wd-pill .material-symbols-outlined { font-size: 18px; color: #d9505e; font-variation-settings: 'FILL' 1; }
+    .wd-go { position: absolute; right: 1.25rem; bottom: 1.25rem; width: 3.75rem; height: 3.75rem; border-radius: 999px; display: grid; place-items: center; background: #f2c98a; color: #0c2a1c; transition: transform .35s; }
+    @media (min-width: 640px) { .wd-go { right: 1.75rem; bottom: 1.75rem; width: 4.25rem; height: 4.25rem; } }
+    .wd-card:hover .wd-go { transform: translateX(4px); }
+    .wd-rail { display: flex; flex-direction: column; gap: .7rem; width: 100%; max-height: 380px; overflow-y: auto; scrollbar-width: none; }
+    .wd-rail::-webkit-scrollbar { display: none; }
+    .wd-th { width: 100%; aspect-ratio: 4 / 3; border-radius: .9rem; overflow: hidden; flex: none; background: #163c2a; outline: 2px solid transparent; outline-offset: 2px; opacity: .6; transition: opacity .3s, outline-color .3s; }
+    .wd-th img { width: 100%; height: 100%; object-fit: cover; }
+    .wd-th:hover { opacity: .9; }
+    .wd-th.on { opacity: 1; outline-color: #f2c98a; }
+    .wd-arrow { width: 3.2rem; height: 3.2rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.35); color: #fff; display: grid; place-items: center; transition: background .3s; }
+    .wd-arrow:hover { background: rgba(255,255,255,.1); }
+    @media (prefers-reduced-motion: reduce) { .wd-card.on img { animation: none; } }
     /* hero photo tile slides */
     .b-sl { position: absolute; inset: 0; opacity: 0; transition: opacity 1.2s ease; display: block; overflow: hidden; }
     .b-sl:first-child, .b-sl.on { opacity: 1; }
@@ -341,25 +376,70 @@
     </div>
 </section>
 
-<!-- ─── Wedding bento ─── -->
+<!-- ─── Wedding: copy left, a large gold-edged card, a numbered thumbnail rail (mockup 2026-10-10). Wedding-service
+     vehicles rotate here; with none yet, the theme's wedding photos stand in. ─── -->
 <section id="wedding" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 lg:auto-rows-[170px]">
-        <div class="tile b-glass p-7 sm:p-10 sm:col-span-2 lg:col-span-5 lg:row-span-3 flex flex-col justify-between gap-8">
+    <div class="wd tile p-6 sm:p-10 lg:p-12" data-wd>
+        <div class="absolute inset-0 opacity-40 pointer-events-none" style="background:radial-gradient(45% 55% at 92% 0%,rgba(242,201,138,.35),transparent 70%)"></div>
+        <div class="relative grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 lg:gap-12 items-center">
             <div>
-                <span class="label-tiny text-primary-container block">Wedding fleet · Kerala</span>
-                <h2 class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em] text-primary">For the day you'll <span class="serif-i">never forget.</span></h2>
-                <p class="mt-4 text-on-surface-variant text-lg">From classic vintage icons to modern luxury flagships, our curated wedding fleet makes your first journey together legendary.</p>
+                <span class="label-tiny text-[#f2c98a]">Wedding fleet · Kerala</span>
+                <h2 class="mt-4 font-extrabold text-[40px] sm:text-6xl lg:text-[clamp(44px,3.9vw,62px)] leading-[1] tracking-[-.04em] text-white" data-no-split><span class="sm:whitespace-nowrap">For the day you'll</span><br/><span class="serif-i wd-gold">never forget.</span></h2>
+                <p class="text-lg text-white/70 mt-6 max-w-md leading-relaxed">From classic vintage icons to modern luxury flagships, our curated wedding fleet makes your first journey together legendary.</p>
+                <div class="flex flex-wrap items-center gap-4 mt-8">
+                    <a href="{% url 'wedding_cars' %}" class="wd-btn">View wedding fleet <span class="material-symbols-outlined">arrow_forward</span></a>
+                    {% if WHATSAPP_NUMBER %}<a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="flex items-center gap-3 font-semibold text-white group"><span class="w-14 h-14 rounded-full border border-white/35 grid place-items-center group-hover:bg-white/10 transition-colors"><span class="material-symbols-outlined">chat</span></span>Ask on WhatsApp</a>{% endif %}
+                </div>
+                <div class="wd-feats mt-10 pt-8 border-t border-white/15">
+                    <div><span class="material-symbols-outlined">person_check</span><span><b>Chauffeur included</b>Trained, punctual drivers</span></div>
+                    <div><span class="material-symbols-outlined">local_florist</span><span><b>Decoration</b>Tailored to your day</span></div>
+                    <div><span class="material-symbols-outlined">diamond</span><span><b>Icons &amp; flagships</b>Vintage to modern luxury</span></div>
+                </div>
+                <div class="wd-bars mt-8" aria-hidden="true"></div>
             </div>
-            <ul class="grid gap-2" data-deal>
-                <li class="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 font-semibold"><span class="material-symbols-outlined text-primary-container">check_circle</span>Chauffeur included</li>
-                <li class="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 font-semibold"><span class="material-symbols-outlined text-primary-container">local_florist</span>Decoration tailored to you</li>
-                <li class="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 font-semibold"><span class="material-symbols-outlined text-primary-container">diamond</span>Vintage icons and modern flagships</li>
-            </ul>
-            <a href="{% url 'wedding_cars' %}" class="bg-primary text-on-primary rounded-full py-4 px-7 font-bold inline-flex items-center justify-center gap-2 self-start">View wedding fleet <span class="material-symbols-outlined" data-icon="favorite">favorite</span></a>
+
+            <div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_120px] gap-5 items-center">
+                <div>
+                    <div class="h-px bg-white/15 mb-6 hidden sm:block"></div>
+                    <div class="wd-stage" data-wd-stage>
+                        {% for v in wedding_vehicles %}
+                        <a href="{{ v.get_absolute_url }}" class="wd-card{% if forloop.first %} on{% endif %}" aria-label="{{ v.brand }} {{ v.name }}" data-thumb="{% if v.thumbnail %}{{ v.thumbnail.url }}{% endif %}">
+                            {% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}"/>{% else %}<span class="absolute inset-0 grid place-items-center"><span class="material-symbols-outlined text-[96px] text-[#f2c98a]/40">favorite</span></span>{% endif %}
+                            <span class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent"></span>
+                            <span class="wd-pill"><span class="material-symbols-outlined">favorite</span>Wedding car {{ forloop.counter|stringformat:"02d" }}</span>
+                            <span class="absolute left-6 right-24 bottom-6 sm:left-8 sm:bottom-8">
+                                <span class="block serif-i text-3xl sm:text-[42px] text-white leading-tight">{{ v.brand }} {{ v.name }}</span>
+                                <span class="flex flex-wrap gap-x-6 gap-y-2 mt-3 text-sm sm:text-base text-white/90">
+                                    {% if v.seating_capacity %}<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">group</span>{{ v.seating_capacity }} Seats</span>{% endif %}
+                                    <span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">workspace_premium</span>{% if v.wedding_tier %}{{ v.get_wedding_tier_display }}{% else %}{{ v.category.name|default:"Wedding" }}{% endif %}</span>
+                                    {% if v.transmission %}<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">settings</span>{{ v.get_transmission_display }}</span>{% endif %}
+                                    {% if v.primary_price_value %}<span class="flex items-center gap-2 text-[#f2c98a]"><span class="material-symbols-outlined text-[20px]">sell</span>{{ v.primary_price_value|inr }}/{{ v.primary_price_label }}</span>{% endif %}
+                                </span>
+                            </span>
+                            <span class="wd-go"><span class="material-symbols-outlined">arrow_forward</span></span>
+                        </a>
+                        {% empty %}
+                        {% for img, cap in wedding_fallback %}
+                        <a href="{% url 'wedding_cars' %}" class="wd-card{% if forloop.first %} on{% endif %}" data-thumb="{% static img %}">
+                            <img src="{% static img %}" alt=""/>
+                            <span class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent"></span>
+                            <span class="wd-pill"><span class="material-symbols-outlined">favorite</span>Wedding fleet</span>
+                            <span class="absolute left-6 right-24 bottom-6 sm:left-8 sm:bottom-8"><span class="block serif-i text-3xl sm:text-[42px] text-white leading-tight">{{ cap }}</span></span>
+                            <span class="wd-go"><span class="material-symbols-outlined">arrow_forward</span></span>
+                        </a>
+                        {% endfor %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="hidden sm:flex flex-col items-center gap-4">
+                    <div class="font-extrabold text-5xl text-[#f2c98a] leading-none tracking-tight"><span data-wd-n>01</span><span class="text-2xl text-white/40 font-semibold"> / <span data-wd-total>01</span></span></div>
+                    <div class="h-px w-full bg-white/15"></div>
+                    <div class="wd-rail" data-wd-rail></div>
+                    <button type="button" class="wd-arrow" data-wd-prev aria-label="Previous"><span class="material-symbols-outlined">keyboard_arrow_up</span></button>
+                    <button type="button" class="wd-arrow" data-wd-next aria-label="Next"><span class="material-symbols-outlined">keyboard_arrow_down</span></button>
+                </div>
+            </div>
         </div>
-        <div class="tile sm:col-span-2 lg:col-span-7 lg:row-span-2 min-h-[320px]"><img src="{% static 'themes/img/wedding-venue.jpg' %}" alt="" class="w-full h-full object-cover absolute inset-0"/></div>
-        <div class="tile lg:col-span-3 lg:row-span-1 min-h-[200px]" data-no-parallax><img src="{% static 'themes/img/jasmine-handle.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover object-[50%_70%] transition-transform duration-1000 hover:scale-110"/></div>
-        <div class="tile lg:col-span-4 lg:row-span-1 min-h-[200px]" data-no-parallax><img src="{% static 'themes/img/ambassador.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 hover:scale-110"/><span class="absolute bottom-4 left-4 b-glass rounded-full px-4 py-2 label-tiny text-primary">Decorated to your story</span></div>
     </div>
 </section>
 
@@ -461,6 +541,31 @@
 
 {% block extra_js %}
 <script>
+/* wedding cards: thumbnails, bars and arrows are built from the cards; 6s auto-advance, paused on hover or off screen, swipe on phones */
+(() => {
+    const sec = document.querySelector("[data-wd]"); if (!sec) return;
+    const cards = [...sec.querySelectorAll(".wd-card")], rail = sec.querySelector("[data-wd-rail]"), barsBox = sec.querySelector(".wd-bars"), num = sec.querySelector("[data-wd-n]");
+    sec.querySelector("[data-wd-total]").textContent = String(cards.length).padStart(2, "0");
+    const thumbs = cards.map((c, k) => { const b = document.createElement("button"); b.type = "button"; b.className = "wd-th"; b.setAttribute("aria-label", "Show " + (c.getAttribute("aria-label") || "photo " + (k + 1)));
+        if (c.dataset.thumb) { const im = document.createElement("img"); im.src = c.dataset.thumb; im.alt = ""; im.loading = "lazy"; b.appendChild(im); } rail.appendChild(b); return b; });
+    const bars = cards.map(() => barsBox.appendChild(document.createElement("span")));
+    let i = 0, timer = 0, visible = false, hover = false;
+    const show = n => { i = (n + cards.length) % cards.length; [cards, thumbs, bars].forEach(list => list.forEach((el, k) => el.classList.toggle("on", k === i)));
+        num.textContent = String(i + 1).padStart(2, "0"); const t = thumbs[i]; rail.scrollTo({ top: t.offsetTop - rail.offsetTop - 8, behavior: "smooth" }); run(); };
+    const run = () => { clearInterval(timer); if (cards.length > 1 && visible && !hover && !document.hidden && !matchMedia("(prefers-reduced-motion: reduce)").matches) timer = setInterval(() => show(i + 1), 6000); };
+    thumbs.forEach((t, k) => t.addEventListener("click", () => show(k)));
+    sec.querySelector("[data-wd-prev]").addEventListener("click", () => show(i - 1));
+    sec.querySelector("[data-wd-next]").addEventListener("click", () => show(i + 1));
+    if (cards.length < 2) sec.querySelectorAll(".wd-arrow").forEach(b => b.hidden = true);
+    const stage = sec.querySelector("[data-wd-stage]");
+    stage.addEventListener("mouseenter", () => { hover = true; run(); }); stage.addEventListener("mouseleave", () => { hover = false; run(); });
+    let x0 = null; stage.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, { passive: true });
+    stage.addEventListener("touchend", e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) show(i + (dx < 0 ? 1 : -1)); x0 = null; });
+    if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; run(); }).observe(sec); else { visible = true; run(); }
+    document.addEventListener("visibilitychange", run);
+    show(0);
+})();
+
 /* hero photo tile: next slide every 5.5s once its photo has loaded; paused off screen or in a hidden tab */
 (() => {
     const host = document.querySelector("[data-b-slides]"); if (!host) return;

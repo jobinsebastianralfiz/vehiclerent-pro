@@ -39,6 +39,11 @@ def home(request):
         .exclude(status="inactive")
         .select_related("category")[:6]
     )
+    wedding_vehicles = (
+        Vehicle.objects.filter(is_wedding_service=True, is_published=True)
+        .exclude(status="inactive")
+        .select_related("category").order_by("-is_featured", "-is_premium", "name")[:8]
+    )
     cities = City.objects.filter(is_active=True)
     city_points = [
         {"name": c.name, "slug": c.slug, "lat": float(c.latitude), "lng": float(c.longitude), "hub": c.is_hub}
@@ -64,6 +69,10 @@ def home(request):
         "categories": categories,
         "featured_vehicles": featured_vehicles,
         "premium_vehicles": premium_vehicles,
+        "wedding_vehicles": wedding_vehicles,
+        # theme photos shown in the wedding section until wedding-service vehicles are added
+        "wedding_fallback": [("themes/img/wedding-rolls.jpg", "The arrival"), ("themes/img/ambassador.jpg", "Classic icons"),
+                             ("themes/img/wedding-venue.jpg", "Decorated to your story"), ("themes/img/rolls-palms.jpg", "Every detail")],
         "cities": cities,
         "city_points": city_points,
         "total_vehicle_count": total_vehicle_count,
