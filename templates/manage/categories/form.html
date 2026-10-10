@@ -16,7 +16,7 @@
         <span class="af-note"><span class="material-symbols-outlined">info</span><span>Fields marked with <b class="text-red-600">*</b> are required.</span></span>
     </div>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form.errors %}
         <div class="af-errors"><p class="font-semibold mb-1">Please correct the errors below:</p>{{ form.errors }}</div>
@@ -42,6 +42,17 @@
                     <label class="af-label" for="f-desc">Description</label>
                     <textarea id="f-desc" name="description" rows="3" placeholder="Brief description of this category…">{{ form.description.value|default:'' }}</textarea>
                     {% if form.description.errors %}<p class="af-err">{{ form.description.errors|join:" " }}</p>{% endif %}
+                </div>
+                <div class="span-all">
+                    <label class="af-label" for="f-image">Tile photo</label>
+                    <div class="flex items-center gap-4 flex-wrap">
+                        <span class="w-36 h-20 rounded-xl bg-stone-100 ring-1 ring-stone-200 grid place-items-center overflow-hidden flex-none">
+                            {% if category.image %}<img src="{{ category.image.url }}" alt="" class="w-full h-full object-contain"/>{% else %}<span class="material-symbols-outlined text-stone-300">image</span>{% endif %}
+                        </span>
+                        <input id="f-image" type="file" name="image" accept="image/*" class="text-sm text-stone-500 file:mr-3 file:px-4 file:py-2 file:rounded-xl file:border file:border-stone-200 file:bg-white file:text-sm file:font-semibold file:text-stone-700"/>
+                        {% if category.image %}<label class="inline-flex items-center gap-2 text-sm text-stone-600"><input type="checkbox" name="image-clear" class="rounded border-stone-300"/> Remove</label>{% endif %}
+                    </div>
+                    {% if form.image.errors %}<p class="af-err">{{ form.image.errors|join:" " }}</p>{% else %}<p class="af-help">Shown on the home page tile (Showroom Reels theme). A side-on car photo with a transparent background (PNG) looks best; without one, a photo of a vehicle in this category is used.</p>{% endif %}
                 </div>
                 <label class="af-check span-all">
                     <input type="checkbox" name="is_active" {% if form.is_active.value %}checked{% endif %}/>

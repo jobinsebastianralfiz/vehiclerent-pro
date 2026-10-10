@@ -181,7 +181,7 @@
                     <div class="span-all">
                         <label class="af-label" for="f-hero_title">Hero Title <span class="req">*</span></label>
                         <input id="f-hero_title" type="text" name="hero_title" value="{{ form.hero_title.value|default:'' }}"/>
-                        {% if form.hero_title.errors %}<p class="af-err">{{ form.hero_title.errors|join:" " }}</p>{% endif %}
+                        {% if form.hero_title.errors %}<p class="af-err">{{ form.hero_title.errors|join:" " }}</p>{% else %}<p class="af-help">Wrap a word in *asterisks* to colour it orange, e.g. Rent Your *Perfect* Vehicle (Kerala Route theme).</p>{% endif %}
                     </div>
                     <div>
                         <label class="af-label" for="f-hero_subtitle">Hero Subtitle</label>

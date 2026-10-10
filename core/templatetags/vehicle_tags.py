@@ -119,3 +119,12 @@ def sparkline(values, color="#1f8a52", width=120, height=40):
         '<polygon points="{a}" fill="url(#{g})"/><polyline points="{l}" fill="none" stroke="{c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
         w=width, h=height, g=gid, c=color, a=area, l=line,
     )
+
+
+@register.filter
+def accent(text, css="r-accent"):
+    """Colours the words wrapped in *asterisks*: "Rent Your *Perfect* Vehicle"."""
+    import re
+    from django.utils.html import escape
+    from django.utils.safestring import mark_safe
+    return mark_safe(re.sub(r"\*([^*]+)\*", lambda m: f'<span class="{css}">{m.group(1)}</span>', escape(text or "")))

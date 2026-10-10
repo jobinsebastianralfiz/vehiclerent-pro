@@ -39,6 +39,7 @@ class VehicleCategory(models.Model):
     slug = models.SlugField(max_length=120, unique=True, blank=True)
     description = models.TextField(blank=True)
     icon = models.CharField(max_length=50, blank=True, help_text="Material Symbols icon name")
+    image = models.ImageField(upload_to="categories/", blank=True, help_text="Tile photo for the home page; a cut-out PNG with a transparent background looks best")
     display_order = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
     # SEO
@@ -61,6 +62,13 @@ class VehicleCategory(models.Model):
 
     def vehicle_count(self):
         return self.vehicles.filter(is_published=True).exclude(status="inactive").count()
+
+    def tile_photo(self):
+        """(url, is_cutout) for the home page tile: the uploaded tile photo, else a photo of one of its vehicles."""
+        if self.image:
+            return self.image.url, True
+        v = self.vehicles.filter(is_published=True).exclude(thumbnail="").order_by("-is_featured", "id").first()
+        return (v.thumbnail.url, False) if v else (None, False)
 
 
 class Vehicle(models.Model):

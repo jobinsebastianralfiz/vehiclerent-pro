@@ -90,80 +90,182 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
   .hs-dots span { width: 8px; height: 8px; border-radius: 999px; background: rgba(255,250,240,.55); transition: width .5s, background .5s; }
   .hs-dots span.on { width: 26px; background: #e39b3c; }
 
+
+  /* ---------- hero (mockup 2026-10-10): copy left, framed slide right, postcards and a trust badge around it ---------- */
+  .rh-wrap { position: relative; overflow: hidden; }
+  .rh-scene { position: absolute; left: 0; bottom: 0; width: min(62%, 980px); height: 190px; pointer-events: none; -webkit-mask-image: linear-gradient(90deg, #000 40%, transparent 82%); mask-image: linear-gradient(90deg, #000 40%, transparent 82%); opacity: .85; }
+  @media (max-width: 1023px) { .rh-scene { width: 100%; height: 150px; } }
+  .rh-frond { position: absolute; right: -18px; top: -10px; width: 170px; height: 170px; opacity: .55; pointer-events: none; transform-origin: 100% 0; animation: rh-sway 6s ease-in-out infinite alternate; }
+  .rh-scene .rh-crown { transform-box: fill-box; transform-origin: 55% 25%; animation: rh-sway 5s ease-in-out infinite alternate; }
+  .rh-scene .rh-boat { animation: rh-bob 4.5s ease-in-out infinite alternate; }
+  .rh-scene .rh-boat.b2 { animation-duration: 5.5s; animation-delay: -2s; }
+  .rh-scene .rh-shimmer path { animation: sc-shim 3.2s ease-in-out infinite; }
+  @keyframes rh-sway { from { rotate: -2deg; } to { rotate: 2.5deg; } }
+  @keyframes rh-bob { from { translate: 0 0; } to { translate: 6px -3px; } }
+  .rh-title { font-size: clamp(46px, 10vw, 72px); line-height: .98; letter-spacing: -.025em; }
+  @media (min-width: 1024px) { .rh-title { font-size: clamp(54px, 4.7vw, 88px); } }
+  .r-accent { color: #d9692f; }
+  .rh-feats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.1rem .5rem; max-width: 36rem; }
+  @media (min-width: 640px) { .rh-feats { grid-template-columns: repeat(4, minmax(0, 1fr)); } .rh-feats li + li { border-left: 1px solid rgba(74,74,62,.16); } }
+  .rh-feats li { display: flex; flex-direction: column; align-items: center; text-align: center; gap: .55rem; font-size: .9375rem; line-height: 1.25; color: #3c3c33; padding: 0 .4rem; }
+  .rh-feats b { display: block; font-weight: 700; color: #1b1c17; }
+  .rh-ico { width: 3.4rem; height: 3.4rem; border-radius: 999px; display: grid; place-items: center; background: #e3efe6; color: #134e4a; box-shadow: 0 8px 18px -12px rgba(19,78,74,.6); }
+  .rh-ico .material-symbols-outlined { font-size: 27px; font-variation-settings: 'FILL' 1; }
+  .rh-btn { display: inline-flex; align-items: center; gap: .75rem; padding: 1.1rem 2rem; border-radius: 999px; font-weight: 700; font-size: 1.0625rem; transition: transform .3s var(--spring), box-shadow .3s; }
+  .rh-btn:not(.rh-btn-ghost) { box-shadow: 0 16px 30px -18px rgba(19,78,74,.9); }
+  .rh-btn:hover { transform: translateY(-2px); }
+  .rh-btn-ghost { background: rgba(255,250,240,.7); border: 1px solid rgba(74,74,62,.18); color: #1b1c17; }
+  .rh-btn-ghost:hover { background: #fffaf0; }
+  .rh-media-col { padding: 0 0 3.5rem; }
+  @media (min-width: 640px) { .rh-media-col { padding: 0 5.5rem 3.5rem 2.5rem; } }
+  .rh-media { position: relative; z-index: 2; border-radius: 2.25rem; box-shadow: 0 40px 70px -40px rgba(15,46,44,.75); }
+  .rh-blob { position: absolute; z-index: 1; left: 0; top: 7%; width: 34%; height: 62%; border-radius: 2.5rem; background: #1f5a45; rotate: -8deg; }
+  .rh-blob.b2 { left: auto; top: auto; right: 12%; bottom: 0; width: 46%; height: 30%; rotate: 6deg; background: #2c6a52; }
+  @media (max-width: 639px) { .rh-blob { left: -8px; } .rh-blob.b2 { right: -6px; } }
+  .rh-flight { position: absolute; z-index: 3; left: -6px; top: 26%; width: 46px; height: 46%; pointer-events: none; display: none; }
+  .rh-plane { position: absolute; z-index: 3; left: -18px; top: 44%; font-size: 30px; color: #d9692f; rotate: 210deg; display: none; }
+  @media (min-width: 640px) { .rh-flight, .rh-plane { display: block; } }
+  .rh-cap { position: absolute; z-index: 10; left: 1.25rem; top: 1.25rem; max-width: 72%; padding: 1rem 1.25rem 1.1rem; border-radius: 1.25rem; background: rgba(255,250,240,.94); backdrop-filter: blur(8px); box-shadow: 0 18px 36px -20px rgba(0,0,0,.45); }
+  @media (min-width: 640px) { .rh-cap { left: 1.75rem; top: 1.75rem; padding: 1.15rem 1.6rem 1.25rem; } }
+  .rh-cards { position: absolute; z-index: 4; right: 0; top: 4%; width: 31%; max-width: 205px; display: none; flex-direction: column; gap: .4rem; pointer-events: none; }
+  @media (min-width: 640px) { .rh-cards { display: flex; } }
+  .rh-cards .pcw:nth-child(1) { rotate: 8deg; }
+  .rh-cards .pcw:nth-child(2) { rotate: -4deg; margin-left: 10%; }
+  .rh-cards .pcw:nth-child(3) { rotate: 7deg; }
+  .rh-cards .pc { padding: 8px 8px 30px; }
+  .rh-cards .pc .pc-cap { font-size: 14px; left: 12px; right: 10px; bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rh-trust { position: absolute; z-index: 5; right: 0; bottom: 0; display: flex; align-items: center; gap: .9rem; padding: .7rem .75rem .7rem 1rem; border-radius: 999px; background: #134e4a; color: #fffaf0; font-size: .9375rem; box-shadow: 0 22px 40px -22px rgba(15,46,44,.9); transition: transform .3s var(--spring); }
+  @media (min-width: 640px) { .rh-trust { right: 3.5rem; padding: .85rem .85rem .85rem 1.25rem; font-size: 1rem; } }
+  .rh-trust:hover { transform: translateY(-3px); }
+  .rh-trust b { font-weight: 800; color: #f6d9a8; }
+  .rh-faces { display: flex; }
+  .rh-faces > * { width: 2.6rem; height: 2.6rem; border-radius: 999px; border: 2px solid #134e4a; object-fit: cover; background: #f6d9a8; color: #134e4a; display: grid; place-items: center; font-weight: 800; }
+  .rh-faces > * + * { margin-left: -.7rem; }
+  .rh-go { width: 2.75rem; height: 2.75rem; border-radius: 999px; background: #fffaf0; color: #134e4a; display: grid; place-items: center; flex: none; }
+
   /* the enquiry include is built for a light card; keep its text dark inside the ivory panel */
   .r-form { color: #1b1c17; }
 
   @media (prefers-reduced-motion: reduce) {
     .motion .pc { opacity: 1 !important; }
-    .route-line path, .route-car, .tag:hover, .hero-slides .hs.on img { animation: none !important; }
+    .route-line path, .route-car, .tag:hover, .hero-slides .hs.on img, .rh-frond, .rh-scene * { animation: none !important; }
   }
 </style>
 {% endblock %}
 
 {% block content %}
 <!-- ─── Hero ─── -->
-<section id="hero" class="r-glow px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 pb-20 lg:pt-14 lg:pb-28 flex flex-col lg:flex-row items-center gap-14 lg:gap-16">
-    <div class="hero-copy lg:w-[46%] w-full space-y-7 lg:space-y-9">
-        <span class="label-tiny text-[#d9692f] flex items-center gap-3" data-intro="0"><span class="w-8 h-px bg-[#d9692f]"></span>{{ config.hero_subtitle|default:"Premium Vehicle Rental · Kerala" }}</span>
-        <h1 class="display-hero text-5xl sm:text-7xl lg:text-[92px] text-tertiary" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Your journey, curated." }}</h1>
-        {% if cities %}
-        <p class="headline-md text-2xl sm:text-3xl text-on-surface-variant font-normal italic" data-intro="4">Your road to <span class="text-[#d9692f] not-italic font-bold" data-cycle="{% for city in cities|slice:':6' %}{{ city.name }}|{% endfor %}the wedding venue" data-wait="1">{{ cities.0.name }}</span></p>
-        {% endif %}
-        <p class="text-lg text-on-surface-variant max-w-lg leading-relaxed font-light" data-intro="5">{{ config.hero_description|default:"From wedding-day Rolls Royces to weekend self-drive hatchbacks — one team, every road across Kerala." }}</p>
-        <div class="flex flex-wrap gap-4 sm:gap-5" data-intro="6">
-            <a href="{% url 'vehicle_list' %}" class="bg-primary-container text-on-primary px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold">{{ config.hero_cta_text|default:"Explore Fleet" }} <span class="material-symbols-outlined">arrow_forward</span></a>
-            <a href="{% url 'wedding_cars' %}" class="border border-outline-variant px-8 sm:px-10 py-4 sm:py-5 rounded-full flex items-center gap-3 font-bold hover:bg-surface-container-lowest transition-colors">Wedding Cars <span class="material-symbols-outlined" data-icon="favorite">favorite</span></a>
+<div class="rh-wrap">
+{% comment %}Kerala backwater along the bottom-left and a palm frond in the top-right corner (drawn, decorative){% endcomment %}
+<svg class="rh-scene" viewBox="0 50 900 210" preserveAspectRatio="xMinYMax meet" aria-hidden="true">
+    <defs>
+        <linearGradient id="rhGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6c98a" stop-opacity="0"/><stop offset="1" stop-color="#f6c98a" stop-opacity=".55"/></linearGradient>
+        <linearGradient id="rhWater" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d7e6df"/><stop offset="1" stop-color="#eef3ec"/></linearGradient>
+        <symbol id="rhPalm" viewBox="0 0 120 200" overflow="visible">
+            <path d="M57 200C55 160 58 110 68 50C69 46 73 46 74 50C66 110 64 160 65 200Z"/>
+            <path d="M58 180h6M58 160h6M59 140h6M60 120h6M62 100h6M64 80h6" stroke="#fffaf0" stroke-opacity=".25" stroke-width="1.4"/>
+            <g class="rh-crown">
+                <path d="M71 48C52 30 24 30 2 50C26 42 48 44 70 54Z"/><path d="M71 48C60 22 38 6 12 4C38 16 54 30 68 54Z"/>
+                <path d="M71 48C72 22 88 6 110 0C92 16 80 30 74 54Z"/><path d="M71 48C92 34 112 38 124 56C104 46 90 48 74 54Z"/>
+                <path d="M71 48C88 58 102 76 108 100C96 80 84 66 72 56Z"/><path d="M71 48C54 58 40 76 34 100C46 80 58 66 70 56Z"/>
+                <path d="M71 48C66 30 70 14 80 6C76 20 76 34 74 52Z"/>
+                <circle cx="69" cy="54" r="3.4" fill="#6b4a2b"/><circle cx="74" cy="55" r="3" fill="#6b4a2b"/>
+            </g>
+        </symbol>
+        <symbol id="rhBoat" viewBox="0 0 200 60" overflow="visible">
+            <path d="M2 38C40 50 150 50 198 30C196 40 190 48 182 50C130 58 60 58 14 50C8 47 4 43 2 38Z" fill="#5c3b22"/>
+            <path d="M14 46C60 52 140 52 186 42" stroke="#8a5a32" stroke-width="2" fill="none"/>
+            <path d="M30 40C34 26 46 22 60 22L150 22C164 22 172 28 176 38Z" fill="#d8b77e"/>
+            <path d="M40 38V26M58 39V23M76 39V22M94 39V22M112 39V22M130 39V22M148 38V23M164 37V27" stroke="#a9874f" stroke-width="1.6"/>
+            <path d="M44 30h10v8H44zM80 29h12v9H80zM116 29h12v9h-12zM150 30h10v7h-10z" fill="#4a3220" opacity=".7"/>
+            <path d="M24 58h70M110 56h60" stroke="#fffaf0" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>
+        </symbol>
+    </defs>
+    <rect x="0" y="60" width="1600" height="140" fill="url(#rhGlow)"/>
+    <path d="M0 176C80 160 140 168 210 158S360 150 430 162S580 154 660 166S820 158 900 168S1060 156 1160 166S1380 158 1600 166V200H0Z" fill="#b9d0c3" opacity=".8"/>
+    <g fill="#2f6b5e" opacity=".85">
+        <use href="#rhPalm" x="10" y="62" width="74" height="122"/><use href="#rhPalm" x="62" y="96" width="52" height="86"/>
+        <use href="#rhPalm" x="300" y="70" width="66" height="112" transform="translate(666 0) scale(-1 1)"/>
+        <use href="#rhPalm" x="400" y="100" width="46" height="80"/><use href="#rhPalm" x="590" y="84" width="58" height="96" transform="translate(1238 0) scale(-1 1)"/>
+        <use href="#rhPalm" x="720" y="110" width="40" height="68"/>
+    </g>
+    <rect x="0" y="182" width="1600" height="78" fill="url(#rhWater)"/>
+    <g class="rh-shimmer" stroke="#fffaf0" stroke-width="1.6" stroke-linecap="round" opacity=".9">
+        <path d="M40 206h34M140 222h22M300 212h40M470 228h26M610 210h30M760 224h22M220 244h30M520 248h40"/>
+    </g>
+    <use href="#rhBoat" class="rh-boat" x="110" y="176" width="200" height="60"/>
+    <use href="#rhBoat" class="rh-boat b2" x="420" y="184" width="150" height="45"/>
+    <path d="M520 102l6 4 6-4M548 90l5 3 5-3M574 108l4 3 4-3" fill="none" stroke="#4a4a3e" stroke-width="1.4" stroke-linecap="round" opacity=".6"/>
+</svg>
+<svg class="rh-frond" viewBox="0 0 200 200" aria-hidden="true"><g fill="#2f6b5e"><path d="M200 0Q120 40 60 140Q130 60 200 30Z"/><path d="M200 0Q150 70 130 180Q170 80 200 50Z"/><path d="M200 0Q90 10 10 70Q100 30 200 16Z"/></g><path d="M200 0Q120 40 60 140M200 0Q150 70 130 180M200 0Q90 10 10 70" fill="none" stroke="#fffaf0" stroke-opacity=".35" stroke-width="1.2"/></svg>
+
+<section id="hero" class="r-glow relative px-4 sm:px-12 max-w-screen-2xl mx-auto pt-8 pb-40 lg:pt-12 lg:pb-44 flex flex-col lg:flex-row items-center gap-12 lg:gap-14">
+    <div class="hero-copy lg:w-[45%] w-full space-y-7 lg:space-y-8 relative z-10">
+        <span class="label-tiny text-[#d9692f] flex items-center gap-3" data-intro="0"><span class="w-8 h-px bg-[#d9692f]"></span>{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</span>
+        <h1 class="display-hero rh-title text-tertiary" data-intro="1" data-intro-kind="split">{{ config.hero_title|default:"Rent Your *Perfect* Vehicle"|accent }}</h1>
+        <p class="text-lg sm:text-xl text-on-surface-variant max-w-xl leading-relaxed" data-intro="5">{{ config.hero_description|default:"Explore our premium fleet. Flexible daily, weekly, and monthly rentals with 24/7 roadside support." }}</p>
+        <ul class="rh-feats" data-intro="6">
+            <li><span class="rh-ico"><span class="material-symbols-outlined">directions_car</span></span>{% if total_vehicle_count %}<b>{{ total_vehicle_count }}{% if total_vehicle_count >= 10 %}+{% endif %}</b> Vehicle{{ total_vehicle_count|pluralize }}{% else %}<b>Premium</b> Vehicles{% endif %}</li>
+            <li><span class="rh-ico"><span class="material-symbols-outlined">verified_user</span></span>{% if config.years_in_business %}<b>{{ config.years_in_business }} Year{{ config.years_in_business|pluralize }}</b> Trusted{% else %}<b>Well</b> Maintained{% endif %}</li>
+            <li><span class="rh-ico"><span class="material-symbols-outlined">support_agent</span></span><b>24/7</b> Support</li>
+            {% if cities %}<li><span class="rh-ico"><span class="material-symbols-outlined">location_on</span></span><b>{{ cities.count }} Cit{{ cities.count|pluralize:"y,ies" }}</b>{% if cities.count == 1 %} ({{ cities.0.name }}){% else %} in Kerala{% endif %}</li>{% endif %}
+        </ul>
+        <div class="flex flex-wrap gap-3 sm:gap-4" data-intro="7">
+            <a href="{% url 'vehicle_list' %}" class="rh-btn bg-primary-container text-on-primary">{{ config.hero_cta_text|default:"Browse Fleet" }} <span class="material-symbols-outlined">arrow_forward</span></a>
+            <a href="{% url 'wedding_cars' %}" class="rh-btn rh-btn-ghost">Wedding Cars <span class="material-symbols-outlined">favorite</span></a>
         </div>
-        {% if config.years_in_business or total_vehicle_count or cities %}
-        <div class="flex flex-wrap gap-8 sm:gap-12 pt-7 border-t border-outline-variant" data-intro="7">
-            {% if config.years_in_business %}<div><div class="headline-md text-3xl sm:text-4xl text-tertiary"><span data-slot>{{ config.years_in_business }}</span></div><div class="label-tiny text-outline mt-2">Year{{ config.years_in_business|pluralize }}</div></div>{% endif %}
-            {% if total_vehicle_count %}<div><div class="headline-md text-3xl sm:text-4xl text-tertiary"><span data-slot>{{ total_vehicle_count }}</span></div><div class="label-tiny text-outline mt-2">Vehicle{{ total_vehicle_count|pluralize }}</div></div>{% endif %}
-            {% if cities %}<div><div class="headline-md text-3xl sm:text-4xl text-tertiary"><span data-slot>{{ cities.count }}</span></div><div class="label-tiny text-outline mt-2">Cit{{ cities.count|pluralize:"y,ies" }}</div></div>{% endif %}
-        </div>
-        {% endif %}
     </div>
-    <div class="lg:w-[54%] w-full relative pb-16 sm:pb-20">
-        <div class="m-hero-media rounded-[2.5rem] h-[420px] sm:h-[560px] lg:h-[640px]" data-intro="2" data-intro-kind="media">
-            {% comment %}Slides, first match wins: vehicles ticked "Hero slides" (photo + name + price, linked), then Hero Background
-            Slides 1-3 from Settings, then the single hero image, then the default photo.{% endcomment %}
-            {% if hero_vehicles %}
+
+    <div class="lg:w-[55%] w-full relative rh-media-col">
+        <span class="rh-blob" aria-hidden="true"></span>
+        <span class="rh-blob b2" aria-hidden="true"></span>
+        <svg class="rh-flight" viewBox="0 0 80 300" aria-hidden="true"><path d="M70 6C10 70 8 200 66 294" fill="none" stroke="#d9692f" stroke-width="2" stroke-dasharray="7 8" stroke-linecap="round"/></svg>
+        <span class="rh-plane material-symbols-outlined" aria-hidden="true">flight</span>
+        <div class="m-hero-media rh-media h-[440px] sm:h-[560px] lg:h-[620px]" data-intro="2" data-intro-kind="media">
+            {% comment %}Slides: vehicles ticked "Hero slides" (photo + name + details, linked) first, then Hero Background Slides 1-3
+            from Settings. With fewer than two, the single hero image (or the default photo) joins so the hero still rotates.{% endcomment %}
+            {% with n_bg=hero_bg_images|length n_v=hero_vehicles|length %}
             <div class="hero-slides absolute inset-0" data-hero-slides>
                 {% for v in hero_vehicles %}
                 <div class="hs">
                     <img src="{{ v.hero_image.url }}" alt="{{ v.brand }} {{ v.name }}" class="w-full h-full object-cover"{% if not forloop.first %} loading="lazy"{% endif %}/>
-                    <a href="{% url 'vehicle_detail' v.slug %}" class="hs-cap absolute left-5 top-5 sm:left-6 sm:top-6 z-10 bg-surface-container-lowest/90 backdrop-blur rounded-2xl px-4 py-3 sm:px-5 sm:py-4 max-w-[75%] shadow-lg shadow-black/10">
-                        <span class="label-tiny text-[#d9692f] block">{{ v.brand }}{% if v.category %} · {{ v.category.name }}{% endif %}</span>
-                        <span class="block font-serif font-bold text-xl sm:text-2xl text-tertiary leading-tight mt-1">{{ v.name }}</span>
+                    <a href="{% url 'vehicle_detail' v.slug %}" class="hs-cap rh-cap">
+                        <span class="label-tiny text-[#d9692f] block">{{ v.brand }}</span>
+                        <span class="block font-serif font-bold text-2xl sm:text-[34px] text-tertiary leading-[1.05] mt-1.5">{{ v.name }}</span>
+                        <span class="block text-sm text-on-surface-variant mt-2">{% if v.category %}{{ v.category.name }}{% else %}{{ v.get_vehicle_type_display }}{% endif %}{% if v.fuel_type %} • {{ v.get_fuel_type_display }}{% endif %}{% if v.transmission %} • {{ v.get_transmission_display }}{% endif %}</span>
                         {% if v.primary_price_value %}<span class="block text-sm text-on-surface-variant mt-1"><b class="text-on-surface">{{ v.primary_price_value|inr }}</b>/{{ v.primary_price_label }} <span class="material-symbols-outlined text-base align-[-3px] text-[#d9692f]">arrow_forward</span></span>{% endif %}
                     </a>
                 </div>
                 {% endfor %}
+                {% for url in hero_bg_images %}
+                <div class="hs"><img src="{{ url }}" alt="" class="w-full h-full object-cover"{% if n_v or not forloop.first %} loading="lazy"{% endif %}/></div>
+                {% endfor %}
+                {% if n_v|add:n_bg < 2 %}
+                <div class="hs">{% if config.hero_image %}<img src="{{ config.hero_image.url }}" alt="" class="w-full h-full object-cover"{% if n_v|add:n_bg %} loading="lazy"{% endif %}/>{% else %}<img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="An SUV beside a Kerala backwater at sunset" class="w-full h-full object-cover"{% if n_v|add:n_bg %} loading="lazy"{% endif %}/>{% endif %}</div>
+                {% endif %}
             </div>
-            {% elif config.hero_bg_1 or config.hero_bg_2 or config.hero_bg_3 %}
-            <div class="hero-slides absolute inset-0" data-hero-slides>
-                {% if config.hero_bg_1 %}<div class="hs"><img src="{{ config.hero_bg_1.url }}" alt="" class="w-full h-full object-cover"/></div>{% endif %}
-                {% if config.hero_bg_2 %}<div class="hs"><img src="{{ config.hero_bg_2.url }}" alt="" class="w-full h-full object-cover" loading="lazy"/></div>{% endif %}
-                {% if config.hero_bg_3 %}<div class="hs"><img src="{{ config.hero_bg_3.url }}" alt="" class="w-full h-full object-cover" loading="lazy"/></div>{% endif %}
-            </div>
-            {% elif config.hero_image %}
-            <img src="{{ config.hero_image.url }}" alt="" class="w-full h-full object-cover"/>
-            {% else %}
-            <img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="An SUV beside a Kerala backwater at sunset" class="w-full h-full object-cover"/>
-            {% endif %}
-            <div class="absolute inset-0 bg-gradient-to-t from-[#0f2e2c]/50 via-transparent to-transparent"></div>
-            <div class="hs-dots absolute right-6 bottom-6 z-10 flex gap-2" aria-hidden="true"></div>
-            {% if starting_price and not hero_vehicles %}
-            <div class="absolute top-6 right-6 bg-surface-container-lowest/85 backdrop-blur px-5 py-3 rounded-full flex items-center gap-2 text-sm font-bold text-on-surface"><span class="material-symbols-outlined text-[#d9692f] text-lg">wb_twilight</span>From <span data-slot>{{ starting_price|inr }}</span>/day</div>
-            {% endif %}
+            {% endwith %}
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0f2e2c]/35 via-transparent to-transparent pointer-events-none"></div>
+            <div class="hs-dots absolute left-6 bottom-6 z-10 flex gap-2" aria-hidden="true"></div>
         </div>
-        <!-- postcard stack fans out on load, spreads as you scroll (decorative) -->
-        <div class="absolute left-0 sm:-left-6 lg:-left-16 bottom-0 w-[64%] sm:w-[52%] lg:w-[48%] h-[46%] pointer-events-none" data-no-parallax aria-hidden="true">
-            <div class="pcw absolute left-0 bottom-0 w-[62%]" style="rotate:-11deg"><div class="pc"><img src="{% static 'themes/img/ambassador.jpg' %}" alt=""><span class="pc-cap">Greetings from Kerala</span><span class="pc-stamp"><span class="material-symbols-outlined">directions_car</span></span></div></div>
-            <div class="pcw absolute left-[22%] bottom-[14%] w-[62%]" style="rotate:-2deg"><div class="pc"><img src="{% static 'themes/img/rolls-palms.jpg' %}" alt=""><span class="pc-cap">Wedding day</span><span class="pc-stamp"><span class="material-symbols-outlined">favorite</span></span></div></div>
-            <div class="pcw absolute left-[44%] bottom-[2%] w-[62%]" style="rotate:9deg"><div class="pc"><img src="{% static 'themes/img/palms.jpg' %}" alt=""><span class="pc-cap">Weekend escape</span><span class="pc-stamp"><span class="material-symbols-outlined">wb_sunny</span></span></div></div>
+
+        <!-- postcards stacked down the right edge (decorative) -->
+        <div class="rh-cards" data-no-parallax aria-hidden="true">
+            <div class="pcw"><div class="pc"><img src="{% static 'themes/img/ambassador.jpg' %}" alt=""><span class="pc-cap">Greetings, Kerala</span></div></div>
+            <div class="pcw"><div class="pc"><img src="{% static 'themes/img/rolls-palms.jpg' %}" alt=""><span class="pc-cap">Wedding day</span></div></div>
+            <div class="pcw"><div class="pc"><img src="{% static 'themes/img/palms.jpg' %}" alt=""><span class="pc-cap">Weekend escape</span></div></div>
         </div>
+
+        {% if testimonials or config.total_happy_customers %}
+        <a href="#reviews" class="rh-trust">
+            {% if testimonials %}<span class="rh-faces">{% for t in testimonials|slice:":3" %}{% if t.photo %}<img src="{{ t.photo.url }}" alt=""/>{% else %}<span>{{ t.name|slice:":1"|upper }}</span>{% endif %}{% endfor %}</span>{% endif %}
+            <span class="leading-tight">Trusted by<br/>{% if config.total_happy_customers %}<b>{{ config.total_happy_customers }}+</b> {% endif %}Happy Customers</span>
+            <span class="rh-go"><span class="material-symbols-outlined">arrow_forward</span></span>
+        </a>
+        {% endif %}
     </div>
 </section>
+</div>
 
 <!-- ═══════════ The journey: a road draws itself down the page ═══════════ -->
 <div id="journey">
@@ -402,6 +504,7 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
     <div class="road-gap" data-stop="Postcards home"></div>
 
     <!-- ─── Testimonial: the back of a postcard ─── -->
+    <span id="reviews" class="block relative -top-24" aria-hidden="true"></span>
     <section class="lane max-w-6xl mx-auto">
         <div class="bg-surface-container-lowest rounded-[1.25rem] shadow-2xl shadow-black/10 p-7 sm:p-12 lg:p-16 grid md:grid-cols-[1.5fr_1fr] gap-10 md:gap-0 relative text-on-surface" style="background-image:repeating-linear-gradient(135deg,transparent 0 14px,rgba(227,155,60,.06) 14px 28px)">
             <div class="md:pr-12 md:border-r border-outline-variant">
@@ -526,9 +629,9 @@ plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as 
 document.addEventListener("motion:ready", ({ detail: { G, ST } }) => {
   /* postcards fan out after the hero opens, then spread as you scroll away */
   const pcs = G.utils.toArray(".pc");
-  G.fromTo(pcs, { opacity: 0, y: 80, x: (i) => [90, 0, -90][i], rotation: (i) => [11, 2, -9][i], scale: .85 },
-    { opacity: 1, y: 0, x: 0, rotation: 0, scale: 1, duration: 1.3, ease: "back.out(1.4)", stagger: .14, delay: 1.1 });
-  G.to(".pcw", { y: (i) => -30 - i * 26, x: (i) => (i - 1) * 24, rotation: (i) => [-5, 2, 7][i], ease: "none",
+  G.fromTo(pcs, { opacity: 0, x: 70, y: 30, rotation: (i) => [14, -10, 12][i], scale: .85 },
+    { opacity: 1, y: 0, x: 0, rotation: 0, scale: 1, duration: 1.2, ease: "back.out(1.4)", stagger: .14, delay: 1.1 });
+  G.to(".pcw", { y: (i) => -16 - i * 14, x: (i) => 8 + i * 6, ease: "none",
     scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true } });
   G.to(".hero-copy", { yPercent: -14, opacity: .25, ease: "none", scrollTrigger: { trigger: "#hero", start: "center top+=40%", end: "bottom top", scrub: true } });
 

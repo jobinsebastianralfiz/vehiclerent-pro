@@ -289,3 +289,29 @@ body { font-family: var(--body); font-size: 16px; line-height: 1.5; -webkit-font
 .foot .social a { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); display: grid; place-items: center; font: 700 11px/1 var(--mono); transition: background .3s, color .3s; }
 .foot .social a:hover { background: var(--ink); color: #fff; }
 .hero-fallback .hero-h { font-size: clamp(48px, 6.6vw, 108px); }
+
+/* occasions, wide tiles (2026-10-10): icon, name and count on the left, an arrow, the category photo on the right */
+.occ2-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.occ2 { display: grid; grid-template-columns: auto auto 1fr; align-items: center; gap: 0 clamp(12px, 1.4vw, 22px); min-height: clamp(150px, 12vw, 172px); padding: clamp(18px, 1.6vw, 24px); background: linear-gradient(115deg, var(--c0) 0%, var(--c0) 30%, color-mix(in srgb, var(--c1) 55%, var(--c0)) 100%); }
+.occ2::after { content: ""; position: absolute; z-index: -1; right: -12%; bottom: -40%; width: 70%; aspect-ratio: 1; border-radius: 50%; background: rgba(255,255,255,.22); }
+.occ2.dk::after { background: rgba(255,255,255,.06); }
+.occ2-txt { display: flex; flex-direction: column; align-items: flex-start; position: relative; z-index: 2; }
+.occ2-ico { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.62); margin-bottom: 14px; }
+.occ2.dk .occ2-ico { background: rgba(255,255,255,.14); }
+.occ2-ico .material-symbols-outlined { font-size: 26px; }
+.occ2 b { display: block; font: 800 clamp(22px, 1.9vw, 28px)/1 var(--display); letter-spacing: -.03em; }
+.occ2 small { display: block; margin-top: 10px; font: 700 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; opacity: .72; }
+.occ2-go { position: relative; z-index: 2; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.55); border: 1.5px solid rgba(255,255,255,.85); align-self: center; margin-top: 30px; transition: transform .45s var(--spring), background .3s; }
+.occ2.dk .occ2-go { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.3); color: #fff; }
+.occ2-go .material-symbols-outlined { font-size: 22px; }
+.occ2:hover .occ2-go { transform: translateX(5px); background: #fff; }
+.occ2.dk:hover .occ2-go { background: rgba(255,255,255,.25); }
+.occ2-ph { justify-self: end; position: relative; z-index: 1; }
+img.occ2-ph { width: 100%; max-width: 230px; height: clamp(110px, 9vw, 132px); object-fit: cover; border-radius: 16px; box-shadow: 0 18px 30px -18px rgba(0,0,0,.5); -webkit-mask-image: linear-gradient(90deg, transparent, #000 28%); mask-image: linear-gradient(90deg, transparent, #000 28%); transition: transform .7s var(--spring); }
+img.occ2-ph.cut { object-fit: contain; border-radius: 0; box-shadow: none; -webkit-mask-image: none; mask-image: none; filter: drop-shadow(0 16px 14px rgba(0,0,0,.28)); height: clamp(120px, 10vw, 150px); max-width: 260px; }
+.occ2:hover img.occ2-ph { transform: scale(1.05) translateX(-4px); }
+.occ2-ph.none { font-size: clamp(64px, 6vw, 92px); opacity: .35; }
+@media (max-width: 1100px) { .occ2-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .occ2-grid { grid-template-columns: 1fr; } .occ2 { min-height: 132px; } img.occ2-ph { height: 104px; } }
+@media (prefers-reduced-motion: reduce) { .occ2:hover img.occ2-ph, .occ2:hover .occ2-go { transform: none; } }
+.occ2.dk { color: #fff; }

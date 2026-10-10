@@ -116,12 +116,20 @@
       <div><span class="kicker"><i></i>Explore by occasion</span><h2 class="h2">Pick the <span class="ol">occasion.</span></h2></div>
       <p class="lede">From a weekend self-drive to a chauffeur-driven wedding morning. Tap a tile to see what fits.</p>
     </div>
-    <div class="occ-grid" data-deal>
-      {% for cat in categories|slice:":8" %}{% cycle 'orange' 'blue' 'red' 'violet' 'night' 'teal' 'green' 'amber' as tone silent %}
-      <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="ct occ t-{{ tone }}{% if tone == 'night' %} dk{% endif %}" data-tilt>
-        <span class="material-symbols-outlined">{{ cat.icon|default:"directions_car" }}</span>
-        <span><b>{{ cat.name }}</b><small>{% if cat.count %}{{ cat.count|stringformat:"02d" }} in fleet{% else %}Enquire{% endif %}</small></span>
+    <div class="occ-grid occ2-grid" data-deal>
+      {% for cat in categories|slice:":9" %}{% cycle 'orange' 'blue' 'red' 'violet' 'night' 'teal' 'amber' 'green' 'silver' as tone silent %}
+      {% with p=cat.tile_photo %}
+      <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="ct occ2 t-{{ tone }}{% if tone == 'night' %} dk{% endif %}" data-tilt="0.5">
+        <span class="occ2-txt">
+          <span class="occ2-ico"><span class="material-symbols-outlined">{{ cat.icon|default:"directions_car" }}</span></span>
+          <b>{{ cat.name }}</b>
+          <small>{% if cat.count %}{{ cat.count|stringformat:"02d" }} in fleet{% else %}Enquire{% endif %}</small>
+        </span>
+        <span class="occ2-go" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></span>
+        {% if p.0 %}<img class="occ2-ph{% if p.1 %} cut{% endif %}" src="{{ p.0 }}" alt="" loading="lazy"/>
+        {% else %}<span class="occ2-ph none material-symbols-outlined" aria-hidden="true">{{ cat.icon|default:"directions_car" }}</span>{% endif %}
       </a>
+      {% endwith %}
       {% endfor %}
     </div>
   </div>

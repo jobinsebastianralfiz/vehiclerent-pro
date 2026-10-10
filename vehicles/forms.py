@@ -45,7 +45,7 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = VehicleCategory
         fields = [
-            "name", "description", "icon", "display_order", "is_active",
+            "name", "description", "icon", "image", "display_order", "is_active",
             "meta_title", "meta_description", "meta_keywords",
         ]
         widgets = {
