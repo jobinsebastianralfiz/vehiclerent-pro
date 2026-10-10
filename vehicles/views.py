@@ -124,7 +124,11 @@ def vehicle_list(request):
 
 
 def vehicle_detail(request, slug):
-    vehicle = get_object_or_404(Vehicle, slug=slug, is_published=True)
+    vehicle = Vehicle.objects.filter(slug=slug, is_published=True).first()
+    if vehicle is None:
+        # Old web address from before the slug clean-up
+        moved = get_object_or_404(Vehicle, previous_slug=slug, is_published=True)
+        return redirect(moved.get_absolute_url(), permanent=True)
     images = vehicle.images.order_by("display_order")
     related = (
         Vehicle.objects.filter(is_published=True, category=vehicle.category)

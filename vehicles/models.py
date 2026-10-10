@@ -179,6 +179,7 @@ class Vehicle(models.Model):
     # Add-vehicle wizard: a draft is saved after step 1 and stays off the public site
     is_draft = models.BooleanField(default=False)
     wizard_step = models.PositiveSmallIntegerField(default=6, help_text="Furthest wizard step reached")
+    previous_slug = models.SlugField(max_length=200, blank=True, db_index=True, help_text="Old web address, redirected to the current one")
     # SEO
     meta_title = models.CharField(max_length=200, blank=True, help_text="Custom <title>; defaults to '{Brand} {Name} for Rent'")
     meta_description = models.CharField(max_length=300, blank=True, help_text="Meta description for search engines (150–160 chars)")
@@ -195,7 +196,7 @@ class Vehicle(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(f"{self.brand}-{self.model}-{self.name}")
+            base_slug = self.build_slug()
             slug = base_slug
             counter = 1
             while Vehicle.objects.filter(slug=slug).exclude(pk=self.pk).exists():
@@ -205,6 +206,15 @@ class Vehicle(models.Model):
         if self.is_draft:
             self.is_published = False  # drafts never show on the public site
         super().save(*args, **kwargs)
+
+    def build_slug(self):
+        """brand-model-name, skipping brand or model when the name already says it."""
+        slug = slugify(self.name)
+        for part in (self.model, self.brand):
+            p = slugify(part or "")
+            if p and p not in slug:
+                slug = f"{p}-{slug}" if slug else p
+        return slug or "vehicle"
 
     def get_absolute_url(self):
         return f"/vehicles/{self.slug}/"
