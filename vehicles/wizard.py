@@ -43,6 +43,9 @@ STEPS = [
                 "wedding_tier", "available_cities", "meta_title", "meta_description", "meta_keywords"]},
 ]
 LAST = len(STEPS)
+# Edited from the Quick settings bar on every step once a vehicle is live, so step 6 leaves them out then
+QUICK_FIELDS = ["status", "is_featured", "show_in_hero", "is_premium", "is_wedding_service",
+                "is_chauffeur_available", "wedding_tier"]
 
 _INPUT = "w-full rounded-xl border-stone-200 text-sm py-2.5 px-3.5 focus:border-[#145c38] focus:ring-[#145c38]/20"
 _CHECK = "w-5 h-5 rounded-md border-stone-300 text-[#145c38] focus:ring-[#145c38]/30"
@@ -115,8 +118,10 @@ class _StepBase(VehicleForm):
             self.fields["meta_description"].widget = forms.Textarea(attrs={"rows": 3, "maxlength": 300, "class": _INPUT})
 
 
-def _step_form(step):
+def _step_form(step, vehicle=None):
     fields = STEPS[step - 1]["fields"]
+    if vehicle is not None and not vehicle.is_draft:
+        fields = [f for f in fields if f not in QUICK_FIELDS]
     return forms.modelform_factory(Vehicle, form=_StepBase, fields=fields)
 
 
@@ -154,12 +159,13 @@ def vehicle_wizard(request, pk, step):
 
 
 def _wizard(request, vehicle, step):
-    Form = _step_form(step)
+    Form = _step_form(step, vehicle)
     is_new = vehicle is None
+    live = bool(vehicle and not vehicle.is_draft)
     publish_form = None
     if request.method == "POST":
         form = Form(request.POST, request.FILES, instance=vehicle)
-        if step == LAST:
+        if step == LAST and not live:
             publish_form = _PublishForm(request.POST)
             publish_form.is_valid()
         action = request.POST.get("action", "next")
@@ -172,10 +178,8 @@ def _wizard(request, vehicle, step):
                 for img_id in request.POST.getlist("delete_image"):
                     VehicleImage.objects.filter(pk=img_id, vehicle=obj).delete()
             finishing = step == LAST and action == "finish"
-            if finishing:
+            if finishing and not live:
                 obj.is_draft = False
-                obj.is_published = publish_form.cleaned_data.get("publish", False)
-            elif not obj.is_draft and step == LAST:
                 obj.is_published = publish_form.cleaned_data.get("publish", False)
             if obj.is_draft:
                 obj.wizard_step = max(obj.wizard_step, min(step + 1, LAST) if action in ("next", "finish") else step)
@@ -206,7 +210,7 @@ def _wizard(request, vehicle, step):
         messages.error(request, "Please fix the highlighted fields. Nothing on this step was saved yet.")
     else:
         form = Form(instance=vehicle)
-        if step == LAST:
+        if step == LAST and not live:
             publish_form = _PublishForm(initial={"publish": True if (vehicle and vehicle.is_draft) else bool(vehicle and vehicle.is_published)})
 
     reached = LAST if (vehicle and not vehicle.is_draft) else (vehicle.wizard_step if vehicle else 1)
@@ -219,7 +223,10 @@ def _wizard(request, vehicle, step):
         "steps": steps,
         "current": STEPS[step - 1],
         "last": LAST,
-        "is_edit": bool(vehicle and not vehicle.is_draft),
+        "is_edit": live,
+        "quick": _quick_json(vehicle) if live else None,
+        "status_choices": Vehicle.STATUS_CHOICES,
+        "tier_choices": [c for c in Vehicle._meta.get_field("wedding_tier").choices if c[0]],
         "draft_key": f"vw-{vehicle.pk if vehicle else 'new'}-{step}",
         "post_url": reverse("vehicle_wizard", args=[vehicle.pk, step]) if vehicle else reverse("vehicle_add"),
         "images": _gallery_json(vehicle) if (vehicle and step == LAST) else [],
@@ -275,3 +282,30 @@ def vehicle_gallery(request, pk):
         return JsonResponse({"error": "Unknown action."}, status=400)
     _sync_primary(vehicle)
     return JsonResponse({"images": _gallery_json(vehicle)})
+
+
+QUICK_FLAGS = ["is_published", "is_featured", "show_in_hero", "is_premium", "is_wedding_service", "is_chauffeur_available"]
+
+
+def _quick_json(vehicle):
+    data = {f: getattr(vehicle, f) for f in QUICK_FLAGS}
+    data.update(status=vehicle.status, wedding_tier=vehicle.wedding_tier or "")
+    return data
+
+
+@login_required
+@require_POST
+def vehicle_quick(request, pk):
+    """Quick settings bar: saves one setting of a live vehicle at once (field + value)."""
+    vehicle = get_object_or_404(Vehicle, pk=pk, is_draft=False)
+    field, value = request.POST.get("field"), request.POST.get("value", "")
+    if field in QUICK_FLAGS:
+        setattr(vehicle, field, value in ("1", "true", "on"))
+    elif field == "status" and value in dict(Vehicle.STATUS_CHOICES):
+        vehicle.status = value
+    elif field == "wedding_tier" and (value == "" or value in dict(Vehicle._meta.get_field("wedding_tier").choices)):
+        vehicle.wedding_tier = value
+    else:
+        return JsonResponse({"error": "That setting can't be changed here."}, status=400)
+    vehicle.save(update_fields=[field])
+    return JsonResponse({"quick": _quick_json(vehicle)})

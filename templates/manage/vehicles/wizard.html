@@ -13,6 +13,44 @@
     {% if vehicle.is_draft %}<span class="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-800 text-xs font-bold ring-1 ring-amber-200"><span class="material-symbols-outlined text-[16px]">edit_note</span>Draft · not on the website yet</span>{% endif %}
 </div>
 
+{% if quick %}
+{{ quick|json_script:"quick-data" }}
+<!-- ─── Quick settings: live vehicles only, saved on click from any step ─── -->
+<section class="mb-5 rounded-2xl bg-white ring-1 ring-black/5 shadow-sm px-4 sm:px-5 py-3.5" x-data="quickSettings('{% url 'vehicle_quick' vehicle.pk %}')" aria-label="Quick settings">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-3">
+        <p class="flex items-center gap-1.5 text-sm font-bold text-stone-800 shrink-0"><span class="material-symbols-outlined text-[20px] text-[#145c38]">bolt</span>Quick settings</p>
+        <label class="flex items-center gap-2 text-sm">
+            <span class="text-stone-500 font-semibold">Status</span>
+            <select x-model="s.status" x-on:change="save('status', s.status)" class="rounded-lg border-stone-200 text-sm py-1.5 pl-3 pr-8 font-semibold focus:border-[#145c38] focus:ring-[#145c38]/20" :class="s.status === 'available' ? 'text-[#145c38]' : 'text-amber-700'">
+                {% for v, l in status_choices %}<option value="{{ v }}">{{ l }}</option>{% endfor %}
+            </select>
+        </label>
+        <span class="hidden sm:block w-px h-6 bg-stone-200"></span>
+        <div class="flex flex-wrap items-center gap-2">
+            <template x-for="t in toggles" :key="t.f">
+                <button type="button" x-on:click="save(t.f, !s[t.f])" :aria-pressed="s[t.f]" :title="t.tip"
+                        class="inline-flex items-center gap-1.5 pl-2 pr-3 py-1.5 rounded-full ring-1 text-xs font-semibold transition-colors"
+                        :class="s[t.f] ? 'bg-[#145c38] text-white ring-[#145c38]' : 'bg-white text-stone-600 ring-stone-200 hover:ring-[#145c38]/50'">
+                    <span class="material-symbols-outlined text-[16px]" x-text="s[t.f] ? 'check_circle' : t.icon"></span><span x-text="t.label"></span>
+                </button>
+            </template>
+            <label x-show="s.is_wedding_service" x-cloak class="flex items-center gap-1.5 text-xs">
+                <span class="text-stone-500 font-semibold">Tier</span>
+                <select x-model="s.wedding_tier" x-on:change="save('wedding_tier', s.wedding_tier)" class="rounded-lg border-stone-200 text-xs py-1 pl-2.5 pr-7 focus:border-[#145c38] focus:ring-[#145c38]/20">
+                    <option value="">Choose…</option>
+                    {% for v, l in tier_choices %}<option value="{{ v }}">{{ l }}</option>{% endfor %}
+                </select>
+            </label>
+        </div>
+        <p class="ml-auto text-xs font-semibold" aria-live="polite">
+            <span x-show="state === 'saving'" x-cloak class="text-stone-400">Saving…</span>
+            <span x-show="state === 'saved'" x-cloak class="text-[#145c38] inline-flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">done</span>Saved</span>
+            <span x-show="state === 'error'" x-cloak class="text-red-600" x-text="error"></span>
+        </p>
+    </div>
+</section>
+{% endif %}
+
 <form method="post" action="{{ post_url }}" enctype="multipart/form-data" id="wizard" data-draft-key="{{ draft_key }}" data-has-errors="{% if form.errors %}1{% endif %}" novalidate>
     {% csrf_token %}
 
@@ -291,6 +329,9 @@
                 </div>
             </div>
             <div class="rounded-2xl bg-stone-50/70 ring-1 ring-stone-200/70 p-5 space-y-5 content-start">
+                {% if is_edit %}
+                <p class="flex items-start gap-2 text-xs text-stone-600 rounded-xl bg-white ring-1 ring-stone-200 p-3"><span class="material-symbols-outlined text-[18px] text-[#145c38]">bolt</span><span>Status, visibility, badges and wedding tier are in <b>Quick settings</b> at the top of every step, and save as soon as you click.</span></p>
+                {% else %}
                 {% include "manage/vehicles/_wf.html" with f=form.status %}
                 <div class="space-y-2.5">
                     <p class="text-sm font-semibold text-stone-700">Visibility</p>
@@ -305,6 +346,7 @@
                     <label class="flex items-center gap-2.5 text-sm">{{ form.is_chauffeur_available }} Chauffeur available</label>
                 </div>
                 {% include "manage/vehicles/_wf.html" with f=form.wedding_tier help="Only used for wedding cars." %}
+                {% endif %}
                 <div>
                     <p class="block text-sm font-semibold text-stone-700 mb-2">Available cities</p>
                     <div class="flex flex-wrap gap-2">
@@ -454,6 +496,40 @@ function featureChips(initial) {
     form.addEventListener("submit", () => { submitting = true; if (store) store.removeItem(key); });
     window.addEventListener("beforeunload", e => { if (dirty && !submitting) { e.preventDefault(); e.returnValue = ""; } });
 })();
+</script>
+<script>
+// Quick settings bar: each click saves one field through vehicle_quick
+function quickSettings(url) {
+    return {
+        s: JSON.parse(document.getElementById("quick-data").textContent),
+        state: "", error: "", timer: null,
+        toggles: [
+            { f: "is_published", label: "Published", icon: "public", tip: "Shown on the website" },
+            { f: "is_featured", label: "Featured", icon: "star", tip: "On the home page" },
+            { f: "show_in_hero", label: "Hero slides", icon: "slideshow", tip: "In the big slider at the top of the home page" },
+            { f: "is_premium", label: "Premium", icon: "workspace_premium", tip: "Premium badge" },
+            { f: "is_wedding_service", label: "Wedding", icon: "favorite", tip: "Available for weddings" },
+            { f: "is_chauffeur_available", label: "Chauffeur", icon: "person", tip: "Can be hired with a driver" },
+        ],
+        async save(field, value) {
+            const before = { ...this.s };
+            this.s[field] = value;
+            this.state = "saving"; clearTimeout(this.timer);
+            const body = new FormData();
+            body.append("field", field);
+            body.append("value", typeof value === "boolean" ? (value ? "1" : "0") : value);
+            try {
+                const r = await fetch(url, { method: "POST", body, headers: { "X-CSRFToken": document.querySelector("#wizard [name=csrfmiddlewaretoken]").value } });
+                const out = await r.json();
+                if (!r.ok) throw new Error(out.error || "Couldn't save. Try again.");
+                this.s = out.quick; this.state = "saved";
+                this.timer = setTimeout(() => this.state = "", 2000);
+            } catch (err) {
+                this.s = before; this.state = "error"; this.error = err.message || "Couldn't save. Try again.";
+            }
+        },
+    };
+}
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 <script>
