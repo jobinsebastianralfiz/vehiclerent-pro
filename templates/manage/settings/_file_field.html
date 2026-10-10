@@ -1,0 +1,14 @@
+{# One image upload: current image (or a placeholder), the picker, help and errors. #}
+{# with: name, label, current (ImageFieldFile), errors, help, wide (bool: big landscape preview), required (bool) #}
+<div>
+    <label class="af-label" for="f-{{ name }}">{{ label }}{% if required %} <span class="req">*</span>{% endif %}</label>
+    <div class="st-file">
+        <span class="st-thumb{% if wide %} wide{% endif %}">
+            <img src="{% if current %}{{ current.url }}{% endif %}" alt="" data-preview-for="f-{{ name }}" class="{% if not current %}hidden{% endif %}"/>
+            <span class="material-symbols-outlined{% if current %} hidden{% endif %}" data-placeholder-for="f-{{ name }}">image</span>
+        </span>
+        <input id="f-{{ name }}" type="file" name="{{ name }}" accept="image/*" class="st-file-input"/>
+    </div>
+    {% if help %}<p class="af-help">{{ help }}</p>{% endif %}
+    {% if errors %}<p class="af-err">{{ errors|join:" " }}</p>{% endif %}
+</div>

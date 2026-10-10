@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models import Count, Min
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 from django_ratelimit.decorators import ratelimit
@@ -232,6 +233,20 @@ def admin_logout(request):
 
 # ──────────────── Admin: Site Settings ────────────────
 
+# Site Settings tabs: (id, label, Material icon).
+SETTINGS_TABS = [
+    ("theme", "Website Theme", "desktop_windows"),
+    ("branding", "Branding", "image"),
+    ("contact", "Contact Info", "call"),
+    ("hero", "Homepage Hero", "home"),
+    ("about", "About Page", "description"),
+    ("seo", "SEO & Meta", "search"),
+    ("social", "Social Links", "share"),
+    ("footer", "Footer", "bottom_panel_open"),
+]
+SETTINGS_TAB_IDS = {t[0] for t in SETTINGS_TABS}
+
+
 @login_required
 def site_config_edit(request):
     config = SiteConfig.load()
@@ -240,10 +255,15 @@ def site_config_edit(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Site settings updated successfully.")
-            return redirect("site_config_edit")
+            # Back to the tab the admin was on.
+            tab = request.POST.get("_tab", "")
+            url = reverse("site_config_edit")
+            return redirect(f"{url}?tab={tab}" if tab in SETTINGS_TAB_IDS else url)
     else:
         form = SiteConfigForm(instance=config)
-    return render(request, "manage/settings/config.html", {"form": form, "config": config, "themes": THEMES.items()})
+    return render(request, "manage/settings/config.html", {
+        "form": form, "config": config, "themes": THEMES.items(), "tabs": SETTINGS_TABS,
+    })
 
 
 # ──────────────── Admin: Testimonials ────────────────

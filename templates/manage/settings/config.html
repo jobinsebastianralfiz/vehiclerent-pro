@@ -4,8 +4,40 @@
 {% block page_title %}Site Settings{% endblock %}
 
 {% block content %}
+<style>
+    /* Tabs: one form, one Save; tabs only change which part is on screen. */
+    .st-tabs { display: flex; overflow-x: auto; scrollbar-width: none; margin: 0 -1.25rem; padding: 0 .75rem; border-bottom: 1px solid #ecebe5; }
+    .st-tabs::-webkit-scrollbar { display: none; }
+    .st-tab { position: relative; display: inline-flex; align-items: center; gap: .55rem; flex: none; padding: 1.05rem 1rem; font-size: .875rem; font-weight: 600; color: #78716c; white-space: nowrap; transition: color .15s; }
+    .st-tab:hover { color: #292524; }
+    .st-tab .material-symbols-outlined { font-size: 20px; }
+    .st-tab[aria-selected="true"] { color: #145c38; font-weight: 700; }
+    .st-tab[aria-selected="true"]::after { content: ""; position: absolute; left: .75rem; right: .75rem; bottom: -1px; height: 3px; border-radius: 3px 3px 0 0; background: #145c38; }
+    .st-dot { width: .45rem; height: .45rem; border-radius: 999px; background: #f59e0b; }
+    .st-dot.err { background: #dc2626; }
+    .st-panel[hidden] { display: none; }
+    .st-panel .af-sec:first-child { padding-top: 1.75rem; }
+    .st-panel .af-sec-title h2 { font-size: 1.3rem; font-weight: 800; letter-spacing: -.01em; }
+    .st-panel .af-sec-title p { font-size: .875rem; margin-top: .4rem; }
+    .st-file { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; }
+    .st-thumb { flex: none; height: 3.5rem; min-width: 3.5rem; max-width: 12rem; padding: .3rem; border: 1px solid #e2e0d8; border-radius: .75rem; background: #f6f5f0; display: grid; place-items: center; overflow: hidden; }
+    .st-thumb.wide { height: 6rem; width: 100%; max-width: 18rem; padding: 0; }
+    .st-thumb img { height: 100%; width: auto; object-fit: contain; }
+    .st-thumb.wide img { width: 100%; object-fit: cover; }
+    .st-thumb .material-symbols-outlined { font-size: 22px; color: #c8c5bb; }
+    .st-file-input { flex: 1; min-width: 12rem; font-size: .8125rem; color: #78716c; }
+    .st-file-input::file-selector-button { margin-right: .75rem; padding: .55rem 1rem; border: 1px solid #e2e0d8; border-radius: .7rem; background: #fff; font-size: .8125rem; font-weight: 600; color: #292524; cursor: pointer; transition: background .15s; }
+    .st-file-input::file-selector-button:hover { background: #f6f5f0; }
+    .st-bar { position: sticky; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin: 0 -1.25rem -1.5rem; padding: .9rem 1.25rem; background: rgba(255,255,255,.96); backdrop-filter: blur(6px); border-top: 1px solid #ecebe5; border-radius: 0 0 1.25rem 1.25rem; }
+    .st-status { font-size: .8125rem; color: #78716c; display: flex; align-items: center; gap: .5rem; min-width: 0; }
+    @media (min-width: 640px) {
+        .st-tabs { margin: 0 -2rem; padding: 0 1.25rem; }
+        .st-bar { margin: 0 -2rem -1.5rem; padding: 1rem 2rem; }
+    }
+</style>
+
 <div class="af-card">
-    <div class="af-head">
+    <div class="af-head !border-b-0 !pb-4">
         <div>
             <h1>Site Settings</h1>
             <p>Configure your website branding, content and SEO.</p>
@@ -13,304 +45,406 @@
         <a href="{% url 'testimonial_list' %}" class="af-btn ghost"><span class="material-symbols-outlined">format_quote</span>Manage Testimonials</a>
     </div>
 
-    <form method="post" enctype="multipart/form-data">
+    <nav class="st-tabs" role="tablist" aria-label="Settings sections">
+        {% for id, label, icon in tabs %}
+        <button type="button" class="st-tab" role="tab" id="tab-{{ id }}" aria-controls="panel-{{ id }}" aria-selected="false" data-tab="{{ id }}" data-label="{{ label }}">
+            <span class="material-symbols-outlined">{{ icon }}</span>{{ label }}<span class="st-dot hidden"></span>
+        </button>
+        {% endfor %}
+    </nav>
+
+    <form method="post" enctype="multipart/form-data" id="settings-form" novalidate>
         {% csrf_token %}
+        <input type="hidden" name="_tab" value="theme"/>
         {% if form.errors %}
-        <div class="af-errors"><p class="font-semibold mb-1">Please correct the errors below:</p>{{ form.errors }}</div>
+        <div class="af-errors"><p class="font-semibold">Some settings need fixing. Tabs with a problem are marked red.</p>{% if form.non_field_errors %}{{ form.non_field_errors }}{% endif %}</div>
         {% endif %}
 
-        <div class="af-sec" id="theme" style="scroll-margin-top:6rem">
-            <div class="af-sec-title">
-                <span class="af-sec-icon"><span class="material-symbols-outlined">palette</span></span>
-                <div><h2>Website Theme</h2><p>The design of your public website. Preview opens the live site in that theme for you only; visitors see the saved theme.</p></div>
-            </div>
-            <div class="af-grid c2 xl:!grid-cols-3">
-                {% for key, t in themes %}
-                <label class="group relative block cursor-pointer rounded-xl border-2 overflow-hidden transition-colors has-[:checked]:border-[#145c38] border-stone-200 hover:border-stone-300">
-                    <input type="radio" name="theme" value="{{ key }}" class="peer sr-only" {% if form.theme.value == key %}checked{% endif %}/>
-                    <img src="{% static 'themes/thumbs/'|add:key|add:'.jpg' %}" alt="" class="w-full aspect-[16/10] object-cover object-top bg-stone-100" loading="lazy"/>
-                    <span class="absolute top-2 right-2 hidden peer-checked:flex items-center gap-1 bg-[#145c38] text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full"><span class="material-symbols-outlined text-sm">check</span>Selected</span>
-                    <span class="block p-3">
-                        <span class="flex items-center justify-between gap-2">
-                            <span class="text-sm font-bold">{{ t.label }}</span>
-                            <a href="{% url 'home' %}?theme={{ key }}" target="_blank" rel="noopener" class="text-[11px] font-bold text-[#145c38] hover:underline flex items-center gap-1">Preview <span class="material-symbols-outlined text-sm">open_in_new</span></a>
+        {# ─────────── Website Theme ─────────── #}
+        <div class="st-panel" id="panel-theme" role="tabpanel" aria-labelledby="tab-theme" data-panel="theme">
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Website Theme</h2><p>Choose a ready-made design for your public website. You can change its content, colors and images in the other tabs. Preview opens the site in that theme for you only; visitors see the saved theme.</p></div>
+                </div>
+                <div class="af-grid c2 xl:!grid-cols-3">
+                    {% for key, t in themes %}
+                    <label class="group relative block cursor-pointer rounded-xl border-2 overflow-hidden transition-colors has-[:checked]:border-[#145c38] has-[:checked]:ring-4 has-[:checked]:ring-[#145c38]/10 border-stone-200 hover:border-stone-300">
+                        <input type="radio" name="theme" value="{{ key }}" class="peer sr-only" {% if form.theme.value == key %}checked{% endif %}/>
+                        <img src="{% static 'themes/thumbs/'|add:key|add:'.jpg' %}" alt="" class="w-full aspect-[16/10] object-cover object-top bg-stone-100" loading="lazy"/>
+                        <span class="absolute top-2 right-2 hidden peer-checked:flex items-center gap-1 bg-[#145c38] text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full"><span class="material-symbols-outlined text-sm">check</span>Selected</span>
+                        <span class="block p-3">
+                            <span class="flex items-center justify-between gap-2">
+                                <span class="text-sm font-bold">{{ t.label }}</span>
+                                <a href="{% url 'home' %}?theme={{ key }}" target="_blank" rel="noopener" class="text-[11px] font-bold text-[#145c38] hover:underline flex items-center gap-1">Preview <span class="material-symbols-outlined text-sm">open_in_new</span></a>
+                            </span>
+                            <span class="block text-xs text-stone-500 mt-1 leading-snug">{{ t.description }}</span>
                         </span>
-                        <span class="block text-xs text-stone-500 mt-1 leading-snug">{{ t.description }}</span>
-                    </span>
-                </label>
-                {% endfor %}
-                {% if form.theme.errors %}<p class="af-err">{{ form.theme.errors|join:" " }}</p>{% endif %}
-            </div>
-        </div>
-
-        <div class="af-sec">
-            <div class="af-sec-title">
-                <span class="af-sec-icon"><span class="material-symbols-outlined">storefront</span></span>
-                <div><h2>Branding</h2><p>Site name, logo and tagline displayed across the website.</p></div>
-            </div>
-            <div class="af-grid c2">
-                <div>
-                    <label class="af-label" for="f-site_name">Site Name</label>
-                    <input id="f-site_name" type="text" name="site_name" value="{{ form.site_name.value|default:'' }}"/>
-                    {% if form.site_name.errors %}<p class="af-err">{{ form.site_name.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-tagline">Tagline</label>
-                    <input id="f-tagline" type="text" name="tagline" value="{{ form.tagline.value|default:'' }}"/>
-                    {% if form.tagline.errors %}<p class="af-err">{{ form.tagline.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-logo">Logo</label>
-                    {% if config.logo %}<img src="{{ config.logo.url }}" alt="" class="h-10 mb-2"/>{% endif %}
-                    <input id="f-logo" type="file" name="logo" accept="image/*" class="block w-full text-sm text-stone-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#ecf7f0] file:text-[#145c38] hover:file:bg-[#d3eedd] file:cursor-pointer"/>
-                    {% if form.logo.errors %}<p class="af-err">{{ form.logo.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-favicon">Favicon</label>
-                    {% if config.favicon %}<img src="{{ config.favicon.url }}" alt="" class="h-8 mb-2"/>{% endif %}
-                    <input id="f-favicon" type="file" name="favicon" accept="image/*" class="block w-full text-sm text-stone-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#ecf7f0] file:text-[#145c38] hover:file:bg-[#d3eedd] file:cursor-pointer"/>
-                    {% if form.favicon.errors %}<p class="af-err">{{ form.favicon.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div class="span-all">
-                    <label class="af-check">
-                        <input type="checkbox" name="show_brand_name" {% if form.show_brand_name.value %}checked{% endif %}/>
-                        <span><b>Show brand name text</b><small>Display the site name next to the logo in the navbar and footer. Turn off if your logo already contains the brand name.</small></span>
                     </label>
+                    {% endfor %}
+                    {% if form.theme.errors %}<p class="af-err span-all">{{ form.theme.errors|join:" " }}</p>{% endif %}
                 </div>
             </div>
         </div>
 
-        <div class="af-sec">
-            <div class="af-sec-title">
-                <span class="af-sec-icon"><span class="material-symbols-outlined">contact_phone</span></span>
-                <div><h2>Contact Info</h2><p>Displayed in the footer, contact page and enquiry emails.</p></div>
-            </div>
-            <div class="af-grid c2">
-                <div>
-                    <label class="af-label" for="f-phone">Phone</label>
-                    <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">call</span></span><input id="f-phone" type="text" name="phone" value="{{ form.phone.value|default:'' }}" placeholder="+91 99999 99999"/></div>
-                    {% if form.phone.errors %}<p class="af-err">{{ form.phone.errors|join:" " }}</p>{% endif %}
+        {# ─────────── Branding ─────────── #}
+        <div class="st-panel" id="panel-branding" role="tabpanel" aria-labelledby="tab-branding" data-panel="branding" hidden>
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Branding</h2><p>Set your site name, logo and tagline. These are shown across your website.</p></div>
                 </div>
-                <div>
-                    <label class="af-label" for="f-email">Email</label>
-                    <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">mail</span></span><input id="f-email" type="email" name="email" value="{{ form.email.value|default:'' }}"/></div>
-                    {% if form.email.errors %}<p class="af-err">{{ form.email.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-whatsapp_number">WhatsApp Number</label>
-                    <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">chat</span></span><input id="f-whatsapp_number" type="text" name="whatsapp_number" value="{{ form.whatsapp_number.value|default:'' }}" placeholder="919999999999"/></div>
-                    {% if form.whatsapp_number.errors %}<p class="af-err">{{ form.whatsapp_number.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-whatsapp_default_message">WhatsApp Default Message</label>
-                    <input id="f-whatsapp_default_message" type="text" name="whatsapp_default_message" value="{{ form.whatsapp_default_message.value|default:'' }}"/>
-                    {% if form.whatsapp_default_message.errors %}<p class="af-err">{{ form.whatsapp_default_message.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div class="span-all">
-                    <label class="af-label" for="f-address">Address</label>
-                    <textarea id="f-address" name="address" rows="2">{{ form.address.value|default:'' }}</textarea>
-                    {% if form.address.errors %}<p class="af-err">{{ form.address.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div class="span-all">
-                    <label class="af-label" for="f-google_maps_embed">Google Maps Embed URL</label>
-                    <textarea id="f-google_maps_embed" name="google_maps_embed" rows="2" class="font-mono !text-xs" placeholder="https://www.google.com/maps/embed?...">{{ form.google_maps_embed.value|default:'' }}</textarea>
-                    {% if form.google_maps_embed.errors %}<p class="af-err">{{ form.google_maps_embed.errors|join:" " }}</p>{% endif %}
-                </div>
-            </div>
-        </div>
-
-        <div class="af-sec">
-            <div class="af-sec-title">
-                <span class="af-sec-icon"><span class="material-symbols-outlined">web</span></span>
-                <div><h2>Homepage Hero</h2><p>The main banner area on the homepage.</p></div>
-            </div>
-            <div class="af-grid c2">
-                <div class="span-all">
-                    <label class="af-label" for="f-hero_title">Hero Title</label>
-                    <input id="f-hero_title" type="text" name="hero_title" value="{{ form.hero_title.value|default:'' }}"/>
-                    {% if form.hero_title.errors %}<p class="af-err">{{ form.hero_title.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-hero_subtitle">Hero Subtitle</label>
-                    <input id="f-hero_subtitle" type="text" name="hero_subtitle" value="{{ form.hero_subtitle.value|default:'' }}"/>
-                    {% if form.hero_subtitle.errors %}<p class="af-err">{{ form.hero_subtitle.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-hero_cta_text">CTA Button Text</label>
-                    <input id="f-hero_cta_text" type="text" name="hero_cta_text" value="{{ form.hero_cta_text.value|default:'' }}"/>
-                    {% if form.hero_cta_text.errors %}<p class="af-err">{{ form.hero_cta_text.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div class="span-all">
-                    <label class="af-label" for="f-hero_description">Hero Description</label>
-                    <input id="f-hero_description" type="text" name="hero_description" value="{{ form.hero_description.value|default:'' }}" placeholder="Short description below the title"/>
-                    {% if form.hero_description.errors %}<p class="af-err">{{ form.hero_description.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div class="span-all">
-                    <label class="af-label" for="f-hero_image">Hero Fallback Image</label>
-                    <p class="af-help !mt-0 mb-2">Used when no background slides are uploaded.</p>{% if config.hero_image %}<img src="{{ config.hero_image.url }}" alt="" class="h-20 rounded-lg object-cover mb-2"/>{% endif %}
-                    <input id="f-hero_image" type="file" name="hero_image" accept="image/*" class="block w-full text-sm text-stone-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#ecf7f0] file:text-[#145c38] hover:file:bg-[#d3eedd] file:cursor-pointer"/>
-                    {% if form.hero_image.errors %}<p class="af-err">{{ form.hero_image.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div class="span-all">
-                    <label class="af-label">Hero Background Slides</label>
-                    <p class="af-help !mt-0 mb-3">Upload up to 3 images for the animated background slideshow. Use wide landscape images (1920×1080 recommended).</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div class="rounded-xl border border-dashed border-stone-300 p-3">
-                            <p class="text-xs font-semibold text-stone-500 mb-2">Slide 1</p>
-                            {% if config.hero_bg_1 %}<img src="{{ config.hero_bg_1.url }}" alt="" class="w-full h-20 rounded-lg object-cover mb-2"/>{% endif %}
-                            <input type="file" name="hero_bg_1" accept="image/*" class="block w-full text-xs text-stone-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#ecf7f0] file:text-[#145c38] file:cursor-pointer"/>
-                            {% if form.hero_bg_1.errors %}<p class="af-err">{{ form.hero_bg_1.errors|join:" " }}</p>{% endif %}
-                        </div>
-                        <div class="rounded-xl border border-dashed border-stone-300 p-3">
-                            <p class="text-xs font-semibold text-stone-500 mb-2">Slide 2</p>
-                            {% if config.hero_bg_2 %}<img src="{{ config.hero_bg_2.url }}" alt="" class="w-full h-20 rounded-lg object-cover mb-2"/>{% endif %}
-                            <input type="file" name="hero_bg_2" accept="image/*" class="block w-full text-xs text-stone-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#ecf7f0] file:text-[#145c38] file:cursor-pointer"/>
-                            {% if form.hero_bg_2.errors %}<p class="af-err">{{ form.hero_bg_2.errors|join:" " }}</p>{% endif %}
-                        </div>
-                        <div class="rounded-xl border border-dashed border-stone-300 p-3">
-                            <p class="text-xs font-semibold text-stone-500 mb-2">Slide 3</p>
-                            {% if config.hero_bg_3 %}<img src="{{ config.hero_bg_3.url }}" alt="" class="w-full h-20 rounded-lg object-cover mb-2"/>{% endif %}
-                            <input type="file" name="hero_bg_3" accept="image/*" class="block w-full text-xs text-stone-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#ecf7f0] file:text-[#145c38] file:cursor-pointer"/>
-                            {% if form.hero_bg_3.errors %}<p class="af-err">{{ form.hero_bg_3.errors|join:" " }}</p>{% endif %}
-                        </div>
+                <div class="af-grid c2">
+                    <div>
+                        <label class="af-label" for="f-site_name">Site Name <span class="req">*</span></label>
+                        <input id="f-site_name" type="text" name="site_name" value="{{ form.site_name.value|default:'' }}"/>
+                        {% if form.site_name.errors %}<p class="af-err">{{ form.site_name.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-tagline">Tagline</label>
+                        <input id="f-tagline" type="text" name="tagline" value="{{ form.tagline.value|default:'' }}" placeholder="Your Trusted Travel Mobility Partner"/>
+                        {% if form.tagline.errors %}<p class="af-err">{{ form.tagline.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    {% include "manage/settings/_file_field.html" with name="logo" label="Logo" current=config.logo errors=form.logo.errors help="Shown in the header and footer. A wide PNG with a transparent background works best." %}
+                    {% include "manage/settings/_file_field.html" with name="favicon" label="Favicon" current=config.favicon errors=form.favicon.errors help="The small icon in the browser tab. Square PNG, 512×512." %}
+                    <div class="span-all">
+                        <label class="af-check">
+                            <input type="checkbox" name="show_brand_name" {% if form.show_brand_name.value %}checked{% endif %}/>
+                            <span><b>Show brand name text</b><small>Display the site name next to the logo in the header and footer. Turn off if your logo already contains the name.</small></span>
+                        </label>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="af-sec">
-            <div class="af-sec-title">
-                <span class="af-sec-icon"><span class="material-symbols-outlined">info</span></span>
-                <div><h2>About Page</h2><p>Content displayed on the About Us page.</p></div>
-            </div>
-            <div class="af-grid c2">
-                <div class="span-all">
-                    <label class="af-label" for="f-about_title">About Title</label>
-                    <input id="f-about_title" type="text" name="about_title" value="{{ form.about_title.value|default:'' }}"/>
-                    {% if form.about_title.errors %}<p class="af-err">{{ form.about_title.errors|join:" " }}</p>{% endif %}
+        {# ─────────── Contact Info ─────────── #}
+        <div class="st-panel" id="panel-contact" role="tabpanel" aria-labelledby="tab-contact" data-panel="contact" hidden>
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Contact Details</h2><p>Shown in the footer, on the contact page and in enquiry emails.</p></div>
                 </div>
-                <div class="span-all">
-                    <label class="af-label" for="f-about_content">About Content</label>
-                    <textarea id="f-about_content" name="about_content" rows="8" class="richtext">{{ form.about_content.value|default:'' }}</textarea>
-                    {% if form.about_content.errors %}<p class="af-err">{{ form.about_content.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div class="span-all">
-                    <label class="af-label" for="f-about_image">About Image</label>
-                    {% if config.about_image %}<img src="{{ config.about_image.url }}" alt="" class="h-24 rounded-lg object-cover mb-2"/>{% endif %}
-                    <input id="f-about_image" type="file" name="about_image" accept="image/*" class="block w-full text-sm text-stone-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#ecf7f0] file:text-[#145c38] hover:file:bg-[#d3eedd] file:cursor-pointer"/>
-                    {% if form.about_image.errors %}<p class="af-err">{{ form.about_image.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-about_mission">Our Mission</label>
-                    <textarea id="f-about_mission" name="about_mission" rows="3">{{ form.about_mission.value|default:'' }}</textarea>
-                    {% if form.about_mission.errors %}<p class="af-err">{{ form.about_mission.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-about_vision">Our Vision</label>
-                    <textarea id="f-about_vision" name="about_vision" rows="3">{{ form.about_vision.value|default:'' }}</textarea>
-                    {% if form.about_vision.errors %}<p class="af-err">{{ form.about_vision.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-years_in_business">Years in Business</label>
-                    <input id="f-years_in_business" type="number" name="years_in_business" value="{{ form.years_in_business.value|default:'0' }}"/>
-                    {% if form.years_in_business.errors %}<p class="af-err">{{ form.years_in_business.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-total_happy_customers">Total Happy Customers</label>
-                    <input id="f-total_happy_customers" type="number" name="total_happy_customers" value="{{ form.total_happy_customers.value|default:'0' }}"/>
-                    {% if form.total_happy_customers.errors %}<p class="af-err">{{ form.total_happy_customers.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-license_number">License / Registration Number</label>
-                    <input id="f-license_number" type="text" name="license_number" value="{{ form.license_number.value|default:'' }}"/>
-                    {% if form.license_number.errors %}<p class="af-err">{{ form.license_number.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div class="span-all">
-                    <label class="af-label" for="f-license_details">License Details &amp; Certifications</label>
-                    <textarea id="f-license_details" name="license_details" rows="4" class="richtext">{{ form.license_details.value|default:'' }}</textarea>
-                    {% if form.license_details.errors %}<p class="af-err">{{ form.license_details.errors|join:" " }}</p>{% endif %}
+                <div class="af-grid c2">
+                    <div>
+                        <label class="af-label" for="f-phone">Phone</label>
+                        <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">call</span></span><input id="f-phone" type="text" name="phone" value="{{ form.phone.value|default:'' }}" placeholder="+91 99999 99999"/></div>
+                        {% if form.phone.errors %}<p class="af-err">{{ form.phone.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-email">Email</label>
+                        <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">mail</span></span><input id="f-email" type="email" name="email" value="{{ form.email.value|default:'' }}" placeholder="hello@example.com"/></div>
+                        {% if form.email.errors %}<p class="af-err">{{ form.email.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div class="span-all">
+                        <label class="af-label" for="f-address">Address</label>
+                        <textarea id="f-address" name="address" rows="2">{{ form.address.value|default:'' }}</textarea>
+                        {% if form.address.errors %}<p class="af-err">{{ form.address.errors|join:" " }}</p>{% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="af-sec">
-            <div class="af-sec-title">
-                <span class="af-sec-icon"><span class="material-symbols-outlined">travel_explore</span></span>
-                <div><h2>SEO &amp; Meta</h2><p>Search engine and social sharing defaults.</p></div>
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>WhatsApp</h2><p>Powers the WhatsApp buttons on the website. The message is pre-filled when a visitor taps one.</p></div>
+                </div>
+                <div class="af-grid c2">
+                    <div>
+                        <label class="af-label" for="f-whatsapp_number">WhatsApp Number</label>
+                        <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">chat</span></span><input id="f-whatsapp_number" type="text" name="whatsapp_number" value="{{ form.whatsapp_number.value|default:'' }}" placeholder="919999999999"/></div>
+                        <p class="af-help">Country code first, no + or spaces.</p>
+                        {% if form.whatsapp_number.errors %}<p class="af-err">{{ form.whatsapp_number.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-whatsapp_default_message">Default Message</label>
+                        <input id="f-whatsapp_default_message" type="text" name="whatsapp_default_message" value="{{ form.whatsapp_default_message.value|default:'' }}"/>
+                        {% if form.whatsapp_default_message.errors %}<p class="af-err">{{ form.whatsapp_default_message.errors|join:" " }}</p>{% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="af-grid c2">
-                <div class="span-all">
-                    <label class="af-label" for="f-meta_title">Meta Title</label>
-                    <input id="f-meta_title" type="text" name="meta_title" value="{{ form.meta_title.value|default:'' }}" placeholder="Default page title for search engines"/>
-                    {% if form.meta_title.errors %}<p class="af-err">{{ form.meta_title.errors|join:" " }}</p>{% endif %}
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Map</h2><p>The map on the contact page. In Google Maps choose Share → Embed a map, and paste the link from the <code>src="…"</code> part.</p></div>
                 </div>
-                <div class="span-all">
-                    <label class="af-label" for="f-meta_description">Meta Description</label>
-                    <textarea id="f-meta_description" name="meta_description" rows="2">{{ form.meta_description.value|default:'' }}</textarea>
-                    {% if form.meta_description.errors %}<p class="af-err">{{ form.meta_description.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div class="span-all">
-                    <label class="af-label" for="f-meta_keywords">Meta Keywords</label>
-                    <input id="f-meta_keywords" type="text" name="meta_keywords" value="{{ form.meta_keywords.value|default:'' }}" placeholder="vehicle rental, car hire, bike rental..."/>
-                    {% if form.meta_keywords.errors %}<p class="af-err">{{ form.meta_keywords.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div class="span-all">
-                    <label class="af-label" for="f-og_image">Default OG Image (for social sharing)</label>
-                    {% if config.og_image %}<img src="{{ config.og_image.url }}" alt="" class="h-16 rounded-lg object-cover mb-2"/>{% endif %}
-                    <input id="f-og_image" type="file" name="og_image" accept="image/*" class="block w-full text-sm text-stone-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#ecf7f0] file:text-[#145c38] hover:file:bg-[#d3eedd] file:cursor-pointer"/>
-                    {% if form.og_image.errors %}<p class="af-err">{{ form.og_image.errors|join:" " }}</p>{% endif %}
+                <div class="af-grid">
+                    <div>
+                        <label class="af-label" for="f-google_maps_embed">Google Maps Embed URL</label>
+                        <textarea id="f-google_maps_embed" name="google_maps_embed" rows="2" class="font-mono !text-xs" placeholder="https://www.google.com/maps/embed?...">{{ form.google_maps_embed.value|default:'' }}</textarea>
+                        {% if form.google_maps_embed.errors %}<p class="af-err">{{ form.google_maps_embed.errors|join:" " }}</p>{% endif %}
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="af-sec">
-            <div class="af-sec-title">
-                <span class="af-sec-icon"><span class="material-symbols-outlined">share</span></span>
-                <div><h2>Social Links</h2><p>Social media profile URLs.</p></div>
+        {# ─────────── Homepage Hero ─────────── #}
+        <div class="st-panel" id="panel-hero" role="tabpanel" aria-labelledby="tab-hero" data-panel="hero" hidden>
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Hero Text</h2><p>The headline and button at the top of the homepage.</p></div>
+                </div>
+                <div class="af-grid c2">
+                    <div class="span-all">
+                        <label class="af-label" for="f-hero_title">Hero Title <span class="req">*</span></label>
+                        <input id="f-hero_title" type="text" name="hero_title" value="{{ form.hero_title.value|default:'' }}"/>
+                        {% if form.hero_title.errors %}<p class="af-err">{{ form.hero_title.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-hero_subtitle">Hero Subtitle</label>
+                        <input id="f-hero_subtitle" type="text" name="hero_subtitle" value="{{ form.hero_subtitle.value|default:'' }}"/>
+                        {% if form.hero_subtitle.errors %}<p class="af-err">{{ form.hero_subtitle.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-hero_cta_text">Button Text <span class="req">*</span></label>
+                        <input id="f-hero_cta_text" type="text" name="hero_cta_text" value="{{ form.hero_cta_text.value|default:'' }}"/>
+                        {% if form.hero_cta_text.errors %}<p class="af-err">{{ form.hero_cta_text.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div class="span-all">
+                        <label class="af-label" for="f-hero_description">Hero Description</label>
+                        <input id="f-hero_description" type="text" name="hero_description" value="{{ form.hero_description.value|default:'' }}" placeholder="Short description below the title"/>
+                        {% if form.hero_description.errors %}<p class="af-err">{{ form.hero_description.errors|join:" " }}</p>{% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="af-grid c2">
-                <div>
-                    <label class="af-label" for="f-facebook_url">Facebook URL</label>
-                    <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">link</span></span><input id="f-facebook_url" type="url" name="facebook_url" value="{{ form.facebook_url.value|default:'' }}"/></div>
-                    {% if form.facebook_url.errors %}<p class="af-err">{{ form.facebook_url.errors|join:" " }}</p>{% endif %}
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Hero Images</h2><p>Up to 3 background slides that cross-fade behind the hero. Use wide landscape photos (1920×1080). The fallback image is used when no slides are uploaded.</p></div>
                 </div>
-                <div>
-                    <label class="af-label" for="f-instagram_url">Instagram URL</label>
-                    <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">link</span></span><input id="f-instagram_url" type="url" name="instagram_url" value="{{ form.instagram_url.value|default:'' }}"/></div>
-                    {% if form.instagram_url.errors %}<p class="af-err">{{ form.instagram_url.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-youtube_url">YouTube URL</label>
-                    <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">link</span></span><input id="f-youtube_url" type="url" name="youtube_url" value="{{ form.youtube_url.value|default:'' }}"/></div>
-                    {% if form.youtube_url.errors %}<p class="af-err">{{ form.youtube_url.errors|join:" " }}</p>{% endif %}
-                </div>
-                <div>
-                    <label class="af-label" for="f-twitter_url">Twitter / X URL</label>
-                    <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">link</span></span><input id="f-twitter_url" type="url" name="twitter_url" value="{{ form.twitter_url.value|default:'' }}"/></div>
-                    {% if form.twitter_url.errors %}<p class="af-err">{{ form.twitter_url.errors|join:" " }}</p>{% endif %}
+                <div class="af-grid c3">
+                    {% include "manage/settings/_file_field.html" with name="hero_bg_1" label="Slide 1" current=config.hero_bg_1 errors=form.hero_bg_1.errors wide=True %}
+                    {% include "manage/settings/_file_field.html" with name="hero_bg_2" label="Slide 2" current=config.hero_bg_2 errors=form.hero_bg_2.errors wide=True %}
+                    {% include "manage/settings/_file_field.html" with name="hero_bg_3" label="Slide 3" current=config.hero_bg_3 errors=form.hero_bg_3.errors wide=True %}
+                    {% include "manage/settings/_file_field.html" with name="hero_image" label="Fallback image" current=config.hero_image errors=form.hero_image.errors wide=True %}
                 </div>
             </div>
         </div>
 
-        <div class="af-sec">
-            <div class="af-sec-title">
-                <span class="af-sec-icon"><span class="material-symbols-outlined">bottom_panel_open</span></span>
-                <div><h2>Footer</h2><p>Footer description text.</p></div>
+        {# ─────────── About Page ─────────── #}
+        <div class="st-panel" id="panel-about" role="tabpanel" aria-labelledby="tab-about" data-panel="about" hidden>
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>About Us</h2><p>The main content of the About page.</p></div>
+                </div>
+                <div class="af-grid c2">
+                    <div class="span-all">
+                        <label class="af-label" for="f-about_title">Page Title <span class="req">*</span></label>
+                        <input id="f-about_title" type="text" name="about_title" value="{{ form.about_title.value|default:'' }}"/>
+                        {% if form.about_title.errors %}<p class="af-err">{{ form.about_title.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div class="span-all">
+                        <label class="af-label" for="f-about_content">Content</label>
+                        <textarea id="f-about_content" name="about_content" rows="8" class="richtext">{{ form.about_content.value|default:'' }}</textarea>
+                        {% if form.about_content.errors %}<p class="af-err">{{ form.about_content.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    {% include "manage/settings/_file_field.html" with name="about_image" label="About Image" current=config.about_image errors=form.about_image.errors wide=True %}
+                </div>
             </div>
-            <div class="af-grid ">
-                <div class="span-all">
-                    <label class="af-label" for="f-footer_text">Footer Text</label>
-                    <textarea id="f-footer_text" name="footer_text" rows="2">{{ form.footer_text.value|default:'' }}</textarea>
-                    {% if form.footer_text.errors %}<p class="af-err">{{ form.footer_text.errors|join:" " }}</p>{% endif %}
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Mission &amp; Vision</h2><p>Short statements shown side by side on the About page.</p></div>
+                </div>
+                <div class="af-grid c2">
+                    <div>
+                        <label class="af-label" for="f-about_mission">Our Mission</label>
+                        <textarea id="f-about_mission" name="about_mission" rows="3">{{ form.about_mission.value|default:'' }}</textarea>
+                        {% if form.about_mission.errors %}<p class="af-err">{{ form.about_mission.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-about_vision">Our Vision</label>
+                        <textarea id="f-about_vision" name="about_vision" rows="3">{{ form.about_vision.value|default:'' }}</textarea>
+                        {% if form.about_vision.errors %}<p class="af-err">{{ form.about_vision.errors|join:" " }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Business Details</h2><p>Numbers and licences that build trust with customers.</p></div>
+                </div>
+                <div class="af-grid c3">
+                    <div>
+                        <label class="af-label" for="f-years_in_business">Years in Business</label>
+                        <input id="f-years_in_business" type="number" min="0" name="years_in_business" value="{{ form.years_in_business.value|default:'0' }}"/>
+                        {% if form.years_in_business.errors %}<p class="af-err">{{ form.years_in_business.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-total_happy_customers">Happy Customers</label>
+                        <input id="f-total_happy_customers" type="number" min="0" name="total_happy_customers" value="{{ form.total_happy_customers.value|default:'0' }}"/>
+                        {% if form.total_happy_customers.errors %}<p class="af-err">{{ form.total_happy_customers.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-license_number">License / Registration No.</label>
+                        <input id="f-license_number" type="text" name="license_number" value="{{ form.license_number.value|default:'' }}"/>
+                        {% if form.license_number.errors %}<p class="af-err">{{ form.license_number.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div class="span-all">
+                        <label class="af-label" for="f-license_details">License Details &amp; Certifications</label>
+                        <textarea id="f-license_details" name="license_details" rows="4" class="richtext">{{ form.license_details.value|default:'' }}</textarea>
+                        {% if form.license_details.errors %}<p class="af-err">{{ form.license_details.errors|join:" " }}</p>{% endif %}
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="af-actions">
-            <button type="submit" class="af-btn primary"><span class="material-symbols-outlined">check</span>Save Settings</button>
+        {# ─────────── SEO & Meta ─────────── #}
+        <div class="st-panel" id="panel-seo" role="tabpanel" aria-labelledby="tab-seo" data-panel="seo" hidden>
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Search Engines</h2><p>The default title and description Google shows for your website.</p></div>
+                </div>
+                <div class="af-grid">
+                    <div>
+                        <label class="af-label" for="f-meta_title">Meta Title</label>
+                        <input id="f-meta_title" type="text" name="meta_title" maxlength="200" value="{{ form.meta_title.value|default:'' }}" placeholder="Default page title for search engines"/>
+                        <p class="af-help">Shown as the blue headline in Google. About 60 characters fit.</p>
+                        {% if form.meta_title.errors %}<p class="af-err">{{ form.meta_title.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-meta_description">Meta Description</label>
+                        <textarea id="f-meta_description" name="meta_description" maxlength="500" rows="2">{{ form.meta_description.value|default:'' }}</textarea>
+                        <p class="af-help">The grey text under the headline. About 155 characters fit.</p>
+                        {% if form.meta_description.errors %}<p class="af-err">{{ form.meta_description.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-meta_keywords">Meta Keywords</label>
+                        <input id="f-meta_keywords" type="text" name="meta_keywords" value="{{ form.meta_keywords.value|default:'' }}" placeholder="vehicle rental, car hire, bike rental..."/>
+                        {% if form.meta_keywords.errors %}<p class="af-err">{{ form.meta_keywords.errors|join:" " }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Social Sharing</h2><p>The picture shown when your website is shared on WhatsApp, Facebook or X.</p></div>
+                </div>
+                <div class="af-grid">
+                    {% include "manage/settings/_file_field.html" with name="og_image" label="Share Image" current=config.og_image errors=form.og_image.errors wide=True help="1200×630 JPG or PNG." %}
+                </div>
+            </div>
+        </div>
+
+        {# ─────────── Social Links ─────────── #}
+        <div class="st-panel" id="panel-social" role="tabpanel" aria-labelledby="tab-social" data-panel="social" hidden>
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Social Links</h2><p>Your social media profiles, linked from the website. Leave any you don't use empty.</p></div>
+                </div>
+                <div class="af-grid c2">
+                    <div>
+                        <label class="af-label" for="f-facebook_url">Facebook</label>
+                        <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">link</span></span><input id="f-facebook_url" type="url" name="facebook_url" value="{{ form.facebook_url.value|default:'' }}" placeholder="https://facebook.com/…"/></div>
+                        {% if form.facebook_url.errors %}<p class="af-err">{{ form.facebook_url.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-instagram_url">Instagram</label>
+                        <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">link</span></span><input id="f-instagram_url" type="url" name="instagram_url" value="{{ form.instagram_url.value|default:'' }}" placeholder="https://instagram.com/…"/></div>
+                        {% if form.instagram_url.errors %}<p class="af-err">{{ form.instagram_url.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-youtube_url">YouTube</label>
+                        <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">link</span></span><input id="f-youtube_url" type="url" name="youtube_url" value="{{ form.youtube_url.value|default:'' }}" placeholder="https://youtube.com/…"/></div>
+                        {% if form.youtube_url.errors %}<p class="af-err">{{ form.youtube_url.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-twitter_url">X (Twitter)</label>
+                        <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">link</span></span><input id="f-twitter_url" type="url" name="twitter_url" value="{{ form.twitter_url.value|default:'' }}" placeholder="https://x.com/…"/></div>
+                        {% if form.twitter_url.errors %}<p class="af-err">{{ form.twitter_url.errors|join:" " }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ─────────── Footer ─────────── #}
+        <div class="st-panel" id="panel-footer" role="tabpanel" aria-labelledby="tab-footer" data-panel="footer" hidden>
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Footer</h2><p>The short description under your logo in the website footer.</p></div>
+                </div>
+                <div class="af-grid">
+                    <div>
+                        <label class="af-label" for="f-footer_text">Footer Text</label>
+                        <textarea id="f-footer_text" name="footer_text" maxlength="500" rows="3">{{ form.footer_text.value|default:'' }}</textarea>
+                        {% if form.footer_text.errors %}<p class="af-err">{{ form.footer_text.errors|join:" " }}</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="st-bar">
+            <p class="st-status" id="st-status">All changes saved</p>
+            <div class="flex items-center gap-3 shrink-0">
+                <a href="?tab=theme" id="st-cancel" class="af-btn ghost">Cancel</a>
+                <button type="submit" class="af-btn primary"><span class="material-symbols-outlined">save</span>Save Settings</button>
+            </div>
         </div>
     </form>
 </div>
+
+<script>
+(function () {
+    var form = document.getElementById('settings-form');
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('.st-tab'));
+    var panels = Array.prototype.slice.call(document.querySelectorAll('.st-panel'));
+    var tabInput = form.querySelector('input[name=_tab]');
+    var cancel = document.getElementById('st-cancel');
+    var status = document.getElementById('st-status');
+    var ids = tabs.map(function (t) { return t.dataset.tab; });
+    var dirty = {};
+    var submitting = false;
+
+    function show(id, push) {
+        if (ids.indexOf(id) < 0) id = ids[0];
+        tabs.forEach(function (t) { t.setAttribute('aria-selected', t.dataset.tab === id ? 'true' : 'false'); });
+        panels.forEach(function (p) { p.hidden = p.dataset.panel !== id; });
+        tabInput.value = id;
+        cancel.href = '?tab=' + id;
+        if (push) history.replaceState(null, '', '?tab=' + id);
+        var active = document.getElementById('tab-' + id);
+        if (active && active.scrollIntoView) active.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+    tabs.forEach(function (t) {
+        t.addEventListener('click', function () { show(t.dataset.tab, true); });
+    });
+
+    // Open the tab from the URL, or after a failed save the first tab with an error.
+    var start = new URLSearchParams(location.search).get('tab');
+    var firstError = null;
+    panels.forEach(function (p) {
+        if (p.querySelector('.af-err')) {
+            document.querySelector('#tab-' + p.dataset.panel + ' .st-dot').className = 'st-dot err';
+            firstError = firstError || p.dataset.panel;
+        }
+    });
+    show(firstError || start || ids[0], false);
+
+    // Unsaved changes: a dot on the tab, a line in the save bar, and a warning on leave.
+    function refreshStatus() {
+        var names = tabs.filter(function (t) { return dirty[t.dataset.tab]; }).map(function (t) { return t.dataset.label; });
+        status.innerHTML = names.length
+            ? '<span class="st-dot"></span><span class="truncate">Unsaved changes in ' + names.join(', ') + '</span>'
+            : 'All changes saved';
+    }
+    function markDirty(el) {
+        var panel = el.closest && el.closest('.st-panel');
+        if (!panel || dirty[panel.dataset.panel]) return;
+        dirty[panel.dataset.panel] = true;
+        var dot = document.querySelector('#tab-' + panel.dataset.panel + ' .st-dot');
+        if (dot.className.indexOf('err') < 0) dot.className = 'st-dot';
+        refreshStatus();
+    }
+    form.addEventListener('input', function (e) { markDirty(e.target); });
+    form.addEventListener('change', function (e) { markDirty(e.target); });
+    form.addEventListener('submit', function () { submitting = true; });
+    window.addEventListener('beforeunload', function (e) {
+        if (!submitting && Object.keys(dirty).length) { e.preventDefault(); e.returnValue = ''; }
+    });
+    cancel.addEventListener('click', function () { dirty = {}; });
+
+    // Show a picked image straight away.
+    form.querySelectorAll('input[type=file]').forEach(function (input) {
+        input.addEventListener('change', function () {
+            var img = form.querySelector('[data-preview-for="' + input.id + '"]');
+            var ph = form.querySelector('[data-placeholder-for="' + input.id + '"]');
+            if (!img || !input.files || !input.files[0]) return;
+            img.src = URL.createObjectURL(input.files[0]);
+            img.classList.remove('hidden');
+            if (ph) ph.classList.add('hidden');
+        });
+    });
+})();
+</script>
 
 <!-- Quill Rich Text Editor (no API key needed) -->
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet"/>
@@ -347,9 +481,10 @@ document.addEventListener('DOMContentLoaded', function() {
             placeholder: 'Start typing...'
         });
 
-        // Sync to textarea on text change
-        quill.on('text-change', function() {
+        // Sync to textarea on text change; user edits count as unsaved changes.
+        quill.on('text-change', function(delta, old, source) {
             textarea.value = quill.root.innerHTML;
+            if (source === 'user') textarea.dispatchEvent(new Event('input', { bubbles: true }));
         });
 
         // Sync before form submit
