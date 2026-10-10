@@ -153,9 +153,9 @@
         {% with n_v=hero_vehicles|length n_bg=hero_bg_images|length %}
         <div class="b-slides absolute inset-0" data-b-slides>
             {% for v in hero_vehicles %}
-            <a href="{% url 'vehicle_detail' v.slug %}" class="b-sl" aria-label="{{ v.brand }} {{ v.name }}">
+            <a href="{% url 'vehicle_detail' v.slug %}" class="b-sl" aria-label="{{ v.full_name }}">
                 <img src="{{ v.hero_image.url }}" alt="" class="b-sl-fill" aria-hidden="true"/>
-                <img src="{{ v.hero_image.url }}" alt="{{ v.brand }} {{ v.name }}" class="b-sl-car"/>
+                <img src="{{ v.hero_image.url }}" alt="{{ v.full_name }}" class="b-sl-car"/>
                 <span class="b-sl-shade"></span>
                 <span class="absolute top-4 left-4 right-4 flex justify-between items-start gap-3">
                     {% if v.primary_price_value %}<span class="b-glass rounded-2xl px-4 py-3"><span class="label-tiny block text-on-surface-variant mb-1">{{ v.category.name|default:v.get_vehicle_type_display }}</span><span class="font-extrabold text-2xl text-primary">{{ v.primary_price_value|inr }}<span class="text-sm font-semibold text-on-surface-variant"> /{{ v.primary_price_label }}</span></span></span>{% else %}<span></span>{% endif %}
@@ -262,10 +262,10 @@
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" data-deal>
         {% for v in featured_vehicles %}
-        <a href="{{ v.get_absolute_url }}" class="vehicle-card tile b-glass group block p-3 {% if forloop.first %}sm:col-span-2 lg:row-span-2 lg:flex lg:flex-col{% endif %}" aria-label="{{ v.brand }} {{ v.name }}">
+        <a href="{{ v.get_absolute_url }}" class="vehicle-card tile b-glass group block p-3 {% if forloop.first %}sm:col-span-2 lg:row-span-2 lg:flex lg:flex-col{% endif %}" aria-label="{{ v.full_name }}">
             <div class="relative overflow-hidden rounded-[22px] {% if forloop.first %}h-64 sm:h-[420px] lg:h-auto lg:flex-1 lg:min-h-[420px]{% else %}h-48{% endif %} bg-surface-container grid place-items-center">
                 {% if v.thumbnail %}
-                <img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
+                <img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
                 {% else %}
                 <span class="material-symbols-outlined text-[64px] text-outline-variant" aria-hidden="true">directions_car</span>
                 {% endif %}
@@ -403,12 +403,12 @@
                     <div class="h-px bg-white/15 mb-6 hidden sm:block"></div>
                     <div class="wd-stage" data-wd-stage>
                         {% for v in wedding_vehicles %}
-                        <a href="{{ v.get_absolute_url }}" class="wd-card{% if forloop.first %} on{% endif %}" aria-label="{{ v.brand }} {{ v.name }}" data-thumb="{% if v.thumbnail %}{{ v.thumbnail.url }}{% endif %}">
-                            {% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}"/>{% else %}<span class="absolute inset-0 grid place-items-center"><span class="material-symbols-outlined text-[96px] text-[#f2c98a]/40">favorite</span></span>{% endif %}
+                        <a href="{{ v.get_absolute_url }}" class="wd-card{% if forloop.first %} on{% endif %}" aria-label="{{ v.full_name }}" data-thumb="{% if v.thumbnail %}{{ v.thumbnail.url }}{% endif %}">
+                            {% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}"/>{% else %}<span class="absolute inset-0 grid place-items-center"><span class="material-symbols-outlined text-[96px] text-[#f2c98a]/40">favorite</span></span>{% endif %}
                             <span class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent"></span>
                             <span class="wd-pill"><span class="material-symbols-outlined">favorite</span>Wedding car {{ forloop.counter|stringformat:"02d" }}</span>
                             <span class="absolute left-6 right-24 bottom-6 sm:left-8 sm:bottom-8">
-                                <span class="block serif-i text-3xl sm:text-[42px] text-white leading-tight">{{ v.brand }} {{ v.name }}</span>
+                                <span class="block serif-i text-3xl sm:text-[42px] text-white leading-tight">{{ v.full_name }}</span>
                                 <span class="flex flex-wrap gap-x-6 gap-y-2 mt-3 text-sm sm:text-base text-white/90">
                                     {% if v.seating_capacity %}<span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">group</span>{{ v.seating_capacity }} Seats</span>{% endif %}
                                     <span class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">workspace_premium</span>{% if v.wedding_tier %}{{ v.get_wedding_tier_display }}{% else %}{{ v.category.name|default:"Wedding" }}{% endif %}</span>
@@ -455,12 +455,12 @@
             {% for v in premium_vehicles %}
             <a href="{{ v.get_absolute_url }}" class="tile block group bg-black">
                 {% if v.thumbnail %}
-                <img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}" class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy"/>
+                <img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}" class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy"/>
                 {% else %}
                 <span class="absolute inset-0 grid place-items-center"><span class="material-symbols-outlined text-[80px] text-white/15" aria-hidden="true">directions_car</span></span>
                 {% endif %}
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
-                <div class="absolute bottom-0 inset-x-0 p-6"><div class="lux-name font-extrabold text-2xl tracking-tight">{{ v.brand }} {{ v.name }}</div><div class="lux-more mt-2 flex items-center justify-between gap-4"><span class="label-tiny text-primary-fixed">{% if v.primary_price_value %}{{ v.primary_price_value|inr }}/{{ v.primary_price_label }}{% elif v.category %}{{ v.category.name }}{% else %}Premium{% endif %}</span><span class="w-11 h-11 rounded-full bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined">arrow_outward</span></span></div></div>
+                <div class="absolute bottom-0 inset-x-0 p-6"><div class="lux-name font-extrabold text-2xl tracking-tight">{{ v.full_name }}</div><div class="lux-more mt-2 flex items-center justify-between gap-4"><span class="label-tiny text-primary-fixed">{% if v.primary_price_value %}{{ v.primary_price_value|inr }}/{{ v.primary_price_label }}{% elif v.category %}{{ v.category.name }}{% else %}Premium{% endif %}</span><span class="w-11 h-11 rounded-full bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined">arrow_outward</span></span></div></div>
             </a>
             {% endfor %}
         </div>

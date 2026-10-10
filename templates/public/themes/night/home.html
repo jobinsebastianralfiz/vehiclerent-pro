@@ -212,7 +212,7 @@
     <a href="{{ vehicle.get_absolute_url }}" class="vehicle-card glow group block rounded-[2rem] p-4 sm:p-5">
       <div class="relative overflow-hidden rounded-[1.5rem] h-56 sm:h-60 mb-6 bg-surface-container">
         {% if vehicle.thumbnail %}
-        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover brightness-[.85] transition-all duration-[1.2s] ease-out group-hover:scale-110 group-hover:brightness-100" loading="lazy"/>
+        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }}" class="w-full h-full object-cover brightness-[.85] transition-all duration-[1.2s] ease-out group-hover:scale-110 group-hover:brightness-100" loading="lazy"/>
         {% else %}
         <div class="w-full h-full grid place-items-center"><span class="material-symbols-outlined text-[64px] text-primary/30">directions_car</span></div>
         {% endif %}
@@ -275,14 +275,14 @@
     {% for vehicle in premium_vehicles %}
     <a href="{{ vehicle.get_absolute_url }}" class="stack-card block h-[62vh] sm:h-[70vh] rounded-[2.5rem] overflow-hidden relative bg-surface-container-low border border-white/5" style="top:calc(14vh + {{ forloop.counter0 }} * 16px)">
       {% if vehicle.thumbnail %}
-      <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="absolute inset-0 w-full h-full object-cover"/>
+      <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }}" class="absolute inset-0 w-full h-full object-cover"/>
       {% else %}
       <div class="absolute inset-0 grid place-items-center bg-surface-container"><span class="material-symbols-outlined text-[120px] text-primary/20">diamond</span></div>
       {% endif %}
       <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/30 to-transparent"></div>
       <div class="relative h-full flex flex-col justify-end p-8 sm:p-14 max-w-xl">
         <span class="font-serif text-primary text-xl">{{ forloop.counter|stringformat:"02d" }}</span>
-        <h3 class="nd-head text-4xl sm:text-6xl text-white mt-3">{{ vehicle.brand }} {{ vehicle.name }}</h3>
+        <h3 class="nd-head text-4xl sm:text-6xl text-white mt-3">{{ vehicle.full_name }}</h3>
         <p class="label-tiny text-primary-container mt-5">{% if vehicle.is_wedding_service %}Wedding flagship{% elif vehicle.category %}{{ vehicle.category.name }}{% else %}Elite collection{% endif %}{% if vehicle.primary_price_value %} · {{ vehicle.primary_price_value|inr }}/{{ vehicle.primary_price_label }}{% endif %}</p>
       </div>
     </a>

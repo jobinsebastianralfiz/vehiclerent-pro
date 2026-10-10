@@ -2,10 +2,10 @@
 Bento vehicle tile. Include with v=<Vehicle>; optional big=True (spans two columns), badge="Premium"/"Wedding" to force the badge,
 note="..." for a line under the specs, deco=True for the wedding decoration line.
 {% endcomment %}
-<a href="{{ v.get_absolute_url }}" class="vehicle-card tile b-glass group block p-3 {% if big %}sm:col-span-2{% endif %}" aria-label="{{ v.brand }} {{ v.name }}">
+<a href="{{ v.get_absolute_url }}" class="vehicle-card tile b-glass group block p-3 {% if big %}sm:col-span-2{% endif %}" aria-label="{{ v.full_name }}">
     <div class="relative overflow-hidden rounded-[22px] {% if big %}h-64 sm:h-[340px]{% else %}h-52{% endif %} bg-surface-container grid place-items-center">
         {% if v.thumbnail %}
-        <img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
+        <img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
         {% else %}
         <span class="material-symbols-outlined text-[64px] text-outline-variant" aria-hidden="true">directions_car</span>
         {% endif %}

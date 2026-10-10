@@ -68,7 +68,7 @@
             {% for v in featured_vehicles %}
             <a href="{{ v.get_absolute_url }}" class="tile block group bg-black">
                 {% if v.thumbnail %}
-                <img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}" class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy"/>
+                <img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}" class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy"/>
                 {% else %}
                 <span class="absolute inset-0 grid place-items-center"><span class="material-symbols-outlined text-[80px] text-white/15" aria-hidden="true">diamond</span></span>
                 {% endif %}

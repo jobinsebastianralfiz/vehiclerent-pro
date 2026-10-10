@@ -35,7 +35,7 @@ featured cars at golden hour, then the road through the full collection and why 
             <!-- postcards of the collection (decorative) -->
             <div class="pol-stack relative h-[340px] sm:h-[460px] lg:h-[520px]" data-no-parallax aria-hidden="true" data-intro="3" data-intro-kind="fade">
                 {% if vehicles|length >= 3 %}
-                {% for v in vehicles|slice:":3" %}<figure class="pol">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="">{% else %}<div class="r-photo-empty aspect-square grid place-items-center"><span class="material-symbols-outlined text-6xl text-[#e39b3c]">diamond</span></div>{% endif %}<figcaption>{{ v.brand }} {{ v.name }}</figcaption></figure>{% endfor %}
+                {% for v in vehicles|slice:":3" %}<figure class="pol">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="">{% else %}<div class="r-photo-empty aspect-square grid place-items-center"><span class="material-symbols-outlined text-6xl text-[#e39b3c]">diamond</span></div>{% endif %}<figcaption>{{ v.full_name }}</figcaption></figure>{% endfor %}
                 {% else %}
                 <figure class="pol"><img src="{% static 'themes/img/rangerover.jpg' %}" alt=""><figcaption>Hill roads</figcaption></figure>
                 <figure class="pol"><img src="{% static 'themes/img/sclass-mist.jpg' %}" alt=""><figcaption>The arrival</figcaption></figure>
@@ -65,7 +65,7 @@ featured cars at golden hour, then the road through the full collection and why 
     <div class="m-htrack relative flex gap-8 lg:gap-10 px-4 sm:px-12 overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-px-4 sm:scroll-px-12 pb-4">
         {% for vehicle in featured_vehicles %}
         <a href="{{ vehicle.get_absolute_url }}" class="snap-start min-w-[280px] sm:min-w-[420px] lg:min-w-[36vw] h-[420px] sm:h-[520px] lg:h-[60vh] relative rounded-[2.5rem] overflow-hidden group block bg-[#163c39]" data-tilt="0.5">
-            {% if vehicle.thumbnail %}<img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover" loading="lazy"/>{% else %}<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[96px] text-[#e39b3c]/40">diamond</span></div>{% endif %}
+            {% if vehicle.thumbnail %}<img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }}" class="w-full h-full object-cover" loading="lazy"/>{% else %}<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[96px] text-[#e39b3c]/40">diamond</span></div>{% endif %}
             <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
             <span class="absolute top-6 left-6 label-tiny bg-[#fffaf0]/15 border border-[#fffaf0]/20 backdrop-blur px-4 py-2 rounded-full text-[#fffaf0]">Viewpoint {{ forloop.counter|stringformat:"02d" }}</span>
             <div class="absolute bottom-8 left-8 right-8">

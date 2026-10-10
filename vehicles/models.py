@@ -219,6 +219,13 @@ class Vehicle(models.Model):
         shrink_uploads(self, "thumbnail")
         super().save(*args, **kwargs)
 
+    @property
+    def full_name(self):
+        """Brand + name, without repeating the brand when the name already starts with it."""
+        if self.brand and not (self.name or "").lower().startswith(self.brand.lower()):
+            return f"{self.brand} {self.name}"
+        return self.name
+
     def build_slug(self):
         """brand-model-name, skipping brand or model when the name already says it."""
         slug = slugify(self.name)

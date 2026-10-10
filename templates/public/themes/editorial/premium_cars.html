@@ -33,7 +33,7 @@
             {% with f=featured_vehicles|first v=vehicles|first %}{% with hero=f|default:v %}
             <div class="ed-prem-media m-hero-media h-[380px] sm:h-[520px] lg:h-[640px] rounded-[2.5rem] bg-[#22261c]" data-intro="5" data-intro-kind="media">
                 {% if hero and hero.thumbnail %}
-                <img src="{{ hero.thumbnail.url }}" alt="{{ hero.brand }} {{ hero.name }}" class="w-full h-full object-cover"/>
+                <img src="{{ hero.thumbnail.url }}" alt="{{ hero.full_name }}" class="w-full h-full object-cover"/>
                 {% else %}
                 <img src="{% static 'themes/img/sclass-mist.jpg' %}" alt="" class="w-full h-full object-cover"/>
                 {% endif %}
@@ -73,7 +73,7 @@
         {% for vehicle in featured_vehicles %}
         <a href="{{ vehicle.get_absolute_url }}" class="snap-start min-w-[280px] sm:min-w-[420px] lg:min-w-[34vw] h-[420px] sm:h-[520px] lg:h-[62vh] relative rounded-[3rem] overflow-hidden group block bg-[#22261c]" data-tilt="0.5">
             {% if vehicle.thumbnail %}
-            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover" loading="lazy"/>
+            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }}" class="w-full h-full object-cover" loading="lazy"/>
             {% else %}
             <div class="ed-ph ed-ph-dark"><span class="material-symbols-outlined text-[80px]" aria-hidden="true">diamond</span></div>
             {% endif %}

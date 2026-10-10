@@ -6,10 +6,10 @@
         {% else %}<span class="absolute inset-0 grid place-items-center text-primary/30"><span class="material-symbols-outlined text-[72px]">{{ v.category.icon|default:"directions_car" }}</span></span>{% endif %}
         <span class="fc-status s-{{ v.status }}"><i></i>{{ v.get_status_display }}</span>
     </a>
-    <button type="button" class="fc-heart" x-data="favBtn({{ v.pk }})" x-on:click.prevent="toggle()" :class="on && 'is-on'" :aria-pressed="on.toString()" aria-label="Save {{ v.brand }} {{ v.name }}"><span class="material-symbols-outlined">favorite</span></button>
+    <button type="button" class="fc-heart" x-data="favBtn({{ v.pk }})" x-on:click.prevent="toggle()" :class="on && 'is-on'" :aria-pressed="on.toString()" aria-label="Save {{ v.full_name }}"><span class="material-symbols-outlined">favorite</span></button>
     <div class="px-2 pt-4 pb-1 flex-1 flex flex-col">
         <div class="flex items-start justify-between gap-3">
-            <h3 class="min-w-0"><a href="{{ v.get_absolute_url }}" class="block font-extrabold text-lg leading-tight text-on-surface hover:text-primary line-clamp-2">{{ v.brand }} {{ v.name }}</a></h3>
+            <h3 class="min-w-0"><a href="{{ v.get_absolute_url }}" class="block font-extrabold text-lg leading-tight text-on-surface hover:text-primary line-clamp-2">{{ v.full_name }}</a></h3>
             {% if v.primary_price_value %}<div class="text-right shrink-0"><div class="font-extrabold text-xl text-on-surface leading-none">{{ v.primary_price_value|inr }}</div><div class="text-xs text-on-surface-variant mt-1">per {{ v.primary_price_label }}</div></div>{% endif %}
         </div>
         <div class="flex flex-wrap gap-x-4 gap-y-1.5 mt-3 text-[13px] text-on-surface-variant">

@@ -3,7 +3,7 @@
 <a href="{{ vehicle.get_absolute_url }}" class="vehicle-card group relative {{ surface|default:'bg-surface-container-lowest' }} p-5 sm:p-6 rounded-[2.5rem] hover:shadow-2xl block" itemscope itemtype="https://schema.org/Product">
     <div class="relative overflow-hidden rounded-[2rem] h-56 sm:h-64 mb-6 bg-surface-container-high">
         {% if vehicle.thumbnail %}
-        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }} for rent" class="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy" itemprop="image"/>
+        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }} for rent" class="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy" itemprop="image"/>
         {% else %}
         <div class="ed-ph"><span class="material-symbols-outlined text-[64px]" aria-hidden="true">directions_car</span></div>
         {% endif %}

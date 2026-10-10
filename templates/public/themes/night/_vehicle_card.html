@@ -3,7 +3,7 @@
 <a href="{{ vehicle.get_absolute_url }}" class="vehicle-card glow group block rounded-[2rem] p-4 sm:p-5">
   <div class="relative overflow-hidden rounded-[1.5rem] h-56 sm:h-60 mb-6 bg-surface-container">
     {% if vehicle.thumbnail %}
-    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover brightness-[.85] transition-all duration-[1.2s] ease-out group-hover:scale-110 group-hover:brightness-100" loading="lazy"/>
+    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }}" class="w-full h-full object-cover brightness-[.85] transition-all duration-[1.2s] ease-out group-hover:scale-110 group-hover:brightness-100" loading="lazy"/>
     {% else %}
     <div class="w-full h-full grid place-items-center"><span class="material-symbols-outlined text-[64px] text-primary/30">{% if vehicle.is_wedding_service %}favorite{% elif vehicle.is_premium %}diamond{% else %}directions_car{% endif %}</span></div>
     {% endif %}

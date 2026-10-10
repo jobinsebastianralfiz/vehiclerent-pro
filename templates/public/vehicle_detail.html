@@ -1,14 +1,14 @@
 {% extends "public/base_public.html" %}
 {% load vehicle_tags %}
 
-{% block title %}{{ vehicle.meta_title|default:vehicle.brand }} {% if not vehicle.meta_title %}{{ vehicle.name }} for Rent in Kerala{% endif %} | {{ BUSINESS_NAME }}{% endblock %}
-{% block meta_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} ({{ vehicle.get_vehicle_type_display }}) at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}{% if vehicle.seating_capacity %}, {{ vehicle.seating_capacity }} seats{% endif %}. Doorstep delivery, transparent pricing, 24x7 support.{% endif %}{% endblock %}
-{% block meta_keywords %}{% if vehicle.meta_keywords %}{{ vehicle.meta_keywords }}{% else %}{{ vehicle.brand }} rental, {{ vehicle.name }} rent, {{ vehicle.get_vehicle_type_display }} rental Kerala, {{ vehicle.brand }} {{ vehicle.name }} hire, car rental Kerala{% endif %}{% endblock %}
+{% block title %}{% if vehicle.meta_title %}{{ vehicle.meta_title }}{% else %}{{ vehicle.full_name }} for Rent in Kerala{% endif %} | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.full_name }} ({{ vehicle.get_vehicle_type_display }}) at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}{% if vehicle.seating_capacity %}, {{ vehicle.seating_capacity }} seats{% endif %}. Doorstep delivery, transparent pricing, 24x7 support.{% endif %}{% endblock %}
+{% block meta_keywords %}{% if vehicle.meta_keywords %}{{ vehicle.meta_keywords }}{% else %}{{ vehicle.brand }} rental, {{ vehicle.name }} rent, {{ vehicle.get_vehicle_type_display }} rental Kerala, {{ vehicle.full_name }} hire, car rental Kerala{% endif %}{% endblock %}
 {% block og_type %}product{% endblock %}
-{% block og_title %}{{ vehicle.brand }} {{ vehicle.name }} for Rent | {{ BUSINESS_NAME }}{% endblock %}
-{% block og_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}.{% endif %}{% endblock %}
-{% block twitter_title %}{{ vehicle.brand }} {{ vehicle.name }} for Rent{% endblock %}
-{% block twitter_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} at {{ vehicle.price_per_day|inr }}/day in Kerala.{% endif %}{% endblock %}
+{% block og_title %}{{ vehicle.full_name }} for Rent | {{ BUSINESS_NAME }}{% endblock %}
+{% block og_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.full_name }} at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}.{% endif %}{% endblock %}
+{% block twitter_title %}{{ vehicle.full_name }} for Rent{% endblock %}
+{% block twitter_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.full_name }} at {{ vehicle.price_per_day|inr }}/day in Kerala.{% endif %}{% endblock %}
 {% block og_image %}{% if vehicle.thumbnail %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ vehicle.thumbnail.url }}"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>{% else %}{{ block.super }}{% endif %}{% endblock %}
@@ -19,7 +19,7 @@
 {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": "{{ vehicle.brand }} {{ vehicle.name }}",
+    "name": "{{ vehicle.full_name }}",
     "description": "{{ vehicle.description|truncatewords:50 }}",
     "brand": { "@type": "Brand", "name": "{{ vehicle.brand }}" },
     "category": "{{ vehicle.get_vehicle_type_display }}",
@@ -45,7 +45,7 @@
         <a href="{% url 'vehicle_list' %}?category={{ vehicle.category.id }}" class="hover:text-primary-container">{{ vehicle.category.name }}</a>
         <span class="material-symbols-outlined text-sm">chevron_right</span>
         {% endif %}
-        <span>{{ vehicle.brand }} {{ vehicle.name }}</span>
+        <span>{{ vehicle.full_name }}</span>
     </div>
 
     <!-- ─── Hero: Image gallery + Booking card ─── -->

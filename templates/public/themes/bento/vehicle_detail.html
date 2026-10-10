@@ -1,14 +1,14 @@
 {% extends "public/themes/bento/_base.html" %}
 {% load vehicle_tags %}
 
-{% block title %}{{ vehicle.meta_title|default:vehicle.brand }} {% if not vehicle.meta_title %}{{ vehicle.name }} for Rent in Kerala{% endif %} | {{ BUSINESS_NAME }}{% endblock %}
-{% block meta_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} ({{ vehicle.get_vehicle_type_display }}) at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}{% if vehicle.seating_capacity %}, {{ vehicle.seating_capacity }} seats{% endif %}. Doorstep delivery, transparent pricing, 24x7 support.{% endif %}{% endblock %}
-{% block meta_keywords %}{% if vehicle.meta_keywords %}{{ vehicle.meta_keywords }}{% else %}{{ vehicle.brand }} rental, {{ vehicle.name }} rent, {{ vehicle.get_vehicle_type_display }} rental Kerala, {{ vehicle.brand }} {{ vehicle.name }} hire, car rental Kerala{% endif %}{% endblock %}
+{% block title %}{% if vehicle.meta_title %}{{ vehicle.meta_title }}{% else %}{{ vehicle.full_name }} for Rent in Kerala{% endif %} | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.full_name }} ({{ vehicle.get_vehicle_type_display }}) at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}{% if vehicle.seating_capacity %}, {{ vehicle.seating_capacity }} seats{% endif %}. Doorstep delivery, transparent pricing, 24x7 support.{% endif %}{% endblock %}
+{% block meta_keywords %}{% if vehicle.meta_keywords %}{{ vehicle.meta_keywords }}{% else %}{{ vehicle.brand }} rental, {{ vehicle.name }} rent, {{ vehicle.get_vehicle_type_display }} rental Kerala, {{ vehicle.full_name }} hire, car rental Kerala{% endif %}{% endblock %}
 {% block og_type %}product{% endblock %}
-{% block og_title %}{{ vehicle.brand }} {{ vehicle.name }} for Rent | {{ BUSINESS_NAME }}{% endblock %}
-{% block og_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}.{% endif %}{% endblock %}
-{% block twitter_title %}{{ vehicle.brand }} {{ vehicle.name }} for Rent{% endblock %}
-{% block twitter_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} at {{ vehicle.price_per_day|inr }}/day in Kerala.{% endif %}{% endblock %}
+{% block og_title %}{{ vehicle.full_name }} for Rent | {{ BUSINESS_NAME }}{% endblock %}
+{% block og_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.full_name }} at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}.{% endif %}{% endblock %}
+{% block twitter_title %}{{ vehicle.full_name }} for Rent{% endblock %}
+{% block twitter_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.full_name }} at {{ vehicle.price_per_day|inr }}/day in Kerala.{% endif %}{% endblock %}
 {% block og_image %}{% if vehicle.thumbnail %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ vehicle.thumbnail.url }}"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>{% else %}{{ block.super }}{% endif %}{% endblock %}
@@ -19,7 +19,7 @@
 {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": "{{ vehicle.brand|escapejs }} {{ vehicle.name|escapejs }}",
+    "name": "{{ vehicle.full_name|escapejs }}",
     "description": "{{ vehicle.description|truncatewords:50|escapejs }}",
     "brand": { "@type": "Brand", "name": "{{ vehicle.brand|escapejs }}" },
     "category": "{{ vehicle.get_vehicle_type_display|escapejs }}",
@@ -44,11 +44,11 @@
     <a href="{% url 'vehicle_list' %}?category={{ vehicle.category.id }}" class="b-chip">{{ vehicle.category.name }}</a>
     <span class="material-symbols-outlined text-outline text-[18px]" aria-hidden="true">chevron_right</span>
     {% endif %}
-    <span class="b-chip is-on" aria-current="page">{{ vehicle.brand }} {{ vehicle.name }}</span>
+    <span class="b-chip is-on" aria-current="page">{{ vehicle.full_name }}</span>
 </nav>
 
 <!-- ─── Gallery + booking bento ─── -->
-<section class="b-hero max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-start" aria-label="{{ vehicle.brand }} {{ vehicle.name }}">
+<section class="b-hero max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-start" aria-label="{{ vehicle.full_name }}">
     <div class="lg:col-span-7 grid gap-3 sm:gap-4">
         <!-- gallery -->
         <div class="tile b-glass p-3" x-data="{ i: 0, n: {% if images %}{{ images|length }}{% else %}1{% endif %} }" data-no-parallax>
@@ -56,10 +56,10 @@
                  x-on:keydown.arrow-right.prevent="i = (i + 1) % n" x-on:keydown.arrow-left.prevent="i = (i - 1 + n) % n">
                 {% if images %}
                     {% for img in images %}
-                    <img src="{{ img.image.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}{% if images|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500" x-bind:style="{ opacity: i === {{ forloop.counter0 }} ? 1 : 0 }" {% if not forloop.first %}style="opacity:0" loading="lazy"{% endif %}/>
+                    <img src="{{ img.image.url }}" alt="{{ vehicle.full_name }}{% if images|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500" x-bind:style="{ opacity: i === {{ forloop.counter0 }} ? 1 : 0 }" {% if not forloop.first %}style="opacity:0" loading="lazy"{% endif %}/>
                     {% endfor %}
                 {% elif vehicle.thumbnail %}
-                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="absolute inset-0 w-full h-full object-cover"/>
+                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }}" class="absolute inset-0 w-full h-full object-cover"/>
                 {% else %}
                     <span class="material-symbols-outlined text-[120px] text-outline-variant" aria-hidden="true">directions_car</span>
                 {% endif %}
@@ -228,7 +228,7 @@
         <div class="absolute -right-24 -bottom-24 w-80 h-80 rounded-full bg-primary-fixed/10 blur-2xl" aria-hidden="true"></div>
         <div class="lg:col-span-8 relative">
             <h2 class="font-extrabold text-4xl sm:text-6xl tracking-[-.04em]" data-no-split>Ready to <span class="serif-i text-primary-fixed">drive?</span></h2>
-            {% if vehicle.primary_price_value %}<p class="mt-3 text-white/70 text-lg">{{ vehicle.brand }} {{ vehicle.name }} · {{ vehicle.primary_price_value|inr }} / {{ vehicle.primary_price_label }}</p>{% endif %}
+            {% if vehicle.primary_price_value %}<p class="mt-3 text-white/70 text-lg">{{ vehicle.full_name }} · {{ vehicle.primary_price_value|inr }} / {{ vehicle.primary_price_label }}</p>{% endif %}
         </div>
         <div class="lg:col-span-4 relative flex flex-wrap lg:justify-end gap-2">
             <a href="#reserve" class="bg-primary-fixed text-primary rounded-full px-7 py-4 font-bold inline-flex items-center gap-2 m-shine" data-magnetic>Reserve this car <span class="material-symbols-outlined">arrow_upward</span></a>

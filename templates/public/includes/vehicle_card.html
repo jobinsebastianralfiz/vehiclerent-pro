@@ -1,5 +1,5 @@
 {% load vehicle_tags %}
-<article class="vehicle-card bg-surface-container-low rounded-xl overflow-hidden group hover:shadow-xl" itemscope itemtype="https://schema.org/Product" aria-label="{{ vehicle.brand }} {{ vehicle.name }}">
+<article class="vehicle-card bg-surface-container-low rounded-xl overflow-hidden group hover:shadow-xl" itemscope itemtype="https://schema.org/Product" aria-label="{{ vehicle.full_name }}">
     <div class="relative">
         {% if vehicle.is_featured %}
         <span class="absolute top-3 left-3 bg-primary/90 text-on-primary text-[9px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full z-10" aria-label="Featured vehicle">Featured</span>
@@ -10,7 +10,7 @@
         </div>
         <div class="aspect-[16/10] overflow-hidden">
             {% if vehicle.thumbnail %}
-            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }} - {{ vehicle.get_vehicle_type_display }} for rent" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" itemprop="image"/>
+            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }} - {{ vehicle.get_vehicle_type_display }} for rent" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" itemprop="image"/>
             {% else %}
             <div class="w-full h-full bg-surface-container flex items-center justify-center">
                 <span class="material-symbols-outlined text-6xl text-outline">directions_car</span>

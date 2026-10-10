@@ -119,7 +119,7 @@
             <a href="{{ vehicle.get_absolute_url }}" class="vehicle-card group relative bg-surface p-5 sm:p-6 rounded-[2.5rem] hover:shadow-2xl block">
                 <div class="relative overflow-hidden rounded-[2rem] h-56 sm:h-64 mb-6 bg-surface-container-high">
                     {% if vehicle.thumbnail %}
-                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
+                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }}" class="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
                     {% else %}
                     <div class="ed-ph"><span class="material-symbols-outlined text-[64px]" aria-hidden="true">directions_car</span></div>
                     {% endif %}
@@ -190,13 +190,13 @@
         {% for vehicle in premium_vehicles %}
         <a href="{{ vehicle.get_absolute_url }}" class="snap-start min-w-[300px] sm:min-w-[420px] lg:min-w-[34vw] h-[420px] sm:h-[520px] lg:h-[62vh] relative rounded-[3rem] overflow-hidden group block bg-[#22261c]" data-tilt="0.5">
             {% if vehicle.thumbnail %}
-            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover" loading="lazy"/>
+            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }}" class="w-full h-full object-cover" loading="lazy"/>
             {% else %}
             <div class="ed-ph ed-ph-dark"><span class="material-symbols-outlined text-[80px]" aria-hidden="true">directions_car</span></div>
             {% endif %}
             <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
             <div class="absolute bottom-8 left-8 right-8 flex justify-between items-end gap-4">
-                <div><div class="headline-md text-3xl text-white">{{ vehicle.brand }} {{ vehicle.name }}</div><div class="text-[#b8cf88] label-tiny mt-3">{% if vehicle.category %}{{ vehicle.category.name }}{% else %}Elite collection{% endif %}</div></div>
+                <div><div class="headline-md text-3xl text-white">{{ vehicle.full_name }}</div><div class="text-[#b8cf88] label-tiny mt-3">{% if vehicle.category %}{{ vehicle.category.name }}{% else %}Elite collection{% endif %}</div></div>
                 <span class="shrink-0 w-12 h-12 rounded-full bg-white/10 border border-white/20 text-white grid place-items-center transition-transform duration-500 group-hover:rotate-45 group-hover:bg-[#d4eca2] group-hover:text-[#1f2e00]"><span class="material-symbols-outlined">arrow_outward</span></span>
             </div>
         </a>

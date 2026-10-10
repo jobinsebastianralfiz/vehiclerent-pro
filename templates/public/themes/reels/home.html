@@ -34,17 +34,17 @@
   <div class="stage" id="stage" data-intro="2" data-intro-kind="pop">
     <div class="ct hero-tile t-orange" id="heroTile" data-tilt="0.6">
       <div class="stack" id="heroStack">
-        {% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="{{ first.brand }} {{ first.name }}"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ first.category.icon|default:"directions_car" }}</span></span>{% endif %}
+        {% if first.thumbnail %}<img src="{{ first.thumbnail.url }}" alt="{{ first.full_name }}"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ first.category.icon|default:"directions_car" }}</span></span>{% endif %}
       </div>
       <span class="pbadge" id="heroCat"{% if not first.category %} hidden{% endif %}>{{ first.category.name }}</span>
-      <span class="ct-tag"><span id="heroName"><b>{{ first.brand }} {{ first.name }}</b></span><span id="heroIdx">01 / {{ heroes|length|stringformat:"02d" }}</span></span>
+      <span class="ct-tag"><span id="heroName"><b>{{ first.full_name }}</b></span><span id="heroIdx">01 / {{ heroes|length|stringformat:"02d" }}</span></span>
     </div>
     {% include "public/themes/reels/_orbit.html" %}
     {% if heroes|length > 1 %}
     <div class="thumbs" id="thumbs" role="group" aria-label="Choose a car">
       {% for v in heroes %}{% cycle 'orange' 'blue' 'green' 'silver' 'amber' 'red' as tone silent %}
-      <button type="button" class="th t-{{ tone }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="Show {{ v.brand }} {{ v.name }}"
-        data-name="{{ v.name }}" data-full="{{ v.brand }} {{ v.name }}" data-cat="{{ v.category.name|default:'' }}" data-icon="{{ v.category.icon|default:'directions_car' }}"
+      <button type="button" class="th t-{{ tone }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="Show {{ v.full_name }}"
+        data-name="{{ v.name }}" data-full="{{ v.full_name }}" data-cat="{{ v.category.name|default:'' }}" data-icon="{{ v.category.icon|default:'directions_car' }}"
         data-img="{% if v.thumbnail %}{{ v.thumbnail.url }}{% endif %}" data-price="{% if v.primary_price_value %}{{ v.primary_price_value|inr|slice:'1:' }}{% endif %}" data-label="{{ v.primary_price_label }}"
         data-meta="{% include 'public/themes/reels/_specs.html' %}">
         {% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt=""/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ v.category.icon|default:"directions_car" }}</span></span>{% endif %}
@@ -149,7 +149,7 @@
       <article class="card m-flip-host" data-cat="{{ v.category.name|default:'Other' }}" data-tone="{{ tone }}">
         <a class="card-a" href="{{ v.get_absolute_url }}">
           <span class="ct t-{{ tone }}" data-tilt="0.7">
-            <span class="ph">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}" loading="lazy"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ v.category.icon|default:"directions_car" }}</span></span>{% endif %}</span>
+            <span class="ph">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}" loading="lazy"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ v.category.icon|default:"directions_car" }}</span></span>{% endif %}</span>
             {% if v.is_premium %}<span class="pbadge">Premium</span>{% elif v.is_wedding_service %}<span class="pbadge">Wedding</span>{% endif %}
             <span class="ct-tag"><span>{{ v.category.name }}</span>{% if v.seating_capacity %}<span>{{ v.seating_capacity }} seats</span>{% endif %}</span>
           </span>
@@ -209,8 +209,8 @@
   <div class="m-htrack">
     {% for v in premium_vehicles %}
     <a href="{{ v.get_absolute_url }}" class="ct lx dk t-night" data-tilt="0.4">
-      <span class="ph">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ v.category.icon|default:"diamond" }}</span></span>{% endif %}</span>
-      <span class="cap"><span><b>{{ v.brand }} {{ v.name }}</b><small>{% if v.primary_price_value %}{{ v.primary_price_value|inr }} / {{ v.primary_price_label }}{% else %}{{ v.category.name|default:"Premium" }}{% endif %}</small></span><span class="go"><span class="material-symbols-outlined">arrow_outward</span></span></span>
+      <span class="ph">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ v.category.icon|default:"diamond" }}</span></span>{% endif %}</span>
+      <span class="cap"><span><b>{{ v.full_name }}</b><small>{% if v.primary_price_value %}{{ v.primary_price_value|inr }} / {{ v.primary_price_label }}{% else %}{{ v.category.name|default:"Premium" }}{% endif %}</small></span><span class="go"><span class="material-symbols-outlined">arrow_outward</span></span></span>
     </a>
     {% endfor %}
   </div>

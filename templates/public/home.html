@@ -88,7 +88,7 @@
             <a href="{{ vehicle.get_absolute_url }}" class="group relative bg-surface p-6 rounded-[2.5rem] hover:shadow-xl transition-all duration-500 vehicle-card block">
                 <div class="relative overflow-hidden rounded-[2rem] h-56 sm:h-64 mb-6 sm:mb-8 bg-surface-container-high">
                     {% if vehicle.thumbnail %}
-                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy"/>
+                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy"/>
                     {% else %}
                     <div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-[60px] text-outline-variant">directions_car</span></div>
                     {% endif %}
@@ -164,7 +164,7 @@
             {% endif %}
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
             <div class="absolute bottom-8 left-8 right-8">
-                <div class="headline-md text-2xl text-white">{{ vehicle.brand }} {{ vehicle.name }}</div>
+                <div class="headline-md text-2xl text-white">{{ vehicle.full_name }}</div>
                 <div class="text-primary-fixed-dim label-tiny mt-2">Elite Collection</div>
             </div>
         </a>

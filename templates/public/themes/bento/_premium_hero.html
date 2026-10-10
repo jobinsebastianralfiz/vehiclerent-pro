@@ -1,6 +1,6 @@
 {% load static vehicle_tags %}{# premium hero photo tile body; include with hero=<Vehicle or ""> #}
         {% if hero and hero.thumbnail %}
-        <img src="{{ hero.thumbnail.url }}" alt="{{ hero.brand }} {{ hero.name }}" class="b-kb absolute inset-0 w-full h-full object-cover"/>
+        <img src="{{ hero.thumbnail.url }}" alt="{{ hero.full_name }}" class="b-kb absolute inset-0 w-full h-full object-cover"/>
         {% else %}
         <img src="{% static 'themes/img/sclass-mist.jpg' %}" alt="" class="b-kb absolute inset-0 w-full h-full object-cover"/>
         {% endif %}

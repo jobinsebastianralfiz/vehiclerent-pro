@@ -29,8 +29,8 @@
   {% with lead=featured_vehicles.first|default:vehicles.first %}
   <div class="stage" data-intro="2" data-intro-kind="pop">
     <div class="ct hero-tile dk t-night" data-tilt="0.6">
-      <div class="stack">{% if lead and lead.thumbnail %}<img src="{{ lead.thumbnail.url }}" alt="{{ lead.brand }} {{ lead.name }}"/>{% else %}<img src="{% static 'themes/img/rolls-palms.jpg' %}" alt=""/>{% endif %}</div>
-      {% if lead %}<span class="ct-tag"><span><b class="on-dk">{{ lead.brand }} {{ lead.name }}</b></span>{% if lead.primary_price_value %}<span>{{ lead.primary_price_value|inr }} / {{ lead.primary_price_label }}</span>{% endif %}</span>{% endif %}
+      <div class="stack">{% if lead and lead.thumbnail %}<img src="{{ lead.thumbnail.url }}" alt="{{ lead.full_name }}"/>{% else %}<img src="{% static 'themes/img/rolls-palms.jpg' %}" alt=""/>{% endif %}</div>
+      {% if lead %}<span class="ct-tag"><span><b class="on-dk">{{ lead.full_name }}</b></span>{% if lead.primary_price_value %}<span>{{ lead.primary_price_value|inr }} / {{ lead.primary_price_label }}</span>{% endif %}</span>{% endif %}
     </div>
   </div>
   {% endwith %}
@@ -51,8 +51,8 @@
   <div class="m-htrack">
     {% for v in featured_vehicles %}
     <a href="{{ v.get_absolute_url }}" class="ct lx dk t-night" data-tilt="0.4">
-      <span class="ph">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">diamond</span></span>{% endif %}</span>
-      <span class="cap"><span><b>{{ v.brand }} {{ v.name }}</b><small>{% if v.primary_price_value %}From {{ v.primary_price_value|inr }} / {{ v.primary_price_label }}{% else %}Price on request{% endif %}</small></span><span class="go"><span class="material-symbols-outlined">arrow_outward</span></span></span>
+      <span class="ph">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">diamond</span></span>{% endif %}</span>
+      <span class="cap"><span><b>{{ v.full_name }}</b><small>{% if v.primary_price_value %}From {{ v.primary_price_value|inr }} / {{ v.primary_price_label }}{% else %}Price on request{% endif %}</small></span><span class="go"><span class="material-symbols-outlined">arrow_outward</span></span></span>
     </a>
     {% endfor %}
   </div>

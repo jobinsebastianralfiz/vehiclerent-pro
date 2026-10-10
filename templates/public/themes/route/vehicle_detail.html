@@ -3,14 +3,14 @@
 {% comment %}Kerala Route · vehicle. A postcard gallery beside a boarding pass that is also the booking form,
 then a road down the page through specs, the story, what's on board and similar drives.{% endcomment %}
 
-{% block title %}{{ vehicle.meta_title|default:vehicle.brand }} {% if not vehicle.meta_title %}{{ vehicle.name }} for Rent in Kerala{% endif %} | {{ BUSINESS_NAME }}{% endblock %}
-{% block meta_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} ({{ vehicle.get_vehicle_type_display }}) at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}{% if vehicle.seating_capacity %}, {{ vehicle.seating_capacity }} seats{% endif %}. Doorstep delivery, transparent pricing, 24x7 support.{% endif %}{% endblock %}
-{% block meta_keywords %}{% if vehicle.meta_keywords %}{{ vehicle.meta_keywords }}{% else %}{{ vehicle.brand }} rental, {{ vehicle.name }} rent, {{ vehicle.get_vehicle_type_display }} rental Kerala, {{ vehicle.brand }} {{ vehicle.name }} hire, car rental Kerala{% endif %}{% endblock %}
+{% block title %}{% if vehicle.meta_title %}{{ vehicle.meta_title }}{% else %}{{ vehicle.full_name }} for Rent in Kerala{% endif %} | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.full_name }} ({{ vehicle.get_vehicle_type_display }}) at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}{% if vehicle.seating_capacity %}, {{ vehicle.seating_capacity }} seats{% endif %}. Doorstep delivery, transparent pricing, 24x7 support.{% endif %}{% endblock %}
+{% block meta_keywords %}{% if vehicle.meta_keywords %}{{ vehicle.meta_keywords }}{% else %}{{ vehicle.brand }} rental, {{ vehicle.name }} rent, {{ vehicle.get_vehicle_type_display }} rental Kerala, {{ vehicle.full_name }} hire, car rental Kerala{% endif %}{% endblock %}
 {% block og_type %}product{% endblock %}
-{% block og_title %}{{ vehicle.brand }} {{ vehicle.name }} for Rent | {{ BUSINESS_NAME }}{% endblock %}
-{% block og_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}.{% endif %}{% endblock %}
-{% block twitter_title %}{{ vehicle.brand }} {{ vehicle.name }} for Rent{% endblock %}
-{% block twitter_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.brand }} {{ vehicle.name }} at {{ vehicle.price_per_day|inr }}/day in Kerala.{% endif %}{% endblock %}
+{% block og_title %}{{ vehicle.full_name }} for Rent | {{ BUSINESS_NAME }}{% endblock %}
+{% block og_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.full_name }} at {{ vehicle.price_per_day|inr }}/day in Kerala. {{ vehicle.get_fuel_type_display }} {{ vehicle.get_transmission_display }}.{% endif %}{% endblock %}
+{% block twitter_title %}{{ vehicle.full_name }} for Rent{% endblock %}
+{% block twitter_description %}{% if vehicle.meta_description %}{{ vehicle.meta_description }}{% else %}Rent {{ vehicle.full_name }} at {{ vehicle.price_per_day|inr }}/day in Kerala.{% endif %}{% endblock %}
 {% block og_image %}{% if vehicle.thumbnail %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ vehicle.thumbnail.url }}"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>{% else %}{{ block.super }}{% endif %}{% endblock %}
@@ -21,7 +21,7 @@ then a road down the page through specs, the story, what's on board and similar 
 {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": "{{ vehicle.brand }} {{ vehicle.name }}",
+    "name": "{{ vehicle.full_name }}",
     "description": "{{ vehicle.description|truncatewords:50 }}",
     "brand": { "@type": "Brand", "name": "{{ vehicle.brand }}" },
     "category": "{{ vehicle.get_vehicle_type_display }}",
@@ -59,10 +59,10 @@ then a road down the page through specs, the story, what's on board and similar 
                 <div class="relative aspect-[16/10] overflow-hidden rounded-[3px] bg-surface-container">
                     {% if images %}
                         {% for img in images %}
-                        <img x-show="active === {{ forloop.counter0 }}" {% if not forloop.first %}x-cloak{% endif %} src="{{ img.image.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}{% if images|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-cover !aspect-auto" x-transition.opacity.duration.500ms/>
+                        <img x-show="active === {{ forloop.counter0 }}" {% if not forloop.first %}x-cloak{% endif %} src="{{ img.image.url }}" alt="{{ vehicle.full_name }}{% if images|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-cover !aspect-auto" x-transition.opacity.duration.500ms/>
                         {% endfor %}
                     {% elif vehicle.thumbnail %}
-                        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="absolute inset-0 w-full h-full object-cover !aspect-auto"/>
+                        <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }}" class="absolute inset-0 w-full h-full object-cover !aspect-auto"/>
                     {% else %}
                         <div class="r-photo-empty absolute inset-0 flex flex-col items-center justify-center gap-3 text-outline"><span class="material-symbols-outlined text-[110px] text-[#e39b3c]">directions_car</span><span class="label-tiny">Photo coming soon</span></div>
                     {% endif %}
@@ -204,7 +204,7 @@ then a road down the page through specs, the story, what's on board and similar 
             <p class="text-lg text-on-surface-variant leading-relaxed font-light whitespace-pre-line">{{ vehicle.description }}</p>
         </div>
         {% if vehicle.thumbnail %}
-        <div class="pc pc-in max-w-md mx-auto w-full rotate-[3deg]"><img src="{{ vehicle.thumbnail.url }}" alt="" loading="lazy"><span class="pc-cap">{{ vehicle.brand }} {{ vehicle.name }}</span><span class="pc-stamp"><span class="material-symbols-outlined">wb_sunny</span></span></div>
+        <div class="pc pc-in max-w-md mx-auto w-full rotate-[3deg]"><img src="{{ vehicle.thumbnail.url }}" alt="" loading="lazy"><span class="pc-cap">{{ vehicle.full_name }}</span><span class="pc-stamp"><span class="material-symbols-outlined">wb_sunny</span></span></div>
         {% endif %}
     </section>
     {% endif %}

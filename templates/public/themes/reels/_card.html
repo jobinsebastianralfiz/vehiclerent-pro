@@ -2,7 +2,7 @@
 <article class="card m-flip-host" data-cat="{% if cat %}{{ cat }}{% else %}{{ v.category.name|default:'Other' }}{% endif %}" data-tone="{{ tone }}">
   <a class="card-a" href="{{ v.get_absolute_url }}">
     <span class="ct t-{{ tone }}" data-tilt="0.7">
-      <span class="ph">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.brand }} {{ v.name }}" loading="lazy"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ v.category.icon|default:"directions_car" }}</span></span>{% endif %}</span>
+      <span class="ph">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}" loading="lazy"/>{% else %}<span class="ph-empty"><span class="material-symbols-outlined">{{ v.category.icon|default:"directions_car" }}</span></span>{% endif %}</span>
       {% if v.is_premium %}<span class="pbadge">Premium</span>{% elif v.is_wedding_service %}<span class="pbadge">Wedding</span>{% endif %}
       {% if v.status and v.status != 'available' %}<span class="status-pill s-{{ v.status }}">{{ v.get_status_display }}</span>{% endif %}
       <span class="ct-tag"><span>{{ v.category.name|default:v.get_vehicle_type_display }}</span>{% if v.is_chauffeur_available %}<span>Driver available</span>{% elif v.seating_capacity %}<span>{{ v.seating_capacity }} seats</span>{% endif %}</span>

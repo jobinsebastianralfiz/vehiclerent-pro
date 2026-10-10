@@ -4,7 +4,7 @@
     <a href="{{ vehicle.get_absolute_url }}" class="tk group block bg-surface-container-lowest rounded-[1.75rem] overflow-hidden shadow-xl shadow-black/10 text-on-surface" {% if dark %}style="--r-notch:#0f2e2c"{% endif %}>
         <div class="relative h-52 sm:h-56 overflow-hidden bg-surface-container">
             {% if vehicle.thumbnail %}
-            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.brand }} {{ vehicle.name }}" class="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
+            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }}" class="w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
             {% else %}
             <div class="r-photo-empty w-full h-full flex flex-col items-center justify-center gap-2 text-outline"><span class="material-symbols-outlined text-[64px] text-[#e39b3c]">directions_car</span><span class="label-tiny">Photo coming soon</span></div>
             {% endif %}
