@@ -20,7 +20,7 @@
     </div>
     <div class="tile sm:col-span-2 lg:col-span-5 min-h-[360px] bg-primary" data-no-parallax>
         {% if config.about_image %}
-        <img src="{{ config.about_image.url }}" alt="About {{ BUSINESS_NAME }}" class="b-kb absolute inset-0 w-full h-full object-cover"/>
+        <img src="{{ config.about_image|resized:1200 }}" alt="About {{ BUSINESS_NAME }}" class="b-kb absolute inset-0 w-full h-full object-cover"/>
         {% else %}
         <img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="" class="b-kb absolute inset-0 w-full h-full object-cover"/>
         {% endif %}
@@ -93,7 +93,7 @@
                 <blockquote class="mt-4 text-lg font-semibold leading-relaxed {% if not forloop.first %}text-on-surface{% endif %}">"{{ t.quote }}"</blockquote>
             </div>
             <figcaption class="flex items-center gap-3">
-                {% if t.photo %}<img src="{{ t.photo.url }}" alt="" class="w-11 h-11 rounded-full object-cover"/>{% else %}<span class="w-11 h-11 rounded-full {% if forloop.first %}bg-white/15 text-primary-fixed{% else %}bg-primary-fixed text-primary{% endif %} grid place-items-center font-extrabold" aria-hidden="true">{{ t.name|slice:":1"|upper }}</span>{% endif %}
+                {% if t.photo %}<img src="{{ t.photo|resized:96 }}" alt="" class="w-11 h-11 rounded-full object-cover"/>{% else %}<span class="w-11 h-11 rounded-full {% if forloop.first %}bg-white/15 text-primary-fixed{% else %}bg-primary-fixed text-primary{% endif %} grid place-items-center font-extrabold" aria-hidden="true">{{ t.name|slice:":1"|upper }}</span>{% endif %}
                 <div><div class="font-extrabold">{{ t.name }}</div>{% if t.role %}<div class="label-tiny mt-1 {% if forloop.first %}text-white/60{% else %}text-outline{% endif %}">{{ t.role }}</div>{% endif %}</div>
             </figcaption>
         </figure>

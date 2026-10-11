@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 
 from core.themes import themed
 
+from core.images import resized_url
 from .models import (
     BookingAddon,
     City,
@@ -155,6 +156,8 @@ def vehicle_detail(request, slug):
         "vehicle": vehicle,
         "images": images,
         "photos": photos,
+        # the full-screen viewer: 1600px WebP copies instead of the original uploads
+        "photos_large": [resized_url(u, 1600) for u in photos],
         "related_vehicles": related,
         "addons": addons,
         "cities": cities,

@@ -47,7 +47,7 @@
         <span class="label-tiny text-primary-container block mb-2">Your enquiry</span>
         {% if enquiry.vehicle %}
         <a href="{{ enquiry.vehicle.get_absolute_url }}" class="bg-white rounded-2xl p-2 flex items-center gap-3 lift">
-            <span class="w-16 h-14 rounded-xl overflow-hidden bg-surface-container grid place-items-center shrink-0">{% if enquiry.vehicle.thumbnail %}<img src="{{ enquiry.vehicle.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-outline" aria-hidden="true">directions_car</span>{% endif %}</span>
+            <span class="w-16 h-14 rounded-xl overflow-hidden bg-surface-container grid place-items-center shrink-0">{% if enquiry.vehicle.thumbnail %}<img src="{{ enquiry.vehicle.thumbnail|resized:480 }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-outline" aria-hidden="true">directions_car</span>{% endif %}</span>
             <span class="min-w-0"><span class="label-tiny text-outline block">Vehicle</span><span class="font-extrabold text-primary block truncate">{{ enquiry.vehicle.brand }} {{ enquiry.vehicle.name }}</span></span>
         </a>
         {% endif %}

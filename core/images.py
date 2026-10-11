@@ -73,3 +73,48 @@ def share_image(file):
     out = io.BytesIO()
     im.save(out, "JPEG", quality=82, optimize=True, progressive=True)
     return os.path.splitext(os.path.basename(file.name))[0] + "-share.jpg", ContentFile(out.getvalue())
+
+
+# ──────────────── Responsive copies for the public site ────────────────
+# Pages ask for a photo at the width they show it; a WebP copy is made the first time and kept under
+# MEDIA_ROOT/cache/<width>/, then served like any other media file. The original upload is never changed.
+
+CACHE_DIR = "cache"
+WEBP_QUALITY = 78
+
+
+def _source(file_or_url):
+    """(relative media path, absolute path) of an ImageField file or a /media/... URL, else (None, None)."""
+    from django.conf import settings
+    name = getattr(file_or_url, "name", None)
+    if not name and isinstance(file_or_url, str) and file_or_url.startswith(settings.MEDIA_URL):
+        name = file_or_url[len(settings.MEDIA_URL):]
+    if not name or name.startswith(CACHE_DIR + "/"):
+        return None, None
+    return name, os.path.join(settings.MEDIA_ROOT, name)
+
+
+def resized_url(file_or_url, width):
+    """URL of a WebP copy at most `width` px wide; the original URL if the file is missing or can't be read."""
+    from django.conf import settings
+    fallback = getattr(file_or_url, "url", file_or_url) if file_or_url else ""
+    name, src = _source(file_or_url)
+    if not name or not os.path.exists(src):
+        return fallback
+    rel = os.path.join(CACHE_DIR, str(width), os.path.splitext(name)[0] + ".webp")
+    dst = os.path.join(settings.MEDIA_ROOT, rel)
+    try:
+        if not os.path.exists(dst) or os.path.getmtime(dst) < os.path.getmtime(src):
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            with Image.open(src) as im:
+                im = ImageOps.exif_transpose(im)
+                if im.width > width:
+                    im.thumbnail((width, width * 10), Image.LANCZOS)
+                keep_alpha = _has_alpha(im)
+                im = im.convert("RGBA" if keep_alpha else "RGB")
+                tmp = dst + ".tmp"
+                im.save(tmp, "WEBP", quality=WEBP_QUALITY, method=4)
+                os.replace(tmp, dst)  # atomic, so a half-written file is never served
+    except Exception:
+        return fallback
+    return settings.MEDIA_URL + rel.replace(os.sep, "/")

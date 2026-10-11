@@ -2,14 +2,6 @@
 {% load vehicle_tags %}
 
 {% block extra_css %}
-<script>
-    /* Admin only: Tailwind's blue scale becomes the brand green, so every page's
-       bg-blue-600 buttons and blue accents follow the new admin look. */
-    tailwind.config.theme.extend.colors.blue = {
-        50: "#ecf7f0", 100: "#d3eedd", 200: "#a8dcbb", 300: "#74c495", 400: "#3fa56d",
-        500: "#1f8a52", 600: "#145c38", 700: "#0f4a2d", 800: "#0c3a24", 900: "#0a2e1d", 950: "#061c12"
-    };
-</script>
 <style>
     body { background: #f6f5ef; }
     .adm-sidebar { background: radial-gradient(120% 60% at 0% 100%, rgba(126,211,155,.10), transparent 60%), linear-gradient(180deg, #0f3d25 0%, #0b2f1c 55%, #08251a 100%); }

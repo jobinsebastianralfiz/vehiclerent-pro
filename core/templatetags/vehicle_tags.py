@@ -41,6 +41,20 @@ def whatsapp_vehicle_url(vehicle, number=None):
 
 
 @register.filter
+def resized(image, width=960):
+    """A WebP copy of an uploaded photo (ImageField file or /media/ URL) at most `width` px wide."""
+    from core.images import resized_url
+    return resized_url(image, int(width))
+
+
+@register.filter
+def srcset(image, widths="480,960,1600"):
+    """srcset value with WebP copies at each width, for <img srcset="..." sizes="...">."""
+    from core.images import resized_url
+    return ", ".join(f"{resized_url(image, int(w))} {w}w" for w in str(widths).split(","))
+
+
+@register.filter
 def lines(text):
     """Non-empty lines of a text field, stripped."""
     return [s.strip() for s in str(text or "").splitlines() if s.strip()]

@@ -42,7 +42,7 @@
     {% if hero %}
     <!-- backdrop: the car's own photo, blurred and faded into the page -->
     <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <img src="{{ hero.url }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-30"/>
+        <img src="{{ hero|resized:64 }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-30"/>
         <div class="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background"></div>
     </div>
     {% endif %}
@@ -81,7 +81,7 @@
         </div>
 
         <!-- gallery: main photo, five thumbnails (the fifth shows "+N"), full-screen viewer -->
-        {{ photos|json_script:"car-photos" }}
+        {{ photos_large|json_script:"car-photos" }}
         <div class="lg:col-span-5" data-no-parallax
              x-data="{ i: 0, open: false, x0: null, p: JSON.parse(document.getElementById('car-photos').textContent), go(d) { this.i = (this.i + d + this.p.length) % this.p.length } }"
              x-effect="document.documentElement.style.overflow = open ? 'hidden' : ''" x-on:keydown.escape.window="open = false" x-on:keydown.window="if (open && $event.key === 'ArrowRight') go(1); if (open && $event.key === 'ArrowLeft') go(-1)">
@@ -92,8 +92,8 @@
                     {% if photos %}
                         {% for url in photos %}
                         <div class="absolute inset-0 transition-opacity duration-500" x-bind:style="{ opacity: i === {{ forloop.counter0 }} ? 1 : 0 }" {% if not forloop.first %}style="opacity:0"{% endif %} data-photo>
-                            <img src="{{ url }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl brightness-90" aria-hidden="true" {% if not forloop.first %}loading="lazy"{% endif %} data-photo-fill/>
-                            <img src="{{ url }}" alt="{{ vehicle.full_name }}{% if photos|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-contain" {% if not forloop.first %}loading="lazy"{% endif %} data-photo-main/>
+                            <img src="{{ url|resized:64 }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl brightness-90" aria-hidden="true" {% if not forloop.first %}loading="lazy"{% endif %} data-photo-fill/>
+                            <img src="{{ url|resized:960 }}" srcset="{{ url|srcset:"640,960,1440" }}" sizes="(min-width: 1024px) 40vw, 100vw" alt="{{ vehicle.full_name }}{% if photos|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-contain" {% if not forloop.first %}loading="lazy"{% endif %} data-photo-main/>
                         </div>
                         {% endfor %}
                         <button type="button" x-on:click="open = true" class="absolute top-3 right-3 w-11 h-11 rounded-full bg-white/90 text-primary shadow-lg grid place-items-center hover:bg-white transition-colors" aria-label="View photos full screen"><span class="material-symbols-outlined">open_in_full</span></button>
@@ -110,12 +110,12 @@
                     {% for url in photos|slice:":5" %}
                     {% if forloop.counter == 5 and photos|length > 5 %}
                     <button type="button" x-on:click="i = 4; open = true" class="b-thumb relative aspect-[5/4] rounded-2xl overflow-hidden" aria-label="See all {{ photos|length }} photos">
-                        <img src="{{ url }}" alt="" class="w-full h-full object-cover" loading="lazy"/>
+                        <img src="{{ url|resized:240 }}" alt="" class="w-full h-full object-cover" loading="lazy"/>
                         <span class="absolute inset-0 bg-primary/85 grid place-items-center text-white font-extrabold text-xl sm:text-2xl">+{{ photos|length|add:"-4" }}</span>
                     </button>
                     {% else %}
                     <button type="button" x-on:click="i = {{ forloop.counter0 }}" class="b-thumb relative aspect-[5/4] rounded-2xl overflow-hidden" x-bind:aria-current="(i === {{ forloop.counter0 }}).toString()" aria-label="Show photo {{ forloop.counter }}">
-                        <img src="{{ url }}" alt="" class="w-full h-full object-cover" loading="lazy"/>
+                        <img src="{{ url|resized:240 }}" alt="" class="w-full h-full object-cover" loading="lazy"/>
                     </button>
                     {% endif %}
                     {% endfor %}
@@ -267,7 +267,7 @@
 <section class="max-w-screen-xl mx-auto pt-14 lg:pt-20">
     <div class="relative overflow-hidden rounded-[28px] bg-primary text-on-primary p-8 sm:p-12 lg:py-16 flex flex-col items-start gap-7">
         {% if hero %}
-        <img src="{{ hero.url }}" alt="" class="absolute inset-y-0 right-0 w-full lg:w-3/5 h-full object-cover opacity-50 lg:opacity-100 lg:[mask-image:linear-gradient(to_right,transparent,#000_45%)]" aria-hidden="true" loading="lazy"/>
+        <img src="{{ hero|resized:1200 }}" alt="" class="absolute inset-y-0 right-0 w-full lg:w-3/5 h-full object-cover opacity-50 lg:opacity-100 lg:[mask-image:linear-gradient(to_right,transparent,#000_45%)]" aria-hidden="true" loading="lazy"/>
         <div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/70 lg:via-primary/30 to-transparent" aria-hidden="true"></div>
         {% endif %}
         <div class="relative">

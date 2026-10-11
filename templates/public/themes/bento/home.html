@@ -134,11 +134,11 @@
 
 {% block content %}
 <!-- ─── Hero: copy + trust points on the left, the "Hero slides" vehicles in a large card on the right ─── -->
-{% with backdrop=hero_vehicles.0.hero_image.url|default:hero_bg_images.0 %}
+{% with backdrop=hero_vehicles.0.hero_image|default:hero_bg_images.0 %}
 <div class="relative -mx-3 sm:-mx-6 -mt-24 sm:-mt-28 px-3 sm:px-6 pt-24 sm:pt-28 pb-2 lg:pb-4 overflow-hidden">
     {% if backdrop %}
     <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <img src="{{ backdrop }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-35"/>
+        <img src="{{ backdrop|resized:64 }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-35"/>
         <div class="absolute inset-0 bg-gradient-to-b from-background/30 via-background/60 to-background"></div>
         <div class="absolute inset-0 bg-gradient-to-r from-background/80 via-background/20 to-transparent"></div>
     </div>
@@ -174,7 +174,7 @@
                 <div class="b-slides absolute inset-0" data-b-slides>
                     {% for v in hero_vehicles %}
                     <a href="{% url 'vehicle_detail' v.slug %}" class="b-sl" aria-label="{{ v.full_name }}">
-                        <img src="{{ v.hero_image.url }}" alt="{{ v.full_name }}" class="b-sl-cover"/>
+                        <img src="{{ v.hero_image|resized:960 }}" srcset="{{ v.hero_image|srcset:"640,960,1440" }}" sizes="(min-width: 1024px) 58vw, 100vw" alt="{{ v.full_name }}" class="b-sl-cover" {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}/>
                         <span class="b-sl-shade"></span>
                         <span class="absolute left-5 right-28 sm:left-7 sm:right-40 bottom-5 sm:bottom-7 text-white">
                             <span class="label-tiny opacity-80">{{ v.category.name|default:v.get_vehicle_type_display }}</span>
@@ -184,7 +184,7 @@
                     </a>
                     {% endfor %}
                     {% if n_v < 2 %}
-                    {% for url in hero_bg_images %}<div class="b-sl"><img src="{{ url }}" alt="" class="b-sl-cover"/><span class="b-sl-shade"></span>{% include "public/themes/bento/_hero_tile_caption.html" %}</div>{% endfor %}
+                    {% for url in hero_bg_images %}<div class="b-sl"><img src="{{ url|resized:960 }}" srcset="{{ url|srcset:"640,960,1440" }}" sizes="(min-width: 1024px) 58vw, 100vw" alt="" class="b-sl-cover"/><span class="b-sl-shade"></span>{% include "public/themes/bento/_hero_tile_caption.html" %}</div>{% endfor %}
                     {% if n_v|add:n_bg < 2 %}<div class="b-sl"><img src="{% if config.hero_image %}{{ config.hero_image.url }}{% else %}{% static 'themes/img/palms.jpg' %}{% endif %}" alt="" class="b-sl-cover"/><span class="b-sl-shade"></span>{% include "public/themes/bento/_hero_tile_caption.html" %}</div>{% endif %}
                     {% endif %}
                 </div>
@@ -214,7 +214,7 @@
         {% with tp=cat.tile_photo %}
         <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="group block bg-white rounded-[24px] overflow-hidden shadow-lg shadow-primary/5 lift">
             <div class="relative h-32 sm:h-44 overflow-hidden {% if tp.1 %}bg-primary-fixed/40{% else %}bg-surface-container{% endif %} grid place-items-center">
-                {% if tp.0 %}<img src="{{ tp.0 }}" alt="" class="absolute inset-0 w-full h-full {% if tp.1 %}object-contain p-3{% else %}object-cover{% endif %} transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>{% else %}<span class="material-symbols-outlined text-6xl text-outline-variant" aria-hidden="true">{{ cat.icon|default:"directions_car" }}</span>{% endif %}
+                {% if tp.0 %}<img src="{{ tp.0|resized:480 }}" alt="" class="absolute inset-0 w-full h-full {% if tp.1 %}object-contain p-3{% else %}object-cover{% endif %} transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>{% else %}<span class="material-symbols-outlined text-6xl text-outline-variant" aria-hidden="true">{{ cat.icon|default:"directions_car" }}</span>{% endif %}
             </div>
             <div class="p-3.5 sm:p-4 flex items-center gap-3">
                 <span class="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full bg-surface-container-low text-primary grid place-items-center" aria-hidden="true"><span class="material-symbols-outlined">{{ cat.icon|default:"directions_car" }}</span></span>
@@ -226,7 +226,7 @@
         {% if wedding_vehicles %}{% with wv=wedding_vehicles.0 %}
         <a href="{% url 'wedding_cars' %}" class="group block bg-white rounded-[24px] overflow-hidden shadow-lg shadow-primary/5 lift">
             <div class="relative h-32 sm:h-44 overflow-hidden bg-surface-container">
-                {% if wv.hero_image %}<img src="{{ wv.hero_image.url }}" alt="" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>{% endif %}
+                {% if wv.hero_image %}<img src="{{ wv.hero_image|resized:480 }}" alt="" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>{% endif %}
             </div>
             <div class="p-3.5 sm:p-4 flex items-center gap-3">
                 <span class="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full bg-surface-container-low text-primary grid place-items-center" aria-hidden="true"><span class="material-symbols-outlined">favorite</span></span>
@@ -256,7 +256,7 @@
         <a href="{{ v.get_absolute_url }}" data-tags="{% if v.is_premium %}luxury {% endif %}{{ v.vehicle_type }}{% if v.is_wedding_service %} wedding{% endif %}" x-show="f === 'all' || $el.dataset.tags.split(' ').includes(f)" x-transition.opacity
            class="vehicle-card group block bg-white rounded-[24px] overflow-hidden shadow-lg shadow-primary/5 lift" aria-label="{{ v.full_name }}">
             <div class="relative h-52 overflow-hidden bg-surface-container grid place-items-center">
-                {% if v.hero_image %}<img src="{{ v.hero_image.url }}" alt="{{ v.full_name }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>{% else %}<span class="material-symbols-outlined text-[64px] text-outline-variant" aria-hidden="true">directions_car</span>{% endif %}
+                {% if v.hero_image %}<img src="{{ v.hero_image|resized:640 }}" alt="{{ v.full_name }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>{% else %}<span class="material-symbols-outlined text-[64px] text-outline-variant" aria-hidden="true">directions_car</span>{% endif %}
                 {% if v.primary_price_value %}<span class="absolute top-3 right-3 bg-white/90 text-primary rounded-full px-3 py-1.5 text-xs font-extrabold">{{ v.primary_price_value|inr }}<span class="font-semibold text-on-surface-variant">/{{ v.primary_price_label }}</span></span>{% endif %}
             </div>
             <div class="p-4">
@@ -338,8 +338,8 @@
                     <div class="h-px bg-white/15 mb-6 hidden sm:block"></div>
                     <div class="wd-stage" data-wd-stage>
                         {% for v in wedding_vehicles %}
-                        <a href="{{ v.get_absolute_url }}" class="wd-card{% if forloop.first %} on{% endif %}" aria-label="{{ v.full_name }}" data-thumb="{% if v.thumbnail %}{{ v.thumbnail.url }}{% endif %}">
-                            {% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}"/>{% else %}<span class="absolute inset-0 grid place-items-center"><span class="material-symbols-outlined text-[96px] text-[#f2c98a]/40">favorite</span></span>{% endif %}
+                        <a href="{{ v.get_absolute_url }}" class="wd-card{% if forloop.first %} on{% endif %}" aria-label="{{ v.full_name }}" data-thumb="{% if v.thumbnail %}{{ v.thumbnail|resized:240 }}{% endif %}">
+                            {% if v.thumbnail %}<img src="{{ v.thumbnail|resized:960 }}" alt="{{ v.full_name }}" loading="lazy"/>{% else %}<span class="absolute inset-0 grid place-items-center"><span class="material-symbols-outlined text-[96px] text-[#f2c98a]/40">favorite</span></span>{% endif %}
                             <span class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent"></span>
                             <span class="wd-pill"><span class="material-symbols-outlined">favorite</span>Wedding car {{ forloop.counter|stringformat:"02d" }}</span>
                             <span class="absolute left-6 right-24 bottom-6 sm:left-8 sm:bottom-8">
@@ -396,7 +396,7 @@
 <section class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-28 pb-6">
     <div class="relative overflow-hidden rounded-[28px] bg-primary text-on-primary p-8 sm:p-12 lg:py-16 flex flex-col items-start gap-7">
         {% if bv.hero_image %}
-        <img src="{{ bv.hero_image.url }}" alt="" class="absolute inset-y-0 right-0 w-full lg:w-3/5 h-full object-cover opacity-45 lg:opacity-100 lg:[mask-image:linear-gradient(to_right,transparent,#000_45%)]" aria-hidden="true" loading="lazy"/>
+        <img src="{{ bv.hero_image|resized:1200 }}" alt="" class="absolute inset-y-0 right-0 w-full lg:w-3/5 h-full object-cover opacity-45 lg:opacity-100 lg:[mask-image:linear-gradient(to_right,transparent,#000_45%)]" aria-hidden="true" loading="lazy"/>
         <div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/70 lg:via-primary/30 to-transparent" aria-hidden="true"></div>
         {% endif %}
         <div class="relative">

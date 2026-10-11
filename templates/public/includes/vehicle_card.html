@@ -10,7 +10,7 @@
         </div>
         <div class="aspect-[16/10] overflow-hidden">
             {% if vehicle.thumbnail %}
-            <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }} - {{ vehicle.get_vehicle_type_display }} for rent" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" itemprop="image"/>
+            <img src="{{ vehicle.thumbnail|resized:640 }}" alt="{{ vehicle.full_name }} - {{ vehicle.get_vehicle_type_display }} for rent" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" itemprop="image"/>
             {% else %}
             <div class="w-full h-full bg-surface-container flex items-center justify-center">
                 <span class="material-symbols-outlined text-6xl text-outline">directions_car</span>

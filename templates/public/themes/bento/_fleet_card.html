@@ -2,7 +2,7 @@
 {% comment %}Fleet page card (mockup 2026-10-10): photo with status and a save heart, name and day rate, specs, View Details / Book Now.{% endcomment %}
 <article class="fc tile bg-white p-3 flex flex-col">
     <a href="{{ v.get_absolute_url }}" class="relative block rounded-[18px] overflow-hidden aspect-[16/10] bg-surface-container" tabindex="-1" aria-hidden="true">
-        {% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+        {% if v.thumbnail %}<img src="{{ v.thumbnail|resized:640 }}" alt="" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
         {% else %}<span class="absolute inset-0 grid place-items-center text-primary/30"><span class="material-symbols-outlined text-[72px]">{{ v.category.icon|default:"directions_car" }}</span></span>{% endif %}
         <span class="fc-status s-{{ v.status }}"><i></i>{{ v.get_status_display }}</span>
     </a>

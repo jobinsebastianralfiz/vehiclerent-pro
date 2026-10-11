@@ -5,7 +5,11 @@ from django.utils.functional import SimpleLazyObject
 
 from . import antispam
 
+from .icons import icon_font_url
+from .theme_css import css_vars
 from .themes import active_theme
+
+FULL_ICON_FONT = "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"
 
 
 def _og_image(config):
@@ -33,6 +37,9 @@ def site_settings(request):
         "ANTISPAM_TOKEN": SimpleLazyObject(antispam.make_token),
         "THEME_FOOTER": [f"public/themes/{theme['key']}/footer.html", "public/includes/footer.html"],
         "SITE_URL": f"{request.scheme}://{request.get_host()}",
+        "THEME_CSS": css_vars(theme["key"], admin=request.path.startswith("/manage/")),
+        # public pages load only the icons they use (about 60 KB instead of the 1 MB full font)
+        "ICON_FONT_URL": FULL_ICON_FONT if request.path.startswith("/manage/") else SimpleLazyObject(icon_font_url),
         "OG_IMAGE": _og_image(config),
         # social profiles for the structured data's sameAs (JSON, so it drops straight into the ld+json block)
         "SOCIAL_JSON": json.dumps([u for u in (getattr(config, f, "") for f in ("facebook_url", "instagram_url", "youtube_url", "twitter_url")) if u]),
