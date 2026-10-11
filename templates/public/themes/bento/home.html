@@ -202,159 +202,114 @@
 </div>
 {% endwith %}
 
-<!-- ─── Occasion bento ─── -->
-{% if categories %}
-<section class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
-    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-        <div><span class="label-tiny text-primary-container block">Explore by occasion</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Find your <span class="serif-i">drive.</span></h2></div>
-        <a href="{% url 'vehicle_list' %}" class="font-bold text-primary inline-flex items-center gap-2 hover:gap-3 transition-all">All {{ categories|length }} categor{{ categories|length|pluralize:"y,ies" }} <span class="material-symbols-outlined">arrow_forward</span></a>
+<!-- ─── Find your drive: categories with cars, then the wedding fleet ─── -->
+{% if drive_categories or wedding_vehicles %}
+<section class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-28">
+    <div class="flex items-end justify-between gap-4 mb-7">
+        <div><span class="label-tiny text-primary-container block">Explore our fleet</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Find your <span class="serif-i">drive.</span></h2></div>
+        <a href="{% url 'vehicle_list' %}" class="hidden sm:inline-flex font-bold text-primary items-center gap-2 hover:gap-3 transition-all whitespace-nowrap">View all vehicles <span class="material-symbols-outlined">arrow_forward</span></a>
     </div>
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4" data-deal>
-        {% for cat in categories|slice:":9" %}
-        {% if forloop.counter == 1 %}
-        <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="occ tile bg-primary text-on-primary p-6 col-span-2 row-span-2 min-h-[260px] flex flex-col justify-between lift">
-            <div class="flex justify-between"><span class="material-symbols-outlined text-5xl text-primary-fixed">{{ cat.icon|default:"directions_car" }}</span><span class="occ-go w-11 h-11 rounded-full bg-white/10 grid place-items-center"><span class="material-symbols-outlined">arrow_outward</span></span></div>
-            <div><div class="font-extrabold text-3xl tracking-tight">{{ cat.name }}</div><div class="text-white/70 mt-1 text-sm">{{ cat.count }} vehicle{{ cat.count|pluralize }} in fleet</div></div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" data-deal>
+        {% for cat in drive_categories %}
+        {% with tp=cat.tile_photo %}
+        <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="group block bg-white rounded-[24px] overflow-hidden shadow-lg shadow-primary/5 lift">
+            <div class="relative h-32 sm:h-44 overflow-hidden {% if tp.1 %}bg-primary-fixed/40{% else %}bg-surface-container{% endif %} grid place-items-center">
+                {% if tp.0 %}<img src="{{ tp.0 }}" alt="" class="absolute inset-0 w-full h-full {% if tp.1 %}object-contain p-3{% else %}object-cover{% endif %} transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>{% else %}<span class="material-symbols-outlined text-6xl text-outline-variant" aria-hidden="true">{{ cat.icon|default:"directions_car" }}</span>{% endif %}
+            </div>
+            <div class="p-3.5 sm:p-4 flex items-center gap-3">
+                <span class="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full bg-surface-container-low text-primary grid place-items-center" aria-hidden="true"><span class="material-symbols-outlined">{{ cat.icon|default:"directions_car" }}</span></span>
+                <span class="min-w-0"><span class="block font-extrabold text-primary leading-tight truncate">{{ cat.name }}</span><span class="block text-xs text-on-surface-variant mt-0.5 truncate">{% if cat.description %}{{ cat.description|truncatechars:40 }}{% else %}{{ cat.count }} vehicle{{ cat.count|pluralize }}{% endif %}</span></span>
+            </div>
         </a>
-        {% elif forloop.counter == 2 %}
-        <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="occ tile bg-primary-fixed text-primary p-6 col-span-2 min-h-[124px] flex items-center justify-between lift"><div><span class="material-symbols-outlined text-4xl">{{ cat.icon|default:"directions_car" }}</span><div class="font-extrabold text-2xl tracking-tight mt-2">{{ cat.name }}</div></div><span class="occ-go w-11 h-11 rounded-full bg-white/60 grid place-items-center"><span class="material-symbols-outlined">arrow_outward</span></span></a>
-        {% elif forloop.counter == 3 %}
-        <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="occ tile b-glass p-6 col-span-2 min-h-[124px] flex items-center justify-between lift"><div><span class="material-symbols-outlined text-4xl text-primary">{{ cat.icon|default:"directions_car" }}</span><div class="font-extrabold text-2xl tracking-tight mt-2 text-primary">{{ cat.name }}</div></div><span class="occ-go w-11 h-11 rounded-full bg-white grid place-items-center"><span class="material-symbols-outlined">arrow_outward</span></span></a>
-        {% else %}
-        <a href="{% url 'vehicle_list' %}?category={{ cat.id }}" class="occ tile b-glass p-5 min-h-[124px] flex flex-col justify-between lift"><span class="material-symbols-outlined text-3xl text-primary">{{ cat.icon|default:"directions_car" }}</span><div class="font-extrabold text-primary leading-tight">{{ cat.name }}</div></a>
-        {% endif %}
+        {% endwith %}
+        {% endfor %}
+        {% if wedding_vehicles %}{% with wv=wedding_vehicles.0 %}
+        <a href="{% url 'wedding_cars' %}" class="group block bg-white rounded-[24px] overflow-hidden shadow-lg shadow-primary/5 lift">
+            <div class="relative h-32 sm:h-44 overflow-hidden bg-surface-container">
+                {% if wv.hero_image %}<img src="{{ wv.hero_image.url }}" alt="" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>{% endif %}
+            </div>
+            <div class="p-3.5 sm:p-4 flex items-center gap-3">
+                <span class="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full bg-surface-container-low text-primary grid place-items-center" aria-hidden="true"><span class="material-symbols-outlined">favorite</span></span>
+                <span class="min-w-0"><span class="block font-extrabold text-primary leading-tight truncate">Wedding cars</span><span class="block text-xs text-on-surface-variant mt-0.5 truncate">Make your day special</span></span>
+            </div>
+        </a>
+        {% endwith %}{% endif %}
+    </div>
+    <a href="{% url 'vehicle_list' %}" class="sm:hidden mt-5 inline-flex font-bold text-primary items-center gap-2">View all vehicles <span class="material-symbols-outlined">arrow_forward</span></a>
+</section>
+{% endif %}
+
+<!-- ─── The new collection: featured (else newest) cars, filtered in place by the chips ─── -->
+{% if collection_vehicles %}
+<section id="fleet" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-28" x-data="{ f: 'all' }">
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-7">
+        <div><span class="label-tiny text-primary-container block">Popular choices</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">The new <span class="serif-i">collection.</span></h2></div>
+        <div class="flex flex-wrap gap-2" role="group" aria-label="Filter the collection">
+            <button type="button" x-on:click="f = 'all'" x-bind:class="f === 'all' ? 'bg-primary text-on-primary' : 'bg-white text-primary hover:bg-primary-fixed/60'" class="px-5 py-2.5 rounded-full font-bold text-sm transition-colors" x-bind:aria-pressed="(f === 'all').toString()">All cars</button>
+            {% for key, label in collection_filters %}
+            <button type="button" x-on:click="f = '{{ key }}'" x-bind:class="f === '{{ key }}' ? 'bg-primary text-on-primary' : 'bg-white text-primary hover:bg-primary-fixed/60'" class="px-5 py-2.5 rounded-full font-bold text-sm transition-colors" x-bind:aria-pressed="(f === '{{ key }}').toString()">{{ label }}</button>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {% for v in collection_vehicles %}
+        <a href="{{ v.get_absolute_url }}" data-tags="{% if v.is_premium %}luxury {% endif %}{{ v.vehicle_type }}{% if v.is_wedding_service %} wedding{% endif %}" x-show="f === 'all' || $el.dataset.tags.split(' ').includes(f)" x-transition.opacity
+           class="vehicle-card group block bg-white rounded-[24px] overflow-hidden shadow-lg shadow-primary/5 lift" aria-label="{{ v.full_name }}">
+            <div class="relative h-52 overflow-hidden bg-surface-container grid place-items-center">
+                {% if v.hero_image %}<img src="{{ v.hero_image.url }}" alt="{{ v.full_name }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>{% else %}<span class="material-symbols-outlined text-[64px] text-outline-variant" aria-hidden="true">directions_car</span>{% endif %}
+                {% if v.primary_price_value %}<span class="absolute top-3 right-3 bg-white/90 text-primary rounded-full px-3 py-1.5 text-xs font-extrabold">{{ v.primary_price_value|inr }}<span class="font-semibold text-on-surface-variant">/{{ v.primary_price_label }}</span></span>{% endif %}
+            </div>
+            <div class="p-4">
+                <div class="flex items-center justify-between gap-3">
+                    <h3 class="font-extrabold text-lg tracking-tight text-primary truncate">{{ v.full_name }}</h3>
+                    <span class="w-9 h-9 shrink-0 rounded-full bg-primary-fixed text-primary grid place-items-center transition-transform duration-500 group-hover:-rotate-45" aria-hidden="true"><span class="material-symbols-outlined text-[20px]">arrow_forward</span></span>
+                </div>
+                <div class="flex flex-wrap gap-1.5 mt-3 text-[11px] font-bold text-on-surface-variant">
+                    {% if v.transmission %}<span class="bg-surface-container-low rounded-full px-2.5 py-1">{{ v.get_transmission_display }}</span>{% endif %}
+                    {% if v.fuel_type %}<span class="bg-surface-container-low rounded-full px-2.5 py-1">{{ v.get_fuel_type_display }}</span>{% endif %}
+                    <span class="bg-surface-container-low rounded-full px-2.5 py-1">{% if v.is_premium %}Luxury{% else %}{{ v.get_vehicle_type_display }}{% endif %}</span>
+                </div>
+            </div>
+        </a>
         {% endfor %}
     </div>
 </section>
 {% endif %}
 
-
-<!-- ─── Featured fleet bento ─── -->
-{% if featured_vehicles %}
-<section id="fleet" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
-    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-        <div><span class="label-tiny text-primary-container block">Featured this week</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">The new <span class="serif-i">collection.</span></h2></div>
-        <div class="flex flex-wrap gap-2">
-            <a href="{% url 'vehicle_list' %}" class="px-5 py-2.5 rounded-full bg-primary text-on-primary font-bold text-sm">All cars</a>
-            <a href="{% url 'vehicle_list' %}?premium=1" class="px-5 py-2.5 rounded-full b-glass font-bold text-sm">Premium</a>
-            <a href="{% url 'vehicle_list' %}?type=suv" class="px-5 py-2.5 rounded-full b-glass font-bold text-sm">SUV</a>
+<!-- ─── Travel with confidence ─── -->
+<section class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-28">
+    <div class="rounded-[28px] bg-primary-fixed/45 p-7 sm:p-10 lg:p-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center" data-deal>
+        <div class="lg:col-span-4">
+            <span class="label-tiny text-primary-container block">Why choose us</span>
+            <h2 class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em] text-primary leading-[1.02]">Travel with <span class="serif-i block">confidence.</span></h2>
+            <p class="mt-4 text-on-surface-variant max-w-sm">Well-maintained vehicles, flexible rental plans and dedicated support for a hassle-free journey.</p>
         </div>
+        <ul class="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-4" role="list">
+            {% for icon, title in confidence_points %}
+            <li class="flex flex-col items-center text-center gap-3">
+                <span class="w-14 h-14 rounded-full bg-white text-primary grid place-items-center shadow-sm" aria-hidden="true"><span class="material-symbols-outlined text-[26px]">{{ icon }}</span></span>
+                <span class="font-extrabold text-primary leading-snug max-w-[9rem]">{{ title }}</span>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" data-deal>
-        {% for v in featured_vehicles %}
-        <a href="{{ v.get_absolute_url }}" class="vehicle-card tile b-glass group block p-3 {% if forloop.first %}sm:col-span-2 lg:row-span-2 lg:flex lg:flex-col{% endif %}" aria-label="{{ v.full_name }}">
-            <div class="relative overflow-hidden rounded-[22px] {% if forloop.first %}h-64 sm:h-[420px] lg:h-auto lg:flex-1 lg:min-h-[420px]{% else %}h-48{% endif %} bg-surface-container grid place-items-center">
-                {% if v.thumbnail %}
-                <img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>
-                {% else %}
-                <span class="material-symbols-outlined text-[64px] text-outline-variant" aria-hidden="true">directions_car</span>
-                {% endif %}
-                <span class="absolute top-3 left-3 b-glass rounded-full px-3 py-1.5 label-tiny text-primary">{% if v.is_premium %}Premium{% elif v.is_wedding_service %}Wedding{% elif v.category %}{{ v.category.name }}{% else %}Fleet{% endif %}</span>
-                {% if v.primary_price_value %}<span class="absolute top-3 right-3 bg-primary text-on-primary rounded-full px-3 py-1.5 text-sm font-extrabold">{{ v.primary_price_value|inr }}<span class="font-semibold text-white/70">/{{ v.primary_price_label }}</span></span>{% endif %}
-            </div>
-            <div class="px-3 pt-4 pb-2">
-                <div class="label-tiny text-outline">{{ v.brand }}</div>
-                <div class="flex items-center justify-between gap-3 mt-1.5">
-                    <h3 class="font-extrabold {% if forloop.first %}text-3xl{% else %}text-xl{% endif %} tracking-tight text-primary">{{ v.name }}</h3>
-                    <span class="w-10 h-10 shrink-0 rounded-full bg-primary-fixed text-primary grid place-items-center transition-transform duration-500 group-hover:-rotate-45" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></span>
-                </div>
-                <div class="flex flex-wrap gap-1.5 mt-3 text-xs font-bold text-on-surface-variant">
-                    {% if v.transmission %}<span class="bg-white rounded-full px-3 py-1.5">{{ v.get_transmission_display }}</span>{% endif %}
-                    {% if v.fuel_type %}<span class="bg-white rounded-full px-3 py-1.5">{{ v.get_fuel_type_display }}</span>{% endif %}
-                    {% if v.seating_capacity %}<span class="bg-white rounded-full px-3 py-1.5">{{ v.seating_capacity }} seats</span>{% endif %}
-                </div>
-            </div>
-        </a>
+</section>
+
+<!-- ─── Three simple steps ─── -->
+<section id="how" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-28">
+    <div class="mb-7"><span class="label-tiny text-primary-container block">How it works</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Three <span class="serif-i">simple steps.</span></h2></div>
+    <ol class="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr_auto_1fr] gap-3 lg:gap-4 items-center" data-deal>
+        {% for icon, title, text in steps %}
+        <li class="bg-white rounded-[24px] p-5 sm:p-6 flex items-center gap-4 shadow-lg shadow-primary/5">
+            <span class="w-11 h-11 shrink-0 rounded-full bg-primary text-primary-fixed grid place-items-center font-extrabold text-sm">{{ forloop.counter|stringformat:"02d" }}</span>
+            <span class="w-11 h-11 shrink-0 rounded-full bg-surface-container-low text-primary grid place-items-center" aria-hidden="true"><span class="material-symbols-outlined">{{ icon }}</span></span>
+            <span class="min-w-0"><span class="block font-extrabold text-primary">{{ title }}</span><span class="block text-sm text-on-surface-variant mt-0.5">{{ text }}</span></span>
+        </li>
+        {% if not forloop.last %}<li class="hidden lg:grid place-items-center text-outline" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></li>{% endif %}
         {% endfor %}
-    </div>
+    </ol>
 </section>
-{% endif %}
 
-<!-- ─── How it works: sticky phone ─── -->
-<section id="how" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
-    <div class="tile b-glass p-6 sm:p-10 lg:p-14" style="overflow:clip">
-        <div class="grid lg:grid-cols-2 gap-10 lg:gap-16">
-            <div class="hidden lg:block">
-                <div class="sticky top-[14vh]">
-                    <div class="relative mx-auto w-[290px] h-[560px] rounded-[48px] bg-primary p-3 shadow-[0_50px_80px_-40px_rgba(31,46,0,.6)]" aria-hidden="true">
-                        <div class="absolute top-5 left-1/2 -translate-x-1/2 w-24 h-6 rounded-full bg-primary z-10"></div>
-                        <div class="relative w-full h-full rounded-[38px] overflow-hidden bg-surface" data-no-parallax>
-                            <!-- screen 1: search -->
-                            <div class="ph-screen is-on p-5 pt-12 flex flex-col gap-3">
-                                <div class="font-extrabold text-xl text-primary">Where to?</div>
-                                <div class="bg-white rounded-2xl p-3"><div class="label-tiny text-outline">Pickup</div><div class="font-bold mt-1">{{ cities.0.name|default:"Your city" }}</div></div>
-                                <div class="grid grid-cols-2 gap-2"><div class="bg-white rounded-2xl p-3"><div class="label-tiny text-outline">From</div><div class="font-bold mt-1 text-sm text-outline">Pick a date</div></div><div class="bg-white rounded-2xl p-3"><div class="label-tiny text-outline">To</div><div class="font-bold mt-1 text-sm text-outline">Return date</div></div></div>
-                                <div class="flex bg-surface-container rounded-full p-1 text-xs font-bold"><span class="flex-1 text-center py-2 rounded-full bg-primary text-on-primary">Self-drive</span><span class="flex-1 text-center py-2">With driver</span></div>
-                                <div class="rounded-2xl overflow-hidden flex-1 min-h-0"><img src="{% static 'themes/img/thar-backwater.jpg' %}" alt="" class="w-full h-full object-cover"/></div>
-                                <div class="bg-primary text-on-primary rounded-2xl py-3.5 text-center font-bold text-sm">Search cars</div>
-                            </div>
-                            <!-- screen 2: choose (real featured cars) -->
-                            <div class="ph-screen p-5 pt-12 flex flex-col gap-3">
-                                <div class="font-extrabold text-xl text-primary">Choose your car</div>
-                                {% for v in featured_vehicles|slice:":4" %}
-                                <div class="bg-white rounded-2xl p-2 flex gap-3 items-center {% if forloop.first %}ring-2 ring-primary{% endif %}">
-                                    <div class="w-16 h-14 rounded-xl overflow-hidden bg-surface-container grid place-items-center shrink-0">{% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-outline">directions_car</span>{% endif %}</div>
-                                    <div class="flex-1 min-w-0"><div class="font-bold text-sm truncate">{{ v.name }}</div><div class="text-xs text-outline truncate">{% if v.transmission %}{{ v.get_transmission_display }}{% endif %}{% if v.fuel_type %} · {{ v.get_fuel_type_display }}{% endif %}{% if v.seating_capacity %} · {{ v.seating_capacity }}{% endif %}</div></div>
-                                    {% if v.primary_price_value %}<div class="font-extrabold text-sm text-primary">{{ v.primary_price_value|inr }}</div>{% endif %}
-                                </div>
-                                {% empty %}
-                                <div class="bg-white rounded-2xl p-4 flex gap-3 items-center"><span class="material-symbols-outlined text-outline">directions_car</span><div class="font-bold text-sm">Cars from our fleet</div></div>
-                                <div class="bg-white rounded-2xl p-4 flex gap-3 items-center"><span class="material-symbols-outlined text-outline">no_crash</span><div class="font-bold text-sm">SUVs and MPVs</div></div>
-                                {% endfor %}
-                                <div class="mt-auto text-center text-xs text-outline font-semibold">listed rates</div>
-                            </div>
-                            <!-- screen 3: enquiry (first featured car) -->
-                            <div class="ph-screen p-5 pt-12 flex flex-col gap-3">
-                                <div class="font-extrabold text-xl text-primary">Send enquiry</div>
-                                {% with v=featured_vehicles.0 %}
-                                <div class="rounded-2xl overflow-hidden flex-1 min-h-[8rem] bg-surface-container grid place-items-center">{% if v and v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-5xl text-outline-variant">directions_car</span>{% endif %}</div>
-                                <div class="bg-white rounded-2xl p-4 text-sm space-y-2">
-                                    <div class="flex justify-between gap-2"><span class="text-outline">Car</span><b class="truncate">{{ v.name|default:"Your pick" }}</b></div>
-                                    <div class="flex justify-between gap-2"><span class="text-outline">Dates</span><b>Your dates</b></div>
-                                    <div class="flex justify-between gap-2"><span class="text-outline">Pickup</span><b>{{ cities.0.name|default:"Your city" }}</b></div>
-                                    {% if v and v.primary_price_value %}<div class="flex justify-between gap-2 border-t pt-2"><span class="text-outline">Rate</span><b class="text-primary">{{ v.primary_price_value|inr }}/{{ v.primary_price_label }}</b></div>{% endif %}
-                                </div>
-                                {% endwith %}
-                                <div class="mt-auto bg-[#25D366] text-white rounded-2xl py-3.5 text-center font-bold text-sm">Continue on WhatsApp</div>
-                                <div class="text-center text-xs text-outline font-semibold">Our team confirms availability</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex justify-center gap-2 mt-6" aria-hidden="true"><span class="step-dot is-on h-2 w-2 rounded-full bg-outline-variant"></span><span class="step-dot h-2 w-2 rounded-full bg-outline-variant"></span><span class="step-dot h-2 w-2 rounded-full bg-outline-variant"></span></div>
-                </div>
-            </div>
-            <div>
-                <span class="label-tiny text-primary-container block">How it works</span>
-                <h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Three steps <span class="serif-i">to the road.</span></h2>
-                <div class="relative mt-8 sm:mt-10 space-y-3">
-                    <span class="steps-rail hidden lg:block" aria-hidden="true"><i></i></span>
-                    <div class="step is-on relative flex gap-5 rounded-[28px] p-5 sm:p-6" data-step="0">
-                        <span class="step-num relative z-[1] w-12 h-12 shrink-0 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-lg">01</span>
-                        <div>
-                            <h3 class="font-extrabold text-2xl tracking-tight text-primary">Tell us where and when.</h3>
-                            <p class="mt-1.5 text-on-surface-variant leading-relaxed max-w-md">Pick your city, your dates, and whether you'll drive or want a chauffeur.</p>
-                        </div>
-                    </div>
-                    <div class="step relative flex gap-5 rounded-[28px] p-5 sm:p-6" data-step="1">
-                        <span class="step-num relative z-[1] w-12 h-12 shrink-0 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-lg">02</span>
-                        <div>
-                            <h3 class="font-extrabold text-2xl tracking-tight text-primary">Choose your car.</h3>
-                            <p class="mt-1.5 text-on-surface-variant leading-relaxed max-w-md">Compare the fleet side by side, with the listed rate on every car.</p>
-                        </div>
-                    </div>
-                    <div class="step relative flex gap-5 rounded-[28px] p-5 sm:p-6" data-step="2">
-                        <span class="step-num relative z-[1] w-12 h-12 shrink-0 rounded-2xl bg-primary-fixed text-primary grid place-items-center font-extrabold text-lg">03</span>
-                        <div>
-                            <h3 class="font-extrabold text-2xl tracking-tight text-primary">Send the enquiry.</h3>
-                            <p class="mt-1.5 text-on-surface-variant leading-relaxed max-w-md">Send it from the site and WhatsApp opens with your details. Our team confirms availability and the final price.</p>
-                        </div>
-                    </div>
-                </div>
-                <a href="{% url 'vehicle_list' %}" class="mt-8 inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-primary text-on-primary font-bold">Find your car <span class="material-symbols-outlined text-[20px]">arrow_forward</span></a>
-            </div>
-        </div>
-    </div>
-</section>
 
 <!-- ─── Wedding: copy left, a large gold-edged card, a numbered thumbnail rail (mockup 2026-10-10). Wedding-service
      vehicles rotate here; with none yet, the theme's wedding photos stand in. ─── -->
@@ -423,90 +378,8 @@
     </div>
 </section>
 
-<!-- ─── Luxury accordion (premium vehicles) ─── -->
-{% if premium_vehicles %}
-<section id="luxury" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
-    <div class="tile bg-[#141611] text-white p-5 sm:p-8 lg:p-10">
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-            <div><span class="label-tiny text-primary-fixed block">Elite collection</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em]">When ordinary <span class="serif-i text-primary-fixed">won't do.</span></h2></div>
-            <a href="{% url 'premium_cars' %}" class="text-white/70 hover:text-white font-bold text-sm inline-flex items-center gap-2">All premium cars <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
-        </div>
-        <div class="lux lg:h-[520px]" data-no-parallax>
-            {% for v in premium_vehicles %}
-            <a href="{{ v.get_absolute_url }}" class="tile block group bg-black">
-                {% if v.thumbnail %}
-                <img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}" class="absolute inset-0 w-full h-full object-cover opacity-90" loading="lazy"/>
-                {% else %}
-                <span class="absolute inset-0 grid place-items-center"><span class="material-symbols-outlined text-[80px] text-white/15" aria-hidden="true">directions_car</span></span>
-                {% endif %}
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
-                <div class="absolute bottom-0 inset-x-0 p-6"><div class="lux-name font-extrabold text-2xl tracking-tight">{{ v.full_name }}</div><div class="lux-more mt-2 flex items-center justify-between gap-4"><span class="label-tiny text-primary-fixed">{% if v.primary_price_value %}{{ v.primary_price_value|inr }}/{{ v.primary_price_label }}{% elif v.category %}{{ v.category.name }}{% else %}Premium{% endif %}</span><span class="w-11 h-11 rounded-full bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined">arrow_outward</span></span></div></div>
-            </a>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-{% endif %}
-
-<!-- ─── Why + cities bento ─── -->
-<section id="why" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
-    <div class="mb-8"><span class="label-tiny text-primary-container block">Why book with us</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Crafted for <span class="serif-i">convenience.</span></h2></div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 lg:auto-rows-[190px]" data-deal>
-        <div class="tile b-glass p-6 lg:col-span-4 flex flex-col justify-between lift" data-tilt="0.6"><span class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined">local_shipping</span></span><div><div class="font-extrabold text-xl text-primary">Doorstep delivery</div><div class="text-on-surface-variant mt-1">We bring the car to you.</div></div></div>
-        <div class="tile lg:col-span-4 lg:row-span-2 min-h-[300px] bg-primary" data-no-parallax><img src="{% static 'themes/img/steering.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-80"/><div class="absolute inset-0 bg-gradient-to-t from-primary via-primary/20 to-transparent"></div>
-            <div class="absolute bottom-6 left-6 right-6 text-white">
-                {% if config.years_in_business %}
-                <div class="font-extrabold text-6xl tracking-tight leading-none"><span data-slot>{{ config.years_in_business }}</span><span class="text-primary-fixed">+</span></div><div class="label-tiny mt-2 text-white/70">Year{{ config.years_in_business|pluralize }} on Kerala roads</div>
-                {% elif total_vehicle_count %}
-                <div class="font-extrabold text-6xl tracking-tight leading-none"><span data-slot>{{ total_vehicle_count }}</span></div><div class="label-tiny mt-2 text-white/70">Vehicle{{ total_vehicle_count|pluralize }} ready to go</div>
-                {% else %}
-                <div class="serif-i text-3xl leading-tight">Every detail considered.</div>
-                {% endif %}
-            </div>
-        </div>
-        <div class="tile b-glass p-6 lg:col-span-4 flex flex-col justify-between lift" data-tilt="0.6"><span class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined">support_agent</span></span><div><div class="font-extrabold text-xl text-primary">24/7 support</div><div class="text-on-surface-variant mt-1">Real humans, on call.</div></div></div>
-        <div class="tile b-glass p-6 lg:col-span-4 flex flex-col justify-between lift" data-tilt="0.6"><span class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined">receipt_long</span></span><div><div class="font-extrabold text-xl text-primary">Zero hidden charges</div><div class="text-on-surface-variant mt-1">Transparent pricing, upfront.</div></div></div>
-        <div class="tile bg-primary-fixed p-6 lg:col-span-4 flex flex-col justify-between lift" data-tilt="0.6"><span class="w-12 h-12 rounded-2xl bg-primary text-primary-fixed grid place-items-center"><span class="material-symbols-outlined">map</span></span><div><div class="font-extrabold text-xl text-primary">All-Kerala network</div><div class="text-primary/70 mt-1">{% if cities %}{{ cities|length }} location{{ cities|length|pluralize }} served.{% else %}Across Kerala.{% endif %}</div></div></div>
-    </div>
-
-    {% if cities %}
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 mt-3 sm:mt-4">
-        <div class="tile b-glass lg:col-span-8 py-8 sm:py-10 flex flex-col justify-center gap-5 overflow-hidden">
-            <div class="px-6 sm:px-10"><span class="label-tiny text-primary-container block">Where we are</span><div class="mt-3 font-extrabold text-3xl sm:text-4xl tracking-[-.04em] text-primary">Kerala at your <span class="serif-i">fingertips.</span></div></div>
-            <div class="m-marquee" data-marquee style="--dur:50s"><div class="m-marquee-track !gap-2 !pr-2">
-                {% for city in cities %}{% if not forloop.counter|divisibleby:2 or cities|length < 6 %}<a data-city-slug="{{ city.slug }}" href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="shrink-0 bg-white rounded-full px-5 py-3 font-bold hover:bg-primary hover:text-on-primary transition-colors">{{ city.name }}</a>{% endif %}{% endfor %}
-            </div></div>
-            {% if cities|length >= 6 %}
-            <div class="m-marquee" data-marquee data-dir="-1" style="--dur:56s"><div class="m-marquee-track !gap-2 !pr-2">
-                {% for city in cities %}{% if forloop.counter|divisibleby:2 %}<a data-city-slug="{{ city.slug }}" href="{% url 'vehicle_list' %}?pickup_city={{ city.slug }}" class="shrink-0 bg-primary-fixed/70 rounded-full px-5 py-3 font-bold text-primary hover:bg-primary hover:text-on-primary transition-colors">{{ city.name }}</a>{% endif %}{% endfor %}
-            </div></div>
-            {% endif %}
-        </div>
-        <div class="tile lg:col-span-4 min-h-[360px] bg-surface-container" data-no-parallax>{% include "public/themes/_city_map.html" with tiles="light" pin="#33450d" box="absolute inset-0" %}<div class="absolute top-5 left-5 b-glass rounded-2xl px-5 py-4"><div class="font-extrabold text-4xl text-primary leading-none"><span data-slot>{{ cities|length }}</span></div><div class="label-tiny text-on-surface-variant mt-2">Cit{{ cities|length|pluralize:"y,ies" }} served</div></div></div>
-    </div>
-    {% endif %}
-</section>
-
-<!-- ─── Testimonial ─── -->
-{% if testimonials %}
-{% with t=testimonials.0 %}
-<section class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
-    <div class="tile b-glass p-8 sm:p-14 lg:p-20 grid lg:grid-cols-12 gap-8 items-center">
-        <span class="material-symbols-outlined text-7xl text-primary-container lg:col-span-1 self-start" style="font-variation-settings:'FILL' 1" aria-hidden="true">format_quote</span>
-        <div class="lg:col-span-11">
-            <p class="font-extrabold text-2xl sm:text-5xl lg:text-6xl tracking-[-.035em] leading-[1.05] text-primary" data-scrub-text data-no-split>"{{ t.quote }}"</p>
-            <div class="mt-10 flex items-center gap-4" data-reveal>
-                {% if t.photo %}<img src="{{ t.photo.url }}" alt="" class="w-12 h-12 rounded-full object-cover"/>{% else %}<span class="w-12 h-12 rounded-full bg-primary-fixed text-primary grid place-items-center font-extrabold" aria-hidden="true">{{ t.name|slice:":1"|upper }}</span>{% endif %}
-                <div><div class="font-extrabold">{{ t.name }}</div>{% if t.role %}<div class="label-tiny text-outline mt-1">{{ t.role }}</div>{% endif %}</div>
-            </div>
-        </div>
-    </div>
-</section>
-{% endwith %}
-{% endif %}
-
 <!-- ─── Enquiry bento ─── -->
-<section id="enquiry" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32 pb-16">
+<section id="enquiry" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-28">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
         <div class="tile bg-primary text-on-primary p-7 sm:p-10 lg:col-span-5 flex flex-col justify-between gap-8 min-h-[360px]">
             <div><span class="label-tiny text-primary-fixed block">Get in touch</span><h2 class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em]">Send us an <span class="serif-i text-primary-fixed">enquiry.</span></h2><p class="mt-4 text-white/70 text-lg">Fill the form and our team will get back to you.</p></div>
@@ -517,6 +390,24 @@
         </div>
     </div>
 </section>
+
+<!-- ─── Closing banner: a hero-slide (else featured) car photo fading into green ─── -->
+{% with bv=hero_vehicles.0|default:collection_vehicles.0 %}
+<section class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-28 pb-6">
+    <div class="relative overflow-hidden rounded-[28px] bg-primary text-on-primary p-8 sm:p-12 lg:py-16 flex flex-col items-start gap-7">
+        {% if bv.hero_image %}
+        <img src="{{ bv.hero_image.url }}" alt="" class="absolute inset-y-0 right-0 w-full lg:w-3/5 h-full object-cover opacity-45 lg:opacity-100 lg:[mask-image:linear-gradient(to_right,transparent,#000_45%)]" aria-hidden="true" loading="lazy"/>
+        <div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/70 lg:via-primary/30 to-transparent" aria-hidden="true"></div>
+        {% endif %}
+        <div class="relative">
+            <span class="label-tiny text-primary-fixed/80">Explore Kerala</span>
+            <h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] leading-[1.02]" data-no-split>Roads you'll <span class="serif-i text-primary-fixed block">never forget.</span></h2>
+            <p class="mt-4 text-white/80 text-lg max-w-md">Scenic drives, unforgettable memories.</p>
+        </div>
+        <a href="{% url 'vehicle_list' %}" class="relative bg-primary-fixed text-primary rounded-full px-7 py-4 font-bold inline-flex items-center gap-2 m-shine whitespace-nowrap" data-magnetic>Book your car <span class="material-symbols-outlined">arrow_forward</span></a>
+    </div>
+</section>
+{% endwith %}
 {% endblock %}
 
 {% block extra_js %}

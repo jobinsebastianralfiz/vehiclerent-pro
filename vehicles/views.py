@@ -198,6 +198,20 @@ def wedding_cars(request):
         "other_cars": other,
         "decorations": decorations,
         "cities": cities,
+        "wedding_slides": [x for x in qs[:12] if x.hero_image][:6],
+        "wedding_fallback": [("themes/img/wedding-rolls.jpg", "The arrival"), ("themes/img/wedding-venue.jpg", "Decorated to your story"),
+                             ("themes/img/ambassador.jpg", "Classic icons")],
+        # one "Ways to arrive" card per tier that has cars
+        "tiers": [(name, line, cars) for name, line, cars in [
+            ("Premium", "European luxury for the bridal entrance.", premium),
+            ("Classic", "Timeless elegance for a memorable arrival.", classic),
+            ("Iconic", "Traditional charm for a grand celebration.", iconic),
+        ] if cars],
+        "wedding_points": [("diamond", "Premium vehicles"), ("local_florist", "Custom decoration"), ("verified_user", "Professional chauffeurs")],
+        "wedding_steps": [("event", "Tell us your date", "Share your wedding date and venue."),
+                          ("directions_car", "Choose car & decor", "Pick from the wedding fleet and packages."),
+                          ("task_alt", "We confirm", "Our team confirms the car and details."),
+                          ("celebration", "Enjoy your day", "We'll be there on time, beautifully prepared.")],
     })
 
 

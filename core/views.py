@@ -53,6 +53,8 @@ def home(request):
     total_vehicle_count = published.count()
     starting_price = published.aggregate(m=Min("price_per_day"))["m"]
     testimonials = Testimonial.objects.filter(is_active=True)[:6]
+    # "The new collection": the featured cars, else the newest ones
+    collection_vehicles = list(featured_vehicles) or list(published.select_related("category").order_by("-created_at")[:8])
     # Vehicles ticked "Hero slides" in the wizard; only those with a photo can be shown
     hero_vehicles = [
         v for v in published.filter(show_in_hero=True).select_related("category").prefetch_related("images").order_by("-is_featured", "name")[:8]
@@ -80,6 +82,20 @@ def home(request):
         "testimonials": testimonials,
         "hero_bg_images": hero_bg_images,
         "hero_vehicles": hero_vehicles,
+        "collection_vehicles": collection_vehicles,
+        # "Find your drive": up to four categories that have cars (three when the wedding tile takes the last slot)
+        "drive_categories": [c for c in categories if c.count][:3 if wedding_vehicles else 4],
+        # chips over the collection, only for kinds it actually has
+        "collection_filters": [(k, label) for k, label, ok in [
+            ("luxury", "Luxury", any(v.is_premium for v in collection_vehicles)),
+            ("suv", "SUV", any(v.vehicle_type == "suv" for v in collection_vehicles)),
+            ("wedding", "Wedding", any(v.is_wedding_service for v in collection_vehicles)),
+        ] if ok],
+        "confidence_points": [("directions_car", "Clean & well maintained"), ("garage", "Wide range of vehicles"),
+                              ("event_available", "Flexible rental plans"), ("support_agent", "Local support in Kerala")],
+        "steps": [("search", "Choose your car", "Browse the fleet and pick the right car."),
+                  ("event_available", "Check availability", "Send your dates; we confirm the best price."),
+                  ("key", "Confirm & drive", "Complete your booking and enjoy the trip.")],
     })
 
 
