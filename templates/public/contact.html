@@ -1,101 +1,150 @@
 {% extends "public/base_public.html" %}
-{% load vehicle_tags %}
+{% load static vehicle_tags %}
+{% comment %}
+Contact page shared by every theme: the theme supplies the navbar, footer, fonts and colour tokens.
+Map: the Settings embed when set, else a Google map of the business address (contact view builds map_src).
+{% endcomment %}
 
-{% block title %}Contact Us - {{ BUSINESS_NAME }}{% endblock %}
-{% block meta_description %}Get in touch with {{ BUSINESS_NAME }}. Call, email, WhatsApp, or visit us. We're here to help with your vehicle rental needs.{% endblock %}
+{% block title %}Contact Us | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}Contact {{ BUSINESS_NAME }} for car rentals in Kerala. Call, WhatsApp or send an enquiry about our fleet, pricing or wedding cars.{% endblock %}
 
-{% block structured_data %}
-{{ block.super }}
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "ContactPage",
-    "name": "Contact {{ BUSINESS_NAME }}",
-    "description": "Get in touch with {{ BUSINESS_NAME }} for vehicle rental enquiries",
-    "mainEntity": {
-        "@type": "AutoRental",
-        "name": "{{ BUSINESS_NAME }}",
-        "telephone": "{{ BUSINESS_PHONE }}",
-        "email": "{{ BUSINESS_EMAIL }}",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "{{ BUSINESS_ADDRESS }}"
-        }
-    }
-}
-</script>
+{% block extra_css %}
+{% if THEME.key == "reels" %}<link rel="stylesheet" href="{% static 'themes/reels/reels.css' %}"/><link rel="stylesheet" href="{% static 'themes/reels/inner.css' %}"/>{% endif %}
+{% if THEME.key == "bento" %}<link rel="stylesheet" href="{% static 'themes/bento/bento.css' %}"/>{% endif %}
+<style>
+    .ct-h { font-family: var(--font-display), serif; }
+    .theme-bento .ct-h { font-family: var(--font-body), sans-serif; }  /* Bento sets headlines in its body face */
+    .ct-i { font-family: 'Noto Serif', var(--font-display), serif; font-style: italic; font-weight: 400; }
+    .ct-field { display: flex; align-items: center; gap: .6rem; border-radius: 1rem; padding: 0 1rem; border: 1px solid; }
+    .ct-field input, .ct-field textarea, .ct-field select { flex: 1; min-width: 0; border: 0 !important; background: transparent !important; padding: .8rem 0; font-size: .9rem; box-shadow: none !important; }
+    .ct-field:focus-within { outline: 2px solid currentColor; outline-offset: -1px; }
+</style>
 {% endblock %}
+{% block extra_js %}{% if THEME.key == "reels" %}<script defer src="{% static 'themes/reels/reels.js' %}"></script><script defer src="{% static 'themes/reels/inner.js' %}"></script>{% endif %}{% endblock %}
+{% block main_class %}pt-24 sm:pt-28 px-3 sm:px-6 pb-6{% endblock %}
 
 {% block content %}
-<article class="py-12 px-8 max-w-screen-2xl mx-auto" aria-label="Contact Us">
-    <header class="mb-16 text-center">
-        <p class="text-primary font-label text-xs tracking-[0.2em] mb-4 uppercase">Get in Touch</p>
-        <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4">Contact Us</h1>
-        <p class="text-on-surface-variant max-w-2xl mx-auto">We'd love to hear from you. Whether you have a question about our fleet, pricing, or anything else, our team is ready to help.</p>
-    </header>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 max-w-6xl mx-auto">
-        <!-- Contact Methods -->
-        <div class="space-y-8">
-            <h2 class="text-2xl font-serif font-bold mb-8">Reach Us Directly</h2>
-
-            {% if BUSINESS_PHONE %}
-            <a href="tel:{{ BUSINESS_PHONE }}" class="flex items-start gap-6 p-6 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:shadow-lg transition-all group">
-                <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-2xl text-primary group-hover:text-white" aria-hidden="true">call</span>
-                </div>
-                <div>
-                    <h3 class="font-bold text-on-surface mb-1">Phone</h3>
-                    <p class="text-primary font-medium text-lg">{{ BUSINESS_PHONE }}</p>
-                                    </div>
-            </a>
-            {% endif %}
-
-            {% if BUSINESS_EMAIL %}
-            <a href="mailto:{{ BUSINESS_EMAIL }}" class="flex items-start gap-6 p-6 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:shadow-lg transition-all group">
-                <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
-                    <span class="material-symbols-outlined text-2xl text-primary group-hover:text-white" aria-hidden="true">mail</span>
-                </div>
-                <div>
-                    <h3 class="font-bold text-on-surface mb-1">Email</h3>
-                    <p class="text-primary font-medium text-lg">{{ BUSINESS_EMAIL }}</p>
-                                    </div>
-            </a>
-            {% endif %}
-
-            {% if WHATSAPP_NUMBER %}
-            <a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="flex items-start gap-6 p-6 bg-surface-container-lowest rounded-2xl border border-outline-variant/10 hover:shadow-lg transition-all group">
-                <div class="w-14 h-14 rounded-xl bg-[#25D366]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#25D366] transition-colors">
-                    <svg class="w-6 h-6 text-[#25D366] group-hover:text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.468l4.573-1.462A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.16 0-4.16-.68-5.804-1.836l-.416-.283-3.103.992.989-3.043-.306-.434A9.965 9.965 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
-                </div>
-                <div>
-                    <h3 class="font-bold text-on-surface mb-1">WhatsApp</h3>
-                    <p class="text-[#25D366] font-medium text-lg">Chat with us</p>
-                    <p class="text-on-surface-variant text-sm mt-1">Instant replies during business hours</p>
-                </div>
-            </a>
-            {% endif %}
-
-            {% if BUSINESS_ADDRESS %}
-            <div class="flex items-start gap-6 p-6 bg-surface-container-lowest rounded-2xl border border-outline-variant/10">
-                <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <span class="material-symbols-outlined text-2xl text-primary" aria-hidden="true">location_on</span>
-                </div>
-                <div>
-                    <h3 class="font-bold text-on-surface mb-1">Visit Us</h3>
-                    <p class="text-on-surface-variant">{{ BUSINESS_ADDRESS }}</p>
-                                    </div>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- Enquiry Form -->
-        <div>
-            <h2 class="text-2xl font-serif font-bold mb-8">Send Us a Message</h2>
-            <div class="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/10">
-                {% include "public/includes/enquiry_form.html" %}
-            </div>
-        </div>
+<!-- ─── Hero: headline + trust points left, a car photo fading in on the right, the phone card on top ─── -->
+<div class="relative -mx-3 sm:-mx-6 -mt-24 sm:-mt-28 px-3 sm:px-6 pt-24 sm:pt-28 pb-10 overflow-hidden">
+    {% if contact_photo %}
+    <div class="absolute inset-y-0 right-0 w-full lg:w-[58%] pointer-events-none" aria-hidden="true">
+        <img src="{{ contact_photo }}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-25 lg:opacity-100 lg:[mask-image:linear-gradient(to_right,transparent,#000_40%)]"/>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background"></div>
     </div>
-</article>
+    {% endif %}
+    <nav class="relative max-w-screen-xl mx-auto mb-6 flex items-center gap-1.5 text-sm font-semibold text-on-surface-variant" aria-label="Breadcrumb">
+        <a href="{% url 'home' %}" class="grid place-items-center hover:text-primary" aria-label="Home"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">home</span></a>
+        <span class="material-symbols-outlined text-outline text-[16px]" aria-hidden="true">chevron_right</span>
+        <span class="text-on-surface" aria-current="page">Contact</span>
+    </nav>
+    <section class="relative max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start" aria-labelledby="ct-title">
+        <div class="lg:col-span-6 lg:pb-16">
+            <span class="text-xs font-extrabold tracking-[.2em] uppercase text-primary flex items-center gap-3">Get in touch<span class="w-8 h-px bg-current opacity-50" aria-hidden="true"></span></span>
+            <h1 id="ct-title" class="ct-h mt-5 font-extrabold text-[44px] sm:text-6xl lg:text-7xl leading-[.98] tracking-[-.04em] text-on-surface">We're here <span class="ct-i block text-primary">to help.</span></h1>
+            <p class="mt-6 text-lg text-on-surface-variant max-w-md leading-relaxed">Have a question about our fleet, pricing or wedding cars? Our team is ready to assist you.</p>
+            <ul class="mt-9 grid grid-cols-3 gap-2 sm:gap-4 max-w-lg" role="list">
+                {% for icon, label in contact_points %}
+                <li class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 text-[13px] sm:text-sm font-semibold text-on-surface leading-snug">
+                    <span class="w-11 h-11 shrink-0 rounded-full bg-primary-fixed text-on-primary-fixed grid place-items-center" aria-hidden="true"><span class="material-symbols-outlined text-[22px]">{{ icon }}</span></span>{{ label }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% if BUSINESS_PHONE %}
+        <div class="lg:col-span-6 flex lg:justify-end">
+            <a href="tel:{{ BUSINESS_PHONE }}" class="inline-flex items-center gap-4 rounded-[24px] bg-primary text-on-primary px-6 py-5 shadow-2xl shadow-black/20 hover:-translate-y-0.5 transition-transform">
+                <span class="w-12 h-12 shrink-0 rounded-full bg-white/15 grid place-items-center" aria-hidden="true"><span class="material-symbols-outlined">call</span></span>
+                <span><span class="block text-sm opacity-80">Talk to our team</span><span class="block font-extrabold text-xl sm:text-2xl tracking-tight">{{ BUSINESS_PHONE }}</span>{% if config.business_hours %}<span class="block text-sm opacity-80">{{ config.business_hours }}</span>{% endif %}</span>
+            </a>
+        </div>
+        {% endif %}
+    </section>
+</div>
+
+<!-- ─── Three ways to reach us ─── -->
+<section class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4" aria-label="Contact options">
+    {% if WHATSAPP_NUMBER %}
+    <a href="{% whatsapp_url %}" target="_blank" rel="noopener" class="group rounded-[24px] bg-[#25D366] text-white p-6 flex flex-col gap-6 hover:-translate-y-1 transition-transform">
+        <span class="w-12 h-12 rounded-2xl bg-white/20 grid place-items-center" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35M12.05 21.5h-.01a9.4 9.4 0 0 1-4.8-1.31l-.34-.2-3.57.93.95-3.48-.22-.36a9.4 9.4 0 0 1-1.44-5.02c0-5.2 4.23-9.43 9.44-9.43a9.43 9.43 0 0 1 9.43 9.44c0 5.2-4.24 9.43-9.44 9.43m8.03-17.46A11.27 11.27 0 0 0 12.05.72C5.8.72.7 5.8.7 12.06c0 2 .52 3.95 1.52 5.67L.6 23.4l5.8-1.52a11.3 11.3 0 0 0 5.65 1.44h.01c6.25 0 11.34-5.09 11.34-11.34 0-3.03-1.18-5.88-3.32-8.02"/></svg></span>
+        <span class="flex items-end justify-between gap-4"><span><span class="block text-xs font-extrabold tracking-[.18em] uppercase opacity-80">WhatsApp</span><span class="block ct-h font-extrabold text-2xl mt-1">Chat with us</span><span class="block text-sm opacity-85 mt-1">Get instant support on WhatsApp</span></span><span class="w-11 h-11 shrink-0 rounded-full bg-white text-[#128C4A] grid place-items-center transition-transform group-hover:translate-x-1" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></span></span>
+    </a>
+    {% endif %}
+    {% if BUSINESS_EMAIL %}
+    <a href="mailto:{{ BUSINESS_EMAIL }}" class="group rounded-[24px] bg-surface-container-lowest border border-outline-variant/40 text-on-surface p-6 flex flex-col gap-6 hover:-translate-y-1 transition-transform">
+        <span class="w-12 h-12 rounded-2xl bg-primary-fixed text-on-primary-fixed grid place-items-center" aria-hidden="true"><span class="material-symbols-outlined">mail</span></span>
+        <span class="flex items-end justify-between gap-4"><span class="min-w-0"><span class="block text-xs font-extrabold tracking-[.18em] uppercase text-on-surface-variant">Email</span><span class="block ct-h font-extrabold text-[15px] sm:text-lg lg:text-xl mt-1 [overflow-wrap:anywhere]">{{ BUSINESS_EMAIL }}</span><span class="block text-sm text-on-surface-variant mt-1">Send us an email anytime</span></span><span class="w-11 h-11 shrink-0 rounded-full bg-surface-container grid place-items-center transition-transform group-hover:translate-x-1" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></span></span>
+    </a>
+    {% endif %}
+    {% if BUSINESS_ADDRESS %}
+    <a href="{{ maps_link|default:'#map' }}" target="_blank" rel="noopener" class="group rounded-[24px] bg-primary-fixed text-on-primary-fixed p-6 flex flex-col gap-6 hover:-translate-y-1 transition-transform">
+        <span class="w-12 h-12 rounded-2xl bg-primary text-on-primary grid place-items-center" aria-hidden="true"><span class="material-symbols-outlined">location_on</span></span>
+        <span class="flex items-end justify-between gap-4"><span class="min-w-0"><span class="block text-xs font-extrabold tracking-[.18em] uppercase opacity-75">Visit us</span><span class="block ct-h font-extrabold text-xl mt-1">{{ BUSINESS_ADDRESS|linebreaksbr }}</span><span class="block text-sm opacity-75 mt-1">Our office location</span></span><span class="w-11 h-11 shrink-0 rounded-full bg-surface-container-lowest text-on-surface grid place-items-center transition-transform group-hover:translate-x-1" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></span></span>
+    </a>
+    {% endif %}
+</section>
+
+<!-- ─── Enquiry form + map ─── -->
+<section id="enquiry" class="max-w-screen-xl mx-auto pt-4 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 scroll-mt-28">
+    <div class="lg:col-span-7 rounded-[28px] bg-surface-container-lowest border border-outline-variant/40 p-6 sm:p-9">
+        <span class="text-xs font-extrabold tracking-[.2em] uppercase text-primary">Send us an enquiry</span>
+        <h2 class="ct-h mt-3 font-extrabold text-3xl sm:text-5xl tracking-[-.04em] text-on-surface">Tell us your <span class="ct-i text-primary">requirements.</span></h2>
+        <p class="mt-3 text-on-surface-variant max-w-md">Share your details and our team will get back to you with the best options.</p>
+        <form method="post" action="{% url 'submit_enquiry' %}" class="mt-7" x-data="{ submitted: false, loading: false, errorMsg: '' }" x-on:submit.prevent="
+            loading = true; errorMsg = '';
+            fetch($el.action, { method: 'POST', body: new FormData($el), headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.json())
+                .then(d => { loading = false; if (d.success) { submitted = true; if (d.whatsapp_url) window.open(d.whatsapp_url, '_blank', 'noopener'); } else { const e = d.errors || {}; errorMsg = (e.__all__ || Object.values(e)[0] || ['Please check the form and try again.'])[0]; } })
+                .catch(() => { loading = false; $el.submit(); });">
+            {% csrf_token %}{% include "public/includes/_antispam.html" %}
+            <input type="hidden" name="source" value="website"/>
+            <div x-show="!submitted" class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-5">
+                <label class="block"><span class="text-sm font-semibold text-on-surface block mb-2">Your name <span class="text-red-500">*</span></span>
+                    <span class="ct-field border-outline-variant/60 text-on-surface-variant"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">person</span><input type="text" name="name" required autocomplete="name" placeholder="Full name" class="text-on-surface"/></span></label>
+                <label class="block"><span class="text-sm font-semibold text-on-surface block mb-2">Phone number <span class="text-red-500">*</span></span>
+                    <span class="ct-field border-outline-variant/60 text-on-surface-variant"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">call</span><input type="tel" name="phone" required autocomplete="tel" placeholder="+91 Phone number" class="text-on-surface"/></span></label>
+                <label class="block"><span class="text-sm font-semibold text-on-surface block mb-2">Email</span>
+                    <span class="ct-field border-outline-variant/60 text-on-surface-variant"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">mail</span><input type="email" name="email" autocomplete="email" placeholder="you@example.com" class="text-on-surface"/></span></label>
+                <label class="block"><span class="text-sm font-semibold text-on-surface block mb-2">Preferred start date</span>
+                    <span class="ct-field border-outline-variant/60 text-on-surface-variant"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">calendar_month</span><input type="date" name="preferred_start_date" class="text-on-surface"/></span></label>
+                <label class="block sm:col-span-2"><span class="text-sm font-semibold text-on-surface block mb-2">Message</span>
+                    <span class="ct-field !items-start border-outline-variant/60 text-on-surface-variant"><span class="material-symbols-outlined text-[20px] mt-3" aria-hidden="true">chat</span><textarea name="message" rows="3" placeholder="Tell us about your requirements (car type, dates, venue, decoration…)" class="text-on-surface resize-y"></textarea></span></label>
+                <p x-show="errorMsg" x-text="errorMsg" x-cloak class="sm:col-span-2 text-sm font-semibold text-red-600"></p>
+                <button type="submit" x-bind:disabled="loading" class="sm:col-span-2 bg-primary text-on-primary rounded-full py-4 font-bold flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-60 transition-opacity group"><span x-text="loading ? 'Sending…' : 'Send Enquiry'">Send Enquiry</span> <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span></button>
+            </div>
+            <div x-show="submitted" x-cloak class="rounded-[20px] bg-primary-fixed text-on-primary-fixed p-8 text-center" role="status">
+                <span class="material-symbols-outlined text-5xl" aria-hidden="true">check_circle</span>
+                <p class="ct-h mt-3 font-extrabold text-2xl">Thank you!</p>
+                <p class="mt-2 opacity-80">Your enquiry is in. Our team will get back to you shortly.</p>
+            </div>
+        </form>
+    </div>
+
+    <div id="map" class="lg:col-span-5 rounded-[28px] bg-surface-container-lowest border border-outline-variant/40 p-4 sm:p-5 flex flex-col gap-4 min-h-[420px]">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 px-1 pt-1">
+            <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-primary text-[28px]" aria-hidden="true">location_on</span>
+                <div><h2 class="ct-h font-extrabold text-xl text-on-surface">Our location</h2><p class="text-sm text-on-surface-variant">Visit our office or get directions on Google Maps.</p></div>
+            </div>
+            {% if maps_link %}<a href="{{ maps_link }}" target="_blank" rel="noopener" class="self-start shrink-0 rounded-full border border-outline-variant/60 px-4 py-2 text-sm font-bold text-on-surface inline-flex items-center gap-1.5 hover:border-primary transition-colors">Open in Maps <span class="material-symbols-outlined text-[18px]" aria-hidden="true">north_east</span></a>{% endif %}
+        </div>
+        {% if map_src %}
+        <div class="relative flex-1 min-h-[320px] rounded-[20px] overflow-hidden bg-surface-container" data-no-parallax>
+            <iframe src="{{ map_src }}" title="Map to {{ BUSINESS_NAME }}" class="absolute inset-0 w-full h-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        </div>
+        {% else %}
+        <div class="flex-1 rounded-[20px] bg-surface-container grid place-items-center text-on-surface-variant text-sm p-6 text-center">Add your address in Settings to show the map.</div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ─── Quick links ─── -->
+<section class="max-w-screen-xl mx-auto pt-4 grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4" aria-label="More help">
+    {% for href, icon, title, text in contact_links %}
+    <a href="{{ href }}" class="group rounded-[24px] bg-surface-container-lowest border border-outline-variant/40 p-5 flex items-center gap-4 hover:-translate-y-0.5 transition-transform">
+        <span class="w-12 h-12 shrink-0 rounded-2xl bg-primary-fixed text-on-primary-fixed grid place-items-center" aria-hidden="true"><span class="material-symbols-outlined">{{ icon }}</span></span>
+        <span class="flex-1 min-w-0"><span class="block font-extrabold text-on-surface">{{ title }}</span><span class="block text-sm text-on-surface-variant">{{ text }}</span></span>
+        <span class="material-symbols-outlined text-on-surface-variant transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
+    </a>
+    {% endfor %}
+</section>
 {% endblock %}

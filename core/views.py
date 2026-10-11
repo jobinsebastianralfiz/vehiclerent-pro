@@ -1,5 +1,8 @@
 import json
+import re
+from urllib.parse import quote
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -136,7 +139,24 @@ def faq(request):
 
 def contact(request):
     config = SiteConfig.load()
-    return render(request, themed(request, "contact.html"), {"config": config})
+    address = (config.address if config else "") or settings.BUSINESS_ADDRESS
+    embed = (config.google_maps_embed if config else "").strip()
+    # the Settings embed (an <iframe> or its URL), else a keyless Google map of the address
+    found = re.search(r'src="([^"]+)"', embed)
+    map_src = found.group(1) if found else (embed if embed.startswith("http") else
+                                            f"https://maps.google.com/maps?q={quote(address)}&z=13&output=embed" if address else "")
+    photo_vehicle = next((v for v in Vehicle.objects.filter(is_published=True, show_in_hero=True).exclude(status="inactive")
+                          .prefetch_related("images").order_by("-is_featured", "name")[:6] if v.hero_image), None)
+    return render(request, themed(request, "contact.html"), {
+        "config": config,
+        "map_src": map_src,
+        "maps_link": f"https://www.google.com/maps/search/?api=1&query={quote(address)}" if address else "",
+        "contact_photo": photo_vehicle.hero_image.url if photo_vehicle else (config.hero_image.url if config and config.hero_image else ""),
+        "contact_points": [("support_agent", "Quick response"), ("verified_user", "Reliable support"), ("groups", "Expert assistance")],
+        "contact_links": [(reverse("faq"), "help", "Read the FAQ", "Answers to common questions"),
+                          (reverse("vehicle_list"), "directions_car", "Browse the fleet", "Explore our vehicle collection"),
+                          (reverse("wedding_cars"), "favorite", "Wedding cars", "View our wedding fleet")],
+    })
 
 
 def sitemap_xml(request):

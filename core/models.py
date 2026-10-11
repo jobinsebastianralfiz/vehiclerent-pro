@@ -47,6 +47,7 @@ class SiteConfig(models.Model):
 
     # Contact
     phone = models.CharField(max_length=30, blank=True)
+    business_hours = models.CharField(max_length=100, blank=True, default="9:00 AM – 8:00 PM (Daily)", help_text="When the phone is answered, shown on the contact page")
     email = models.EmailField(blank=True)
     address = models.TextField(blank=True)
     whatsapp_number = models.CharField(max_length=20, blank=True, help_text="Without + sign, e.g. 919999999999")

@@ -128,6 +128,11 @@
                         {% if form.phone.errors %}<p class="af-err">{{ form.phone.errors|join:" " }}</p>{% endif %}
                     </div>
                     <div>
+                        <label class="af-label" for="f-business_hours">Business hours</label>
+                        <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">schedule</span></span><input id="f-business_hours" type="text" name="business_hours" value="{{ form.business_hours.value|default:'' }}" placeholder="9:00 AM – 8:00 PM (Daily)"/></div>
+                        {% if form.business_hours.errors %}<p class="af-err">{{ form.business_hours.errors|join:" " }}</p>{% else %}<p class="af-help">Shown on the contact page next to the phone number.</p>{% endif %}
+                    </div>
+                    <div>
                         <label class="af-label" for="f-email">Email</label>
                         <div class="af-affix"><span class="icon"><span class="material-symbols-outlined">mail</span></span><input id="f-email" type="email" name="email" value="{{ form.email.value|default:'' }}" placeholder="hello@example.com"/></div>
                         {% if form.email.errors %}<p class="af-err">{{ form.email.errors|join:" " }}</p>{% endif %}
