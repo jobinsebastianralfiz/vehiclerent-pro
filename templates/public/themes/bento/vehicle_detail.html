@@ -86,12 +86,15 @@
              x-data="{ i: 0, open: false, x0: null, p: JSON.parse(document.getElementById('car-photos').textContent), go(d) { this.i = (this.i + d + this.p.length) % this.p.length } }"
              x-effect="document.documentElement.style.overflow = open ? 'hidden' : ''" x-on:keydown.escape.window="open = false" x-on:keydown.window="if (open && $event.key === 'ArrowRight') go(1); if (open && $event.key === 'ArrowLeft') go(-1)">
             <div class="bg-white/60 rounded-[30px] p-2.5 shadow-2xl shadow-primary/15">
-                <div class="group relative overflow-hidden rounded-[22px] aspect-[11/10] bg-surface-container grid place-items-center"
+                <div class="group relative overflow-hidden rounded-[22px] aspect-[4/3] bg-surface-container grid place-items-center"
                      tabindex="0" x-on:keydown.arrow-right.prevent="go(1)" x-on:keydown.arrow-left.prevent="go(-1)"
                      x-on:touchstart.passive="x0 = $event.touches[0].clientX" x-on:touchend="if (x0 !== null && Math.abs($event.changedTouches[0].clientX - x0) > 40) go($event.changedTouches[0].clientX < x0 ? 1 : -1); x0 = null">
                     {% if photos %}
                         {% for url in photos %}
-                        <img src="{{ url }}" alt="{{ vehicle.full_name }}{% if photos|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500" x-bind:style="{ opacity: i === {{ forloop.counter0 }} ? 1 : 0 }" {% if not forloop.first %}style="opacity:0" loading="lazy"{% endif %}/>
+                        <div class="absolute inset-0 transition-opacity duration-500" x-bind:style="{ opacity: i === {{ forloop.counter0 }} ? 1 : 0 }" {% if not forloop.first %}style="opacity:0"{% endif %} data-photo>
+                            <img src="{{ url }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl brightness-90" aria-hidden="true" {% if not forloop.first %}loading="lazy"{% endif %} data-photo-fill/>
+                            <img src="{{ url }}" alt="{{ vehicle.full_name }}{% if photos|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-contain" {% if not forloop.first %}loading="lazy"{% endif %} data-photo-main/>
+                        </div>
                         {% endfor %}
                         <button type="button" x-on:click="open = true" class="absolute top-3 right-3 w-11 h-11 rounded-full bg-white/90 text-primary shadow-lg grid place-items-center hover:bg-white transition-colors" aria-label="View photos full screen"><span class="material-symbols-outlined">open_in_full</span></button>
                         {% if photos|length > 1 %}
@@ -281,6 +284,20 @@
 
 {% block page_js %}
 <script>
+/* gallery: a photo close to the box's shape fills it; any other shape shows whole, on a blurred copy of itself */
+(() => {
+    const fit = img => { const box = img.parentElement; if (!img.naturalWidth || !box.clientWidth) return;
+        const r = (img.naturalWidth / img.naturalHeight) / (box.clientWidth / box.clientHeight), fill = r > .82 && r < 1.22;
+        img.classList.toggle("object-cover", fill); img.classList.toggle("object-contain", !fill);
+        /* the bands of a contained photo melt into its blurred copy instead of ending in a hard line */
+        const m = fill ? "" : (r > 1 ? "linear-gradient(to bottom, transparent, #000 7%, #000 93%, transparent)" : "linear-gradient(to right, transparent, #000 7%, #000 93%, transparent)");
+        img.style.webkitMaskImage = img.style.maskImage = m;
+        box.querySelector("[data-photo-fill]").style.display = fill ? "none" : ""; };
+    const all = [...document.querySelectorAll("[data-photo-main]")];
+    all.forEach(img => img.complete ? fit(img) : img.addEventListener("load", () => fit(img)));
+    addEventListener("resize", () => all.forEach(fit));
+})();
+
 /* live estimate: whole days between the chosen dates x the listed day rate (+ driver rate when chosen) */
 (() => {
     const f = document.getElementById("b-book"); if (!f) return;
