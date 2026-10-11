@@ -206,7 +206,22 @@ class Vehicle(models.Model):
     def __str__(self):
         return f"{self.brand} {self.name}"
 
+    # Vehicle type -> the category (by slug) it is listed under unless the admin picks another
+    TYPE_CATEGORY = {
+        "hatchback": "cars", "sedan": "cars", "muv": "cars", "car": "cars",
+        "suv": "suvs", "bike": "bikes", "scooter": "scooters",
+        "van": "vans", "tempo": "vans", "bus": "vans", "truck": "trucks",
+    }
+
+    @classmethod
+    def type_category_map(cls):
+        """{vehicle_type: category id} for the active categories that exist."""
+        ids = dict(VehicleCategory.objects.filter(is_active=True, slug__in=set(cls.TYPE_CATEGORY.values())).values_list("slug", "id"))
+        return {t: ids[s] for t, s in cls.TYPE_CATEGORY.items() if s in ids}
+
     def save(self, *args, **kwargs):
+        if self.category_id is None and self.vehicle_type:
+            self.category_id = self.type_category_map().get(self.vehicle_type)
         if not self.slug:
             base_slug = self.build_slug()
             slug = base_slug

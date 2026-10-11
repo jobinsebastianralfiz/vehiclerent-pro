@@ -230,6 +230,7 @@ def _wizard(request, vehicle, step):
         "draft_key": f"vw-{vehicle.pk if vehicle else 'new'}-{step}",
         "post_url": reverse("vehicle_wizard", args=[vehicle.pk, step]) if vehicle else reverse("vehicle_add"),
         "images": _gallery_json(vehicle) if (vehicle and step == LAST) else [],
+        "type_category": Vehicle.type_category_map() if step == 2 else {},
         "catalog": catalog.as_json() if step == 1 else None,
         "colors": catalog.COLORS if step == 1 else None,
         "input_class": _INPUT,
