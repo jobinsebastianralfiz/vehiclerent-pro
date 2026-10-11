@@ -8,6 +8,15 @@ from . import antispam
 from .themes import active_theme
 
 
+def _og_image(config):
+    """Path of the default share image: the Settings share image, else a hero photo, else the logo."""
+    for f in ("og_image", "hero_bg_1", "hero_image", "logo"):
+        img = getattr(config, f, None) if config else None
+        if img:
+            return img.url
+    return ""
+
+
 def site_settings(request):
     from .models import SiteConfig
     try:
@@ -23,6 +32,10 @@ def site_settings(request):
         "THEME_NAVBAR": [f"public/themes/{theme['key']}/navbar.html", "public/includes/navbar.html"],
         "ANTISPAM_TOKEN": SimpleLazyObject(antispam.make_token),
         "THEME_FOOTER": [f"public/themes/{theme['key']}/footer.html", "public/includes/footer.html"],
+        "SITE_URL": f"{request.scheme}://{request.get_host()}",
+        "OG_IMAGE": _og_image(config),
+        # social profiles for the structured data's sameAs (JSON, so it drops straight into the ld+json block)
+        "SOCIAL_JSON": json.dumps([u for u in (getattr(config, f, "") for f in ("facebook_url", "instagram_url", "youtube_url", "twitter_url")) if u]),
     }
 
     if config:

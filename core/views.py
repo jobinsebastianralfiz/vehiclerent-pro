@@ -208,24 +208,74 @@ def sitemap_xml(request):
     return HttpResponse("\n".join(xml_parts), content_type="application/xml")
 
 
+# AI crawlers welcomed by name (OpenAI, Google Gemini, Perplexity, Anthropic Claude) so answer engines can read and cite the site
+AI_CRAWLERS = [
+    "GPTBot", "OAI-SearchBot", "ChatGPT-User",          # OpenAI
+    "Google-Extended", "GoogleOther",                     # Google Gemini
+    "PerplexityBot", "Perplexity-User",                   # Perplexity
+    "ClaudeBot", "Claude-SearchBot", "Claude-User", "anthropic-ai",  # Anthropic Claude
+]
+ROBOTS_DISALLOW = ["/manage/", "/enquiry/submit/", "/enquiry/thanks/", "/api/"]
+
+
 def robots_txt(request):
-    """Generate robots.txt pointing crawlers to the sitemap and disallowing /manage/."""
+    """robots.txt: everyone (and each AI crawler by name) may read the public site; admin and form endpoints stay closed."""
     from django.http import HttpResponse
     base = f"{request.scheme}://{request.get_host()}"
-    body = "\n".join([
-        "User-agent: *",
-        "Allow: /",
-        "Disallow: /manage/",
-        "Disallow: /enquiry/submit/",
-        "Disallow: /enquiry/thanks/",
-        "Disallow: /api/",
-        "",
-        f"Sitemap: {base}/sitemap.xml",
-        "",
-    ])
-    return HttpResponse(body, content_type="text/plain")
+    rules = ["Allow: /", *[f"Disallow: {p}" for p in ROBOTS_DISALLOW]]
+    lines = ["User-agent: *", *rules, ""]
+    for bot in AI_CRAWLERS:
+        lines += [f"User-agent: {bot}", *rules, ""]
+    lines += [f"Sitemap: {base}/sitemap.xml", f"# LLM summary: {base}/llms.txt", ""]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
 
 
+def llms_txt(request):
+    """/llms.txt (llmstxt.org): a plain Markdown summary of the business, key pages and the live fleet for AI answer engines."""
+    from django.http import HttpResponse
+    from .templatetags.vehicle_tags import inr
+    config = SiteConfig.load()
+    base = f"{request.scheme}://{request.get_host()}"
+    name = config.site_name if config else settings.BUSINESS_NAME
+    about = (config.meta_description if config else "") or (
+        "Car rental company in Kerala, India: self-drive and chauffeur-driven cars, SUVs, luxury cars and "
+        "decorated wedding cars, with daily, weekly and monthly plans.")
+    out = [f"# {name}", "", f"> {about}", ""]
+    contact = [("Phone", config.phone if config else ""), ("WhatsApp", f"+{config.whatsapp_number}" if config and config.whatsapp_number else ""),
+               ("Email", config.email if config else ""), ("Address", config.address if config else ""),
+               ("Hours", config.business_hours if config else "")]
+    out += [f"- {k}: {v}" for k, v in contact if v] + [""]
+    cities = list(City.objects.filter(is_active=True).values_list("name", flat=True))
+    if cities:
+        out += [f"Pickup and delivery across Kerala, including {', '.join(cities)}.", ""]
+    out += ["## Pages", "",
+            f"- [Fleet]({base}{reverse('vehicle_list')}): every car with daily, weekly and monthly prices",
+            f"- [Premium and luxury cars]({base}{reverse('premium_cars')})",
+            f"- [Wedding cars]({base}{reverse('wedding_cars')}): decorated, chauffeur-driven cars and decoration packages",
+            f"- [About]({base}{reverse('about')})",
+            f"- [FAQ]({base}{reverse('faq')}): documents, booking, rates, cancellation, fuel",
+            f"- [Contact]({base}{reverse('contact')})", ""]
+    fleet = Vehicle.objects.filter(is_published=True).exclude(status="inactive").select_related("category").order_by("category__display_order", "name")
+    if fleet:
+        out += ["## Fleet", ""]
+        for v in fleet:
+            bits = [v.category.name if v.category else v.get_vehicle_type_display()]
+            if v.seating_capacity:
+                bits.append(f"{v.seating_capacity} seats")
+            if v.transmission:
+                bits.append(v.get_transmission_display())
+            if v.fuel_type:
+                bits.append(v.get_fuel_type_display())
+            if v.primary_price_value:
+                bits.append(f"{inr(v.primary_price_value)} per {v.primary_price_label}")
+            if v.is_chauffeur_available:
+                bits.append("driver available")
+            if v.is_wedding_service:
+                bits.append("wedding car")
+            out.append(f"- [{v.full_name}]({base}{v.get_absolute_url()}): {', '.join(bits)}")
+        out.append("")
+    out += ["## Optional", "", f"- [Sitemap]({base}/sitemap.xml)", ""]
+    return HttpResponse("\n".join(out), content_type="text/plain; charset=utf-8")
 @require_POST
 @ratelimit(key=antispam.client_ip, rate="30/m", block=False)
 def chat_search(request):

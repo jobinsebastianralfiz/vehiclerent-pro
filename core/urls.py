@@ -12,6 +12,7 @@ urlpatterns = [
     path("api/chat/", views.chat_search, name="chat_search"),
     path("sitemap.xml", views.sitemap_xml, name="sitemap_xml"),
     path("robots.txt", views.robots_txt, name="robots_txt"),
+    path("llms.txt", views.llms_txt, name="llms_txt"),
     # Auth
     path("manage/login/", views.admin_login, name="admin_login"),
     path("manage/logout/", views.admin_logout, name="admin_logout"),

@@ -12,24 +12,27 @@
     <meta name="robots" content="{% block meta_robots %}index, follow, max-image-preview:large{% endblock %}"/>
     <meta name="geo.region" content="IN-KL"/>
     <meta name="geo.placename" content="Kerala, India"/>
-    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}"/>
+    <link rel="canonical" href="{% block canonical_url %}{{ SITE_URL }}{{ request.path }}{% endblock %}"/>
+    <link rel="alternate" type="text/plain" title="LLM summary" href="{{ SITE_URL }}/llms.txt"/>
 
     <!-- Open Graph -->
     <meta property="og:title" content="{% block og_title %}{{ SITE_CONFIG.meta_title|default:BUSINESS_NAME }}{% endblock %}"/>
     <meta property="og:description" content="{% block og_description %}{{ SITE_CONFIG.meta_description|default:'Premium car rentals across Kerala — self-drive, chauffeur, wedding cars and luxury fleet.' }}{% endblock %}"/>
     <meta property="og:type" content="{% block og_type %}website{% endblock %}"/>
-    <meta property="og:url" content="{{ request.build_absolute_uri }}"/>
+    <meta property="og:url" content="{{ SITE_URL }}{{ request.path }}"/>
     <meta property="og:site_name" content="{{ BUSINESS_NAME }}"/>
     <meta property="og:locale" content="en_IN"/>
-    {% block og_image %}{% if SITE_CONFIG.og_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ SITE_CONFIG.og_image.url }}"/>
-    <meta property="og:image:width" content="1200"/>
-    <meta property="og:image:height" content="630"/>{% endif %}{% endblock %}
+    {% block og_image %}{% if OG_IMAGE %}<meta property="og:image" content="{{ SITE_URL }}{{ OG_IMAGE }}"/>
+    <meta property="og:image:secure_url" content="{{ SITE_URL }}{{ OG_IMAGE }}"/>
+    {% if SITE_CONFIG.og_image %}<meta property="og:image:width" content="1200"/>
+    <meta property="og:image:height" content="630"/>{% endif %}{% endif %}{% endblock %}
+    <meta property="og:image:alt" content="{% block og_image_alt %}{{ BUSINESS_NAME }} car rentals in Kerala{% endblock %}"/>
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image"/>
     <meta name="twitter:title" content="{% block twitter_title %}{{ SITE_CONFIG.meta_title|default:BUSINESS_NAME }}{% endblock %}"/>
     <meta name="twitter:description" content="{% block twitter_description %}{{ SITE_CONFIG.meta_description|default:'Premium car rentals across Kerala.' }}{% endblock %}"/>
-    {% block twitter_image %}{% if SITE_CONFIG.og_image %}<meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ SITE_CONFIG.og_image.url }}"/>{% endif %}{% endblock %}
+    {% block twitter_image %}{% if OG_IMAGE %}<meta name="twitter:image" content="{{ SITE_URL }}{{ OG_IMAGE }}"/>{% endif %}{% endblock %}
 
     <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -180,14 +183,32 @@
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "AutoRental",
-        "name": "{{ BUSINESS_NAME }}",
-        "telephone": "{{ BUSINESS_PHONE }}",
-        "email": "{{ BUSINESS_EMAIL }}",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "{{ BUSINESS_ADDRESS }}"
-        }
+        "@graph": [
+            {
+                "@type": "AutoRental",
+                "@id": "{{ SITE_URL }}/#business",
+                "name": "{{ BUSINESS_NAME|escapejs }}",
+                "url": "{{ SITE_URL }}/",
+                {% if SITE_CONFIG.logo %}"logo": "{{ SITE_URL }}{{ SITE_CONFIG.logo.url }}",{% endif %}
+                {% if OG_IMAGE %}"image": "{{ SITE_URL }}{{ OG_IMAGE }}",{% endif %}
+                "description": "{{ SITE_CONFIG.meta_description|default:'Car rentals across Kerala: self-drive and chauffeur-driven cars, SUVs, luxury and decorated wedding cars, with daily, weekly and monthly plans.'|escapejs }}",
+                {% if BUSINESS_PHONE %}"telephone": "{{ BUSINESS_PHONE|escapejs }}",{% endif %}
+                {% if BUSINESS_EMAIL %}"email": "{{ BUSINESS_EMAIL|escapejs }}",{% endif %}
+                "address": { "@type": "PostalAddress", "streetAddress": "{{ BUSINESS_ADDRESS|escapejs }}", "addressRegion": "Kerala", "addressCountry": "IN" },
+                "areaServed": { "@type": "State", "name": "Kerala" },
+                "priceRange": "₹₹",
+                "currenciesAccepted": "INR",
+                "sameAs": {{ SOCIAL_JSON|safe }}
+            },
+            {
+                "@type": "WebSite",
+                "@id": "{{ SITE_URL }}/#website",
+                "name": "{{ BUSINESS_NAME|escapejs }}",
+                "url": "{{ SITE_URL }}/",
+                "inLanguage": "en-IN",
+                "publisher": { "@id": "{{ SITE_URL }}/#business" }
+            }
+        ]
     }
     </script>
     {% endblock %}
