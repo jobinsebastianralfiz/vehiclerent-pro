@@ -1,9 +1,31 @@
+import re
+from functools import lru_cache
 from urllib.parse import quote
 
 from django import template
 from django.conf import settings
+from django.contrib.staticfiles import finders
+from django.utils.safestring import mark_safe
 
 register = template.Library()
+
+
+@lru_cache(maxsize=16)
+def _read_static(path, mtime):
+    with open(finders.find(path), encoding="utf-8") as f:
+        css = f.read()
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    return re.sub(r"\s*\n\s*", "\n", css).strip()
+
+
+@register.simple_tag
+def inline_static(path):
+    """A small static stylesheet's text, for a <style> tag: saves a render-blocking request."""
+    import os
+    found = finders.find(path)
+    if not found:
+        return ""
+    return mark_safe(_read_static(path, os.path.getmtime(found)))
 
 
 def _get_whatsapp_config():

@@ -38,7 +38,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    {% block text_fonts %}<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>{% endblock %}
     <link href="{{ ICON_FONT_URL }}" rel="stylesheet"/>
     <!-- Tailwind is pre-built (tailwind.config.js, `make css`); colours come from the variables below -->
     <style>{{ THEME_CSS|safe }}</style>
