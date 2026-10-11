@@ -196,6 +196,8 @@
         <div class="grid sm:grid-cols-2 gap-4 sm:gap-5 mt-6">
             {% include "manage/vehicles/_wf.html" with f=form.category help="Manage the list under Categories." %}
             {% include "manage/vehicles/_wf.html" with f=form.seating_capacity post="seats" %}
+            {% include "manage/vehicles/_wf.html" with f=form.luggage_capacity post="bags" %}
+            <label class="inline-flex items-center gap-2.5 text-sm font-semibold text-stone-700 sm:self-end sm:pb-3">{{ form.has_ac }} Air conditioning</label>
         </div>
 
         {% elif step == 3 %}

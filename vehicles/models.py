@@ -133,6 +133,8 @@ class Vehicle(models.Model):
     fuel_type = models.CharField(max_length=20, choices=FUEL_TYPE_CHOICES, blank=True)
     transmission = models.CharField(max_length=20, choices=TRANSMISSION_CHOICES, blank=True)
     seating_capacity = models.PositiveIntegerField(blank=True, null=True)
+    luggage_capacity = models.PositiveIntegerField(blank=True, null=True, help_text="Large bags that fit in the boot")
+    has_ac = models.BooleanField("Air conditioning", default=False)
     engine_cc = models.PositiveIntegerField(blank=True, null=True, help_text="For petrol/diesel/CNG vehicles")
     mileage_kmpl = models.DecimalField(max_digits=5, decimal_places=1, blank=True, null=True, help_text="For petrol/diesel vehicles")
     # EV / Hybrid specific fields

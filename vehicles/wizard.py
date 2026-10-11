@@ -24,7 +24,7 @@ STEPS = [
      "fields": ["name", "brand", "model", "year", "registration_number", "color"]},
     {"n": 2, "key": "class", "title": "Classification", "sub": "Type & category", "icon": "category",
      "heading": "Vehicle Classification", "lede": "Select the vehicle type and category",
-     "fields": ["vehicle_type", "category", "seating_capacity"]},
+     "fields": ["vehicle_type", "category", "seating_capacity", "luggage_capacity", "has_ac"]},
     {"n": 3, "key": "specs", "title": "Specifications", "sub": "Technical & EV", "icon": "tune",
      "heading": "Technical Specifications", "lede": "Engine, fuel and EV details",
      "fields": ["fuel_type", "transmission", "engine_cc", "mileage_kmpl", "battery_capacity_kwh",
@@ -83,7 +83,7 @@ class _StepBase(VehicleForm):
         placeholders = {
             "name": "e.g. Swift Dzire VXi", "brand": "e.g. Maruti Suzuki", "model": "e.g. Dzire",
             "year": "e.g. 2022", "registration_number": "e.g. KL 07 AB 1234", "color": "e.g. White",
-            "seating_capacity": "e.g. 5", "engine_cc": "e.g. 1197", "mileage_kmpl": "e.g. 21",
+            "seating_capacity": "e.g. 5", "luggage_capacity": "e.g. 3", "engine_cc": "e.g. 1197", "mileage_kmpl": "e.g. 21",
             "battery_capacity_kwh": "e.g. 40", "range_km": "e.g. 350", "motor_power_kw": "e.g. 100",
             "charging_time_hours": "e.g. 6", "price_per_day": "e.g. 2500", "price_per_week": "e.g. 15000",
             "price_per_month": "e.g. 50000", "security_deposit": "e.g. 10000", "with_driver_price_per_day": "e.g. 800",

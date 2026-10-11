@@ -36,206 +36,253 @@
 {% endblock %}
 
 {% block content %}
-<!-- ─── Breadcrumb ─── -->
-<nav class="max-w-screen-xl mx-auto mb-3 sm:mb-4 flex items-center gap-1.5 overflow-x-auto no-scrollbar" aria-label="Breadcrumb">
-    <a href="{% url 'vehicle_list' %}" class="b-chip">Fleet</a>
-    <span class="material-symbols-outlined text-outline text-[18px]" aria-hidden="true">chevron_right</span>
-    {% if vehicle.category %}
-    <a href="{% url 'vehicle_list' %}?category={{ vehicle.category.id }}" class="b-chip">{{ vehicle.category.name }}</a>
-    <span class="material-symbols-outlined text-outline text-[18px]" aria-hidden="true">chevron_right</span>
+{% with hero=vehicle.hero_image %}
+<!-- ─── Hero: title · gallery · booking ─── -->
+<div class="relative -mx-3 sm:-mx-6 -mt-24 sm:-mt-28 px-3 sm:px-6 pt-24 sm:pt-28 pb-12 lg:pb-16 overflow-hidden">
+    {% if hero %}
+    <!-- backdrop: the car's own photo, blurred and faded into the page -->
+    <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <img src="{{ hero.url }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-30"/>
+        <div class="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background"></div>
+    </div>
     {% endif %}
-    <span class="b-chip is-on" aria-current="page">{{ vehicle.full_name }}</span>
-</nav>
 
-<!-- ─── Gallery + booking bento ─── -->
-<section class="b-hero max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-start" aria-label="{{ vehicle.full_name }}">
-    <div class="lg:col-span-7 grid gap-3 sm:gap-4">
-        <!-- gallery -->
-        <div class="tile b-glass p-3" x-data="{ i: 0, n: {% if images %}{{ images|length }}{% else %}1{% endif %} }" data-no-parallax>
-            <div class="relative overflow-hidden rounded-[22px] aspect-[16/10] bg-surface-container grid place-items-center"
-                 x-on:keydown.arrow-right.prevent="i = (i + 1) % n" x-on:keydown.arrow-left.prevent="i = (i - 1 + n) % n">
-                {% if images %}
-                    {% for img in images %}
-                    <img src="{{ img.image.url }}" alt="{{ vehicle.full_name }}{% if images|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500" x-bind:style="{ opacity: i === {{ forloop.counter0 }} ? 1 : 0 }" {% if not forloop.first %}style="opacity:0" loading="lazy"{% endif %}/>
-                    {% endfor %}
-                {% elif vehicle.thumbnail %}
-                    <img src="{{ vehicle.thumbnail.url }}" alt="{{ vehicle.full_name }}" class="absolute inset-0 w-full h-full object-cover"/>
-                {% else %}
-                    <span class="material-symbols-outlined text-[120px] text-outline-variant" aria-hidden="true">directions_car</span>
-                {% endif %}
-                <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                    {% if vehicle.is_premium %}<span class="b-glass rounded-full px-3 py-1.5 label-tiny text-primary">Premium</span>{% endif %}
-                    {% if vehicle.is_wedding_service %}<span class="b-glass rounded-full px-3 py-1.5 label-tiny text-primary">Wedding</span>{% endif %}
-                    {% if vehicle.category %}<span class="b-glass rounded-full px-3 py-1.5 label-tiny text-primary">{{ vehicle.category.name }}</span>{% endif %}
+    <!-- breadcrumb -->
+    <nav class="relative max-w-screen-xl mx-auto mb-4 sm:mb-6 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-sm font-semibold text-on-surface-variant" aria-label="Breadcrumb">
+        <a href="{% url 'home' %}" class="grid place-items-center hover:text-primary" aria-label="Home"><span class="material-symbols-outlined text-[18px]" aria-hidden="true">home</span></a>
+        <span class="material-symbols-outlined text-outline text-[16px]" aria-hidden="true">chevron_right</span>
+        <a href="{% url 'vehicle_list' %}" class="hover:text-primary whitespace-nowrap">Fleet</a>
+        {% if vehicle.category %}
+        <span class="material-symbols-outlined text-outline text-[16px]" aria-hidden="true">chevron_right</span>
+        <a href="{% url 'vehicle_list' %}?category={{ vehicle.category.id }}" class="hover:text-primary whitespace-nowrap">{{ vehicle.category.name }}</a>
+        {% endif %}
+        <span class="material-symbols-outlined text-outline text-[16px]" aria-hidden="true">chevron_right</span>
+        <span class="text-primary font-bold whitespace-nowrap" aria-current="page">{{ vehicle.full_name }}</span>
+    </nav>
+
+    <section class="b-hero relative max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start" aria-label="{{ vehicle.full_name }}">
+        <div class="lg:col-span-8 grid gap-3 sm:gap-4" x-data="{ i: 0, n: {% if images %}{{ images|length }}{% else %}1{% endif %} }">
+            <div class="grid grid-cols-1 lg:grid-cols-8 gap-4 sm:gap-5 items-center">
+                <!-- title -->
+                <div class="lg:col-span-3 order-1">
+                    <span class="label-tiny text-primary-container flex items-center gap-3">{% if vehicle.category %}{{ vehicle.category.name }}{% else %}{{ vehicle.get_vehicle_type_display }}{% endif %}<span class="w-8 h-px bg-current opacity-50" aria-hidden="true"></span></span>
+                    <h1 class="b-title mt-4 font-extrabold text-[44px] sm:text-6xl lg:text-[56px] leading-[.95] tracking-[-.045em] text-primary" data-no-split>{{ vehicle.brand }} <span class="serif-i font-normal block">{{ vehicle.name }}</span></h1>
+                    {% if vehicle.short_description %}<p class="mt-4 text-lg text-on-surface-variant">{{ vehicle.short_description }}</p>{% endif %}
+                    {% if vehicle.seating_capacity or vehicle.transmission or vehicle.fuel_type or vehicle.luggage_capacity or vehicle.engine_cc or vehicle.range_km %}
+                    <div class="mt-6 b-glass rounded-[22px] p-4 grid grid-cols-4 divide-x divide-outline-variant/40">
+                        {% if vehicle.seating_capacity %}<div class="px-2 first:pl-0"><span class="material-symbols-outlined text-primary" aria-hidden="true">group</span><div class="font-extrabold text-primary mt-2 text-sm">{{ vehicle.seating_capacity }}</div><div class="text-[11px] text-on-surface-variant">Seating</div></div>{% endif %}
+                        {% if vehicle.transmission %}<div class="px-2 first:pl-0"><span class="material-symbols-outlined text-primary" aria-hidden="true">settings</span><div class="font-extrabold text-primary mt-2 text-sm truncate">{{ vehicle.get_transmission_display }}</div><div class="text-[11px] text-on-surface-variant">Gearbox</div></div>{% endif %}
+                        {% if vehicle.fuel_type %}<div class="px-2 first:pl-0"><span class="material-symbols-outlined text-primary" aria-hidden="true">{% if vehicle.is_ev_or_hybrid %}bolt{% else %}local_gas_station{% endif %}</span><div class="font-extrabold text-primary mt-2 text-sm truncate">{{ vehicle.get_fuel_type_display }}</div><div class="text-[11px] text-on-surface-variant">Fuel</div></div>{% endif %}
+                        {% if vehicle.luggage_capacity %}<div class="px-2 first:pl-0"><span class="material-symbols-outlined text-primary" aria-hidden="true">luggage</span><div class="font-extrabold text-primary mt-2 text-sm">{{ vehicle.luggage_capacity }}</div><div class="text-[11px] text-on-surface-variant">Luggage</div></div>{% elif vehicle.range_km %}<div class="px-2 first:pl-0"><span class="material-symbols-outlined text-primary" aria-hidden="true">route</span><div class="font-extrabold text-primary mt-2 text-sm">{{ vehicle.range_km }} km</div><div class="text-[11px] text-on-surface-variant">Range</div></div>{% elif vehicle.engine_cc %}<div class="px-2 first:pl-0"><span class="material-symbols-outlined text-primary" aria-hidden="true">speed</span><div class="font-extrabold text-primary mt-2 text-sm">{{ vehicle.engine_cc }} cc</div><div class="text-[11px] text-on-surface-variant">Engine</div></div>{% endif %}
+                    </div>
+                    {% endif %}
                 </div>
-                <span class="absolute top-3 right-3 b-glass rounded-full px-3 py-1.5 label-tiny flex items-center gap-1.5"><span class="w-2 h-2 rounded-full {% if vehicle.status == 'available' %}bg-emerald-500{% elif vehicle.status == 'rented' %}bg-blue-500{% else %}bg-amber-500{% endif %}"></span>{{ vehicle.get_status_display }}</span>
-                {% if images|length > 1 %}
-                <div class="absolute bottom-3 right-3 flex gap-1.5">
-                    <button type="button" x-on:click="i = (i - 1 + n) % n" class="w-11 h-11 rounded-full b-glass grid place-items-center" aria-label="Previous photo"><span class="material-symbols-outlined">arrow_back</span></button>
-                    <button type="button" x-on:click="i = (i + 1) % n" class="w-11 h-11 rounded-full bg-primary text-on-primary grid place-items-center" aria-label="Next photo"><span class="material-symbols-outlined">arrow_forward</span></button>
+
+                <!-- gallery -->
+                <div class="lg:col-span-5 order-2" data-no-parallax>
+                    <div class="relative overflow-hidden rounded-[26px] aspect-[4/3] bg-surface-container grid place-items-center shadow-2xl shadow-primary/15 ring-4 ring-white/70"
+                         tabindex="0" x-on:keydown.arrow-right.prevent="i = (i + 1) % n" x-on:keydown.arrow-left.prevent="i = (i - 1 + n) % n">
+                        {% if images %}
+                            {% for img in images %}
+                            <img src="{{ img.image.url }}" alt="{{ vehicle.full_name }}{% if images|length > 1 %}, photo {{ forloop.counter }}{% endif %}" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500" x-bind:style="{ opacity: i === {{ forloop.counter0 }} ? 1 : 0 }" {% if not forloop.first %}style="opacity:0" loading="lazy"{% endif %}/>
+                            {% endfor %}
+                        {% elif hero %}
+                            <img src="{{ hero.url }}" alt="{{ vehicle.full_name }}" class="absolute inset-0 w-full h-full object-cover"/>
+                        {% else %}
+                            <span class="material-symbols-outlined text-[120px] text-outline-variant" aria-hidden="true">directions_car</span>
+                        {% endif %}
+                        <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                            {% if vehicle.is_premium %}<span class="b-glass rounded-full px-3 py-1.5 label-tiny text-primary">Premium</span>{% endif %}
+                            {% if vehicle.is_wedding_service %}<span class="b-glass rounded-full px-3 py-1.5 label-tiny text-primary">Wedding</span>{% endif %}
+                        </div>
+                        {% if images|length > 1 %}
+                        <button type="button" x-on:click="i = (i - 1 + n) % n" class="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 text-primary shadow-lg grid place-items-center hover:bg-white transition-colors" aria-label="Previous photo"><span class="material-symbols-outlined">arrow_back</span></button>
+                        <button type="button" x-on:click="i = (i + 1) % n" class="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/90 text-primary shadow-lg grid place-items-center hover:bg-white transition-colors" aria-label="Next photo"><span class="material-symbols-outlined">arrow_forward</span></button>
+                        <span class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/45 backdrop-blur rounded-full px-3 py-1 text-xs font-extrabold text-white" aria-live="polite"><span x-text="i + 1">1</span> / {{ images|length }}</span>
+                        {% endif %}
+                    </div>
                 </div>
-                <span class="absolute bottom-4 left-4 b-glass rounded-full px-3 py-1.5 text-xs font-extrabold text-primary" aria-live="polite"><span x-text="i + 1">1</span> / {{ images|length }}</span>
-                {% endif %}
             </div>
+
+            <!-- thumbnails: first five, then a "+N" tile that opens the sixth -->
             {% if images|length > 1 %}
-            <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 mt-2">
-                {% for img in images %}
-                <button type="button" x-on:click="i = {{ forloop.counter0 }}" class="b-thumb aspect-[4/3] rounded-2xl overflow-hidden" x-bind:aria-current="(i === {{ forloop.counter0 }}).toString()" aria-label="Show photo {{ forloop.counter }}">
+            <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 sm:gap-3">
+                {% for img in images|slice:":6" %}
+                <button type="button" x-on:click="i = {{ forloop.counter0 }}" class="b-thumb relative aspect-[4/3] rounded-2xl overflow-hidden {% if forloop.counter > 4 %}hidden sm:block{% endif %}" x-bind:aria-current="(i === {{ forloop.counter0 }}).toString()" aria-label="Show photo {{ forloop.counter }}">
                     <img src="{{ img.image.url }}" alt="" class="w-full h-full object-cover" loading="lazy"/>
+                    {% if forloop.counter == 6 and images|length > 6 %}<span class="absolute inset-0 bg-black/55 grid place-items-center text-white font-extrabold text-2xl">+{{ images|length|add:"-5" }}</span>{% endif %}
                 </button>
                 {% endfor %}
             </div>
             {% endif %}
         </div>
 
-        <!-- rates bento -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-            {% if vehicle.price_per_day %}<div class="tile bg-primary text-on-primary p-5 sm:p-6"><div class="label-tiny text-primary-fixed">Per day</div><div class="font-extrabold text-3xl sm:text-4xl tracking-tight mt-3">{{ vehicle.price_per_day|inr }}</div></div>{% endif %}
-            {% if vehicle.price_per_week %}<div class="tile b-glass p-5 sm:p-6"><div class="label-tiny text-outline">Per week</div><div class="font-extrabold text-3xl sm:text-4xl tracking-tight mt-3 text-primary">{{ vehicle.price_per_week|inr }}</div></div>{% endif %}
-            {% if vehicle.price_per_month %}<div class="tile bg-primary-fixed p-5 sm:p-6"><div class="label-tiny text-primary/70">Per month</div><div class="font-extrabold text-3xl sm:text-4xl tracking-tight mt-3 text-primary">{{ vehicle.price_per_month|inr }}</div></div>{% endif %}
-            {% if vehicle.is_chauffeur_available and vehicle.with_driver_price_per_day %}<div class="tile b-glass p-5 sm:p-6"><div class="label-tiny text-outline">With driver</div><div class="font-extrabold text-2xl sm:text-3xl tracking-tight mt-3 text-primary">+{{ vehicle.with_driver_price_per_day|inr }}<span class="text-sm font-semibold text-on-surface-variant">/day</span></div></div>{% endif %}
-            {% if vehicle.security_deposit %}<div class="tile b-glass p-5 sm:p-6"><div class="label-tiny text-outline">Refundable deposit</div><div class="font-extrabold text-2xl sm:text-3xl tracking-tight mt-3 text-primary">{{ vehicle.security_deposit|inr }}</div></div>{% endif %}
-            {% if vehicle.included_km_per_day %}<div class="tile b-glass p-5 sm:p-6"><div class="label-tiny text-outline">Included</div><div class="font-extrabold text-2xl sm:text-3xl tracking-tight mt-3 text-primary">{{ vehicle.included_km_per_day }}<span class="text-sm font-semibold text-on-surface-variant"> km/day</span></div>{% if vehicle.per_km_charge %}<div class="text-xs font-bold text-on-surface-variant mt-1">₹{{ vehicle.per_km_charge }}/km after</div>{% endif %}</div>{% endif %}
-            {% if vehicle.minimum_rental_days and vehicle.minimum_rental_days > 1 %}<div class="tile b-glass p-5 sm:p-6"><div class="label-tiny text-outline">Minimum</div><div class="font-extrabold text-2xl sm:text-3xl tracking-tight mt-3 text-primary">{{ vehicle.minimum_rental_days }}<span class="text-sm font-semibold text-on-surface-variant"> days</span></div></div>{% endif %}
-        </div>
-    </div>
-
-    <!-- booking tile -->
-    <aside id="reserve" class="lg:col-span-5 lg:sticky lg:top-28 scroll-mt-28">
-        <div class="tile b-glass p-6 sm:p-8">
-            <span class="label-tiny text-primary-container block">{{ vehicle.brand }} · {{ vehicle.get_vehicle_type_display }}</span>
-            <h1 class="b-title mt-3 font-extrabold text-4xl sm:text-5xl leading-[.95] tracking-[-.045em] text-primary" data-no-split>{{ vehicle.name }}</h1>
-            {% if vehicle.year or vehicle.color %}<p class="mt-2 text-sm font-semibold text-on-surface-variant">{{ vehicle.year|default:"" }}{% if vehicle.year and vehicle.color %} · {% endif %}{{ vehicle.color }}</p>{% endif %}
-            {% if vehicle.primary_price_value %}
-            <div class="mt-5 flex items-baseline gap-2"><span class="font-extrabold text-5xl tracking-[-.04em] text-primary"><span data-bslot>{{ vehicle.primary_price_value|inr }}</span></span><span class="font-semibold text-on-surface-variant">/ {{ vehicle.primary_price_label }}</span></div>
-            {% endif %}
-
-            <form action="{% url 'submit_enquiry' %}" method="post" class="mt-6 space-y-3" id="b-book" data-day="{{ vehicle.price_per_day|default:0|floatformat:0 }}" data-driver="{{ vehicle.with_driver_price_per_day|default:0|floatformat:0 }}">
-                {% csrf_token %}{% include "public/includes/_antispam.html" %}
-                <input type="hidden" name="vehicle" value="{{ vehicle.id }}"/>
-                <input type="hidden" name="source" value="website"/>
-                <input type="hidden" name="message" value="" id="b-msg"/>
-
-                {% if vehicle.is_chauffeur_available %}
-                <div class="flex bg-surface-container rounded-full p-1" role="radiogroup" aria-label="Rental type">
-                    <label class="flex-1 cursor-pointer"><input type="radio" name="rental_type" value="self_drive" checked class="peer sr-only"><span class="block text-center px-3 py-2.5 rounded-full text-sm font-bold peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">Self-drive</span></label>
-                    <label class="flex-1 cursor-pointer"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only"><span class="block text-center px-3 py-2.5 rounded-full text-sm font-bold peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">With driver{% if vehicle.with_driver_price_per_day %} +{{ vehicle.with_driver_price_per_day|inr }}{% endif %}</span></label>
-                </div>
-                {% else %}
-                <input type="hidden" name="rental_type" value="self_drive"/>
-                {% endif %}
-
-                <div class="grid grid-cols-2 gap-2">
-                    <label class="bg-white rounded-2xl px-4 py-3 min-w-0"><span class="label-tiny text-outline block mb-1">Pickup</span><input type="date" name="preferred_start_date" required class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
-                    <label class="bg-white rounded-2xl px-4 py-3 min-w-0"><span class="label-tiny text-outline block mb-1">Return</span><input type="date" name="preferred_end_date" required class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
-                </div>
-                {% if cities %}
-                <label class="block bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Pickup city</span>
-                    <select name="pickup_city" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"><option value="">Choose city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
-                {% endif %}
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Your name</span><input type="text" name="name" required autocomplete="name" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
-                    <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Phone</span><input type="tel" name="phone" required autocomplete="tel" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
-                </div>
-
-                {% if addons %}
-                <fieldset>
-                    <legend class="label-tiny text-outline mb-2 mt-2">Extras</legend>
-                    <div class="grid gap-1.5">
-                        {% for addon in addons %}
-                        <label class="flex items-center justify-between gap-3 cursor-pointer bg-white/70 hover:bg-white rounded-2xl px-4 py-3 transition-colors">
-                            <span class="flex items-center gap-3 min-w-0"><input type="checkbox" name="addons" value="{{ addon.slug }}" class="rounded text-primary focus:ring-primary">{% if addon.icon %}<span class="material-symbols-outlined text-[18px] text-primary" aria-hidden="true">{{ addon.icon }}</span>{% endif %}<span class="text-sm font-semibold truncate">{{ addon.name }}</span></span>
-                            <span class="text-xs font-bold text-outline whitespace-nowrap">+₹{{ addon.price }} {{ addon.get_pricing_unit_display|lower }}</span>
-                        </label>
-                        {% endfor %}
+        <!-- booking card -->
+        <aside id="reserve" class="lg:col-span-4 lg:sticky lg:top-28 scroll-mt-28">
+            <div class="bg-white rounded-[28px] p-6 sm:p-7 shadow-2xl shadow-primary/10">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <div class="font-bold text-xl text-primary leading-tight">{{ vehicle.brand }}</div>
+                        <div class="font-extrabold text-4xl tracking-[-.04em] text-primary leading-none mt-1">{{ vehicle.name }}</div>
+                        {% if vehicle.color or vehicle.year %}<div class="mt-2 text-sm font-semibold text-on-surface-variant">{{ vehicle.color }}{% if vehicle.year and vehicle.color %} · {% endif %}{{ vehicle.year|default:"" }}</div>{% endif %}
                     </div>
-                </fieldset>
+                    <span class="shrink-0 rounded-full px-3 py-1.5 label-tiny flex items-center gap-1.5 {% if vehicle.status == 'available' %}bg-emerald-50 text-emerald-700{% elif vehicle.status == 'rented' %}bg-blue-50 text-blue-700{% else %}bg-amber-50 text-amber-700{% endif %}"><span class="w-1.5 h-1.5 rounded-full {% if vehicle.status == 'available' %}bg-emerald-500{% elif vehicle.status == 'rented' %}bg-blue-500{% else %}bg-amber-500{% endif %}"></span>{{ vehicle.get_status_display }}</span>
+                </div>
+                {% if vehicle.primary_price_value %}
+                <div class="mt-4 flex items-baseline gap-2"><span class="font-extrabold text-3xl tracking-[-.03em] text-primary"><span data-bslot>{{ vehicle.primary_price_value|inr }}</span></span><span class="font-semibold text-on-surface-variant text-sm">/ {{ vehicle.primary_price_label }}</span></div>
                 {% endif %}
 
-                <!-- live estimate from the chosen dates (day rate only, extras excluded) -->
-                <div id="b-est" class="hidden rounded-2xl bg-primary text-on-primary px-5 py-4" aria-live="polite">
-                    <div class="flex items-center justify-between gap-3"><span class="label-tiny text-primary-fixed">Estimate</span><span class="text-xs font-semibold text-white/60" id="b-est-break"></span></div>
-                    <div class="font-extrabold text-3xl tracking-tight mt-1" id="b-est-total"></div>
-                    <p class="text-xs text-white/60 mt-1">At the listed day rate, extras not included. Our team confirms the final price.</p>
+                <form action="{% url 'submit_enquiry' %}" method="post" class="mt-5 space-y-2.5" id="b-book" data-day="{{ vehicle.price_per_day|default:0|floatformat:0 }}" data-driver="{{ vehicle.with_driver_price_per_day|default:0|floatformat:0 }}">
+                    {% csrf_token %}{% include "public/includes/_antispam.html" %}
+                    <input type="hidden" name="vehicle" value="{{ vehicle.id }}"/>
+                    <input type="hidden" name="source" value="website"/>
+                    <input type="hidden" name="message" value="" id="b-msg"/>
+
+                    {% if vehicle.is_chauffeur_available %}
+                    <div class="flex bg-surface-container rounded-full p-1" role="radiogroup" aria-label="Rental type">
+                        <label class="flex-1 cursor-pointer"><input type="radio" name="rental_type" value="self_drive" checked class="peer sr-only"><span class="block text-center px-3 py-2.5 rounded-full text-sm font-bold peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">Self-drive</span></label>
+                        <label class="flex-1 cursor-pointer"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only"><span class="block text-center px-3 py-2.5 rounded-full text-sm font-bold peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">With driver{% if vehicle.with_driver_price_per_day %} +{{ vehicle.with_driver_price_per_day|inr }}{% endif %}</span></label>
+                    </div>
+                    {% else %}
+                    <input type="hidden" name="rental_type" value="self_drive"/>
+                    {% endif %}
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <label class="bg-surface-container-low border border-outline-variant/30 rounded-2xl px-4 py-3 min-w-0"><span class="label-tiny text-outline block mb-1">Pickup</span><input type="date" name="preferred_start_date" required class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+                        <label class="bg-surface-container-low border border-outline-variant/30 rounded-2xl px-4 py-3 min-w-0"><span class="label-tiny text-outline block mb-1">Return</span><input type="date" name="preferred_end_date" required class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
+                    </div>
+                    {% if cities %}
+                    <label class="block bg-surface-container-low border border-outline-variant/30 rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Pickup city</span>
+                        <select name="pickup_city" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"><option value="">Choose city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
+                    {% endif %}
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <label class="bg-surface-container-low border border-outline-variant/30 rounded-2xl px-4 py-3 min-w-0"><span class="label-tiny text-outline block mb-1">Your name</span><input type="text" name="name" required autocomplete="name" placeholder="Enter your name" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm placeholder:font-medium placeholder:text-outline"></label>
+                        <label class="bg-surface-container-low border border-outline-variant/30 rounded-2xl px-4 py-3 min-w-0"><span class="label-tiny text-outline block mb-1">Phone</span><input type="tel" name="phone" required autocomplete="tel" placeholder="Phone number" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm placeholder:font-medium placeholder:text-outline"></label>
+                    </div>
+
+                    {% if addons %}
+                    <details class="group rounded-2xl border border-outline-variant/30">
+                        <summary class="flex items-center justify-between cursor-pointer list-none px-4 py-3 label-tiny text-outline">Extras <span class="material-symbols-outlined text-[18px] transition-transform group-open:rotate-180" aria-hidden="true">expand_more</span></summary>
+                        <div class="grid gap-1 px-2 pb-2">
+                            {% for addon in addons %}
+                            <label class="flex items-center justify-between gap-3 cursor-pointer hover:bg-surface-container-low rounded-xl px-3 py-2.5 transition-colors">
+                                <span class="flex items-center gap-3 min-w-0"><input type="checkbox" name="addons" value="{{ addon.slug }}" class="rounded text-primary focus:ring-primary">{% if addon.icon %}<span class="material-symbols-outlined text-[18px] text-primary" aria-hidden="true">{{ addon.icon }}</span>{% endif %}<span class="text-sm font-semibold truncate">{{ addon.name }}</span></span>
+                                <span class="text-xs font-bold text-outline whitespace-nowrap">+₹{{ addon.price }} {{ addon.get_pricing_unit_display|lower }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </details>
+                    {% endif %}
+
+                    <!-- live estimate from the chosen dates (day rate only, extras excluded) -->
+                    <div id="b-est" class="hidden rounded-2xl bg-primary-fixed/50 text-primary px-5 py-4" aria-live="polite">
+                        <div class="flex items-center justify-between gap-3"><span class="label-tiny">Estimate</span><span class="text-xs font-semibold text-primary/70" id="b-est-break"></span></div>
+                        <div class="font-extrabold text-3xl tracking-tight mt-1" id="b-est-total"></div>
+                        <p class="text-xs text-primary/70 mt-1">At the listed day rate, extras not included. Our team confirms the final price.</p>
+                    </div>
+
+                    <button type="submit" class="w-full bg-primary text-on-primary rounded-full py-4 font-bold flex items-center justify-center gap-2 m-shine m-btn group">Reserve now <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span></button>
+                </form>
+
+                <div class="grid grid-cols-2 gap-2.5 mt-3">
+                    <a href="{% whatsapp_vehicle_url vehicle %}" target="_blank" rel="noopener" class="bg-primary-fixed text-primary rounded-2xl px-4 py-3.5 font-bold text-sm flex items-center gap-2 lift"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35M12.05 21.5h-.01a9.4 9.4 0 0 1-4.8-1.31l-.34-.2-3.57.93.95-3.48-.22-.36a9.4 9.4 0 0 1-1.44-5.02c0-5.2 4.23-9.43 9.44-9.43a9.43 9.43 0 0 1 9.43 9.44c0 5.2-4.24 9.43-9.44 9.43m8.03-17.46A11.27 11.27 0 0 0 12.05.72C5.8.72.7 5.8.7 12.06c0 2 .52 3.95 1.52 5.67L.6 23.4l5.8-1.52a11.3 11.3 0 0 0 5.65 1.44h.01c6.25 0 11.34-5.09 11.34-11.34 0-3.03-1.18-5.88-3.32-8.02"/></svg><span class="flex-1">WhatsApp</span><span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span></a>
+                    {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="bg-white border border-outline-variant/40 rounded-2xl px-4 py-3.5 font-bold text-sm flex items-center gap-2 lift text-primary"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">call</span><span class="flex-1">Call us</span><span class="material-symbols-outlined text-[18px]" aria-hidden="true">arrow_forward</span></a>{% endif %}
                 </div>
-
-                <button type="submit" class="w-full bg-primary text-on-primary rounded-full py-4 font-bold flex items-center justify-center gap-2 m-shine m-btn group">Reserve now <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span></button>
-            </form>
-
-            <div class="grid grid-cols-2 gap-2 mt-3">
-                <a href="{% whatsapp_vehicle_url vehicle %}" target="_blank" rel="noopener" class="bg-[#25D366] text-white rounded-2xl p-4 font-bold flex flex-col gap-4 lift"><span class="material-symbols-outlined">chat</span>WhatsApp</a>
-                {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="bg-white rounded-2xl p-4 font-bold flex flex-col gap-4 lift text-primary"><span class="material-symbols-outlined">call</span>Call us</a>{% endif %}
             </div>
+        </aside>
+    </section>
+</div>
+
+<!-- ─── Specifications band ─── -->
+<div class="-mx-3 sm:-mx-6 px-3 sm:px-6 py-14 lg:py-20 bg-primary-fixed/20">
+    <section class="max-w-screen-xl mx-auto" aria-labelledby="specs-h">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end mb-8">
+            <div class="lg:col-span-6"><span class="label-tiny text-primary-container flex items-center gap-3">Specifications<span class="w-8 h-px bg-current opacity-50" aria-hidden="true"></span></span><h2 id="specs-h" class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em] text-primary">The <span class="serif-i">details.</span></h2></div>
+            {% if vehicle.description %}<p class="lg:col-span-6 text-on-surface-variant text-lg leading-relaxed whitespace-pre-line">{{ vehicle.description }}</p>{% endif %}
         </div>
-    </aside>
-</section>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4" data-bpop>
+            {% if vehicle.transmission %}<div class="bg-white rounded-[22px] p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">settings</span><div class="text-sm text-on-surface-variant mt-4">Transmission</div><div class="font-extrabold text-lg text-primary">{{ vehicle.get_transmission_display }}</div><div class="text-xs text-outline">Gearbox</div></div>{% endif %}
+            {% if vehicle.fuel_type %}<div class="bg-white rounded-[22px] p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">{% if vehicle.is_ev_or_hybrid %}bolt{% else %}local_gas_station{% endif %}</span><div class="text-sm text-on-surface-variant mt-4">Fuel type</div><div class="font-extrabold text-lg text-primary">{{ vehicle.get_fuel_type_display }}</div><div class="text-xs text-outline">Fuel</div></div>{% endif %}
+            {% if vehicle.seating_capacity %}<div class="bg-white rounded-[22px] p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">group</span><div class="text-sm text-on-surface-variant mt-4">Seating capacity</div><div class="font-extrabold text-lg text-primary">{{ vehicle.seating_capacity }}</div><div class="text-xs text-outline">Passengers</div></div>{% endif %}
+            {% if vehicle.luggage_capacity %}<div class="bg-white rounded-[22px] p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">luggage</span><div class="text-sm text-on-surface-variant mt-4">Luggage capacity</div><div class="font-extrabold text-lg text-primary">{{ vehicle.luggage_capacity }}</div><div class="text-xs text-outline">Large bag{{ vehicle.luggage_capacity|pluralize }}</div></div>{% endif %}
+            {% if vehicle.has_ac %}<div class="bg-white rounded-[22px] p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">ac_unit</span><div class="text-sm text-on-surface-variant mt-4">Air conditioning</div><div class="font-extrabold text-lg text-primary">Yes</div><div class="text-xs text-outline">Climate control</div></div>{% endif %}
+            <div class="bg-white rounded-[22px] p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">directions_car</span><div class="text-sm text-on-surface-variant mt-4">Vehicle type</div><div class="font-extrabold text-lg text-primary">{% if vehicle.category %}{{ vehicle.category.name }}{% else %}{{ vehicle.get_vehicle_type_display }}{% endif %}</div><div class="text-xs text-outline">{% if vehicle.is_premium %}Premium{% else %}{{ vehicle.get_vehicle_type_display }}{% endif %}</div></div>
+            {% if vehicle.engine_cc %}<div class="bg-white rounded-[22px] p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">speed</span><div class="text-sm text-on-surface-variant mt-4">Engine</div><div class="font-extrabold text-lg text-primary">{{ vehicle.engine_cc }} cc</div><div class="text-xs text-outline">Displacement</div></div>{% endif %}
+            {% if vehicle.mileage_kmpl %}<div class="bg-white rounded-[22px] p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">eco</span><div class="text-sm text-on-surface-variant mt-4">Mileage</div><div class="font-extrabold text-lg text-primary">{{ vehicle.mileage_kmpl }}</div><div class="text-xs text-outline">km per litre</div></div>{% endif %}
+            {% if vehicle.range_km %}<div class="bg-white rounded-[22px] p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">route</span><div class="text-sm text-on-surface-variant mt-4">Range</div><div class="font-extrabold text-lg text-primary">{{ vehicle.range_km }} km</div><div class="text-xs text-outline">Full charge</div></div>{% endif %}
+            {% if vehicle.battery_capacity_kwh %}<div class="bg-white rounded-[22px] p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">battery_charging_full</span><div class="text-sm text-on-surface-variant mt-4">Battery</div><div class="font-extrabold text-lg text-primary">{{ vehicle.battery_capacity_kwh }} kWh</div><div class="text-xs text-outline">Capacity</div></div>{% endif %}
+            {% if vehicle.year %}<div class="bg-white rounded-[22px] p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">calendar_month</span><div class="text-sm text-on-surface-variant mt-4">Model year</div><div class="font-extrabold text-lg text-primary">{{ vehicle.year }}</div><div class="text-xs text-outline">Year</div></div>{% endif %}
+        </div>
 
-<!-- ─── Specs bento ─── -->
-{% if vehicle.seating_capacity or vehicle.transmission or vehicle.fuel_type or vehicle.engine_cc or vehicle.range_km or vehicle.mileage_kmpl or vehicle.battery_capacity_kwh %}
-<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24" aria-labelledby="specs-h">
-    <div class="mb-6"><span class="label-tiny text-primary-container block">Specifications</span><h2 id="specs-h" class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em] text-primary">The <span class="serif-i">details.</span></h2></div>
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4" data-bpop>
-        {% if vehicle.seating_capacity %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">airline_seat_recline_normal</span><div class="font-extrabold text-3xl text-primary mt-4">{{ vehicle.seating_capacity }}</div><div class="label-tiny text-outline mt-1">Seats</div></div>{% endif %}
-        {% if vehicle.transmission %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">settings</span><div class="font-extrabold text-2xl text-primary mt-4">{{ vehicle.get_transmission_display }}</div><div class="label-tiny text-outline mt-1">Gearbox</div></div>{% endif %}
-        {% if vehicle.fuel_type %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">{% if vehicle.is_ev_or_hybrid %}bolt{% else %}local_gas_station{% endif %}</span><div class="font-extrabold text-2xl text-primary mt-4">{{ vehicle.get_fuel_type_display }}</div><div class="label-tiny text-outline mt-1">Fuel</div></div>{% endif %}
-        {% if vehicle.engine_cc %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">speed</span><div class="font-extrabold text-3xl text-primary mt-4">{{ vehicle.engine_cc }}<span class="text-base">cc</span></div><div class="label-tiny text-outline mt-1">Engine</div></div>{% endif %}
-        {% if vehicle.mileage_kmpl %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">eco</span><div class="font-extrabold text-3xl text-primary mt-4">{{ vehicle.mileage_kmpl }}</div><div class="label-tiny text-outline mt-1">km per litre</div></div>{% endif %}
-        {% if vehicle.range_km %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">route</span><div class="font-extrabold text-3xl text-primary mt-4">{{ vehicle.range_km }}<span class="text-base">km</span></div><div class="label-tiny text-outline mt-1">Range</div></div>{% endif %}
-        {% if vehicle.battery_capacity_kwh %}<div class="tile b-glass p-5 lift"><span class="material-symbols-outlined text-primary" aria-hidden="true">battery_charging_full</span><div class="font-extrabold text-3xl text-primary mt-4">{{ vehicle.battery_capacity_kwh }}<span class="text-base">kWh</span></div><div class="label-tiny text-outline mt-1">Battery</div></div>{% endif %}
-    </div>
-</section>
-{% endif %}
+        <!-- rates & terms -->
+        {% if vehicle.price_per_week or vehicle.price_per_month or vehicle.security_deposit or vehicle.included_km_per_day or vehicle.minimum_rental_days > 1 or vehicle.is_chauffeur_available and vehicle.with_driver_price_per_day %}
+        <div class="mt-4 flex flex-wrap gap-2 text-sm font-bold text-primary">
+            {% if vehicle.price_per_day %}<span class="bg-white rounded-full px-4 py-2.5">{{ vehicle.price_per_day|inr }} <span class="font-semibold text-on-surface-variant">/ day</span></span>{% endif %}
+            {% if vehicle.price_per_week %}<span class="bg-white rounded-full px-4 py-2.5">{{ vehicle.price_per_week|inr }} <span class="font-semibold text-on-surface-variant">/ week</span></span>{% endif %}
+            {% if vehicle.price_per_month %}<span class="bg-white rounded-full px-4 py-2.5">{{ vehicle.price_per_month|inr }} <span class="font-semibold text-on-surface-variant">/ month</span></span>{% endif %}
+            {% if vehicle.is_chauffeur_available and vehicle.with_driver_price_per_day %}<span class="bg-white rounded-full px-4 py-2.5">+{{ vehicle.with_driver_price_per_day|inr }} <span class="font-semibold text-on-surface-variant">/ day with driver</span></span>{% endif %}
+            {% if vehicle.included_km_per_day %}<span class="bg-white rounded-full px-4 py-2.5">{{ vehicle.included_km_per_day }} km/day <span class="font-semibold text-on-surface-variant">included{% if vehicle.per_km_charge %}, ₹{{ vehicle.per_km_charge }}/km after{% endif %}</span></span>{% endif %}
+            {% if vehicle.security_deposit %}<span class="bg-white rounded-full px-4 py-2.5">{{ vehicle.security_deposit|inr }} <span class="font-semibold text-on-surface-variant">refundable deposit</span></span>{% endif %}
+            {% if vehicle.minimum_rental_days and vehicle.minimum_rental_days > 1 %}<span class="bg-white rounded-full px-4 py-2.5">{{ vehicle.minimum_rental_days }} days <span class="font-semibold text-on-surface-variant">minimum</span></span>{% endif %}
+        </div>
+        {% endif %}
 
-<!-- ─── About + features bento ─── -->
-{% if vehicle.description or vehicle.features or vehicle.short_description %}
-<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4" data-bpop>
-    {% if vehicle.description or vehicle.short_description %}
-    <div class="tile b-glass p-7 sm:p-10 {% if vehicle.features %}lg:col-span-7{% else %}lg:col-span-12{% endif %}">
-        <span class="label-tiny text-primary-container block">About this car</span>
-        <h2 class="mt-3 font-extrabold text-3xl sm:text-4xl tracking-[-.04em] text-primary" data-no-split>{{ vehicle.short_description|default:"Built for Kerala roads." }}</h2>
-        {% if vehicle.description %}<p class="mt-5 text-on-surface-variant text-lg leading-relaxed whitespace-pre-line">{{ vehicle.description }}</p>{% endif %}
-    </div>
-    {% endif %}
-    {% if vehicle.features %}
-    <div class="tile bg-primary text-on-primary p-7 sm:p-10 {% if vehicle.description or vehicle.short_description %}lg:col-span-5{% else %}lg:col-span-12{% endif %}">
-        <span class="label-tiny text-primary-fixed block">What's included</span>
-        <ul class="mt-6 grid gap-2" role="list">
+        {% if vehicle.features %}
+        <ul class="mt-4 flex flex-wrap gap-2" role="list" aria-label="What's included">
             {% for feature in vehicle.features %}
-            <li class="flex items-center gap-3 bg-white/10 rounded-2xl px-4 py-3 font-semibold"><span class="material-symbols-outlined text-primary-fixed" aria-hidden="true">check_circle</span>{{ feature }}</li>
+            <li class="flex items-center gap-2 bg-primary text-on-primary rounded-full pl-3 pr-4 py-2 text-sm font-semibold"><span class="material-symbols-outlined text-primary-fixed text-[18px]" aria-hidden="true">check_circle</span>{{ feature }}</li>
             {% endfor %}
         </ul>
-    </div>
-    {% endif %}
-</section>
-{% endif %}
+        {% endif %}
+    </section>
+</div>
 
-<!-- ─── Related ─── -->
+<!-- ─── Similar drives ─── -->
 {% if related_vehicles %}
-<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24">
-    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
-        <div><span class="label-tiny text-primary-container block">Also consider</span><h2 class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em] text-primary">Similar <span class="serif-i">drives.</span></h2></div>
-        {% if vehicle.category %}<a href="{% url 'vehicle_list' %}?category={{ vehicle.category.id }}" class="font-bold text-primary inline-flex items-center gap-2 hover:gap-3 transition-all">All {{ vehicle.category.name }} <span class="material-symbols-outlined">arrow_forward</span></a>{% endif %}
+<section class="max-w-screen-xl mx-auto pt-14 lg:pt-20">
+    <div class="flex items-end justify-between gap-4 mb-6">
+        <h2 class="font-extrabold text-4xl sm:text-5xl tracking-[-.04em] text-primary">Similar <span class="serif-i">drives.</span></h2>
+        <a href="{% url 'vehicle_list' %}" class="font-bold text-primary inline-flex items-center gap-2 hover:gap-3 transition-all whitespace-nowrap">View all cars <span class="material-symbols-outlined">arrow_forward</span></a>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4" data-deal>
-        {% for v in related_vehicles %}{% include "public/themes/bento/_card.html" with v=v big=False %}{% endfor %}
+        {% for v in related_vehicles %}
+        <a href="{{ v.get_absolute_url }}" class="vehicle-card group block bg-white rounded-[24px] overflow-hidden shadow-lg shadow-primary/5 lift" aria-label="{{ v.full_name }}">
+            <div class="relative h-48 bg-surface-container grid place-items-center overflow-hidden">
+                {% if v.thumbnail %}<img src="{{ v.thumbnail.url }}" alt="{{ v.full_name }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110" loading="lazy"/>{% else %}<span class="material-symbols-outlined text-[64px] text-outline-variant" aria-hidden="true">directions_car</span>{% endif %}
+                <span class="absolute top-3 left-3 bg-white/90 rounded-full px-3 py-1.5 label-tiny text-primary">{% if v.is_premium %}Premium{% elif v.is_wedding_service %}Wedding{% else %}Fleet{% endif %}</span>
+                {% if v.primary_price_value %}<span class="absolute top-3 right-3 bg-primary text-on-primary rounded-full px-3 py-1.5 text-xs font-extrabold">{{ v.primary_price_value|inr }}<span class="font-semibold text-white/70">/{{ v.primary_price_label }}</span></span>{% endif %}
+            </div>
+            <div class="p-4 flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <h3 class="font-extrabold text-lg tracking-tight text-primary truncate">{{ v.full_name }}</h3>
+                    <div class="text-xs font-semibold text-on-surface-variant mt-1 truncate">{% if v.transmission %}{{ v.get_transmission_display }}{% endif %}{% if v.transmission and v.fuel_type %} <span class="text-outline-variant">|</span> {% endif %}{% if v.fuel_type %}{{ v.get_fuel_type_display }}{% endif %}{% if v.seating_capacity %} <span class="text-outline-variant">|</span> {{ v.seating_capacity }} seater{% endif %}</div>
+                </div>
+                <span class="w-10 h-10 shrink-0 rounded-full bg-primary-fixed text-primary grid place-items-center transition-transform duration-500 group-hover:-rotate-45" aria-hidden="true"><span class="material-symbols-outlined">arrow_forward</span></span>
+            </div>
+        </a>
+        {% endfor %}
     </div>
 </section>
 {% endif %}
 
 <!-- ─── Final CTA ─── -->
-<section class="max-w-screen-xl mx-auto pt-16 lg:pt-24">
-    <div class="tile bg-primary text-on-primary p-8 sm:p-14 grid lg:grid-cols-12 gap-6 items-center">
-        <div class="absolute -right-24 -bottom-24 w-80 h-80 rounded-full bg-primary-fixed/10 blur-2xl" aria-hidden="true"></div>
-        <div class="lg:col-span-8 relative">
-            <h2 class="font-extrabold text-4xl sm:text-6xl tracking-[-.04em]" data-no-split>Ready to <span class="serif-i text-primary-fixed">drive?</span></h2>
-            {% if vehicle.primary_price_value %}<p class="mt-3 text-white/70 text-lg">{{ vehicle.full_name }} · {{ vehicle.primary_price_value|inr }} / {{ vehicle.primary_price_label }}</p>{% endif %}
+<section class="max-w-screen-xl mx-auto pt-14 lg:pt-20">
+    <div class="relative overflow-hidden rounded-[28px] bg-primary text-on-primary p-8 sm:p-12 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        {% if hero %}
+        <img src="{{ hero.url }}" alt="" class="absolute inset-y-0 right-0 w-full lg:w-2/3 h-full object-cover opacity-50" aria-hidden="true" loading="lazy"/>
+        <div class="absolute inset-0 bg-gradient-to-r from-primary via-primary/85 to-primary/30" aria-hidden="true"></div>
+        {% endif %}
+        <div class="relative">
+            <span class="label-tiny text-primary-fixed/80">Plan your journey</span>
+            <h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em]" data-no-split>Ready to <span class="serif-i text-primary-fixed">drive?</span></h2>
+            <p class="mt-3 text-white/75 text-lg">{{ vehicle.full_name }}{% if vehicle.primary_price_value %} · {{ vehicle.primary_price_value|inr }} / {{ vehicle.primary_price_label }}{% endif %}</p>
         </div>
-        <div class="lg:col-span-4 relative flex flex-wrap lg:justify-end gap-2">
-            <a href="#reserve" class="bg-primary-fixed text-primary rounded-full px-7 py-4 font-bold inline-flex items-center gap-2 m-shine" data-magnetic>Reserve this car <span class="material-symbols-outlined">arrow_upward</span></a>
-        </div>
+        <a href="#reserve" class="relative self-start lg:self-auto bg-primary-fixed text-primary rounded-full px-7 py-4 font-bold inline-flex items-center gap-2 m-shine whitespace-nowrap" data-magnetic>Reserve this car <span class="material-symbols-outlined">arrow_forward</span></a>
     </div>
 </section>
+{% endwith %}
 {% endblock %}
+
 
 {% block page_js %}
 <script>
