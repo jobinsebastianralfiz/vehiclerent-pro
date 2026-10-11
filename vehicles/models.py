@@ -242,6 +242,14 @@ class Vehicle(models.Model):
             return f"{self.brand} {self.name}"
         return self.name
 
+    @property
+    def model_name(self):
+        """The name without a leading brand: "BMW 5 Series" -> "5 Series"."""
+        name = self.name or ""
+        if self.brand and name.lower().startswith(self.brand.lower() + " "):
+            return name[len(self.brand):].strip()
+        return name
+
     def build_slug(self):
         """brand-model-name, skipping brand or model when the name already says it."""
         slug = slugify(self.name)

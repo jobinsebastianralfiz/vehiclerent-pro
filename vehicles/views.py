@@ -138,6 +138,12 @@ def vehicle_detail(request, slug):
         moved = get_object_or_404(Vehicle, previous_slug=slug, is_published=True)
         return redirect(moved.get_absolute_url(), permanent=True)
     images = vehicle.images.order_by("display_order")
+    # Every photo of the car for the gallery: the main photo first, then the gallery (no repeats)
+    photos, seen = [], set()
+    for f in [vehicle.thumbnail] + [img.image for img in images]:
+        if f and f.name not in seen:
+            seen.add(f.name)
+            photos.append(f.url)
     related = (
         Vehicle.objects.filter(is_published=True, category=vehicle.category)
         .exclude(pk=vehicle.pk).exclude(status="inactive")
@@ -148,6 +154,7 @@ def vehicle_detail(request, slug):
     return render(request, themed(request, "vehicle_detail.html"), {
         "vehicle": vehicle,
         "images": images,
+        "photos": photos,
         "related_vehicles": related,
         "addons": addons,
         "cities": cities,
