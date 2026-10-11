@@ -26,7 +26,6 @@ BODY_TYPES = {
     "sedan": "sedan", "saloon": "sedan",
     "hatchback": "hatchback", "hatch": "hatchback", "compact": "hatchback",
     "muv": "muv", "mpv": "muv", "7 seater": "muv", "7-seater": "muv",
-    "luxury car": "luxury",
     "van": "van", "minivan": "van",
     "bike": "bike", "motorcycle": "bike", "two-wheeler": "bike", "two wheeler": "bike",
     "scooter": "scooter",
@@ -37,7 +36,7 @@ BODY_TYPES = {
 
 # A searched body type also matches older vehicles saved under the broader type
 BODY_MATCHES = {
-    "car": ["car", "hatchback", "sedan", "muv", "luxury"],
+    "car": ["car", "hatchback", "sedan", "muv"],
     "sedan": ["sedan", "car"],
     "hatchback": ["hatchback", "car"],
     "muv": ["muv", "van", "car"],

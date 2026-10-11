@@ -24,7 +24,7 @@ STEPS = [
      "fields": ["name", "brand", "model", "year", "registration_number", "color"]},
     {"n": 2, "key": "class", "title": "Classification", "sub": "Type & category", "icon": "category",
      "heading": "Vehicle Classification", "lede": "Select the vehicle type and category",
-     "fields": ["vehicle_type", "category", "seating_capacity", "luggage_capacity", "has_ac"]},
+     "fields": ["vehicle_type", "is_premium", "category", "seating_capacity", "luggage_capacity", "has_ac"]},
     {"n": 3, "key": "specs", "title": "Specifications", "sub": "Technical & EV", "icon": "tune",
      "heading": "Technical Specifications", "lede": "Engine, fuel and EV details",
      "fields": ["fuel_type", "transmission", "engine_cc", "mileage_kmpl", "battery_capacity_kwh",
@@ -39,12 +39,12 @@ STEPS = [
      "fields": ["short_description", "thumbnail", "description", "features"]},
     {"n": 6, "key": "media", "title": "Media & Settings", "sub": "Images, status & SEO", "icon": "photo_library",
      "heading": "Media & Settings", "lede": "Gallery, visibility, badges and search details",
-     "fields": ["status", "is_featured", "show_in_hero", "is_premium", "is_wedding_service", "is_chauffeur_available",
+     "fields": ["status", "is_featured", "show_in_hero", "is_wedding_service", "is_chauffeur_available",
                 "wedding_tier", "available_cities", "meta_title", "meta_description", "meta_keywords"]},
 ]
 LAST = len(STEPS)
 # Edited from the Quick settings bar on every step once a vehicle is live, so step 6 leaves them out then
-QUICK_FIELDS = ["status", "is_featured", "show_in_hero", "is_premium", "is_wedding_service",
+QUICK_FIELDS = ["status", "is_featured", "show_in_hero", "is_wedding_service",
                 "is_chauffeur_available", "wedding_tier"]
 
 _INPUT = "w-full rounded-xl border-stone-200 text-sm py-2.5 px-3.5 focus:border-[#145c38] focus:ring-[#145c38]/20"

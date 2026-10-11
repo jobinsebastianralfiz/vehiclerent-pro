@@ -80,7 +80,6 @@ class Vehicle(models.Model):
         ("sedan", "Sedan"),
         ("suv", "SUV"),
         ("muv", "MUV / MPV"),
-        ("luxury", "Luxury"),
         ("car", "Car"),
         ("tempo", "Tempo"),
         ("van", "Van"),
@@ -171,7 +170,7 @@ class Vehicle(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="available")
     is_featured = models.BooleanField(default=False)
     show_in_hero = models.BooleanField(default=False, help_text="Showcase this vehicle in the home page hero slides (needs a photo)")
-    is_premium = models.BooleanField(default=False, help_text="Mark as a premium/luxury vehicle")
+    is_premium = models.BooleanField("Luxury", default=False, help_text="Luxury vehicle: listed on the Premium page with a Premium badge")
     is_wedding_service = models.BooleanField(default=False, help_text="Available for wedding services")
     is_chauffeur_available = models.BooleanField(default=False, help_text="Can be rented with a chauffeur")
     wedding_tier = models.CharField(
