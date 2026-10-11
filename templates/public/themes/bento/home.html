@@ -69,9 +69,9 @@
     @keyframes b-sl-in { from { scale: 1.06; } to { scale: 1; } }
     .b-sl-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     .b-sl.on .b-sl-cover { animation: b-kb 20s ease-in-out infinite alternate; transform-origin: 60% 40%; }
-    .b-sl-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.6), rgba(0,0,0,0) 45%, rgba(0,0,0,.12)); }
-    .b-sl-dots span { width: 7px; height: 7px; border-radius: 999px; background: rgba(255,255,255,.55); transition: width .4s, background .4s; }
-    .b-sl-dots span.on { width: 22px; background: #fff; }
+    .b-sl-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.68), rgba(0,0,0,0) 48%, rgba(0,0,0,.08)); }
+    .b-sl-dots span { width: 14px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.45); transition: width .4s, background .4s; }
+    .b-sl-dots span.on { width: 26px; background: #fff; }
     @media (prefers-reduced-motion: reduce) { .b-sl.on .b-sl-car, .b-sl.on .b-sl-cover { animation: none; } }
     @keyframes b-kb { 0% { transform: scale(1.02) translate(0,0); } 100% { transform: scale(1.14) translate(-2%, -2%); } }
     .b-kb { animation: b-kb 20s ease-in-out infinite alternate; transform-origin: 60% 40%; }
@@ -133,98 +133,78 @@
 {% block footer %}{% include "public/themes/bento/footer.html" %}{% endblock %}
 
 {% block content %}
-<!-- ─── Hero bento ─── -->
-<section class="b-hero max-w-screen-xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 lg:auto-rows-[150px]" aria-label="Introduction">
-    <!-- headline -->
-    <div class="tile b-glass p-7 sm:p-10 sm:col-span-2 lg:col-span-7 lg:row-span-3 flex flex-col justify-between gap-8">
-        <div>
-            <span class="inline-flex items-center gap-2 bg-primary-fixed text-primary label-tiny px-3 py-2 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>{{ config.hero_subtitle|default:"Premium Vehicle Rental" }}</span>
-            <h1 class="b-title mt-6 font-extrabold text-[44px] sm:text-6xl lg:text-[72px] leading-[.95] tracking-[-.045em] text-primary" data-no-split>{{ config.hero_title|default:"Rent Your Perfect Vehicle"|accent:"serif-i text-primary-container" }}</h1>
-            <p class="mt-5 text-xl sm:text-2xl font-semibold text-on-surface-variant">Ready for the <span class="text-primary bg-primary-fixed/70 px-2 rounded-lg" data-cycle="wedding day|weekend escape|airport run|monthly commute|outstation trip" data-wait="1.4">wedding day</span></p>
-        </div>
-        <div class="flex flex-wrap items-center gap-3">
-            <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-7 py-4 rounded-full font-bold flex items-center gap-2">{{ config.hero_cta_text|default:"Browse Fleet" }} <span class="material-symbols-outlined">arrow_forward</span></a>
-            {% if config.hero_description %}<p class="w-full text-sm text-on-surface-variant font-medium max-w-xl">{{ config.hero_description }}</p>{% endif %}
-        </div>
-    </div>
-    <!-- photo: vehicles ticked "Hero slides" rotate here (whole car on a blurred fill of the same photo); with fewer than two,
-         the Settings background slides and hero image join so it still rotates -->
-    <div class="tile sm:col-span-2 lg:col-span-5 lg:row-span-4 min-h-[420px] bg-primary" data-no-parallax>
-        {% with n_v=hero_vehicles|length n_bg=hero_bg_images|length %}
-        <div class="b-slides absolute inset-0" data-b-slides>
-            {% for v in hero_vehicles %}
-            <a href="{% url 'vehicle_detail' v.slug %}" class="b-sl" aria-label="{{ v.full_name }}">
-                <img src="{{ v.hero_image.url }}" alt="" class="b-sl-fill" aria-hidden="true"/>
-                <img src="{{ v.hero_image.url }}" alt="{{ v.full_name }}" class="b-sl-car"/>
-                <span class="b-sl-shade"></span>
-                <span class="absolute top-4 left-4 right-4 flex justify-between items-start gap-3">
-                    {% if v.primary_price_value %}<span class="b-glass rounded-2xl px-4 py-3"><span class="label-tiny block text-on-surface-variant mb-1">{{ v.category.name|default:v.get_vehicle_type_display }}</span><span class="font-extrabold text-2xl text-primary">{{ v.primary_price_value|inr }}<span class="text-sm font-semibold text-on-surface-variant"> /{{ v.primary_price_label }}</span></span></span>{% else %}<span></span>{% endif %}
-                    <span class="w-11 h-11 shrink-0 rounded-full b-glass grid place-items-center"><span class="material-symbols-outlined text-primary">north_east</span></span>
-                </span>
-                <span class="absolute bottom-5 left-5 right-5 text-white">
-                    <span class="label-tiny opacity-80">{{ v.brand }}{% if v.fuel_type %} · {{ v.get_fuel_type_display }}{% endif %}{% if v.transmission %} · {{ v.get_transmission_display }}{% endif %}</span>
-                    <span class="block serif-i text-3xl mt-2 leading-tight">{{ v.name }}</span>
-                </span>
-            </a>
-            {% endfor %}
-            {% if n_v < 2 %}
-            {% for url in hero_bg_images %}<div class="b-sl"><img src="{{ url }}" alt="" class="b-sl-cover"/><span class="b-sl-shade"></span>{% include "public/themes/bento/_hero_tile_caption.html" %}</div>{% endfor %}
-            {% if n_v|add:n_bg < 2 %}<div class="b-sl"><img src="{% if config.hero_image %}{{ config.hero_image.url }}{% else %}{% static 'themes/img/palms.jpg' %}{% endif %}" alt="" class="b-sl-cover"/><span class="b-sl-shade"></span>{% include "public/themes/bento/_hero_tile_caption.html" %}</div>{% endif %}
-            {% endif %}
-        </div>
-        {% endwith %}
-        <div class="b-sl-dots absolute z-10 right-5 bottom-6 flex gap-1.5" aria-hidden="true"></div>
-    </div>
-    <!-- fleet count -->
-    {% if total_vehicle_count %}
-    <div class="tile bg-primary text-on-primary p-6 lg:col-span-3 lg:row-span-1 flex items-center justify-between gap-4 lift">
-        <div><div class="font-extrabold text-5xl tracking-tight leading-none"><span data-bslot>{{ total_vehicle_count }}</span></div><div class="label-tiny mt-2 opacity-70">Vehicle{{ total_vehicle_count|pluralize }} in fleet</div></div>
-        <span class="material-symbols-outlined text-5xl text-primary-fixed/80" aria-hidden="true">garage</span>
+<!-- ─── Hero: copy + trust points on the left, the "Hero slides" vehicles in a large card on the right ─── -->
+{% with backdrop=hero_vehicles.0.hero_image.url|default:hero_bg_images.0 %}
+<div class="relative -mx-3 sm:-mx-6 -mt-24 sm:-mt-28 px-3 sm:px-6 pt-24 sm:pt-28 pb-2 lg:pb-4 overflow-hidden">
+    {% if backdrop %}
+    <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <img src="{{ backdrop }}" alt="" class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-35"/>
+        <div class="absolute inset-0 bg-gradient-to-b from-background/30 via-background/60 to-background"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-background/80 via-background/20 to-transparent"></div>
     </div>
     {% endif %}
-    <!-- city ticker -->
-    {% if cities %}
-    <div class="tile b-glass p-6 {% if total_vehicle_count %}lg:col-span-4{% else %}lg:col-span-7{% endif %} lg:row-span-1 flex items-center gap-4 lift">
-        <span class="w-14 h-14 shrink-0 rounded-2xl bg-primary-fixed grid place-items-center"><span class="material-symbols-outlined text-primary text-3xl">location_on</span></span>
-        <div class="min-w-0"><div class="label-tiny text-outline">Pick up in · <span data-bslot>{{ cities|length }}</span> cit{{ cities|length|pluralize:"y,ies" }}</div><div class="font-extrabold text-2xl sm:text-3xl text-primary mt-2 tracking-tight truncate" data-cycle="{% for c in cities|slice:':8' %}{{ c.name }}{% if not forloop.last %}|{% endif %}{% endfor %}" data-every="1.8">{{ cities.0.name }}</div></div>
-    </div>
-    {% endif %}
-    <!-- booking search (real search: GET to the fleet list) -->
-    <form action="{% url 'vehicle_list' %}" method="get" class="tile b-glass p-5 sm:p-6 sm:col-span-2 lg:col-span-8 lg:row-span-2 flex flex-col justify-between gap-4" aria-label="Search vehicles">
-        <div class="flex items-center justify-between gap-3 flex-wrap">
-            <div class="flex bg-surface-container rounded-full p-1">
-                <label class="cursor-pointer"><input type="radio" name="rental_type" value="self_drive" class="peer sr-only" checked><span class="block px-4 py-2 rounded-full text-sm font-bold peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">Self-drive</span></label>
-                <label class="cursor-pointer"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only"><span class="block px-4 py-2 rounded-full text-sm font-bold peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors">With driver</span></label>
+    <section class="b-hero relative max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center" aria-label="Introduction">
+        <!-- copy -->
+        <div class="lg:col-span-5 lg:py-10">
+            {% if config.hero_subtitle %}<span class="label-tiny text-primary-container flex items-center gap-3">{{ config.hero_subtitle }}<span class="w-8 h-px bg-current opacity-50" aria-hidden="true"></span></span>{% endif %}
+            <h1 class="b-title mt-5 font-extrabold text-[42px] leading-[.98] sm:text-6xl lg:text-[64px] tracking-[-.045em] text-primary" data-no-split>{{ config.hero_title|default:"Rent Your Perfect Vehicle"|accent:"serif-i font-normal text-primary-container" }}</h1>
+            {% if config.hero_description %}<p class="mt-5 text-lg text-on-surface-variant max-w-md leading-relaxed">{{ config.hero_description }}</p>{% endif %}
+            <div class="mt-7 flex flex-wrap items-center gap-3">
+                <a href="{% url 'vehicle_list' %}" class="bg-primary text-on-primary px-7 py-4 rounded-full font-bold inline-flex items-center gap-2 m-shine group">{{ config.hero_cta_text|default:"Browse Fleet" }} <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span></a>
+                {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="sm:hidden bg-white/80 border border-outline-variant/50 px-6 py-4 rounded-full font-bold inline-flex items-center gap-2 text-primary"><span class="material-symbols-outlined">call</span>Call us</a>{% endif %}
             </div>
-            <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-on-surface-variant">
-                <input type="checkbox" name="same_location" value="1" checked class="rounded border-outline-variant text-primary focus:ring-primary"> Same-location return
-            </label>
+            {% with points=config.hero_highlights|lines %}
+            {% if points %}
+            <ul class="mt-9 grid grid-cols-3 gap-2 sm:gap-4 max-w-lg" role="list">
+                {% for p in points|slice:":3" %}
+                <li class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 text-[13px] sm:text-sm font-semibold text-on-surface leading-snug">
+                    <span class="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full bg-white shadow-sm grid place-items-center text-primary" aria-hidden="true"><span class="material-symbols-outlined text-[20px]">{% cycle "verified_user" "event_available" "support_agent" %}</span></span>
+                    {{ p }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
         </div>
-        <div class="grid grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2">
-            <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Pickup</span>
-                <select name="pickup_city" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"><option value="">Any city</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
-            <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">Drop</span>
-                <select name="drop_city" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"><option value="">Same as pickup</option>{% for city in cities %}<option value="{{ city.slug }}">{{ city.name }}</option>{% endfor %}</select></label>
-            <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">From</span><input type="date" name="pickup_date" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
-            <label class="bg-white rounded-2xl px-4 py-3"><span class="label-tiny text-outline block mb-1">To</span><input type="date" name="return_date" class="border-0 p-0 font-bold bg-transparent focus:ring-0 w-full text-sm"></label>
-            <button type="submit" class="col-span-2 lg:col-span-1 bg-primary text-on-primary rounded-2xl px-6 py-4 font-bold flex items-center justify-center gap-2 m-shine m-btn" data-magnetic>Search <span class="material-symbols-outlined">search</span></button>
+
+        <!-- slides: vehicles ticked "Hero slides"; with fewer than two, the Settings hero photos join in -->
+        <div class="lg:col-span-7">
+            <div class="tile relative aspect-[4/3.4] sm:aspect-[16/11] lg:aspect-[16/11.5] bg-primary shadow-2xl shadow-primary/20 ring-4 ring-white/80" data-no-parallax data-b-hero-card>
+                {% with n_v=hero_vehicles|length n_bg=hero_bg_images|length %}
+                <div class="b-slides absolute inset-0" data-b-slides>
+                    {% for v in hero_vehicles %}
+                    <a href="{% url 'vehicle_detail' v.slug %}" class="b-sl" aria-label="{{ v.full_name }}">
+                        <img src="{{ v.hero_image.url }}" alt="{{ v.full_name }}" class="b-sl-cover"/>
+                        <span class="b-sl-shade"></span>
+                        <span class="absolute left-5 right-28 sm:left-7 sm:right-40 bottom-5 sm:bottom-7 text-white">
+                            <span class="label-tiny opacity-80">{{ v.category.name|default:v.get_vehicle_type_display }}</span>
+                            <span class="block serif-i text-3xl sm:text-4xl mt-1.5 leading-tight">{{ v.full_name }}</span>
+                            <span class="block text-sm sm:text-base text-white/80 mt-1 truncate">{% if v.short_description %}{{ v.short_description }}{% else %}{{ v.get_transmission_display }}{% if v.fuel_type %} · {{ v.get_fuel_type_display }}{% endif %}{% if v.seating_capacity %} · {{ v.seating_capacity }} seats{% endif %}{% endif %}</span>
+                        </span>
+                    </a>
+                    {% endfor %}
+                    {% if n_v < 2 %}
+                    {% for url in hero_bg_images %}<div class="b-sl"><img src="{{ url }}" alt="" class="b-sl-cover"/><span class="b-sl-shade"></span>{% include "public/themes/bento/_hero_tile_caption.html" %}</div>{% endfor %}
+                    {% if n_v|add:n_bg < 2 %}<div class="b-sl"><img src="{% if config.hero_image %}{{ config.hero_image.url }}{% else %}{% static 'themes/img/palms.jpg' %}{% endif %}" alt="" class="b-sl-cover"/><span class="b-sl-shade"></span>{% include "public/themes/bento/_hero_tile_caption.html" %}</div>{% endif %}
+                    {% endif %}
+                </div>
+                {% endwith %}
+                <div class="absolute z-10 right-4 bottom-4 sm:right-6 sm:bottom-6 flex flex-col items-end gap-3" data-b-ctrl>
+                    <div class="flex gap-2">
+                        <button type="button" data-b-prev class="w-11 h-11 rounded-full bg-white/20 backdrop-blur border border-white/40 text-white grid place-items-center hover:bg-white/35 transition-colors" aria-label="Previous slide"><span class="material-symbols-outlined">arrow_back</span></button>
+                        <button type="button" data-b-next class="w-11 h-11 rounded-full bg-white text-primary grid place-items-center hover:bg-primary-fixed transition-colors" aria-label="Next slide"><span class="material-symbols-outlined">arrow_forward</span></button>
+                    </div>
+                    <div class="b-sl-dots flex gap-1.5" aria-hidden="true"></div>
+                </div>
+            </div>
         </div>
-        <p class="text-xs text-on-surface-variant font-semibold">Free cancellation · No hidden charges · 24×7 customer support</p>
-    </form>
-    <!-- wedding mini -->
-    <a href="{% url 'wedding_cars' %}" class="tile sm:col-span-2 lg:col-span-4 lg:row-span-2 min-h-[220px] group block" data-no-parallax>
-        <img src="{% static 'themes/img/rolls-palms.jpg' %}" alt="" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-110"/>
-        <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
-        <div class="absolute inset-0 p-6 flex flex-col justify-between text-white">
-            <span class="label-tiny bg-white/20 backdrop-blur px-3 py-2 rounded-full self-start">Wedding fleet</span>
-            <div class="flex items-end justify-between gap-4"><div class="serif-i text-3xl leading-tight">For the day you'll<br/>never forget.</div><span class="w-11 h-11 shrink-0 rounded-full bg-primary-fixed text-primary grid place-items-center transition-transform duration-500 group-hover:-rotate-45"><span class="material-symbols-outlined">arrow_forward</span></span></div>
-        </div>
-    </a>
-</section>
+    </section>
+</div>
+{% endwith %}
 
 <!-- ─── Occasion bento ─── -->
 {% if categories %}
-<section class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+<section class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
         <div><span class="label-tiny text-primary-container block">Explore by occasion</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Find your <span class="serif-i">drive.</span></h2></div>
         <a href="{% url 'vehicle_list' %}" class="font-bold text-primary inline-flex items-center gap-2 hover:gap-3 transition-all">All {{ categories|length }} categor{{ categories|length|pluralize:"y,ies" }} <span class="material-symbols-outlined">arrow_forward</span></a>
@@ -251,7 +231,7 @@
 
 <!-- ─── Featured fleet bento ─── -->
 {% if featured_vehicles %}
-<section id="fleet" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+<section id="fleet" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
         <div><span class="label-tiny text-primary-container block">Featured this week</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">The new <span class="serif-i">collection.</span></h2></div>
         <div class="flex flex-wrap gap-2">
@@ -291,7 +271,7 @@
 {% endif %}
 
 <!-- ─── How it works: sticky phone ─── -->
-<section id="how" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+<section id="how" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
     <div class="tile b-glass p-6 sm:p-10 lg:p-14" style="overflow:clip">
         <div class="grid lg:grid-cols-2 gap-10 lg:gap-16">
             <div class="hidden lg:block">
@@ -378,7 +358,7 @@
 
 <!-- ─── Wedding: copy left, a large gold-edged card, a numbered thumbnail rail (mockup 2026-10-10). Wedding-service
      vehicles rotate here; with none yet, the theme's wedding photos stand in. ─── -->
-<section id="wedding" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+<section id="wedding" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
     <div class="wd tile p-6 sm:p-10 lg:p-12" data-wd>
         <div class="absolute inset-0 opacity-40 pointer-events-none" style="background:radial-gradient(45% 55% at 92% 0%,rgba(242,201,138,.35),transparent 70%)"></div>
         <div class="relative grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 lg:gap-12 items-center">
@@ -445,7 +425,7 @@
 
 <!-- ─── Luxury accordion (premium vehicles) ─── -->
 {% if premium_vehicles %}
-<section id="luxury" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+<section id="luxury" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
     <div class="tile bg-[#141611] text-white p-5 sm:p-8 lg:p-10">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
             <div><span class="label-tiny text-primary-fixed block">Elite collection</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em]">When ordinary <span class="serif-i text-primary-fixed">won't do.</span></h2></div>
@@ -469,7 +449,7 @@
 {% endif %}
 
 <!-- ─── Why + cities bento ─── -->
-<section id="why" class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+<section id="why" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
     <div class="mb-8"><span class="label-tiny text-primary-container block">Why book with us</span><h2 class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">Crafted for <span class="serif-i">convenience.</span></h2></div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 lg:auto-rows-[190px]" data-deal>
         <div class="tile b-glass p-6 lg:col-span-4 flex flex-col justify-between lift" data-tilt="0.6"><span class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined">local_shipping</span></span><div><div class="font-extrabold text-xl text-primary">Doorstep delivery</div><div class="text-on-surface-variant mt-1">We bring the car to you.</div></div></div>
@@ -510,11 +490,11 @@
 <!-- ─── Testimonial ─── -->
 {% if testimonials %}
 {% with t=testimonials.0 %}
-<section class="max-w-screen-xl mx-auto pt-24 lg:pt-32">
+<section class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32">
     <div class="tile b-glass p-8 sm:p-14 lg:p-20 grid lg:grid-cols-12 gap-8 items-center">
         <span class="material-symbols-outlined text-7xl text-primary-container lg:col-span-1 self-start" style="font-variation-settings:'FILL' 1" aria-hidden="true">format_quote</span>
         <div class="lg:col-span-11">
-            <p class="font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-[-.035em] leading-[1.05] text-primary" data-scrub-text data-no-split>"{{ t.quote }}"</p>
+            <p class="font-extrabold text-2xl sm:text-5xl lg:text-6xl tracking-[-.035em] leading-[1.05] text-primary" data-scrub-text data-no-split>"{{ t.quote }}"</p>
             <div class="mt-10 flex items-center gap-4" data-reveal>
                 {% if t.photo %}<img src="{{ t.photo.url }}" alt="" class="w-12 h-12 rounded-full object-cover"/>{% else %}<span class="w-12 h-12 rounded-full bg-primary-fixed text-primary grid place-items-center font-extrabold" aria-hidden="true">{{ t.name|slice:":1"|upper }}</span>{% endif %}
                 <div><div class="font-extrabold">{{ t.name }}</div>{% if t.role %}<div class="label-tiny text-outline mt-1">{{ t.role }}</div>{% endif %}</div>
@@ -526,7 +506,7 @@
 {% endif %}
 
 <!-- ─── Enquiry bento ─── -->
-<section id="enquiry" class="max-w-screen-xl mx-auto pt-24 lg:pt-32 pb-16">
+<section id="enquiry" class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-32 pb-16">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
         <div class="tile bg-primary text-on-primary p-7 sm:p-10 lg:col-span-5 flex flex-col justify-between gap-8 min-h-[360px]">
             <div><span class="label-tiny text-primary-fixed block">Get in touch</span><h2 class="mt-3 font-extrabold text-4xl sm:text-5xl tracking-[-.04em]">Send us an <span class="serif-i text-primary-fixed">enquiry.</span></h2><p class="mt-4 text-white/70 text-lg">Fill the form and our team will get back to you.</p></div>
@@ -566,28 +546,25 @@
     show(0);
 })();
 
-/* hero photo tile: next slide every 5.5s once its photo has loaded; paused off screen or in a hidden tab */
+/* hero card: next slide every 5.5s once its photo has loaded; arrows, swipe, and pausing off screen or in a hidden tab */
 (() => {
     const host = document.querySelector("[data-b-slides]"); if (!host) return;
-    const slides = [...host.children], dots = host.parentElement.querySelector(".b-sl-dots");
+    const card = host.closest("[data-b-hero-card]"), slides = [...host.children], dots = card.querySelector(".b-sl-dots");
     const marks = slides.map(() => dots.appendChild(document.createElement("span")));
     const loaded = s => [...s.querySelectorAll("img")].every(im => im.complete && im.naturalWidth > 0);
-    /* a vehicle photo close to the tile's shape fills the tile; otherwise it sits whole on its blurred backdrop */
-    const fit = () => slides.forEach(sl => { const im = sl.querySelector(".b-sl-car"); if (!im || !im.naturalWidth) return;
-        const ar = im.naturalWidth / im.naturalHeight, r = ar / (host.clientWidth / host.clientHeight), on = r > .62 && r < 1.6;
-        sl.classList.toggle("fit", on);
-        /* wider than the tile: exactly as tall as the photo, so its faded top and bottom melt into the backdrop */
-        im.style.height = !on && r >= 1.6 ? Math.min(host.clientHeight, host.clientWidth / ar) + "px" : ""; });
-    slides.forEach(sl => sl.querySelector(".b-sl-car")?.addEventListener("load", fit));
-    addEventListener("resize", fit); fit();
     let i = 0, timer = 0, visible = true;
-    const show = n => { i = n; slides.forEach((s, k) => s.classList.toggle("on", k === n)); marks.forEach((m, k) => m.classList.toggle("on", k === n)); };
+    const show = n => { i = (n + slides.length) % slides.length; slides.forEach((s, k) => s.classList.toggle("on", k === i)); marks.forEach((m, k) => m.classList.toggle("on", k === i)); };
     show(0); host.classList.add("ready");
-    if (slides.length < 2) { dots.innerHTML = ""; return; }
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (slides.length < 2) { card.querySelector("[data-b-ctrl]").remove(); return; }
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     const next = () => { for (let k = 1; k < slides.length; k++) { const n = (i + k) % slides.length; if (loaded(slides[n])) return show(n); } };
-    const run = () => { clearInterval(timer); if (visible && !document.hidden) timer = setInterval(next, 5500); };
-    if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; run(); }).observe(host);
+    const run = () => { clearInterval(timer); if (!reduce && visible && !document.hidden) timer = setInterval(next, 5500); };
+    card.querySelector("[data-b-prev]").addEventListener("click", () => { show(i - 1); run(); });
+    card.querySelector("[data-b-next]").addEventListener("click", () => { show(i + 1); run(); });
+    let x0 = null;
+    card.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, { passive: true });
+    card.addEventListener("touchend", e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 40) { show(i + (dx < 0 ? 1 : -1)); run(); } x0 = null; });
+    if ("IntersectionObserver" in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; run(); }).observe(card);
     document.addEventListener("visibilitychange", run);
     run();
 })();

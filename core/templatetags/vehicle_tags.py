@@ -41,6 +41,12 @@ def whatsapp_vehicle_url(vehicle, number=None):
 
 
 @register.filter
+def lines(text):
+    """Non-empty lines of a text field, stripped."""
+    return [s.strip() for s in str(text or "").splitlines() if s.strip()]
+
+
+@register.filter
 def inr(value):
     """Format number as Indian currency: 1,23,456"""
     if value is None:

@@ -58,6 +58,8 @@ class SiteConfig(models.Model):
     hero_subtitle = models.CharField(max_length=500, blank=True, default="Premium Vehicle Rental")
     hero_description = models.CharField(max_length=500, blank=True, default="Explore our premium fleet. Flexible daily, weekly, and monthly rentals with 24/7 roadside support.")
     hero_cta_text = models.CharField(max_length=100, default="Browse Fleet")
+    hero_highlights = models.TextField(blank=True, default="Well-maintained vehicles\nFlexible rental plans\nTrusted local support",
+                                       help_text="Short trust points under the hero button, one per line (up to 3)")
     hero_image = models.ImageField(upload_to="site/hero/", blank=True, help_text="Hero background/side image")
     hero_bg_1 = models.ImageField(upload_to="site/hero/", blank=True, help_text="Hero background slide 1")
     hero_bg_2 = models.ImageField(upload_to="site/hero/", blank=True, help_text="Hero background slide 2")

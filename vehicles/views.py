@@ -140,7 +140,7 @@ def vehicle_detail(request, slug):
     images = vehicle.images.order_by("display_order")
     related = (
         Vehicle.objects.filter(is_published=True, category=vehicle.category)
-        .exclude(pk=vehicle.pk, status="inactive")
+        .exclude(pk=vehicle.pk).exclude(status="inactive")
         .select_related("category")[:4]
     )
     addons = BookingAddon.objects.filter(is_active=True)

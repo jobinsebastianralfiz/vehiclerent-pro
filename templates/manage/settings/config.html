@@ -198,6 +198,11 @@
                         <input id="f-hero_description" type="text" name="hero_description" value="{{ form.hero_description.value|default:'' }}" placeholder="Short description below the title"/>
                         {% if form.hero_description.errors %}<p class="af-err">{{ form.hero_description.errors|join:" " }}</p>{% endif %}
                     </div>
+                    <div class="span-all">
+                        <label class="af-label" for="f-hero_highlights">Hero Highlights</label>
+                        <textarea id="f-hero_highlights" name="hero_highlights" rows="3" placeholder="One per line, e.g. Well-maintained vehicles">{{ form.hero_highlights.value|default:'' }}</textarea>
+                        {% if form.hero_highlights.errors %}<p class="af-err">{{ form.hero_highlights.errors|join:" " }}</p>{% else %}<p class="af-help">Up to 3 short trust points shown under the hero button (Bento theme), one per line.</p>{% endif %}
+                    </div>
                 </div>
             </div>
             <div class="af-sec">
