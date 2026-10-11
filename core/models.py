@@ -154,3 +154,49 @@ class SiteSettings(models.Model):
             return cls.objects.get(key=key).value
         except cls.DoesNotExist:
             return default
+
+
+class PageView(models.Model):
+    """One public page view, recorded by core.analytics.PageViewMiddleware. No IP is stored: `visitor` is a
+    daily-rotating hash, enough to count unique visitors per day and nothing more."""
+    SOURCE_CHOICES = [
+        ("direct", "Direct"), ("google", "Google"), ("bing", "Bing"), ("whatsapp", "WhatsApp"),
+        ("facebook", "Facebook"), ("instagram", "Instagram"), ("youtube", "YouTube"),
+        ("ai", "AI assistants"), ("internal", "Within the site"), ("other", "Other sites"),
+    ]
+    DEVICE_CHOICES = [("mobile", "Mobile"), ("tablet", "Tablet"), ("desktop", "Desktop")]
+
+    path = models.CharField(max_length=300, db_index=True)
+    vehicle_slug = models.SlugField(max_length=200, blank=True, db_index=True)
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default="direct")
+    referrer_host = models.CharField(max_length=200, blank=True)
+    device = models.CharField(max_length=10, choices=DEVICE_CHOICES, default="desktop")
+    visitor = models.CharField(max_length=16, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.path} ({self.source})"
+
+
+class SpeedResult(models.Model):
+    """Latest Google PageSpeed Insights result for a page and strategy (mobile/desktop), saved from the admin."""
+    path = models.CharField(max_length=300)
+    strategy = models.CharField(max_length=10, choices=[("mobile", "Mobile"), ("desktop", "Desktop")])
+    score = models.PositiveSmallIntegerField()
+    lcp_ms = models.PositiveIntegerField(null=True, blank=True)
+    cls = models.DecimalField(max_digits=6, decimal_places=3, null=True, blank=True)
+    tbt_ms = models.PositiveIntegerField(null=True, blank=True)
+    tested_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = [("path", "strategy")]
+
+    @property
+    def lcp_s(self):
+        return round(self.lcp_ms / 1000, 1) if self.lcp_ms else None
+
+    def __str__(self):
+        return f"{self.path} {self.strategy}: {self.score}"

@@ -1,0 +1,184 @@
+{% extends "manage/base_admin.html" %}
+{% load vehicle_tags %}
+
+{% block title %}Performance - {{ BUSINESS_NAME }}{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-2xl sm:text-[32px] font-extrabold tracking-tight text-stone-900">Performance</h1>
+        <p class="text-stone-500 mt-1">How visitors find and use your website, and how fast it loads. {{ start|date:"j M" }} – {{ today|date:"j M Y" }}.</p>
+    </div>
+    <div class="inline-flex rounded-2xl bg-white p-1 shadow-sm ring-1 ring-black/5 self-start" role="tablist" aria-label="Period">
+        {% for d, label in periods %}
+        <a href="?days={{ d }}" class="px-4 py-2 rounded-xl text-sm font-semibold {% if d == days %}bg-[#145c38] text-white{% else %}text-stone-600 hover:bg-stone-50{% endif %}" {% if d == days %}aria-current="page"{% endif %}>{{ label }}</a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- ─── Headline numbers ─── -->
+<div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
+    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+        <div class="flex items-center justify-between text-stone-500 text-sm font-semibold">Page views <span class="material-symbols-outlined text-[20px]">visibility</span></div>
+        <div class="mt-2 text-3xl font-extrabold text-stone-900">{{ total }}</div>
+        <div class="mt-1 text-xs font-semibold {% if change is None %}text-stone-400{% elif change >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">{% if change is None %}No earlier data yet{% else %}{% if change >= 0 %}+{% endif %}{{ change }}% vs previous {{ days }} days{% endif %}</div>
+    </div>
+    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+        <div class="flex items-center justify-between text-stone-500 text-sm font-semibold">Visitors <span class="material-symbols-outlined text-[20px]">group</span></div>
+        <div class="mt-2 text-3xl font-extrabold text-stone-900">{{ visitors }}</div>
+        <div class="mt-1 text-xs text-stone-400">Unique per day</div>
+    </div>
+    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+        <div class="flex items-center justify-between text-stone-500 text-sm font-semibold">Enquiries <span class="material-symbols-outlined text-[20px]">mail</span></div>
+        <div class="mt-2 text-3xl font-extrabold text-stone-900">{{ n_enq }}</div>
+        <div class="mt-1 text-xs text-stone-400">From all sources</div>
+    </div>
+    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+        <div class="flex items-center justify-between text-stone-500 text-sm font-semibold">Conversion <span class="material-symbols-outlined text-[20px]">trending_up</span></div>
+        <div class="mt-2 text-3xl font-extrabold text-stone-900">{{ conversion }}%</div>
+        <div class="mt-1 text-xs text-stone-400">Enquiries per visitor</div>
+    </div>
+    <div class="col-span-2 lg:col-span-1 rounded-2xl bg-[#0a2e1d] text-white p-5 shadow-sm">
+        <div class="flex items-center justify-between text-white/70 text-sm font-semibold">From AI assistants <span class="material-symbols-outlined text-[20px]">smart_toy</span></div>
+        <div class="mt-2 text-3xl font-extrabold">{{ ai_views }}</div>
+        <div class="mt-1 text-xs text-white/60">ChatGPT, Perplexity, Claude, Gemini</div>
+    </div>
+</div>
+
+<!-- ─── Daily views ─── -->
+<div class="rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-black/5 mb-6">
+    <div class="flex items-center justify-between mb-4"><h2 class="font-bold text-stone-900">Page views per day</h2><span class="text-xs text-stone-400">Busiest day: {{ peak }}</span></div>
+    {% if total %}
+    <div class="flex items-end gap-[3px] h-40" role="img" aria-label="Bar chart of page views per day">
+        {% for d, n in daily %}
+        <div class="group relative flex-1 h-full flex items-end">
+            <div class="w-full rounded-t-[4px] {% if n %}bg-[#1f8a52] group-hover:bg-[#145c38]{% else %}bg-stone-100{% endif %}" style="height: {% widthratio n peak 100 %}%; min-height: 3px"></div>
+            <span class="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block whitespace-nowrap rounded-lg bg-stone-900 px-2 py-1 text-[11px] font-semibold text-white z-10">{{ d|date:"D j M" }}: {{ n }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="flex justify-between mt-2 text-[11px] text-stone-400"><span>{{ start|date:"j M" }}</span><span>{{ today|date:"j M" }}</span></div>
+    {% else %}
+    <p class="py-10 text-center text-stone-500">No visits recorded yet in this period. Tracking started with this update, so numbers build up from today. Your own visits while logged in aren't counted.</p>
+    {% endif %}
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-6">
+    <!-- top pages -->
+    <div class="xl:col-span-2 rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-black/5">
+        <h2 class="font-bold text-stone-900 mb-4">Top pages</h2>
+        {% if pages %}
+        <div class="overflow-x-auto"><table class="w-full text-sm">
+            <thead><tr class="text-left text-xs uppercase tracking-wide text-stone-400"><th class="pb-2 font-semibold">Page</th><th class="pb-2 font-semibold text-right">Views</th><th class="pb-2 font-semibold text-right">Visitors</th></tr></thead>
+            <tbody class="divide-y divide-stone-100">
+            {% for p in pages %}
+            <tr><td class="py-2.5 pr-3"><a href="{{ p.path }}" target="_blank" rel="noopener" class="font-medium text-stone-800 hover:text-[#145c38] break-all">{{ p.path }}</a></td><td class="py-2.5 text-right font-semibold text-stone-900">{{ p.n }}</td><td class="py-2.5 text-right text-stone-500">{{ p.u }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table></div>
+        {% else %}<p class="text-sm text-stone-500">No data yet.</p>{% endif %}
+    </div>
+
+    <!-- sources + devices -->
+    <div class="rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-black/5">
+        <h2 class="font-bold text-stone-900 mb-4">Where visitors come from</h2>
+        {% if sources %}
+        <ul class="space-y-3" role="list">
+            {% for s in sources %}
+            <li><div class="flex justify-between text-sm"><span class="font-medium text-stone-700">{{ s.label }}</span><span class="font-semibold text-stone-900">{{ s.n }} <span class="text-stone-400 font-normal">· {% widthratio s.n total 100 %}%</span></span></div>
+                <div class="mt-1.5 h-2 rounded-full bg-stone-100"><div class="h-2 rounded-full {% if s.key == 'ai' %}bg-[#0a2e1d]{% else %}bg-[#1f8a52]{% endif %}" style="width: {% widthratio s.n total 100 %}%"></div></div></li>
+            {% endfor %}
+        </ul>
+        {% if ai_hosts %}<p class="mt-4 text-xs text-stone-500">AI referrals: {% for a in ai_hosts %}{{ a.referrer_host|default:"tagged link" }} ({{ a.n }}){% if not forloop.last %}, {% endif %}{% endfor %}</p>{% endif %}
+        <h3 class="font-bold text-stone-900 mt-7 mb-3">Devices</h3>
+        <div class="flex gap-2">{% for d in devices %}<div class="flex-1 rounded-xl bg-stone-50 p-3 text-center"><div class="text-lg font-extrabold text-stone-900">{% widthratio d.n total 100 %}%</div><div class="text-xs text-stone-500">{{ d.label }}</div></div>{% endfor %}</div>
+        {% else %}<p class="text-sm text-stone-500">No data yet.</p>{% endif %}
+    </div>
+</div>
+
+<!-- ─── Cars ─── -->
+<div class="rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-black/5 mb-6">
+    <h2 class="font-bold text-stone-900">Cars: views vs enquiries</h2>
+    <p class="text-sm text-stone-500 mb-4">A car with many views but few enquiries may need better photos, a description or a sharper price.</p>
+    <div class="overflow-x-auto"><table class="w-full text-sm">
+        <thead><tr class="text-left text-xs uppercase tracking-wide text-stone-400"><th class="pb-2 font-semibold">Car</th><th class="pb-2 font-semibold text-right">Views</th><th class="pb-2 font-semibold text-right">Enquiries</th><th class="pb-2 font-semibold text-right">Rate</th></tr></thead>
+        <tbody class="divide-y divide-stone-100">
+        {% for c in cars %}
+        <tr><td class="py-2.5 pr-3"><a href="{% url 'vehicle_wizard' c.v.pk 1 %}" class="font-medium text-stone-800 hover:text-[#145c38]">{{ c.v.full_name }}</a></td><td class="py-2.5 text-right font-semibold text-stone-900">{{ c.views }}</td><td class="py-2.5 text-right text-stone-700">{{ c.enquiries }}</td><td class="py-2.5 text-right text-stone-500">{% if c.views %}{% widthratio c.enquiries c.views 100 %}%{% else %}–{% endif %}</td></tr>
+        {% empty %}<tr><td colspan="4" class="py-6 text-center text-stone-500">No published cars.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+</div>
+
+<!-- ─── Page speed ─── -->
+<div class="rounded-2xl bg-white p-5 sm:p-6 shadow-sm ring-1 ring-black/5" id="speed">
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
+        <div><h2 class="font-bold text-stone-900">Page speed</h2><p class="text-sm text-stone-500">Google PageSpeed scores (0–100). 90+ is good, 50–89 needs work, under 50 is slow. A test takes about 20 seconds per page.</p></div>
+        <button type="button" id="speed-all" class="shrink-0 inline-flex items-center gap-2 rounded-xl bg-[#145c38] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0f4a2d]"><span class="material-symbols-outlined text-[18px]">speed</span>Test all pages</button>
+    </div>
+    <div class="overflow-x-auto"><table class="w-full text-sm">
+        <thead><tr class="text-left text-xs uppercase tracking-wide text-stone-400"><th class="pb-2 font-semibold">Page</th><th class="pb-2 font-semibold text-center">Mobile</th><th class="pb-2 font-semibold text-center">Desktop</th><th class="pb-2 font-semibold">Largest paint (mobile)</th><th class="pb-2 font-semibold">Last test</th><th></th></tr></thead>
+        <tbody class="divide-y divide-stone-100">
+        {% for r in speed_rows %}
+        <tr data-speed-row data-path="{{ r.path }}">
+            <td class="py-3 pr-3"><div class="font-medium text-stone-800">{{ r.label }}</div><div class="text-xs text-stone-400 break-all">{{ r.path }}</div></td>
+            <td class="py-3 text-center" data-cell="mobile">{% if r.mobile %}<span class="inline-grid place-items-center w-11 h-11 rounded-full text-sm font-extrabold {% if r.mobile.score >= 90 %}bg-emerald-100 text-emerald-700{% elif r.mobile.score >= 50 %}bg-amber-100 text-amber-700{% else %}bg-rose-100 text-rose-700{% endif %}">{{ r.mobile.score }}</span>{% else %}<span class="text-stone-300">–</span>{% endif %}</td>
+            <td class="py-3 text-center" data-cell="desktop">{% if r.desktop %}<span class="inline-grid place-items-center w-11 h-11 rounded-full text-sm font-extrabold {% if r.desktop.score >= 90 %}bg-emerald-100 text-emerald-700{% elif r.desktop.score >= 50 %}bg-amber-100 text-amber-700{% else %}bg-rose-100 text-rose-700{% endif %}">{{ r.desktop.score }}</span>{% else %}<span class="text-stone-300">–</span>{% endif %}</td>
+            <td class="py-3 text-stone-600" data-cell="lcp">{% if r.mobile.lcp_ms %}{{ r.mobile.lcp_s }} s{% else %}–{% endif %}</td>
+            <td class="py-3 text-stone-500 text-xs" data-cell="when">{% if r.mobile %}{{ r.mobile.tested_at|timesince }} ago{% else %}Not tested{% endif %}</td>
+            <td class="py-3 text-right"><button type="button" data-speed-test class="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-semibold text-stone-700 hover:border-[#145c38] hover:text-[#145c38]">Test</button></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+    <p id="speed-msg" class="mt-3 text-xs text-stone-500" aria-live="polite"></p>
+</div>
+
+<script>
+/* Page speed: the browser asks Google PageSpeed Insights directly, then saves the scores here */
+(() => {
+    const site = "{{ site_url|escapejs }}", key = "{{ pagespeed_key|escapejs }}", csrf = "{{ csrf_token }}";
+    const msg = document.getElementById("speed-msg");
+    const pill = s => `<span class="inline-grid place-items-center w-11 h-11 rounded-full text-sm font-extrabold ${s >= 90 ? "bg-emerald-100 text-emerald-700" : s >= 50 ? "bg-amber-100 text-amber-700" : "bg-rose-100 text-rose-700"}">${s}</span>`;
+    async function run(path, strategy) {
+        const u = new URL("https://www.googleapis.com/pagespeedonline/v5/runPagespeed");
+        u.searchParams.set("url", site + path); u.searchParams.set("strategy", strategy); u.searchParams.set("category", "performance");
+        if (key) u.searchParams.set("key", key);
+        const r = await fetch(u); const d = await r.json();
+        if (!r.ok || !d.lighthouseResult) throw new Error(d.error?.message || "PageSpeed did not return a result");
+        const a = d.lighthouseResult.audits;
+        const res = { score: Math.round(d.lighthouseResult.categories.performance.score * 100), lcp_ms: Math.round(a["largest-contentful-paint"]?.numericValue || 0),
+                      cls: (a["cumulative-layout-shift"]?.numericValue || 0).toFixed(3), tbt_ms: Math.round(a["total-blocking-time"]?.numericValue || 0) };
+        const body = new FormData(); body.append("path", path); body.append("strategy", strategy);
+        Object.entries(res).forEach(([k, v]) => body.append(k, v));
+        await fetch("{% url 'performance_speed_save' %}", { method: "POST", body, headers: { "X-CSRFToken": csrf } });
+        return res;
+    }
+    async function testRow(row) {
+        const btn = row.querySelector("[data-speed-test]"), path = row.dataset.path;
+        btn.disabled = true; btn.textContent = "Testing…";
+        try {
+            for (const strategy of ["mobile", "desktop"]) {
+                row.querySelector(`[data-cell=${strategy}]`).innerHTML = '<span class="text-xs text-stone-400">…</span>';
+                const res = await run(path, strategy);
+                row.querySelector(`[data-cell=${strategy}]`).innerHTML = pill(res.score);
+                if (strategy === "mobile") row.querySelector("[data-cell=lcp]").textContent = (res.lcp_ms / 1000).toFixed(1) + " s";
+            }
+            row.querySelector("[data-cell=when]").textContent = "just now";
+            btn.textContent = "Test";
+        } catch (e) {
+            msg.textContent = `Could not test ${path}: ${e.message}. Google limits free tests; wait a minute and try again.`;
+            btn.textContent = "Retry";
+        }
+        btn.disabled = false;
+    }
+    document.querySelectorAll("[data-speed-row]").forEach(row => row.querySelector("[data-speed-test]").addEventListener("click", () => testRow(row)));
+    document.getElementById("speed-all").addEventListener("click", async e => {
+        e.currentTarget.disabled = true; msg.textContent = "Testing every page, one after another. Keep this tab open.";
+        for (const row of document.querySelectorAll("[data-speed-row]")) await testRow(row);
+        msg.textContent = "Done."; e.currentTarget.disabled = false;
+    });
+})();
+</script>
+{% endblock %}

@@ -7,6 +7,8 @@ from decouple import config, Csv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-dev-key-change-in-production")
+# Optional Google PageSpeed Insights API key for the admin Performance page (works without one, at a lower rate limit)
+PAGESPEED_API_KEY = config("PAGESPEED_API_KEY", default="")
 DEBUG = config("DEBUG", default=True, cast=bool)
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 
@@ -47,6 +49,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.AdminLoginRequiredMiddleware",
+    "core.analytics.PageViewMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"

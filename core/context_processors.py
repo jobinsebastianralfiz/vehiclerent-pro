@@ -78,6 +78,8 @@ ADMIN_NAV = [
     {"label": "Customers", "icon": "group", "url": "customer_list", "match": ["customer"]},
     {"label": "Allocations", "icon": "event_available", "url": "allocation_list", "match": ["allocation"]},
     {"label": "Enquiries", "icon": "mail", "url": "enquiry_list", "match": ["enquiry"], "badge": True},
+    {"label": "Performance", "icon": "monitoring", "url": "performance", "match": ["performance"]},
+    {"label": "Sitemap & SEO", "icon": "account_tree", "url": "sitemap_admin", "match": ["sitemap_admin"]},
     {"label": "Settings", "icon": "settings", "url": "site_config_edit", "match": ["site_config", "testimonial"]},
 ]
 
