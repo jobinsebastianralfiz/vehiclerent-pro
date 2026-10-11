@@ -241,7 +241,7 @@ def llms_txt(request):
         "Car rental company in Kerala, India: self-drive and chauffeur-driven cars, SUVs, luxury cars and "
         "decorated wedding cars, with daily, weekly and monthly plans.")
     out = [f"# {name}", "", f"> {about}", ""]
-    contact = [("Phone", config.phone if config else ""), ("WhatsApp", f"+{config.whatsapp_number}" if config and config.whatsapp_number else ""),
+    contact = [("Phone", config.phone if config else ""), ("WhatsApp", "+" + config.whatsapp_number.lstrip("+") if config and config.whatsapp_number else ""),
                ("Email", config.email if config else ""), ("Address", config.address if config else ""),
                ("Hours", config.business_hours if config else "")]
     out += [f"- {k}: {v}" for k, v in contact if v] + [""]
