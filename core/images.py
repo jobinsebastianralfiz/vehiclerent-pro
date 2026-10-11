@@ -57,3 +57,19 @@ def shrink_uploads(instance, *fields):
         res = shrunk(f.file)
         if res:
             f.save(res[0], res[1], save=False)
+
+
+SHARE_SIZE = (1200, 630)
+
+
+def share_image(file):
+    """(new_name, ContentFile) for a 1200x630 JPEG crop of the image: the size WhatsApp, Facebook and X preview best."""
+    try:
+        file.seek(0)
+        im = ImageOps.exif_transpose(Image.open(file))
+    except Exception:
+        return None
+    im = ImageOps.fit(im.convert("RGB"), SHARE_SIZE, Image.LANCZOS, centering=(0.5, 0.5))
+    out = io.BytesIO()
+    im.save(out, "JPEG", quality=82, optimize=True, progressive=True)
+    return os.path.splitext(os.path.basename(file.name))[0] + "-share.jpg", ContentFile(out.getvalue())

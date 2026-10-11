@@ -1,7 +1,7 @@
 {% extends "public/base_public.html" %}
 {% load static vehicle_tags %}
 
-{% block title %}{{ BUSINESS_NAME }} | {{ config.tagline|default:"Premium Car Rentals in Kerala" }}{% endblock %}
+{% block title %}{% if config.meta_title %}{{ config.meta_title }}{% else %}{{ BUSINESS_NAME }} | {{ config.tagline|default:"Premium Car Rentals in Kerala" }}{% endif %}{% endblock %}
 
 {% block extra_css %}
 <style>

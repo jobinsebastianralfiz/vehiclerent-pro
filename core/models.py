@@ -103,6 +103,15 @@ class SiteConfig(models.Model):
         self.pk = 1
         from .images import shrink_uploads
         shrink_uploads(self, "hero_image", "hero_bg_1", "hero_bg_2", "hero_bg_3", "about_image")
+        # a newly uploaded share image becomes an exact 1200x630 JPEG
+        if self.og_image and not getattr(self.og_image, "_committed", True):
+            from .images import share_image
+            res = share_image(self.og_image.file)
+            if res:
+                self.og_image.save(res[0], res[1], save=False)
+        # pasted SEO text arrives with line breaks; search engines and share previews want one line
+        for f in ("meta_title", "meta_description", "meta_keywords"):
+            setattr(self, f, " ".join((getattr(self, f) or "").split()))
         super().save(*args, **kwargs)
 
     @classmethod

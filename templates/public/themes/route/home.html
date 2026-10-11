@@ -8,7 +8,7 @@ leave no stop behind. Palette: tokens from core/themes.py (surface = sand, terti
 plus amber #e39b3c, amber-soft #f6d9a8, sunset #d9692f and teal-deep #0f2e2c as literals.
 {% endcomment %}
 
-{% block title %}{{ BUSINESS_NAME }} | {{ config.tagline|default:"Premium Car Rentals in Kerala" }}{% endblock %}
+{% block title %}{% if config.meta_title %}{{ config.meta_title }}{% else %}{{ BUSINESS_NAME }} | {{ config.tagline|default:"Premium Car Rentals in Kerala" }}{% endif %}{% endblock %}
 
 {% block navbar %}{% include "public/themes/route/navbar.html" %}{% endblock %}
 
