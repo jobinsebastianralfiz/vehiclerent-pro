@@ -35,6 +35,7 @@ def site_settings(request):
         "THEME_PREVIEW": theme["key"] != (config.theme if config else theme["key"]),
         "THEME_NAVBAR": [f"public/themes/{theme['key']}/navbar.html", "public/includes/navbar.html"],
         "ANTISPAM_TOKEN": SimpleLazyObject(antispam.make_token),
+        "TURNSTILE_SITE_KEY": settings.TURNSTILE_SITE_KEY,
         "THEME_FOOTER": [f"public/themes/{theme['key']}/footer.html", "public/includes/footer.html"],
         "SITE_URL": f"{request.scheme}://{request.get_host()}",
         "THEME_CSS": css_vars(theme["key"], admin=request.path.startswith("/manage/")),

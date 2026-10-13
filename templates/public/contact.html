@@ -93,7 +93,7 @@ Map: the Settings embed when set, else a Google map of the business address (con
             loading = true; errorMsg = '';
             fetch($el.action, { method: 'POST', body: new FormData($el), headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                 .then(r => r.json())
-                .then(d => { loading = false; if (d.success) { submitted = true; if (d.whatsapp_url) window.open(d.whatsapp_url, '_blank', 'noopener'); } else { const e = d.errors || {}; errorMsg = (e.__all__ || Object.values(e)[0] || ['Please check the form and try again.'])[0]; } })
+                .then(d => { loading = false; if (d.success) { submitted = true; if (d.whatsapp_url) window.open(d.whatsapp_url, '_blank', 'noopener'); } else { window.turnstile && $el.querySelector('.cf-turnstile') && turnstile.reset($el.querySelector('.cf-turnstile')); const e = d.errors || {}; errorMsg = (e.__all__ || Object.values(e)[0] || ['Please check the form and try again.'])[0]; } })
                 .catch(() => { loading = false; $el.submit(); });">
             {% csrf_token %}{% include "public/includes/_antispam.html" %}
             <input type="hidden" name="source" value="website"/>

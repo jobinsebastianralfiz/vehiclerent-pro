@@ -13,6 +13,7 @@
                     window.open(waUrl, '_blank', 'noopener');
                 }
             } else {
+                window.turnstile && $el.querySelector('.cf-turnstile') && turnstile.reset($el.querySelector('.cf-turnstile')); 
                 const e = data.errors || {};
                 errorMsg = (e.__all__ || Object.values(e)[0] || ['Please check the form and try again.'])[0];
             }

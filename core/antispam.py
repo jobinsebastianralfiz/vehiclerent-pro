@@ -4,10 +4,17 @@
 Templates add the fields with {% include "public/includes/_antispam.html" %};
 views call check(request) and treat a non-empty result as spam.
 """
+import json
+import logging
 import re
 import time
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
+from django.conf import settings
 from django.core import signing
+
+logger = logging.getLogger(__name__)
 
 HONEYPOT_FIELD = "website"
 TOKEN_FIELD = "form_ts"
@@ -37,6 +44,28 @@ def check(request):
     if len(_URL.findall(request.POST.get("message", ""))) > 1:
         return "links_in_message"
     return ""
+
+
+TURNSTILE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+
+
+def turnstile_ok(request):
+    """Cloudflare Turnstile check. Always passes while TURNSTILE_SECRET_KEY isn't set.
+    Call it only for an otherwise valid form: each token can be verified once."""
+    secret = settings.TURNSTILE_SECRET_KEY
+    if not secret:
+        return True
+    token = request.POST.get("cf-turnstile-response", "")
+    if not token:
+        return False
+    data = urlencode({"secret": secret, "response": token, "remoteip": client_ip(None, request)}).encode()
+    try:
+        with urlopen(Request(TURNSTILE_VERIFY, data=data), timeout=6) as resp:
+            return bool(json.load(resp).get("success"))
+    except Exception:
+        # Cloudflare unreachable: let it through rather than lose a real customer's enquiry
+        logger.warning("Turnstile verification failed to run", exc_info=True)
+        return True
 
 
 def client_ip(group, request):

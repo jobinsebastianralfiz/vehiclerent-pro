@@ -42,6 +42,12 @@ def submit_enquiry(request):
             return JsonResponse({"success": True, "enquiry_id": None, "whatsapp_message": "", "whatsapp_url": "", "thanks_url": "/"})
         return redirect("home")
     form = EnquiryPublicForm(request.POST)
+    if form.is_valid() and not antispam.turnstile_ok(request):
+        msg = "Please wait for the security check under the form to finish, then send again."
+        if is_ajax:
+            return JsonResponse({"success": False, "errors": {"__all__": [msg]}}, status=400)
+        messages.error(request, msg)
+        return redirect("contact")
     if form.is_valid():
         enquiry = form.save()
         mine = request.session.get(SESSION_ENQUIRIES, [])[-19:]
