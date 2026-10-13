@@ -82,6 +82,8 @@ def vehicle_list(request):
     rental_type = request.GET.get("rental_type")  # "self_drive" or "with_driver"
     if rental_type == "with_driver":
         qs = qs.filter(is_chauffeur_available=True)
+    elif rental_type == "self_drive":
+        qs = qs.exclude(chauffeur_only=True)
 
     pickup_city = request.GET.get("pickup_city")
     if pickup_city:

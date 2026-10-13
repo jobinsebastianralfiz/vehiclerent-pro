@@ -171,6 +171,7 @@ def search(message: str, limit: int = 5) -> dict:
     is_wedding = bool(INTENT_PATTERNS["wedding"].search(text))
     is_premium = bool(INTENT_PATTERNS["premium"].search(text))
     is_chauffeur = bool(INTENT_PATTERNS["with_driver"].search(text))
+    is_self_drive = not is_chauffeur and bool(INTENT_PATTERNS["self_drive"].search(text))
     is_outstation = bool(INTENT_PATTERNS["outstation"].search(text))
     is_monthly = bool(INTENT_PATTERNS["monthly"].search(text))
 
@@ -208,6 +209,9 @@ def search(message: str, limit: int = 5) -> dict:
     if is_chauffeur:
         qs = qs.filter(is_chauffeur_available=True)
         filters.append("With Driver")
+    elif is_self_drive:
+        qs = qs.exclude(chauffeur_only=True)  # driver-only vans can't be self-driven
+        filters.append("Self-drive")
     if is_monthly:
         qs = qs.filter(rental_mode__in=["monthly", "flexible"])
         filters.append("Monthly")

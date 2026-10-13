@@ -40,12 +40,12 @@ STEPS = [
     {"n": 6, "key": "media", "title": "Media & Settings", "sub": "Images, status & SEO", "icon": "photo_library",
      "heading": "Media & Settings", "lede": "Gallery, visibility, badges and search details",
      "fields": ["status", "is_featured", "show_in_hero", "is_wedding_service", "is_chauffeur_available",
-                "wedding_tier", "meta_title", "meta_description", "meta_keywords"]},
+                "chauffeur_only", "wedding_tier", "meta_title", "meta_description", "meta_keywords"]},
 ]
 LAST = len(STEPS)
 # Edited from the Quick settings bar on every step once a vehicle is live, so step 6 leaves them out then
 QUICK_FIELDS = ["status", "is_featured", "show_in_hero", "is_wedding_service",
-                "is_chauffeur_available", "wedding_tier"]
+                "is_chauffeur_available", "chauffeur_only", "wedding_tier"]
 
 _INPUT = "w-full rounded-xl border-stone-200 text-sm py-2.5 px-3.5 focus:border-[#145c38] focus:ring-[#145c38]/20"
 _CHECK = "w-5 h-5 rounded-md border-stone-300 text-[#145c38] focus:ring-[#145c38]/30"
@@ -285,7 +285,7 @@ def vehicle_gallery(request, pk):
     return JsonResponse({"images": _gallery_json(vehicle)})
 
 
-QUICK_FLAGS = ["is_published", "is_featured", "show_in_hero", "is_premium", "is_wedding_service", "is_chauffeur_available"]
+QUICK_FLAGS = ["is_published", "is_featured", "show_in_hero", "is_premium", "is_wedding_service", "is_chauffeur_available", "chauffeur_only"]
 
 
 def _quick_json(vehicle):
@@ -302,6 +302,8 @@ def vehicle_quick(request, pk):
     field, value = request.POST.get("field"), request.POST.get("value", "")
     if field in QUICK_FLAGS:
         setattr(vehicle, field, value in ("1", "true", "on"))
+        if field == "is_chauffeur_available" and not vehicle.is_chauffeur_available:
+            vehicle.chauffeur_only = False  # no driver means it can't be driver-only
     elif field == "status" and value in dict(Vehicle.STATUS_CHOICES):
         vehicle.status = value
     elif field == "wedding_tier" and (value == "" or value in dict(Vehicle._meta.get_field("wedding_tier").choices)):

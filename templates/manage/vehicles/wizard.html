@@ -363,6 +363,7 @@
                     <p class="text-sm font-semibold text-stone-700">Badges</p>
                     <label class="flex items-center gap-2.5 text-sm">{{ form.is_wedding_service }} Wedding service</label>
                     <label class="flex items-center gap-2.5 text-sm">{{ form.is_chauffeur_available }} Chauffeur available</label>
+                    <label class="flex items-center gap-2.5 text-sm">{{ form.chauffeur_only }} <span><b>Driver only</b> <span class="text-stone-500">· never self-drive (vans, buses)</span></span></label>
                 </div>
                 {% include "manage/vehicles/_wf.html" with f=form.wedding_tier help="Only used for wedding cars." %}
                 {% endif %}
@@ -535,6 +536,7 @@ function quickSettings(url) {
             { f: "is_premium", label: "Luxury", icon: "diamond", tip: "Premium page and badge" },
             { f: "is_wedding_service", label: "Wedding", icon: "favorite", tip: "Available for weddings" },
             { f: "is_chauffeur_available", label: "Chauffeur", icon: "person", tip: "Can be hired with a driver" },
+            { f: "chauffeur_only", label: "Driver only", icon: "badge", tip: "Only hired with a driver, never self-drive" },
         ],
         async save(field, value) {
             const before = { ...this.s };

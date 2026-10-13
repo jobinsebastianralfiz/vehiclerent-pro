@@ -173,6 +173,7 @@ class Vehicle(models.Model):
     is_premium = models.BooleanField("Luxury", default=False, help_text="Luxury vehicle: listed on the Premium page with a Premium badge")
     is_wedding_service = models.BooleanField(default=False, help_text="Available for wedding services")
     is_chauffeur_available = models.BooleanField(default=False, help_text="Can be rented with a chauffeur")
+    chauffeur_only = models.BooleanField(default=False, help_text="Only hired with a driver, never self-drive (vans, buses)")
     wedding_tier = models.CharField(
         max_length=20,
         blank=True,
@@ -232,6 +233,11 @@ class Vehicle(models.Model):
             self.slug = slug
         if self.is_draft:
             self.is_published = False  # drafts never show on the public site
+        if self.chauffeur_only:
+            self.is_chauffeur_available = True  # driver-only implies a driver is available
+        update_fields = kwargs.get("update_fields")
+        if update_fields and {"chauffeur_only", "is_chauffeur_available"} & set(update_fields):
+            kwargs["update_fields"] = set(update_fields) | {"chauffeur_only", "is_chauffeur_available"}
         shrink_uploads(self, "thumbnail")
         super().save(*args, **kwargs)
 
