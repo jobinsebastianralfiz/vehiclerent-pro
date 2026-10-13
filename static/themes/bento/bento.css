@@ -66,3 +66,8 @@ body { background-image: radial-gradient(60rem 40rem at 90% -10%, rgba(212,236,1
     .lift:hover, .b-chip:hover, .b-thumb:hover { transform: none; }
     .b-faq .b-faq-a { animation: none; }
 }
+
+/* Big screens: let the layout use more of the width (the 1280px cap left wide side gaps). */
+@media (min-width: 1536px) {
+    html .max-w-screen-xl { max-width: 1440px; }
+}
