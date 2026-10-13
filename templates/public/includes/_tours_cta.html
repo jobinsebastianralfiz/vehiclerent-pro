@@ -1,0 +1,16 @@
+{% load vehicle_tags %}{# "No packages here yet" card for one scope: destination chips + a WhatsApp enquiry. with: scope, places #}
+{% if scope == "international" %}
+<div class="rounded-[24px] bg-primary text-on-primary p-6 sm:p-7 flex flex-col gap-5 h-full">
+    <span class="w-12 h-12 rounded-2xl bg-primary-fixed text-primary grid place-items-center"><span class="material-symbols-outlined">flight</span></span>
+    <div><h3 class="font-extrabold text-2xl">International holidays</h3><p class="opacity-75 mt-1">Flights, stays and sightseeing, planned for you. Tell us where you'd like to go.</p></div>
+    {% if places %}<div class="flex flex-wrap gap-2">{% for p in places %}<a href="{% whatsapp_tour_url place=p %}" target="_blank" rel="noopener" class="rounded-full px-3.5 py-1.5 text-sm font-bold bg-white/10 hover:bg-primary-fixed hover:text-primary transition-colors">{{ p }}</a>{% endfor %}</div>{% endif %}
+    <a href="{% whatsapp_tour_url scope='international' %}" target="_blank" rel="noopener" class="mt-auto self-start inline-flex items-center gap-2 bg-[#25D366] text-white rounded-full pl-4 pr-5 py-3 font-bold">{% include "public/includes/_wa_icon.html" %}Plan an international trip</a>
+</div>
+{% else %}
+<div class="rounded-[24px] bg-primary-fixed/50 text-primary p-6 sm:p-7 flex flex-col gap-5 h-full">
+    <span class="w-12 h-12 rounded-2xl bg-primary text-primary-fixed grid place-items-center"><span class="material-symbols-outlined">landscape</span></span>
+    <div><h3 class="font-extrabold text-2xl">Domestic holidays</h3><p class="text-on-surface-variant mt-1">Kerala and across India: stays, sightseeing and a car with driver. Tell us where you'd like to go.</p></div>
+    {% if places %}<div class="flex flex-wrap gap-2">{% for p in places %}<a href="{% whatsapp_tour_url place=p %}" target="_blank" rel="noopener" class="rounded-full px-3.5 py-1.5 text-sm font-bold bg-white hover:bg-primary hover:text-on-primary transition-colors">{{ p }}</a>{% endfor %}</div>{% endif %}
+    <a href="{% whatsapp_tour_url scope='domestic' %}" target="_blank" rel="noopener" class="mt-auto self-start inline-flex items-center gap-2 bg-[#25D366] text-white rounded-full pl-4 pr-5 py-3 font-bold">{% include "public/includes/_wa_icon.html" %}Plan a domestic trip</a>
+</div>
+{% endif %}

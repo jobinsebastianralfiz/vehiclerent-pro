@@ -19,6 +19,12 @@
                 <td style="padding: 12px 0; color: #1a1c1c; font-weight: 600;">{{ enquiry.email }}</td>
             </tr>
             {% endif %}
+            {% if enquiry.tour %}
+            <tr>
+                <td style="padding: 12px 0; color: #76786b; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Tour package</td>
+                <td style="padding: 12px 0; color: #1a1c1c; font-weight: 600;">{{ enquiry.tour.title }}{% if enquiry.tour.duration %} ({{ enquiry.tour.duration }}){% endif %}</td>
+            </tr>
+            {% endif %}
             {% if enquiry.vehicle %}
             <tr>
                 <td style="padding: 12px 0; color: #76786b; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Vehicle</td>

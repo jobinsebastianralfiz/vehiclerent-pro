@@ -1,0 +1,6 @@
+{# One form field in the admin style. with: f (bound field), help, span (bool: full width) #}
+<div{% if span %} class="span-all"{% endif %}>
+    <label class="af-label" for="{{ f.id_for_label }}">{{ f.label }}{% if f.field.required %} <span class="req">*</span>{% endif %}</label>
+    {{ f }}
+    {% if f.errors %}<p class="af-err">{{ f.errors|join:" " }}</p>{% elif help or f.help_text %}<p class="af-help">{{ help|default:f.help_text }}</p>{% endif %}
+</div>

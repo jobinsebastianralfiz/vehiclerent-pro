@@ -223,6 +223,43 @@
             </div>
         </div>
 
+        {# ─────────── Tour Packages ─────────── #}
+        <div class="st-panel" id="panel-tours" role="tabpanel" aria-labelledby="tab-tours" data-panel="tours" hidden>
+            <div class="af-sec">
+                <div class="af-sec-title">
+                    <div><h2>Tour Packages Section</h2><p>The Domestic / International holidays block on the home page and the Tours page. Add the packages themselves under <a href="{% url 'tour_manage_list' %}" class="underline">Tour Packages</a>.</p></div>
+                </div>
+                <div class="af-grid c2">
+                    <div class="span-all">
+                        <label class="af-check">
+                            <input type="checkbox" name="tours_on_home" {% if form.tours_on_home.value %}checked{% endif %}/>
+                            <span><b>Show on the home page</b><small>Until packages are added, the section shows “Plan a domestic / international trip” WhatsApp cards with the places below.</small></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-tours_heading">Heading</label>
+                        <input id="f-tours_heading" type="text" name="tours_heading" value="{{ form.tours_heading.value|default:'' }}" placeholder="Where to *next?*"/>
+                        {% if form.tours_heading.errors %}<p class="af-err">{{ form.tours_heading.errors|join:" " }}</p>{% else %}<p class="af-help">Wrap words in *asterisks* for the italic accent.</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-tours_intro">Intro line</label>
+                        <input id="f-tours_intro" type="text" name="tours_intro" value="{{ form.tours_intro.value|default:'' }}"/>
+                        {% if form.tours_intro.errors %}<p class="af-err">{{ form.tours_intro.errors|join:" " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-tours_domestic_places">Domestic places</label>
+                        <input id="f-tours_domestic_places" type="text" name="tours_domestic_places" value="{{ form.tours_domestic_places.value|default:'' }}" placeholder="Kerala, Kashmir, Goa"/>
+                        {% if form.tours_domestic_places.errors %}<p class="af-err">{{ form.tours_domestic_places.errors|join:" " }}</p>{% else %}<p class="af-help">Comma-separated. Each becomes a WhatsApp enquiry chip.</p>{% endif %}
+                    </div>
+                    <div>
+                        <label class="af-label" for="f-tours_international_places">International places</label>
+                        <input id="f-tours_international_places" type="text" name="tours_international_places" value="{{ form.tours_international_places.value|default:'' }}" placeholder="Dubai, Thailand, Bali"/>
+                        {% if form.tours_international_places.errors %}<p class="af-err">{{ form.tours_international_places.errors|join:" " }}</p>{% else %}<p class="af-help">Comma-separated. Each becomes a WhatsApp enquiry chip.</p>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {# ─────────── About Page ─────────── #}
         <div class="st-panel" id="panel-about" role="tabpanel" aria-labelledby="tab-about" data-panel="about" hidden>
             <div class="af-sec">

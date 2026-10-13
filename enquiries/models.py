@@ -22,6 +22,9 @@ class Enquiry(models.Model):
     vehicle = models.ForeignKey(
         "vehicles.Vehicle", on_delete=models.SET_NULL, blank=True, null=True, related_name="enquiries"
     )
+    tour = models.ForeignKey(
+        "tours.TourPackage", on_delete=models.SET_NULL, blank=True, null=True, related_name="enquiries"
+    )
     customer = models.ForeignKey(
         "customers.Customer", on_delete=models.SET_NULL, blank=True, null=True, related_name="enquiries"
     )
@@ -61,7 +64,10 @@ class Enquiry(models.Model):
 
     def whatsapp_message(self) -> str:
         """Build a customer-facing WhatsApp message containing booking details."""
-        lines = [f"Hi! I'm {self.name} and I'd like to book a rental."]
+        lines = [f"Hi! I'm {self.name} and I'd like to book a rental." if not self.tour_id else f"Hi! I'm {self.name} and I'd like to book a holiday."]
+        if self.tour_id:
+            lines.append(f"")
+            lines.append(f"🧳 *Tour package:* {self.tour.title}" + (f" ({self.tour.duration})" if self.tour.duration else ""))
         if self.vehicle_id:
             v = self.vehicle
             # names usually already start with the brand ("Maruti Suzuki Fronx")
@@ -76,9 +82,11 @@ class Enquiry(models.Model):
             days = (self.preferred_end_date - self.preferred_start_date).days
             span = f" ({days} day{'s' if days != 1 else ''})" if days > 0 else ""
             lines.append(f"📅 *Dates:* {self.preferred_start_date:%d %b %Y} → {self.preferred_end_date:%d %b %Y}{span}")
+        elif self.preferred_start_date and self.tour_id:
+            lines.append(f"📅 *Travel date:* {self.preferred_start_date:%d %b %Y}")
         elif self.preferred_start_date:
             lines.append(f"📅 *Pickup date:* {self.preferred_start_date:%d %b %Y} (return date not fixed yet)")
-        else:
+        elif self.vehicle_id or self.tour_id:
             lines.append(f"📅 *Dates:* Not fixed yet, please share what's available")
         if self.pickup_city:
             location = f"📍 *Pickup:* {self.pickup_city.title()}"

@@ -1,0 +1,19 @@
+{% load vehicle_tags %}{# One tour package card (no prices: visitors enquire). with: t #}
+<article class="group bg-white rounded-[24px] overflow-hidden shadow-lg shadow-primary/5 lift flex flex-col h-full">
+    <a href="{{ t.get_absolute_url }}" class="relative block h-48 bg-surface-container overflow-hidden" tabindex="-1" aria-hidden="true">
+        {% if t.cover_image %}<img src="{{ t.cover_image|resized:640 }}" alt="" loading="lazy" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"/>
+        {% elif t.scope == "international" %}<span class="absolute inset-0 grid place-items-center text-outline"><span class="material-symbols-outlined text-5xl">flight</span></span>
+        {% else %}<span class="absolute inset-0 grid place-items-center text-outline"><span class="material-symbols-outlined text-5xl">landscape</span></span>{% endif %}
+        {% if t.duration %}<span class="absolute top-3 left-3 bg-white/90 rounded-full px-3 py-1.5 text-xs font-extrabold text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span>{{ t.duration }}</span>{% endif %}
+        {% if t.tag %}<span class="absolute top-3 right-3 bg-primary-fixed text-primary rounded-full px-3 py-1.5 label-tiny">{{ t.tag }}</span>{% endif %}
+    </a>
+    <div class="p-5 flex flex-col gap-2 flex-1">
+        <h3 class="font-extrabold text-lg leading-snug text-primary"><a href="{{ t.get_absolute_url }}" class="hover:underline underline-offset-4">{{ t.title }}</a></h3>
+        {% if t.destinations %}<p class="text-sm text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">location_on</span>{{ t.destinations }}</p>{% endif %}
+        {% if t.summary %}<p class="text-sm text-on-surface-variant line-clamp-2">{{ t.summary }}</p>{% endif %}
+        <div class="mt-auto pt-3 flex items-center justify-between gap-3">
+            <a href="{{ t.get_absolute_url }}" class="font-bold text-sm text-primary flex items-center gap-1 group/v">View trip <span class="material-symbols-outlined text-[18px] transition-transform group-hover/v:translate-x-0.5">arrow_forward</span></a>
+            <a href="{% whatsapp_tour_url tour=t %}" target="_blank" rel="noopener" class="bg-[#25D366] text-white rounded-full w-11 h-11 grid place-items-center shrink-0 hover:scale-105 transition-transform" aria-label="Ask about {{ t.title }} on WhatsApp" title="Ask on WhatsApp">{% include "public/includes/_wa_icon.html" %}</a>
+        </div>
+    </div>
+</article>

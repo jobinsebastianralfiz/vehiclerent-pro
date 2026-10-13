@@ -69,7 +69,10 @@ def home(request):
         for field in [config.hero_bg_1, config.hero_bg_2, config.hero_bg_3]:
             if field:
                 hero_bg_images.append(field.url)
+    from tours.views import tour_context
     return render(request, themed(request, "home.html"), {
+        **(tour_context(config) if config and config.tours_on_home else {}),
+        "show_tours": bool(config and config.tours_on_home),
         "config": config,
         "categories": categories,
         "featured_vehicles": featured_vehicles,
@@ -171,6 +174,11 @@ def sitemap_entries():
     ]
     entries = [{"path": reverse(name), "lastmod": today, "changefreq": freq, "priority": pri, "kind": "Page", "label": label}
                for name, label, freq, pri in rows]
+    from tours.models import TourPackage
+    entries.append({"path": reverse("tour_list"), "lastmod": today, "changefreq": "weekly", "priority": "0.8", "kind": "Page", "label": "Tour packages"})
+    for t in TourPackage.objects.filter(is_published=True).order_by("title"):
+        entries.append({"path": t.get_absolute_url(), "lastmod": t.updated_at.date(), "changefreq": "weekly", "priority": "0.7",
+                        "kind": "Tour", "label": t.title})
     for v in Vehicle.objects.filter(is_published=True).exclude(status="inactive").order_by("name"):
         entries.append({"path": v.get_absolute_url(), "lastmod": v.updated_at.date(), "changefreq": "weekly", "priority": "0.8",
                         "kind": "Vehicle", "label": v.full_name})
@@ -315,6 +323,7 @@ SETTINGS_TABS = [
     ("branding", "Branding", "image"),
     ("contact", "Contact Info", "call"),
     ("hero", "Homepage Hero", "home"),
+    ("tours", "Tour Packages", "travel_explore"),
     ("about", "About Page", "description"),
     ("seo", "SEO & Meta", "search"),
     ("social", "Social Links", "share"),

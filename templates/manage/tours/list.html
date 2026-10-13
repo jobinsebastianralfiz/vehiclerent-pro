@@ -1,0 +1,66 @@
+{% extends "manage/base_admin.html" %}
+{% load vehicle_tags %}
+{% block page_title %}Tour Packages{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-xl sm:text-2xl font-bold">Tour Packages</h1>
+        <p class="text-stone-500 text-xs sm:text-sm mt-1">Domestic and international holidays. No prices are shown on the website: visitors enquire on WhatsApp or by form.</p>
+    </div>
+    <div class="flex gap-2 w-full sm:w-auto">
+        <a href="{% url 'tour_list' %}" target="_blank" class="bg-white ring-1 ring-stone-200 text-stone-700 hover:bg-stone-50 px-4 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 justify-center"><span class="material-symbols-outlined text-lg">open_in_new</span>View on site</a>
+        <a href="{% url 'tour_add' %}" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 flex-1 sm:flex-none justify-center"><span class="material-symbols-outlined text-lg">add</span> Add Package</a>
+    </div>
+</div>
+
+<div class="flex gap-2 mb-4 text-sm font-semibold">
+    <a href="{% url 'tour_manage_list' %}" class="px-4 py-2 rounded-full {% if not scope %}bg-stone-900 text-white{% else %}bg-white ring-1 ring-stone-200 text-stone-600{% endif %}">All</a>
+    <a href="?scope=domestic" class="px-4 py-2 rounded-full {% if scope == 'domestic' %}bg-stone-900 text-white{% else %}bg-white ring-1 ring-stone-200 text-stone-600{% endif %}">Domestic <span class="opacity-60">{{ counts.domestic }}</span></a>
+    <a href="?scope=international" class="px-4 py-2 rounded-full {% if scope == 'international' %}bg-stone-900 text-white{% else %}bg-white ring-1 ring-stone-200 text-stone-600{% endif %}">International <span class="opacity-60">{{ counts.international }}</span></a>
+</div>
+
+<div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="text-[10px] font-bold uppercase tracking-widest text-stone-500 border-b border-stone-100">
+                    <th class="text-left px-6 py-4">Package</th>
+                    <th class="text-left px-4 py-4">Type</th>
+                    <th class="text-left px-4 py-4">Duration</th>
+                    <th class="text-center px-4 py-4">Featured</th>
+                    <th class="text-center px-4 py-4">Published</th>
+                    <th class="text-right px-6 py-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tours %}
+                <tr class="hover:bg-stone-50 border-b border-stone-50">
+                    <td class="px-6 py-3">
+                        <a href="{% url 'tour_edit' t.pk %}" class="flex items-center gap-3 min-w-0">
+                            <span class="w-16 h-12 rounded-lg bg-stone-100 overflow-hidden shrink-0 grid place-items-center">{% if t.cover_image %}<img src="{{ t.cover_image|resized:240 }}" alt="" class="w-full h-full object-cover"/>{% else %}<span class="material-symbols-outlined text-stone-400">image</span>{% endif %}</span>
+                            <span class="min-w-0"><span class="block font-semibold text-sm truncate">{{ t.title }}</span><span class="block text-xs text-stone-500 truncate">{{ t.destinations|default:"—" }}</span></span>
+                        </a>
+                    </td>
+                    <td class="px-4 py-3 text-sm"><span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold {% if t.scope == 'international' %}bg-sky-50 text-sky-700{% else %}bg-emerald-50 text-emerald-700{% endif %}">{{ t.get_scope_display }}</span></td>
+                    <td class="px-4 py-3 text-sm text-stone-600">{{ t.duration|default:"—" }}</td>
+                    <td class="px-4 py-3 text-center"><span class="material-symbols-outlined text-lg {% if t.is_featured %}text-amber-500{% else %}text-stone-300{% endif %}">{% if t.is_featured %}star{% else %}star_outline{% endif %}</span></td>
+                    <td class="px-4 py-3 text-center"><span class="material-symbols-outlined text-lg {% if t.is_published %}text-green-600{% else %}text-stone-300{% endif %}">{% if t.is_published %}check_circle{% else %}cancel{% endif %}</span></td>
+                    <td class="px-6 py-3 text-right whitespace-nowrap">
+                        {% if t.is_published %}<a href="{{ t.get_absolute_url }}" target="_blank" class="p-1.5 rounded-lg hover:bg-stone-100 inline-block" title="View on site"><span class="material-symbols-outlined text-lg text-stone-500">open_in_new</span></a>{% endif %}
+                        <a href="{% url 'tour_edit' t.pk %}" class="p-1.5 rounded-lg hover:bg-stone-100 inline-block" title="Edit"><span class="material-symbols-outlined text-lg text-stone-500">edit</span></a>
+                        <form method="post" action="{% url 'tour_delete' t.pk %}" class="inline" onsubmit="return confirm('Delete this tour package?')">{% csrf_token %}<button type="submit" class="p-1.5 rounded-lg hover:bg-red-50" title="Delete"><span class="material-symbols-outlined text-lg text-red-400">delete</span></button></form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="px-8 py-16 text-center text-stone-500">
+                    <span class="material-symbols-outlined text-4xl text-stone-300 block mb-2">travel_explore</span>
+                    No tour packages yet. Until you add one, the website shows “Plan a domestic / international trip” WhatsApp cards instead.<br>
+                    <a href="{% url 'tour_add' %}" class="inline-flex mt-4 bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium items-center gap-2"><span class="material-symbols-outlined text-lg">add</span>Add your first package</a>
+                </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "public/base_public.html" %}
+{% load static vehicle_tags %}
+{% comment %}One tour package, shared by every theme. No prices: an enquiry form and WhatsApp instead.{% endcomment %}
+
+{% block title %}{{ tour.meta_title|default:tour.title }} | {{ BUSINESS_NAME }}{% endblock %}
+{% block meta_description %}{{ tour.meta_description|default:tour.summary|default:tour.title }}{% endblock %}
+{% block extra_css %}{% include "public/includes/_tours_css.html" %}{% endblock %}
+{% block main_class %}pt-24 sm:pt-28 px-3 sm:px-6 pb-6{% endblock %}
+
+{% block content %}
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TouristTrip","name":"{{ tour.title|escapejs }}","description":"{{ tour.summary|default:tour.title|escapejs }}"{% if tour.cover_image %},"image":"{{ SITE_URL }}{{ tour.cover_image.url }}"{% endif %},"provider":{"@type":"TravelAgency","name":"{{ BUSINESS_NAME|escapejs }}","url":"{{ SITE_URL }}"}}</script>
+
+<div class="max-w-screen-xl mx-auto">
+    <nav class="mb-5 flex flex-wrap items-center gap-1.5 text-sm font-semibold text-on-surface-variant" aria-label="Breadcrumb">
+        <a href="{% url 'home' %}" class="hover:text-primary">Home</a><span class="material-symbols-outlined text-[16px]" aria-hidden="true">chevron_right</span>
+        <a href="{% url 'tour_list' %}?scope={{ tour.scope }}" class="hover:text-primary">{{ tour.get_scope_display }} tours</a><span class="material-symbols-outlined text-[16px]" aria-hidden="true">chevron_right</span>
+        <span class="text-primary truncate">{{ tour.title }}</span>
+    </nav>
+
+    <!-- hero photo with the title on it -->
+    <section class="relative rounded-[28px] overflow-hidden min-h-[340px] sm:min-h-[460px] bg-primary text-white flex">
+        {% if tour.cover_image %}<img src="{{ tour.cover_image|resized:1600 }}" alt="{{ tour.title }}" class="absolute inset-0 w-full h-full object-cover"/>{% endif %}
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/5" aria-hidden="true"></div>
+        <div class="relative mt-auto p-6 sm:p-10 w-full">
+            <div class="flex flex-wrap gap-2 mb-4">
+                <span class="rounded-full bg-white/15 backdrop-blur px-3 py-1.5 label-tiny flex items-center gap-1.5">{% if tour.scope == "international" %}<span class="material-symbols-outlined text-[16px]">flight</span>{% else %}<span class="material-symbols-outlined text-[16px]">landscape</span>{% endif %}{{ tour.get_scope_display }}</span>
+                {% if tour.duration %}<span class="rounded-full bg-white/15 backdrop-blur px-3 py-1.5 text-xs font-extrabold flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">schedule</span>{{ tour.duration }}</span>{% endif %}
+                {% if tour.tag %}<span class="rounded-full bg-primary-fixed text-primary px-3 py-1.5 label-tiny">{{ tour.tag }}</span>{% endif %}
+            </div>
+            <h1 class="tr-h font-extrabold text-4xl sm:text-6xl tracking-[-.03em] max-w-3xl">{{ tour.title }}</h1>
+            {% if tour.destinations %}<p class="mt-3 text-white/80 text-lg flex items-center gap-1.5"><span class="material-symbols-outlined">location_on</span>{{ tour.destinations }}</p>{% endif %}
+        </div>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 pt-8 lg:pt-12 items-start">
+        <div class="lg:col-span-7 xl:col-span-8 space-y-10">
+            {% if tour.summary %}<p class="text-xl text-on-surface leading-relaxed">{{ tour.summary }}</p>{% endif %}
+
+            {% if tour.highlight_list %}
+            <section aria-labelledby="hl-h">
+                <h2 id="hl-h" class="tr-h font-extrabold text-2xl text-primary mb-4">Highlights</h2>
+                <ul class="grid sm:grid-cols-2 gap-2.5">{% for h in tour.highlight_list %}<li class="flex items-start gap-2.5 bg-white rounded-2xl px-4 py-3"><span class="material-symbols-outlined text-primary text-[20px]" aria-hidden="true">check_circle</span><span class="font-semibold">{{ h }}</span></li>{% endfor %}</ul>
+            </section>
+            {% endif %}
+
+            {% if tour.itinerary_days %}
+            <section aria-labelledby="it-h">
+                <h2 id="it-h" class="tr-h font-extrabold text-2xl text-primary mb-5">Day by day</h2>
+                <ol class="relative border-l-2 border-primary/15 ml-3 space-y-6">
+                    {% for label, text in tour.itinerary_days %}
+                    <li class="pl-7 relative"><span class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-primary ring-4 ring-background" aria-hidden="true"></span>
+                        <p class="label-tiny text-primary-container">{{ label }}</p><p class="mt-1 font-semibold text-on-surface">{{ text }}</p></li>
+                    {% endfor %}
+                </ol>
+            </section>
+            {% endif %}
+
+            {% if tour.inclusion_list or tour.exclusion_list %}
+            <section class="grid sm:grid-cols-2 gap-4" aria-label="What's included">
+                {% if tour.inclusion_list %}<div class="bg-white rounded-[22px] p-6"><h2 class="tr-h font-extrabold text-xl text-primary mb-3">Included</h2><ul class="space-y-2">{% for x in tour.inclusion_list %}<li class="flex gap-2"><span class="material-symbols-outlined text-[20px] text-emerald-600" aria-hidden="true">check</span>{{ x }}</li>{% endfor %}</ul></div>{% endif %}
+                {% if tour.exclusion_list %}<div class="bg-white rounded-[22px] p-6"><h2 class="tr-h font-extrabold text-xl text-primary mb-3">Not included</h2><ul class="space-y-2">{% for x in tour.exclusion_list %}<li class="flex gap-2"><span class="material-symbols-outlined text-[20px] text-red-500" aria-hidden="true">close</span>{{ x }}</li>{% endfor %}</ul></div>{% endif %}
+            </section>
+            {% endif %}
+        </div>
+
+        <!-- enquiry -->
+        <aside class="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-28">
+            <div class="bg-white rounded-[28px] p-6 shadow-xl shadow-primary/5">
+                <h2 class="tr-h font-extrabold text-2xl text-primary">Plan this trip</h2>
+                <p class="text-sm text-on-surface-variant mt-1">Send your dates and we'll reply with the price and availability.</p>
+                <form action="{% url 'submit_enquiry' %}" method="post" class="mt-5 space-y-2.5" id="tr-form">
+                    {% csrf_token %}{% include "public/includes/_antispam.html" %}
+                    <input type="hidden" name="tour" value="{{ tour.id }}"/>
+                    <input type="hidden" name="source" value="website"/>
+                    <label class="tr-field"><span class="label-tiny text-outline block mb-1">Your name</span><input type="text" name="name" required minlength="2" maxlength="100" pattern="[\p{L}\p{M} .'\-]*\p{L}[\p{L}\p{M} .'\-]*\p{L}[\p{L}\p{M} .'\-]*" title="Your name, letters only" autocomplete="name" placeholder="Enter your name"/></label>
+                    <label class="tr-field"><span class="label-tiny text-outline block mb-1">Phone</span><input type="tel" name="phone" required pattern="\+?[0-9 \-]{10,16}" title="A 10-digit mobile number (with country code if outside India)" autocomplete="tel" placeholder="Phone number"/></label>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <label class="tr-field"><span class="label-tiny text-outline block mb-1">Travel date</span><input type="date" name="preferred_start_date" min="{% now 'Y-m-d' %}"/></label>
+                        <label class="tr-field"><span class="label-tiny text-outline block mb-1">Travellers</span><select id="tr-pax"><option value="">Choose</option>{% for n in "123456789" %}<option>{{ n }}</option>{% endfor %}<option>10+</option></select></label>
+                    </div>
+                    <label class="tr-field"><span class="label-tiny text-outline block mb-1">Anything else?</span><textarea name="message" rows="2" maxlength="1500" placeholder="Hotel preference, kids, special occasion…"></textarea></label>
+                    <button type="submit" class="w-full bg-primary text-on-primary rounded-full py-4 font-bold flex items-center justify-center gap-2">Send enquiry <span class="material-symbols-outlined">arrow_forward</span></button>
+                </form>
+                <div class="grid grid-cols-2 gap-2.5 mt-3">
+                    <a href="{% whatsapp_tour_url tour=tour %}" target="_blank" rel="noopener" class="bg-[#25D366] text-white rounded-2xl px-4 py-3.5 font-bold text-sm flex items-center justify-center gap-2">{% include "public/includes/_wa_icon.html" %}WhatsApp</a>
+                    {% if BUSINESS_PHONE %}<a href="tel:{{ BUSINESS_PHONE }}" class="bg-surface-container rounded-2xl px-4 py-3.5 font-bold text-sm flex items-center justify-center gap-2 text-primary"><span class="material-symbols-outlined text-[20px]" aria-hidden="true">call</span>Call us</a>{% endif %}
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    {% if more_tours %}
+    <section class="pt-16" aria-labelledby="more-h">
+        <div class="flex items-end justify-between gap-4 mb-6"><h2 id="more-h" class="tr-h font-extrabold text-3xl sm:text-4xl tracking-tight text-primary">More {{ tour.get_scope_display|lower }} <span class="serif-i">trips</span></h2><a href="{% url 'tour_list' %}?scope={{ tour.scope }}" class="font-bold text-primary flex items-center gap-1 shrink-0">View all <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">{% for t in more_tours %}{% include "public/includes/_tour_card.html" %}{% endfor %}</div>
+    </section>
+    {% endif %}
+</div>
+
+<script>
+/* travellers go into the message, so the team sees the group size */
+(() => {
+    const f = document.getElementById("tr-form"); if (!f) return;
+    f.addEventListener("submit", () => {
+        const pax = document.getElementById("tr-pax").value, msg = f.elements.namedItem("message");
+        if (pax && !/^Travellers:/.test(msg.value)) msg.value = `Travellers: ${pax}` + (msg.value ? `\n${msg.value}` : "");
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "manage/base_admin.html" %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<a href="{% url 'tour_manage_list' %}" class="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-[#145c38] mb-4">
+    <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Tour Packages
+</a>
+
+<div class="af-card">
+    <div class="af-head">
+        <div><h1>{{ title }}</h1><p>{% if tour %}Update this holiday package{% else %}A new domestic or international holiday{% endif %}. Prices aren't shown on the website: visitors enquire.</p></div>
+        {% if tour and tour.is_published %}<a href="{{ tour.get_absolute_url }}" target="_blank" class="af-btn ghost"><span class="material-symbols-outlined">open_in_new</span>View on site</a>{% endif %}
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.errors %}<div class="af-errors"><p class="font-semibold">Please correct the errors below.</p>{{ form.non_field_errors }}</div>{% endif %}
+
+        <div class="af-sec">
+            <div class="af-sec-title"><span class="af-sec-icon"><span class="material-symbols-outlined">travel_explore</span></span><div><h2>Package</h2><p>Name, type and where it goes.</p></div></div>
+            <div class="af-grid c2">
+                {% include "manage/tours/_f.html" with f=form.title span=1 %}
+                <div>
+                    <p class="af-label">Type <span class="req">*</span></p>
+                    <div class="flex gap-2">{% for c in form.scope %}<label class="flex-1 cursor-pointer"><input type="radio" name="scope" value="{{ c.data.value }}" class="peer sr-only" {% if c.data.selected %}checked{% endif %}/><span class="flex items-center justify-center gap-2 rounded-xl ring-1 ring-stone-200 px-4 py-3 text-sm font-semibold text-stone-600 peer-checked:bg-[#145c38] peer-checked:text-white peer-checked:ring-[#145c38]">{{ c.choice_label }}</span></label>{% endfor %}</div>
+                </div>
+                {% include "manage/tours/_f.html" with f=form.destinations %}
+                <div class="grid grid-cols-2 gap-3">
+                    {% include "manage/tours/_f.html" with f=form.nights help="e.g. 3" %}
+                    {% include "manage/tours/_f.html" with f=form.days help="e.g. 4 (shows as 3N / 4D)" %}
+                </div>
+                {% include "manage/tours/_f.html" with f=form.tag %}
+                {% include "manage/tours/_f.html" with f=form.summary span=1 %}
+            </div>
+        </div>
+
+        <div class="af-sec">
+            <div class="af-sec-title"><span class="af-sec-icon"><span class="material-symbols-outlined">image</span></span><div><h2>Cover photo</h2><p>A wide landscape photo of the destination. Shown on the card and at the top of the package page.</p></div></div>
+            <div class="flex flex-col sm:flex-row gap-4 items-start">
+                <span class="w-full sm:w-72 aspect-[16/10] rounded-xl bg-stone-100 overflow-hidden grid place-items-center shrink-0">
+                    <img id="tr-prev" src="{% if tour.cover_image %}{{ tour.cover_image.url }}{% endif %}" alt="" class="w-full h-full object-cover{% if not tour.cover_image %} hidden{% endif %}"/>
+                    <span id="tr-ph" class="material-symbols-outlined text-4xl text-stone-300{% if tour.cover_image %} hidden{% endif %}">landscape</span>
+                </span>
+                <div class="min-w-0">
+                    <input type="file" name="cover_image" accept="image/*" id="tr-file"/>
+                    {% if tour.cover_image %}<label class="flex items-center gap-2 text-sm mt-3"><input type="checkbox" name="cover_image-clear"/> Remove the current photo</label>{% endif %}
+                    {% if form.cover_image.errors %}<p class="af-err">{{ form.cover_image.errors|join:" " }}</p>{% else %}<p class="af-help">Use your own photos or ones you have rights to. Large photos are resized automatically.</p>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="af-sec">
+            <div class="af-sec-title"><span class="af-sec-icon"><span class="material-symbols-outlined">route</span></span><div><h2>Trip details</h2><p>One item per line. Leave any you don't need empty and it won't show.</p></div></div>
+            <div class="af-grid c2">
+                {% include "manage/tours/_f.html" with f=form.highlights %}
+                {% include "manage/tours/_f.html" with f=form.itinerary %}
+                {% include "manage/tours/_f.html" with f=form.inclusions %}
+                {% include "manage/tours/_f.html" with f=form.exclusions %}
+            </div>
+        </div>
+
+        <div class="af-sec">
+            <div class="af-sec-title"><span class="af-sec-icon"><span class="material-symbols-outlined">visibility</span></span><div><h2>Visibility</h2><p>Where and in what order it appears.</p></div></div>
+            <div class="af-grid c3">
+                <label class="flex items-center gap-2.5 text-sm">{{ form.is_published }} <span><b>Published</b> <span class="text-stone-500">· shown on the website</span></span></label>
+                <label class="flex items-center gap-2.5 text-sm">{{ form.is_featured }} <span><b>Featured</b> <span class="text-stone-500">· shown first</span></span></label>
+                {% include "manage/tours/_f.html" with f=form.display_order help="Lower numbers come first" %}
+            </div>
+        </div>
+
+        <div class="af-sec">
+            <div class="af-sec-title"><span class="af-sec-icon"><span class="material-symbols-outlined">search</span></span><div><h2>Search engines</h2><p>Optional. Leave empty to use the title and summary.</p></div></div>
+            <div class="af-grid c2">
+                {% include "manage/tours/_f.html" with f=form.meta_title %}
+                {% include "manage/tours/_f.html" with f=form.meta_description %}
+            </div>
+        </div>
+
+        <div class="af-actions">
+            <a href="{% url 'tour_manage_list' %}" class="af-btn ghost">Cancel</a>
+            <button type="submit" class="af-btn primary"><span class="material-symbols-outlined">save</span>Save package</button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById("tr-file").addEventListener("change", e => {
+    const f = e.target.files[0]; if (!f) return;
+    const img = document.getElementById("tr-prev"); img.src = URL.createObjectURL(f); img.classList.remove("hidden");
+    document.getElementById("tr-ph").classList.add("hidden");
+});
+</script>
+{% endblock %}

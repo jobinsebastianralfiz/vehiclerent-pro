@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "customers",
     "allocations",
     "enquiries",
+    "tours",
     "dashboard",
     "django.contrib.auth",
     "django.contrib.contenttypes",

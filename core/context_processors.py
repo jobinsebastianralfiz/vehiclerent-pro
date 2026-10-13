@@ -83,6 +83,7 @@ ADMIN_NAV = [
     {"label": "Cities", "icon": "location_on", "url": "city_list", "match": ["city"]},
     {"label": "Booking Add-ons", "icon": "add_circle", "url": "addon_list", "match": ["addon"]},
     {"label": "Wedding Decor", "icon": "local_florist", "url": "decoration_list", "match": ["decoration"]},
+    {"label": "Tour Packages", "icon": "travel_explore", "url": "tour_manage_list", "match": ["tour_"]},
     {"label": "Customers", "icon": "group", "url": "customer_list", "match": ["customer"]},
     {"label": "Allocations", "icon": "event_available", "url": "allocation_list", "match": ["allocation"]},
     {"label": "Enquiries", "icon": "mail", "url": "enquiry_list", "match": ["enquiry"], "badge": True},

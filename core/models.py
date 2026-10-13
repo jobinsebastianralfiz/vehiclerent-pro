@@ -90,6 +90,15 @@ class SiteConfig(models.Model):
     twitter_url = models.URLField(blank=True)
 
     # Footer
+    # Tour packages section (home page + Tours page)
+    tours_on_home = models.BooleanField(default=True, help_text="Show the tour packages section on the home page")
+    tours_heading = models.CharField(max_length=120, blank=True, default="Where to *next?*", help_text="Wrap words in *asterisks* for the italic accent")
+    tours_intro = models.CharField(max_length=300, blank=True, default="Hand-planned holidays with stays, sightseeing and a car with driver, across India and abroad.")
+    tours_domestic_places = models.CharField(max_length=300, blank=True, default="Kerala, Kashmir, Goa, Rajasthan, Himachal, Andaman",
+                                             help_text="Comma-separated; shown as WhatsApp enquiry chips while no domestic packages are added")
+    tours_international_places = models.CharField(max_length=300, blank=True, default="Dubai, Thailand, Bali, Singapore, Malaysia, Maldives",
+                                                  help_text="Comma-separated; shown as WhatsApp enquiry chips while no international packages are added")
+
     footer_text = models.CharField(max_length=500, blank=True, default="Premium vehicle rental service. Flexible daily, weekly & monthly plans.")
 
     class Meta:

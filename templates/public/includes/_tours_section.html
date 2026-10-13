@@ -1,0 +1,46 @@
+{% load vehicle_tags %}{# Home page "Tour packages" block: Domestic / International tabs with up to four cards each.
+   A tab with no packages shows its WhatsApp "plan a trip" card; with no packages at all, both cards side by side.
+   Needs tours_dom, tours_intl, tour_places_dom, tour_places_intl (tours.views.tour_context). #}
+<section class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-28" aria-labelledby="tours-h" x-data="{ tab: '{% if tours_dom or not tours_intl %}domestic{% else %}international{% endif %}' }">
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-7">
+        <div>
+            <span class="label-tiny text-primary-container flex items-center gap-3">Holidays<span class="w-8 h-px bg-current opacity-50" aria-hidden="true"></span></span>
+            <h2 id="tours-h" class="mt-3 font-extrabold text-4xl sm:text-6xl tracking-[-.04em] text-primary">{{ SITE_CONFIG.tours_heading|default:"Where to *next?*"|accent:"serif-i" }}</h2>
+            {% if SITE_CONFIG.tours_intro %}<p class="mt-3 text-on-surface-variant max-w-xl">{{ SITE_CONFIG.tours_intro }}</p>{% endif %}
+        </div>
+        {% if tours_dom or tours_intl %}
+        <div class="flex bg-surface-container rounded-full p-1 text-sm font-bold self-start lg:self-auto" role="tablist" aria-label="Tour type">
+            <button type="button" role="tab" x-on:click="tab = 'domestic'" x-bind:aria-selected="tab === 'domestic'" x-bind:class="tab === 'domestic' ? 'bg-primary text-on-primary' : 'text-on-surface-variant'" class="px-5 py-2.5 rounded-full flex items-center gap-2 transition-colors"><span class="material-symbols-outlined text-[18px]">landscape</span>Domestic</button>
+            <button type="button" role="tab" x-on:click="tab = 'international'" x-bind:aria-selected="tab === 'international'" x-bind:class="tab === 'international' ? 'bg-primary text-on-primary' : 'text-on-surface-variant'" class="px-5 py-2.5 rounded-full flex items-center gap-2 transition-colors"><span class="material-symbols-outlined text-[18px]">flight</span>International</button>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if tours_dom or tours_intl %}
+    <div x-show="tab === 'domestic'"{% if not tours_dom and tours_intl %} x-cloak{% endif %}>
+        {% if tours_dom %}
+        <div class="flex lg:grid lg:grid-cols-4 gap-4 overflow-x-auto lg:overflow-visible snap-x -mx-3 px-3 sm:mx-0 sm:px-0 pb-2 [scrollbar-width:none]">
+            {% for t in tours_dom|slice:":4" %}<div class="snap-start shrink-0 w-[78%] sm:w-[46%] lg:w-auto">{% include "public/includes/_tour_card.html" %}</div>{% endfor %}
+        </div>
+        <div class="mt-6 flex justify-center"><a href="{% url 'tour_list' %}?scope=domestic" class="bg-primary text-on-primary rounded-full px-6 py-3.5 font-bold flex items-center gap-2">{% if tours_dom|length > 4 %}View all {{ tours_dom|length }} domestic packages{% else %}View domestic packages{% endif %}<span class="material-symbols-outlined">arrow_forward</span></a></div>
+        {% else %}
+        <div class="max-w-2xl">{% include "public/includes/_tours_cta.html" with scope="domestic" places=tour_places_dom %}</div>
+        {% endif %}
+    </div>
+    <div x-show="tab === 'international'"{% if tours_dom or not tours_intl %} x-cloak{% endif %}>
+        {% if tours_intl %}
+        <div class="flex lg:grid lg:grid-cols-4 gap-4 overflow-x-auto lg:overflow-visible snap-x -mx-3 px-3 sm:mx-0 sm:px-0 pb-2 [scrollbar-width:none]">
+            {% for t in tours_intl|slice:":4" %}<div class="snap-start shrink-0 w-[78%] sm:w-[46%] lg:w-auto">{% include "public/includes/_tour_card.html" %}</div>{% endfor %}
+        </div>
+        <div class="mt-6 flex justify-center"><a href="{% url 'tour_list' %}?scope=international" class="bg-primary text-on-primary rounded-full px-6 py-3.5 font-bold flex items-center gap-2">{% if tours_intl|length > 4 %}View all {{ tours_intl|length }} international packages{% else %}View international packages{% endif %}<span class="material-symbols-outlined">arrow_forward</span></a></div>
+        {% else %}
+        <div class="max-w-2xl">{% include "public/includes/_tours_cta.html" with scope="international" places=tour_places_intl %}</div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% include "public/includes/_tours_cta.html" with scope="domestic" places=tour_places_dom %}
+        {% include "public/includes/_tours_cta.html" with scope="international" places=tour_places_intl %}
+    </div>
+    {% endif %}
+</section>

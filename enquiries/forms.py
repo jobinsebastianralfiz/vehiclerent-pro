@@ -15,10 +15,11 @@ class EnquiryPublicForm(forms.ModelForm):
         fields = [
             "name", "phone", "email", "message",
             "preferred_start_date", "preferred_end_date",
-            "vehicle", "pickup_city", "drop_city", "rental_type",
+            "vehicle", "tour", "pickup_city", "drop_city", "rental_type",
         ]
         widgets = {
             "vehicle": forms.HiddenInput(),
+            "tour": forms.HiddenInput(),
             "preferred_start_date": forms.DateInput(attrs={"type": "date"}),
             "preferred_end_date": forms.DateInput(attrs={"type": "date"}),
         }
@@ -26,6 +27,7 @@ class EnquiryPublicForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["vehicle"].required = False
+        self.fields["tour"].required = False
         self.fields["email"].required = False
         self.fields["message"].required = False
         self.fields["preferred_start_date"].required = False

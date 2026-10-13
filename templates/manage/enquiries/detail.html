@@ -54,6 +54,12 @@
                         <p class="font-medium text-on-surface">{{ enquiry.vehicle.brand }} {{ enquiry.vehicle.name }}</p>
                     </div>
                     {% endif %}
+                    {% if enquiry.tour %}
+                    <div>
+                        <p class="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Tour Package</p>
+                        <p class="font-medium text-on-surface"><a href="{% url 'tour_edit' enquiry.tour.pk %}" class="hover:underline">{{ enquiry.tour.title }}</a>{% if enquiry.tour.duration %} <span class="text-stone-500">· {{ enquiry.tour.duration }}</span>{% endif %}</p>
+                    </div>
+                    {% endif %}
                     {% if enquiry.preferred_start_date %}
                     <div>
                         <p class="text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-1">Preferred Dates</p>

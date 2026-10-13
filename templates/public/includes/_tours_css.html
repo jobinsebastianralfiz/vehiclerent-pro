@@ -1,0 +1,11 @@
+{% load static %}{% if THEME.key == "bento" %}<link rel="stylesheet" href="{% static 'themes/bento/bento.css' %}"/>{% endif %}
+<style>
+    .serif-i { font-family: 'Noto Serif', var(--font-display), serif; font-style: italic; font-weight: 400; letter-spacing: -.02em; }
+    .tr-h { font-family: var(--font-display), serif; }
+    .theme-bento .tr-h { font-family: var(--font-body), sans-serif; }
+    .lift { transition: transform .25s, box-shadow .25s; } .lift:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(31,46,0,.12); }
+    .tr-field { display: block; border-radius: 1rem; padding: .7rem 1rem; border: 1px solid rgb(0 0 0 / .1); background: #fff; }
+    .tr-field input, .tr-field textarea, .tr-field select { width: 100%; border: 0 !important; padding: 0; background: transparent; font-weight: 600; font-size: .9rem; box-shadow: none !important; }
+    .tr-field:focus-within { border-color: currentColor; }
+    @media (min-width: 1536px) { html .max-w-screen-xl { max-width: 1440px; } }
+</style>

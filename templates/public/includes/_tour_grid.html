@@ -1,0 +1,8 @@
+{# Cards for one scope, or that scope's "plan a trip" card while it has none. with: list, places, scope #}
+{% if list %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    {% for t in list %}{% include "public/includes/_tour_card.html" %}{% endfor %}
+</div>
+{% else %}
+<div class="max-w-2xl">{% include "public/includes/_tours_cta.html" %}</div>
+{% endif %}

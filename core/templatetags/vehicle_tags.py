@@ -171,3 +171,17 @@ def accent(text, css="r-accent"):
     from django.utils.html import escape
     from django.utils.safestring import mark_safe
     return mark_safe(re.sub(r"\*([^*]+)\*", lambda m: f'<span class="{css}">{m.group(1)}</span>', escape(text or "")))
+
+
+@register.simple_tag
+def whatsapp_tour_url(tour=None, place="", scope=""):
+    """WhatsApp link for a tour package, a destination chip, or a domestic/international trip in general."""
+    if tour:
+        msg = tour.whatsapp_text
+    elif place:
+        msg = f"Hi! I'd like a tour package for *{place}*. Could you share the options?"
+    elif scope == "international":
+        msg = "Hi! I'd like to plan an international holiday. Could you suggest a tour package?"
+    else:
+        msg = "Hi! I'd like to plan a holiday within India. Could you suggest a tour package?"
+    return whatsapp_url(msg)
