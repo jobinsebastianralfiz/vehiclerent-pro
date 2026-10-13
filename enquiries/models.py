@@ -61,16 +61,25 @@ class Enquiry(models.Model):
 
     def whatsapp_message(self) -> str:
         """Build a customer-facing WhatsApp message containing booking details."""
-        lines = [f"Hi! I'd like to book a rental from {self.name}."]
+        lines = [f"Hi! I'm {self.name} and I'd like to book a rental."]
         if self.vehicle_id:
+            v = self.vehicle
+            # names usually already start with the brand ("Maruti Suzuki Fronx")
+            title = v.name if not v.brand or v.name.lower().startswith(v.brand.lower()) else f"{v.brand} {v.name}"
             lines.append(f"")
-            lines.append(f"🚗 *Vehicle:* {self.vehicle.brand} {self.vehicle.name}")
-            if self.vehicle.price_per_day:
-                lines.append(f"💰 *Listed at:* ₹{self.vehicle.price_per_day}/day")
+            lines.append(f"🚗 *Vehicle:* {title}")
+            price, unit = v.primary_price
+            if price:
+                from core.templatetags.vehicle_tags import inr
+                lines.append(f"💰 *Listed at:* {inr(price)}/{unit}")
         if self.preferred_start_date and self.preferred_end_date:
-            lines.append(f"📅 *Dates:* {self.preferred_start_date:%d %b %Y} → {self.preferred_end_date:%d %b %Y}")
+            days = (self.preferred_end_date - self.preferred_start_date).days
+            span = f" ({days} day{'s' if days != 1 else ''})" if days > 0 else ""
+            lines.append(f"📅 *Dates:* {self.preferred_start_date:%d %b %Y} → {self.preferred_end_date:%d %b %Y}{span}")
         elif self.preferred_start_date:
-            lines.append(f"📅 *Pickup date:* {self.preferred_start_date:%d %b %Y}")
+            lines.append(f"📅 *Pickup date:* {self.preferred_start_date:%d %b %Y} (return date not fixed yet)")
+        else:
+            lines.append(f"📅 *Dates:* Not fixed yet, please share what's available")
         if self.pickup_city:
             location = f"📍 *Pickup:* {self.pickup_city.title()}"
             if self.drop_city and self.drop_city != self.pickup_city:

@@ -53,10 +53,11 @@ def whatsapp_url(message=None, number=None):
 def whatsapp_vehicle_url(vehicle, number=None):
     wa_number, _ = _get_whatsapp_config()
     num = number or wa_number
+    kind = vehicle.category.name if vehicle.category_id else vehicle.get_vehicle_type_display()
+    price, unit = vehicle.primary_price
+    about = f"{kind}, {inr(price)}/{unit}" if price else kind  # no "\u20b9None" when a rate isn't set
     msg = quote(
-        f"Hi! I'm interested in renting the *{vehicle.name}* "
-        f"({vehicle.get_vehicle_type_display()}) "
-        f"at \u20b9{vehicle.price_per_day}/day. "
+        f"Hi! I'm interested in renting the *{vehicle.name}* ({about}). "
         f"Could you share availability and booking details?"
     )
     return f"https://wa.me/{num}?text={msg}"

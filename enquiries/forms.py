@@ -1,3 +1,6 @@
+import re
+import unicodedata
+
 from django import forms
 from django.core.validators import MaxLengthValidator
 from .models import Enquiry
@@ -42,6 +45,22 @@ class EnquiryPublicForm(forms.ModelForm):
             ]
         except Exception:
             self.fields["addons"].choices = []
+
+    def clean_name(self):
+        """A real name: letters (any script), spaces and . ' - only, at least two letters."""
+        name = " ".join(self.cleaned_data.get("name", "").split())
+        letters = [c for c in name if c.isalpha()]
+        if len(letters) < 2 or not all(c.isalpha() or c in " .'-’" or unicodedata.category(c).startswith("M") for c in name):
+            raise forms.ValidationError("Please enter your name using letters only.")
+        return name
+
+    def clean_phone(self):
+        """10 to 13 digits once spaces, dashes and a leading + are removed (Indian or international)."""
+        phone = self.cleaned_data.get("phone", "").strip()
+        digits = re.sub(r"[\s\-()+]", "", phone)
+        if not digits.isdigit() or not 10 <= len(digits) <= 13:
+            raise forms.ValidationError("Please enter a valid phone number.")
+        return phone
 
     def save(self, commit=True):
         instance = super().save(commit=False)
