@@ -96,6 +96,8 @@ class SiteConfig(models.Model):
     tours_intro = models.CharField(max_length=300, blank=True, default="Hand-planned holidays with stays, sightseeing and a car with driver, across India and abroad.")
     tours_domestic_places = models.CharField(max_length=300, blank=True, default="Kerala, Kashmir, Goa, Rajasthan, Himachal, Andaman",
                                              help_text="Comma-separated; shown as WhatsApp enquiry chips while no domestic packages are added")
+    tours_domestic_image = models.ImageField(upload_to="site/", blank=True, help_text="Background photo of the Domestic card")
+    tours_international_image = models.ImageField(upload_to="site/", blank=True, help_text="Background photo of the International card")
     tours_international_places = models.CharField(max_length=300, blank=True, default="Dubai, Thailand, Bali, Singapore, Malaysia, Maldives",
                                                   help_text="Comma-separated; shown as WhatsApp enquiry chips while no international packages are added")
 

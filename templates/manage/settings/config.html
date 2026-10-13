@@ -256,6 +256,8 @@
                         <input id="f-tours_international_places" type="text" name="tours_international_places" value="{{ form.tours_international_places.value|default:'' }}" placeholder="Dubai, Thailand, Bali"/>
                         {% if form.tours_international_places.errors %}<p class="af-err">{{ form.tours_international_places.errors|join:" " }}</p>{% else %}<p class="af-help">Comma-separated. Each becomes a WhatsApp enquiry chip.</p>{% endif %}
                     </div>
+                    {% include "manage/settings/_file_field.html" with name="tours_domestic_image" label="Domestic card photo" current=config.tours_domestic_image errors=form.tours_domestic_image.errors help="Wide landscape photo. Empty = a photo of Athirappilly Falls." wide=True %}
+                    {% include "manage/settings/_file_field.html" with name="tours_international_image" label="International card photo" current=config.tours_international_image errors=form.tours_international_image.errors help="Wide landscape photo. Empty = a photo of the Dubai skyline." wide=True %}
                 </div>
             </div>
         </div>

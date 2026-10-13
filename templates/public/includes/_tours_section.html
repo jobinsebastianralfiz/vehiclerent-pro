@@ -1,6 +1,6 @@
-{% load vehicle_tags %}{# Home page "Tour packages" block: Domestic / International tabs with up to four cards each.
+{% load vehicle_tags %}{% comment %} Home page "Tour packages" block: Domestic / International tabs with up to four cards each.
    A tab with no packages shows its WhatsApp "plan a trip" card; with no packages at all, both cards side by side.
-   Needs tours_dom, tours_intl, tour_places_dom, tour_places_intl (tours.views.tour_context). #}
+   Needs tours_dom, tours_intl, tour_places_dom, tour_places_intl (tours.views.tour_context). {% endcomment %}
 <section class="max-w-screen-xl mx-auto pt-16 sm:pt-24 lg:pt-28" aria-labelledby="tours-h" x-data="{ tab: '{% if tours_dom or not tours_intl %}domestic{% else %}international{% endif %}' }">
     <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-7">
         <div>
