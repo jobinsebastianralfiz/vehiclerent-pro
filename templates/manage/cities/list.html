@@ -6,11 +6,18 @@
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
     <div>
         <h1 class="text-xl sm:text-2xl font-bold">Cities</h1>
-        <p class="text-stone-500 text-xs sm:text-sm mt-1">Pickup / drop-off cities served by your fleet</p>
+        <p class="text-stone-500 text-xs sm:text-sm mt-1">Shown in the pickup/drop menus and on the website map. Every vehicle is available in all of them.</p>
     </div>
-    <a href="{% url 'city_add' %}" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
-        <span class="material-symbols-outlined text-lg">add</span> Add City
-    </a>
+    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <form method="post" action="{% url 'city_load_kerala' %}">{% csrf_token %}
+            <button type="submit" class="bg-white ring-1 ring-stone-200 text-stone-700 hover:bg-stone-50 px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 w-full justify-center" title="Adds all 14 districts and the main towns. Cities already listed are skipped.">
+                <span class="material-symbols-outlined text-lg">travel_explore</span> Load all Kerala
+            </button>
+        </form>
+        <a href="{% url 'city_add' %}" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
+            <span class="material-symbols-outlined text-lg">add</span> Add City
+        </a>
+    </div>
 </div>
 
 <div class="bg-white rounded-2xl border border-stone-100 overflow-hidden">
@@ -44,7 +51,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="px-8 py-16 text-center text-stone-400">No cities yet. <a href="{% url 'city_add' %}" class="text-primary font-medium">Add one</a>.</td></tr>
+                <tr><td colspan="6" class="px-8 py-16 text-center text-stone-400">No cities yet. Use <b>Load all Kerala</b> to add every district in one click.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

@@ -51,6 +51,22 @@ ALIASES = {
 
 def lookup(name):
     """Return (lat, lng) for a Kerala town name, or None if it isn't known."""
+    return KERALA_COORDS.get(canonical(name))
+
+
+# What the "Load all Kerala" button on the Cities page adds: every district, then the
+# towns customers ask for by name. Names already in the list (or an alias of them) are skipped.
+KERALA_DISTRICTS = [
+    "Trivandrum", "Kollam", "Pathanamthitta", "Alappuzha", "Kottayam", "Idukki", "Kochi",
+    "Thrissur", "Palakkad", "Malappuram", "Calicut", "Wayanad", "Kannur", "Kasaragod",
+]
+KERALA_TOWNS = [
+    "Aluva", "Muvattupuzha", "Thodupuzha", "Thiruvalla", "Changanassery", "Guruvayur",
+    "Munnar", "Thekkady", "Vagamon", "Kumarakom", "Varkala", "Kovalam",
+]
+
+
+def canonical(name):
+    """Lower-cased key with aliases folded, so "Ernakulam" and "Kochi" count as the same place."""
     key = (name or "").strip().lower()
-    key = ALIASES.get(key, key)
-    return KERALA_COORDS.get(key)
+    return ALIASES.get(key, key)

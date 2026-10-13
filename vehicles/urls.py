@@ -25,6 +25,7 @@ urlpatterns = [
     # Admin - Cities
     path("manage/cities/", views.city_list, name="city_list"),
     path("manage/cities/add/", views.city_add, name="city_add"),
+    path("manage/cities/load-kerala/", views.city_load_kerala, name="city_load_kerala"),
     path("manage/cities/<int:pk>/edit/", views.city_edit, name="city_edit"),
     path("manage/cities/<int:pk>/delete/", views.city_delete, name="city_delete"),
     # Admin - Booking Addons

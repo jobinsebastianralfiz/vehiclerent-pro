@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from core.themes import themed
 
 from core.images import resized_url
+from .geo import KERALA_DISTRICTS, KERALA_TOWNS, canonical
 from .models import (
     BookingAddon,
     City,
@@ -388,6 +389,24 @@ def category_delete(request, pk):
 def city_list(request):
     cities = City.objects.all()
     return render(request, "manage/cities/list.html", {"cities": cities})
+
+
+@login_required
+def city_load_kerala(request):
+    """Add every Kerala district and the main towns in one go, skipping ones already listed."""
+    if request.method == "POST":
+        have = {canonical(n) for n in City.objects.values_list("name", flat=True)}
+        added = []
+        for name in KERALA_DISTRICTS + KERALA_TOWNS:
+            if canonical(name) not in have:
+                City.objects.create(name=name)
+                have.add(canonical(name))
+                added.append(name)
+        if added:
+            messages.success(request, f"Added {len(added)} cit{'y' if len(added) == 1 else 'ies'}: {', '.join(added)}.")
+        else:
+            messages.info(request, "All Kerala districts and main towns are already listed.")
+    return redirect("city_list")
 
 
 @login_required
