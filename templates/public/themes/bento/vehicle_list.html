@@ -85,20 +85,20 @@
     </div>
 
     <!-- search -->
-    <form action="{% url 'vehicle_list' %}" method="get" class="tile b-glass mt-6 p-4 sm:p-5 grid gap-3 lg:grid-cols-[auto_1fr_1fr_1fr_1fr_auto] items-stretch" aria-label="Search vehicles">
-        <div class="flex bg-surface-container rounded-2xl p-1 self-center">
-            <label class="cursor-pointer flex-1"><input type="radio" name="rental_type" value="self_drive" class="peer sr-only" {% if current_rental_type != "with_driver" %}checked{% endif %}><span class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-[20px]">directions_car</span>Self-drive</span></label>
-            <label class="cursor-pointer flex-1"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only" {% if current_rental_type == "with_driver" %}checked{% endif %}><span class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-[20px]">person</span>With driver</span></label>
+    <form action="{% url 'vehicle_list' %}" method="get" class="tile b-glass mt-6 p-4 sm:p-5 flex flex-col gap-3" aria-label="Search vehicles">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex bg-surface-container rounded-2xl p-1">
+                <label class="cursor-pointer flex-1"><input type="radio" name="rental_type" value="self_drive" class="peer sr-only" {% if current_rental_type != "with_driver" %}checked{% endif %}><span class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-[20px]">directions_car</span>Self-drive</span></label>
+                <label class="cursor-pointer flex-1"><input type="radio" name="rental_type" value="with_driver" class="peer sr-only" {% if current_rental_type == "with_driver" %}checked{% endif %}><span class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold whitespace-nowrap peer-checked:bg-primary peer-checked:text-on-primary text-on-surface-variant transition-colors"><span class="material-symbols-outlined text-[20px]">person</span>With driver</span></label>
+            </div>
+            <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-on-surface-variant"><input type="checkbox" name="same_location" value="1" {% if request.GET.same_location or not request.GET %}checked{% endif %} class="rounded border-outline-variant text-primary focus:ring-primary"> Same-location return</label>
         </div>
-        <div class="grid grid-cols-2 lg:contents gap-3">
+        <div class="grid grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] gap-3">
             <label class="fl-field"><span>Pickup location</span><span class="fl-in"><span class="material-symbols-outlined">location_on</span><select name="pickup_city"><option value="">Any city</option>{% for city in cities %}<option value="{{ city.slug }}" {% if current_pickup_city == city.slug %}selected{% endif %}>{{ city.name }}</option>{% endfor %}</select></span></label>
             <label class="fl-field"><span>Drop location</span><span class="fl-in"><span class="material-symbols-outlined">location_on</span><select name="drop_city"><option value="">Same as pickup</option>{% for city in cities %}<option value="{{ city.slug }}" {% if request.GET.drop_city == city.slug %}selected{% endif %}>{{ city.name }}</option>{% endfor %}</select></span></label>
             <label class="fl-field"><span>Pickup date</span><span class="fl-in"><input type="date" name="pickup_date" value="{{ request.GET.pickup_date }}"/></span></label>
             <label class="fl-field"><span>Drop date</span><span class="fl-in"><input type="date" name="return_date" value="{{ request.GET.return_date }}"/></span></label>
-        </div>
-        <div class="flex flex-col justify-center gap-2">
-            <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-on-surface-variant"><input type="checkbox" name="same_location" value="1" {% if request.GET.same_location or not request.GET %}checked{% endif %} class="rounded border-outline-variant text-primary focus:ring-primary"> Same-location return</label>
-            <button type="submit" class="bg-primary text-on-primary rounded-2xl px-6 py-4 font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined">search</span>Search Vehicles <span class="material-symbols-outlined text-[20px]">arrow_forward</span></button>
+            <button type="submit" class="col-span-2 lg:col-span-1 bg-primary text-on-primary rounded-2xl px-6 py-4 font-bold flex items-center justify-center gap-2"><span class="material-symbols-outlined">search</span>Search Vehicles <span class="material-symbols-outlined text-[20px]">arrow_forward</span></button>
         </div>
     </form>
 </section>
