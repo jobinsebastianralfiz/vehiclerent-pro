@@ -47,9 +47,9 @@
     </div>
     {% endif %}
 
-    <section class="b-hero relative max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[minmax(0,.92fr)_minmax(0,1.55fr)_minmax(0,1.08fr)] gap-6 xl:gap-7 items-start" aria-label="{{ vehicle.full_name }}">
+    <section class="b-hero relative max-w-screen-xl mx-auto grid grid-cols-1 xl:grid-cols-[minmax(0,.92fr)_minmax(0,2.63fr)] gap-6 xl:gap-7 items-start" aria-label="{{ vehicle.full_name }}">
         <!-- breadcrumb, title, tagline, description, highlights -->
-        <div class="md:col-span-2 xl:col-span-1 min-w-0">
+        <div class="min-w-0">
             <nav class="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-sm font-medium text-on-surface-variant" aria-label="Breadcrumb">
                 <a href="{% url 'home' %}" class="grid place-items-center text-primary hover:opacity-70" aria-label="Home"><span class="material-symbols-outlined text-[19px]" style="font-variation-settings:'FILL' 1" aria-hidden="true">home</span></a>
                 <span class="material-symbols-outlined text-outline text-[16px]" aria-hidden="true">chevron_right</span>
@@ -81,13 +81,15 @@
             </ul>
         </div>
 
+        <!-- gallery and booking card share one row: same top, same bottom -->
+        <div class="grid grid-cols-1 md:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] gap-6 xl:gap-7 md:items-stretch">
         <!-- gallery: main photo, a scrolling thumbnail strip, full-screen viewer -->
         {{ photos_large|json_script:"car-photos" }}
-        <div class="min-w-0" data-no-parallax
+        <div class="min-w-0 flex flex-col" data-no-parallax
              x-data="{ i: 0, open: false, x0: null, p: JSON.parse(document.getElementById('car-photos').textContent), go(d) { this.i = (this.i + d + this.p.length) % this.p.length } }"
              x-effect="document.documentElement.style.overflow = open ? 'hidden' : ''; $refs.strip && $refs.strip.children[i] && $refs.strip.children[i].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })"
              x-on:keydown.escape.window="open = false" x-on:keydown.window="if (open && $event.key === 'ArrowRight') go(1); if (open && $event.key === 'ArrowLeft') go(-1)">
-            <div class="group relative overflow-hidden rounded-[28px] aspect-[4/3] bg-surface-container grid place-items-center shadow-2xl shadow-primary/15"
+            <div class="group relative overflow-hidden rounded-[28px] aspect-[4/3] md:flex-1 bg-surface-container grid place-items-center shadow-2xl shadow-primary/15"
                  tabindex="0" x-on:keydown.arrow-right.prevent="go(1)" x-on:keydown.arrow-left.prevent="go(-1)"
                  x-on:touchstart.passive="x0 = $event.touches[0].clientX" x-on:touchend="if (x0 !== null && Math.abs($event.changedTouches[0].clientX - x0) > 40) go($event.changedTouches[0].clientX < x0 ? 1 : -1); x0 = null">
                 {% if photos %}
@@ -138,8 +140,8 @@
         </div>
 
         <!-- booking card -->
-        <aside id="reserve" class="xl:sticky xl:top-28 scroll-mt-28 min-w-0">
-            <div class="bg-white rounded-[28px] p-5 sm:p-6 shadow-2xl shadow-primary/10">
+        <aside id="reserve" class="scroll-mt-28 min-w-0">
+            <div class="h-full flex flex-col bg-white rounded-[28px] p-5 sm:p-6 shadow-2xl shadow-primary/10">
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
                         <div class="font-bold text-xl text-primary leading-tight">{{ vehicle.brand }}</div>
@@ -152,7 +154,7 @@
                 <div class="mt-4 flex items-baseline gap-2"><span class="font-extrabold text-3xl tracking-[-.03em] text-primary"><span data-bslot>{{ vehicle.primary_price_value|inr }}</span></span><span class="font-semibold text-on-surface-variant text-sm">/ {{ vehicle.primary_price_label }}</span></div>
                 {% endif %}
 
-                <form action="{% url 'submit_enquiry' %}" method="post" class="mt-5 space-y-3" id="b-book" data-day="{{ vehicle.price_per_day|default:0|floatformat:0 }}" data-driver="{{ vehicle.with_driver_price_per_day|default:0|floatformat:0 }}">
+                <form action="{% url 'submit_enquiry' %}" method="post" class="mt-5 md:mt-auto md:pt-5 space-y-3" id="b-book" data-day="{{ vehicle.price_per_day|default:0|floatformat:0 }}" data-driver="{{ vehicle.with_driver_price_per_day|default:0|floatformat:0 }}">
                     {% csrf_token %}{% include "public/includes/_antispam.html" %}
                     <input type="hidden" name="vehicle" value="{{ vehicle.id }}"/>
                     <input type="hidden" name="source" value="website"/>
@@ -215,6 +217,7 @@
                 <p id="b-wa-err" class="hidden mt-3 rounded-xl bg-red-50 text-red-700 text-sm font-semibold px-4 py-3" role="alert"></p>
             </div>
         </aside>
+        </div>
     </section>
 </div>
 
