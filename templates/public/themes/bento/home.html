@@ -63,8 +63,10 @@
     .h-slide.on .h-img { animation: h-in 9s ease-out both; }
     @keyframes h-in { from { scale: 1.07; } to { scale: 1; } }
     @media (min-width: 1024px) { .h-slide { left: 22%; -webkit-mask-image: linear-gradient(to right, transparent, #000 30%); mask-image: linear-gradient(to right, transparent, #000 30%); } }
-    .h-cap { position: absolute; left: 1.25rem; right: 8.5rem; bottom: 1.25rem; color: #fff; opacity: 0; translate: 0 12px; transition: opacity .7s, translate .7s; pointer-events: none !important; text-shadow: 0 2px 18px rgba(0,0,0,.35); }
+    .h-cap { position: absolute; left: 1.25rem; right: 8.5rem; bottom: 1.25rem; color: #fff; opacity: 0; translate: 0 12px; transition: opacity .7s, translate .7s; pointer-events: none !important; text-shadow: 0 1px 2px rgba(0,0,0,.35), 0 2px 18px rgba(0,0,0,.45); }
     .h-cap.on { opacity: 1; translate: 0 0; pointer-events: auto !important; }
+    /* a soft dark pool behind the caption so it reads on light photos too */
+    .h-shade { background: radial-gradient(ellipse 44% 34% at 64% 80%, rgba(0,0,0,.62), rgba(0,0,0,.25) 55%, transparent 100%); }
     @media (min-width: 640px) { .h-cap { left: 1.75rem; bottom: 1.75rem; } }
     @media (min-width: 1024px) { .h-cap { left: 46%; right: 190px; bottom: 0; } }
     /* search bar fields */
@@ -154,7 +156,8 @@
         {% endfor %}
         <!-- wide screens: the photo melts into the page on the left (under the copy) and at the bottom (under the search bar) -->
         <span class="hidden lg:block absolute inset-0 bg-gradient-to-r from-background via-background/75 via-35% to-transparent to-65%" aria-hidden="true"></span>
-        <span class="hidden lg:block absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background/90 to-transparent" aria-hidden="true"></span>
+        <span class="hidden lg:block absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-background/90 to-transparent" aria-hidden="true"></span>
+        <span class="h-shade hidden lg:block absolute inset-0" aria-hidden="true"></span>
         <span class="lg:hidden absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" aria-hidden="true"></span>
 
         <!-- caption of the car on show -->
